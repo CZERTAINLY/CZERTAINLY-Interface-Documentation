@@ -4,8 +4,8 @@ import com.czertainly.api.exception.AlreadyExistException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.connector.AuthorityInstanceController;
-import com.czertainly.api.model.common.attribute.AttributeDefinition;
-import com.czertainly.api.model.common.attribute.RequestAttributeDto;
+import com.czertainly.api.model.client.attribute.RequestAttributeDto;
+import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.connector.authority.AuthorityProviderInstanceDto;
 import com.czertainly.api.model.connector.authority.AuthorityProviderInstanceRequestDto;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,7 +46,7 @@ public class AuthorityInstanceControllerDummyImpl implements AuthorityInstanceCo
     }
 
     @Override
-    public List<AttributeDefinition> listRAProfileAttributes(String uuid) throws NotFoundException {
+    public List<BaseAttribute> listRAProfileAttributes(String uuid) throws NotFoundException {
         return null;
     }
 
@@ -54,5 +54,4 @@ public class AuthorityInstanceControllerDummyImpl implements AuthorityInstanceCo
     public void validateRAProfileAttributes(String uuid, List<RequestAttributeDto> attributes) throws ValidationException, NotFoundException {
 
     }
-
 }

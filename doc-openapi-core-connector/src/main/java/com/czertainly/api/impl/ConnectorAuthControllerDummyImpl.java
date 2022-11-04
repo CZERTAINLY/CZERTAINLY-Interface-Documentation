@@ -1,8 +1,8 @@
 package com.czertainly.api.impl;
 
 import com.czertainly.api.interfaces.core.web.ConnectorAuthController;
-import com.czertainly.api.model.common.attribute.AttributeDefinition;
-import com.czertainly.api.model.common.attribute.RequestAttributeDto;
+import com.czertainly.api.model.client.attribute.RequestAttributeDto;
+import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.connector.AuthType;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +17,7 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
     }
 
     @Override
-    public List<AttributeDefinition> getBasicAuthAttributes() {
+    public List<BaseAttribute> getBasicAuthAttributes() {
         return null;
     }
 
@@ -27,7 +27,7 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
     }
 
     @Override
-    public List<AttributeDefinition> getCertificateAttributes() {
+    public List<BaseAttribute> getCertificateAttributes() {
         return null;
     }
 
@@ -37,7 +37,7 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
     }
 
     @Override
-    public List<AttributeDefinition> getApiKeyAuthAttributes() {
+    public List<BaseAttribute> getApiKeyAuthAttributes() {
         return null;
     }
 
@@ -47,7 +47,7 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
     }
 
     @Override
-    public List<AttributeDefinition> getJWTAuthAttributes() {
+    public List<BaseAttribute> getJWTAuthAttributes() {
         return null;
     }
 

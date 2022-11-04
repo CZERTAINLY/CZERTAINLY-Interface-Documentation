@@ -9,7 +9,7 @@ import com.czertainly.api.model.client.location.AddLocationRequestDto;
 import com.czertainly.api.model.client.location.EditLocationRequestDto;
 import com.czertainly.api.model.client.location.IssueToLocationRequestDto;
 import com.czertainly.api.model.client.location.PushToLocationRequestDto;
-import com.czertainly.api.model.common.attribute.AttributeDefinition;
+import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.location.LocationDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,12 +55,12 @@ public class LocationManagementControllerDummyImpl implements LocationManagement
     }
 
     @Override
-    public List<AttributeDefinition> listPushAttributes(String entityUuid, String locationUuid) throws NotFoundException, LocationException {
+    public List<BaseAttribute> listPushAttributes(String entityUuid, String locationUuid) throws NotFoundException, LocationException {
         return null;
     }
 
     @Override
-    public List<AttributeDefinition> listCsrAttributes(String entityUuid, String locationUuid) throws NotFoundException, LocationException {
+    public List<BaseAttribute> listCsrAttributes(String entityUuid, String locationUuid) throws NotFoundException, LocationException {
         return null;
     }
 

@@ -1,10 +1,11 @@
 package com.czertainly.api.impl;
 
+import com.czertainly.api.exception.CertificateOperationException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.connector.v2.CertificateController;
-import com.czertainly.api.model.common.attribute.AttributeDefinition;
-import com.czertainly.api.model.common.attribute.RequestAttributeDto;
+import com.czertainly.api.model.client.attribute.RequestAttributeDto;
+import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.connector.v2.CertRevocationDto;
 import com.czertainly.api.model.connector.v2.CertificateDataResponseDto;
 import com.czertainly.api.model.connector.v2.CertificateRenewRequestDto;
@@ -17,7 +18,7 @@ import java.util.List;
 public class CertificateControllerDummyImpl implements CertificateController {
 
     @Override
-    public List<AttributeDefinition> listIssueCertificateAttributes(String uuid) throws NotFoundException {
+    public List<BaseAttribute> listIssueCertificateAttributes(String uuid) throws NotFoundException {
         return null;
     }
 
@@ -27,17 +28,17 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
-    public CertificateDataResponseDto issueCertificate(String uuid, CertificateSignRequestDto request) throws NotFoundException {
+    public CertificateDataResponseDto issueCertificate(String uuid, CertificateSignRequestDto request) throws NotFoundException, CertificateOperationException {
         return null;
     }
 
     @Override
-    public CertificateDataResponseDto renewCertificate(String uuid, CertificateRenewRequestDto request) throws NotFoundException {
+    public CertificateDataResponseDto renewCertificate(String uuid, CertificateRenewRequestDto request) throws NotFoundException, CertificateOperationException {
         return null;
     }
 
     @Override
-    public List<AttributeDefinition> listRevokeCertificateAttributes(String uuid) throws NotFoundException {
+    public List<BaseAttribute> listRevokeCertificateAttributes(String uuid) throws NotFoundException {
         return null;
     }
 
@@ -47,8 +48,7 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
-    public void revokeCertificate(String uuid, CertRevocationDto request) throws NotFoundException {
+    public void revokeCertificate(String uuid, CertRevocationDto request) throws NotFoundException, CertificateOperationException {
 
     }
-
 }

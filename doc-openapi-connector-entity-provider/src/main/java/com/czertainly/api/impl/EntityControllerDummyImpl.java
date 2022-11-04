@@ -4,8 +4,8 @@ import com.czertainly.api.exception.AlreadyExistException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.connector.entity.EntityController;
-import com.czertainly.api.model.common.attribute.AttributeDefinition;
-import com.czertainly.api.model.common.attribute.RequestAttributeDto;
+import com.czertainly.api.model.client.attribute.RequestAttributeDto;
+import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.connector.entity.EntityInstanceDto;
 import com.czertainly.api.model.connector.entity.EntityInstanceRequestDto;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,7 +41,7 @@ public class EntityControllerDummyImpl implements EntityController {
     }
 
     @Override
-    public List<AttributeDefinition> listLocationAttributes(String entityUuid) throws NotFoundException {
+    public List<BaseAttribute> listLocationAttributes(String entityUuid) throws NotFoundException {
         return null;
     }
 

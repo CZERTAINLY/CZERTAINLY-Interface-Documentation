@@ -6,8 +6,11 @@ import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.RAProfileManagementController;
 import com.czertainly.api.model.client.compliance.SimplifiedComplianceProfileDto;
-import com.czertainly.api.model.client.raprofile.*;
-import com.czertainly.api.model.common.attribute.AttributeDefinition;
+import com.czertainly.api.model.client.raprofile.ActivateAcmeForRaProfileRequestDto;
+import com.czertainly.api.model.client.raprofile.AddRaProfileRequestDto;
+import com.czertainly.api.model.client.raprofile.EditRaProfileRequestDto;
+import com.czertainly.api.model.client.raprofile.RaProfileAcmeDetailResponseDto;
+import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.raprofile.RaProfileDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -93,12 +96,12 @@ public class RAProfileManagementControllerDummyImpl implements RAProfileManageme
     }
 
     @Override
-    public List<AttributeDefinition> listRevokeCertificateAttributes(String authorityUuid, String raProfileUuid) throws ConnectorException {
+    public List<BaseAttribute> listRevokeCertificateAttributes(String authorityUuid, String raProfileUuid) throws ConnectorException {
         return null;
     }
 
     @Override
-    public List<AttributeDefinition> listIssueCertificateAttributes(String authorityUuid, String raProfileUuid) throws ConnectorException {
+    public List<BaseAttribute> listIssueCertificateAttributes(String authorityUuid, String raProfileUuid) throws ConnectorException {
         return null;
     }
 
