@@ -48,12 +48,6 @@ public class OpenApiConfig {
         logoExtensionFields.put("url", "images/czertainly_color_H.svg");
         logoExtension.put("x-logo", logoExtensionFields);
 
-//        Schema<Map<String, List<BaseAttribute>>> innerSchema = new Schema<Map<String, List<BaseAttribute>>>();
-//        innerSchema.setAdditionalProperties(new ArraySchema());
-//
-//        Schema<Map<FunctionGroupCode, Map<String, List<BaseAttribute>>>> outerSchema = new Schema<Map<FunctionGroupCode, Map<String, List<BaseAttribute>>>>();
-//        outerSchema.setAdditionalProperties(innerSchema);
-
         return new OpenAPI()
                 .info(new Info().title("CZERTAINLY Connector API")
                         .description("REST API for managing Connectors in the platform")
@@ -69,7 +63,6 @@ public class OpenApiConfig {
                         .description("CZERTAINLY Documentation")
                         .url("https://docs.czertainly.com"))
                 .servers(null)
-//                .components(new Components().addSchemas("AttributesMap", outerSchema))
                 ;
     }
 
