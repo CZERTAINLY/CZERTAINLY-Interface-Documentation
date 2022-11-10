@@ -7,6 +7,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,6 +20,9 @@ public class OpenApiConfig {
 	
 	@Autowired
 	ServletContext context;
+
+    @Value( "${api.version}" )
+    private String version;
 	
     @Bean
     public GroupedOpenApi discoveryProviderApis() {
@@ -40,7 +44,7 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info().title("CZERTAINLY Entity Provider API")
                         .description("REST API for implementations of custom Entity Provider")
-                        //.version("1.0.1")
+                        .version(version)
                         .license(new License()
                                 .name("MIT License")
                                 .url("https://github.com/3KeyCompany/CZERTAINLY/blob/develop/LICENSE.md"))

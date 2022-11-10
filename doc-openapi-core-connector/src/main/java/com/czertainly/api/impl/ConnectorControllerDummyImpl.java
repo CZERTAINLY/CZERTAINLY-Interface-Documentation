@@ -83,7 +83,7 @@ public class ConnectorControllerDummyImpl implements ConnectorController {
     }
 
     @Override
-    public List<BaseAttribute> getAttributes(String uuid, String functionGroup, String kind) throws ConnectorException {
+    public List<BaseAttribute> getAttributes(String uuid, FunctionGroupCode functionGroup, String kind) throws ConnectorException {
         return null;
     }
 
