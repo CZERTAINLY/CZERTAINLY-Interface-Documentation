@@ -1,16 +1,10 @@
 package com.czertainly.config;
 
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
-import com.czertainly.api.model.core.connector.FunctionGroupCode;
-import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
-import io.swagger.v3.oas.models.media.ArraySchema;
-import io.swagger.v3.oas.models.media.ObjectSchema;
-import io.swagger.v3.oas.models.media.Schema;
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.servlet.ServletContext;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -32,9 +25,9 @@ public class OpenApiConfig {
     private String version;
 	
     @Bean
-    public GroupedOpenApi connectorApis() {
+    public GroupedOpenApi authorityApis() {
         return GroupedOpenApi.builder()
-        		.group("core-connector")
+        		.group("czertainly-core")
                 .packagesToScan("com.czertainly.api.impl")
                 //.pathsToMatch("/v1/**")
                 .build()
@@ -42,15 +35,15 @@ public class OpenApiConfig {
     }
 
     @Bean
-    public OpenAPI connectorOpenAPI() {
+    public OpenAPI authorityOpenAPI() {
         Map<String, Object> logoExtension = new HashMap<>();
         Map<String, Object> logoExtensionFields = new HashMap<>();
         logoExtensionFields.put("url", "images/czertainly_color_H.svg");
         logoExtension.put("x-logo", logoExtensionFields);
 
         return new OpenAPI()
-                .info(new Info().title("CZERTAINLY Connector API")
-                        .description("REST API for managing Connectors in the platform")
+                .info(new Info().title("CZERTAINLY Core API")
+                        .description("REST API for CZERTAINLY Core")
                         .version(version)
                         .license(new License()
                                 .name("MIT License")
