@@ -10,12 +10,7 @@ RUN mvn -f /home/app/pom.xml clean verify
 FROM node:alpine as docs
 RUN npm install -g redoc-cli
 COPY --from=build /home/app/openapi /home/app
-RUN redoc-cli bundle /home/app/doc-openapi-ca-connector-legacy.yaml -o /home/app/doc-openapi-ca-connector-legacy.html --options.theme.logo.gutter=20px
-RUN redoc-cli bundle /home/app/doc-openapi-ca-connector-v2.yaml -o /home/app/doc-openapi-ca-connector-v2.html --options.theme.logo.gutter=20px
-RUN redoc-cli bundle /home/app/doc-openapi-credential-provider.yaml -o /home/app/doc-openapi-credential-provider.html --options.theme.logo.gutter=20px
-RUN redoc-cli bundle /home/app/doc-openapi-discovery-provider.yaml -o /home/app/doc-openapi-discovery-provider.html --options.theme.logo.gutter=20px
-RUN redoc-cli bundle /home/app/doc-openapi-client-operations.yaml -o /home/app/doc-openapi-client-operations.html --options.theme.logo.gutter=20px
-RUN redoc-cli bundle /home/app/doc-openapi-legacy-client-operations.yaml -o /home/app/doc-openapi-legacy-client-operations.html --options.theme.logo.gutter=20px
+RUN for file in /home/app/*.yaml; do redoc-cli build "$file" -o "${file/yaml/html}" --options.theme.logo.gutter=20px; done
 
 # production environment
 FROM nginx:stable-alpine
