@@ -5,7 +5,8 @@ import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.DiscoveryController;
 import com.czertainly.api.model.client.discovery.DiscoveryDto;
-import com.czertainly.api.model.core.discovery.DiscoveryHistoryDto;
+import com.czertainly.api.model.client.discovery.DiscoveryHistoryDetailDto;
+import com.czertainly.api.model.client.discovery.DiscoveryHistoryDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,7 @@ public class DiscoveryControllerDummyImpl implements DiscoveryController {
     }
 
     @Override
-    public DiscoveryHistoryDto getDiscovery(String uuid) throws NotFoundException {
+    public DiscoveryHistoryDetailDto getDiscovery(String uuid) throws NotFoundException {
         return null;
     }
 
