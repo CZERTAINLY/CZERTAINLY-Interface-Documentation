@@ -16,7 +16,7 @@ public class CallbackControllerDummyImpl implements CallbackController {
     }
 
     @Override
-    public Object resourceCallback(Resource resource, String resourceParentUuid, RequestAttributeCallback callback) throws NotFoundException, ConnectorException, ValidationException {
+    public Object resourceCallback(Resource resource, String parentObjectUuid, RequestAttributeCallback callback) throws NotFoundException, ConnectorException, ValidationException {
         return null;
     }
 }
