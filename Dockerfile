@@ -1,5 +1,5 @@
 # build environment
-FROM maven:3.8.1-openjdk-11-slim as build
+FROM maven:3.8.7-eclipse-temurin-17 as build
 COPY ./ /home/app
 COPY settings.xml /root/.m2/settings.xml
 ARG SERVER_USERNAME
