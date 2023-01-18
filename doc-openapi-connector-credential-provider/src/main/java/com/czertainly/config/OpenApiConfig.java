@@ -5,29 +5,29 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import jakarta.servlet.ServletContext;
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.servlet.ServletContext;
 import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
 public class OpenApiConfig {
-	
-	@Autowired
-	ServletContext context;
 
-    @Value( "${api.version}" )
+    @Autowired
+    ServletContext context;
+
+    @Value("${api.version}")
     private String version;
-	
+
     @Bean
     public GroupedOpenApi credentialProviderApis() {
         return GroupedOpenApi.builder()
-        		.group("connector-credential-provider")
+                .group("connector-credential-provider")
                 .packagesToScan("com.czertainly.api.impl")
                 //.pathsToMatch("/v1/**")
                 .build()

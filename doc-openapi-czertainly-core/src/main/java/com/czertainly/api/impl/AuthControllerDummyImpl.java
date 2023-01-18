@@ -8,8 +8,6 @@ import com.czertainly.api.model.core.auth.Resource;
 import com.czertainly.api.model.core.auth.ResourceDetailDto;
 import com.czertainly.api.model.core.auth.UserDetailDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.v3.oas.annotations.Parameter;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.cert.CertificateException;

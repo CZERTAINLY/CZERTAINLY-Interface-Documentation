@@ -5,13 +5,13 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import jakarta.servlet.ServletContext;
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.servlet.ServletContext;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +19,7 @@ import java.util.Map;
 public class OpenApiConfig {
 	
 	@Autowired
-	ServletContext context;
+    ServletContext context;
 
     @Value( "${api.version}" )
     private String version;

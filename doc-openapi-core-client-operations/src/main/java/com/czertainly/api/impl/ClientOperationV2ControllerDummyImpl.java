@@ -3,7 +3,6 @@ package com.czertainly.api.impl;
 import com.czertainly.api.exception.AlreadyExistException;
 import com.czertainly.api.exception.CertificateOperationException;
 import com.czertainly.api.exception.ConnectorException;
-import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.client.v2.ClientOperationController;
 import com.czertainly.api.model.client.attribute.RequestAttributeDto;
