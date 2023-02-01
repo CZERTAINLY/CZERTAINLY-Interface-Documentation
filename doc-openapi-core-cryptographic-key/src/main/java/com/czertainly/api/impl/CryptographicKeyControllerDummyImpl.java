@@ -7,10 +7,7 @@ import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.CryptographicKeyController;
 import com.czertainly.api.model.client.cryptography.key.*;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
-import com.czertainly.api.model.core.cryptography.key.KeyDetailDto;
-import com.czertainly.api.model.core.cryptography.key.KeyDto;
-import com.czertainly.api.model.core.cryptography.key.KeyEventHistoryDto;
-import com.czertainly.api.model.core.cryptography.key.KeyItemDto;
+import com.czertainly.api.model.core.cryptography.key.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -29,7 +26,7 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
     }
 
     @Override
-    public KeyItemDto getKeyItem(String tokenInstanceUuid, String uuid, String keyItemUuid) throws NotFoundException {
+    public KeyItemDetailDto getKeyItem(String tokenInstanceUuid, String uuid, String keyItemUuid) throws NotFoundException {
         return null;
     }
 
