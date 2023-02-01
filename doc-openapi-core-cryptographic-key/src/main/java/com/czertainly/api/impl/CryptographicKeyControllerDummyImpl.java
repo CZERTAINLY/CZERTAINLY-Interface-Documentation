@@ -10,6 +10,7 @@ import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.cryptography.key.KeyDetailDto;
 import com.czertainly.api.model.core.cryptography.key.KeyDto;
 import com.czertainly.api.model.core.cryptography.key.KeyEventHistoryDto;
+import com.czertainly.api.model.core.cryptography.key.KeyItemDto;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -17,7 +18,6 @@ import java.util.Optional;
 
 @RestController
 public class CryptographicKeyControllerDummyImpl implements CryptographicKeyController {
-
     @Override
     public List<KeyDto> listKeys(Optional<String> tokenProfileUuid) {
         return null;
@@ -25,6 +25,11 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
 
     @Override
     public KeyDetailDto getKey(String tokenInstanceUuid, String uuid) throws NotFoundException {
+        return null;
+    }
+
+    @Override
+    public KeyItemDto getKeyItem(String tokenInstanceUuid, String uuid, String keyItemUuid) throws NotFoundException {
         return null;
     }
 
@@ -39,12 +44,17 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
     }
 
     @Override
-    public void compromiseKey(String tokenInstanceUuid, String uuid, List<String> uuids) throws NotFoundException {
+    public void compromiseKey(String tokenInstanceUuid, String uuid, CompromiseKeyRequestDto request) throws NotFoundException {
 
     }
 
     @Override
-    public void compromiseKeys(List<String> uuids) {
+    public void compromiseKeys(BulkCompromiseKeyRequestDto request) {
+
+    }
+
+    @Override
+    public void compromiseKeyItems(BulkCompromiseKeyItemRequestDto request) {
 
     }
 
@@ -59,12 +69,22 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
     }
 
     @Override
+    public void destroyKeyItems(List<String> keyItemUuids) throws ConnectorException {
+
+    }
+
+    @Override
     public void deleteKey(String tokenInstanceUuid, String uuid, List<String> keyItemUuids) throws ConnectorException {
 
     }
 
     @Override
     public void deleteKeys(List<String> keyUuids) throws ConnectorException {
+
+    }
+
+    @Override
+    public void deleteKeyItems(List<String> keyItemUuids) throws ConnectorException {
 
     }
 
@@ -79,6 +99,11 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
     }
 
     @Override
+    public void enableKeyItems(List<String> uuids) {
+
+    }
+
+    @Override
     public void disableKey(String tokenInstanceUuid, String uuid, List<String> keyItemUuids) throws NotFoundException {
 
     }
@@ -89,12 +114,22 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
     }
 
     @Override
+    public void disableKeyItems(List<String> uuids) {
+
+    }
+
+    @Override
     public void updateKeyUsages(String tokenInstanceUuid, String uuid, UpdateKeyUsageRequestDto request) throws NotFoundException, ValidationException {
 
     }
 
     @Override
     public void updateKeysUsages(BulkKeyUsageRequestDto request) {
+
+    }
+
+    @Override
+    public void updateKeyItemUsages(BulkKeyItemUsageRequestDto request) {
 
     }
 
