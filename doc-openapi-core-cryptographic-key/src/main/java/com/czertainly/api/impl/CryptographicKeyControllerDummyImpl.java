@@ -5,9 +5,12 @@ import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.CryptographicKeyController;
+import com.czertainly.api.model.client.certificate.SearchRequestDto;
+import com.czertainly.api.model.client.cryptography.CryptographicKeyResponseDto;
 import com.czertainly.api.model.client.cryptography.key.*;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.cryptography.key.*;
+import com.czertainly.api.model.core.search.SearchFieldDataDto;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -16,7 +19,12 @@ import java.util.Optional;
 @RestController
 public class CryptographicKeyControllerDummyImpl implements CryptographicKeyController {
     @Override
-    public List<KeyDto> listKeys(Optional<String> tokenProfileUuid) {
+    public List<SearchFieldDataDto> getSearchableFieldInformation() {
+        return null;
+    }
+
+    @Override
+    public CryptographicKeyResponseDto listCryptographicKeys(SearchRequestDto request) throws ValidationException {
         return null;
     }
 
