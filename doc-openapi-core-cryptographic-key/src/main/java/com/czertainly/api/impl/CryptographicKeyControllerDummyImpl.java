@@ -21,6 +21,11 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
     }
 
     @Override
+    public List<KeyDto> listKeyPairs(Optional<String> tokenProfileUuid) {
+        return null;
+    }
+
+    @Override
     public KeyDetailDto getKey(String tokenInstanceUuid, String uuid) throws NotFoundException {
         return null;
     }
