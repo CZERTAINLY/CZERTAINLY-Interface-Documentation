@@ -55,6 +55,11 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
     }
 
     @Override
+    public void syncKeys(String tokenInstanceUuid) throws ConnectorException {
+
+    }
+
+    @Override
     public void compromiseKey(String tokenInstanceUuid, String uuid, CompromiseKeyRequestDto request) throws NotFoundException {
 
     }
