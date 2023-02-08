@@ -7,7 +7,7 @@ import com.czertainly.api.interfaces.core.web.CertificateController;
 import com.czertainly.api.model.client.certificate.*;
 import com.czertainly.api.model.common.UuidDto;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
-import com.czertainly.api.model.core.certificate.CertificateDto;
+import com.czertainly.api.model.core.certificate.CertificateDetailDto;
 import com.czertainly.api.model.core.certificate.CertificateEventHistoryDto;
 import com.czertainly.api.model.core.certificate.CertificateValidationDto;
 import com.czertainly.api.model.core.location.LocationDto;
@@ -29,7 +29,7 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
-    public CertificateDto getCertificate(String uuid) throws NotFoundException, CertificateException, IOException {
+    public CertificateDetailDto getCertificate(String uuid) throws NotFoundException, CertificateException, IOException {
         return null;
     }
 
