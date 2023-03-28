@@ -14,12 +14,12 @@ import java.util.List;
 @RestController
 public class ClientOperationLegacyControllerDummyImpl implements ClientOperationController {
     @Override
-    public ClientCertificateSignResponseDto issueCertificate(String raProfileName, ClientCertificateSignRequestDto request) throws NotFoundException, CertificateException, AlreadyExistException, ConnectorException, NoSuchAlgorithmException {
+    public ClientCertificateSignResponseDto issueCertificate(String raProfileName, LegacyClientCertificateSignRequestDto request) throws NotFoundException, CertificateException, AlreadyExistException, ConnectorException, NoSuchAlgorithmException {
         return null;
     }
 
     @Override
-    public void revokeCertificate(String raProfileName, ClientCertificateRevocationDto request) throws NotFoundException, ConnectorException {
+    public void revokeCertificate(String raProfileName, LegacyClientCertificateRevocationDto request) throws NotFoundException, ConnectorException {
 
     }
 
