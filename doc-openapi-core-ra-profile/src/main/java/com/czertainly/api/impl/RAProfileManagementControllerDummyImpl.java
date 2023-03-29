@@ -6,10 +6,7 @@ import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.RAProfileManagementController;
 import com.czertainly.api.model.client.compliance.SimplifiedComplianceProfileDto;
-import com.czertainly.api.model.client.raprofile.ActivateAcmeForRaProfileRequestDto;
-import com.czertainly.api.model.client.raprofile.AddRaProfileRequestDto;
-import com.czertainly.api.model.client.raprofile.EditRaProfileRequestDto;
-import com.czertainly.api.model.client.raprofile.RaProfileAcmeDetailResponseDto;
+import com.czertainly.api.model.client.raprofile.*;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.raprofile.RaProfileDto;
 import org.springframework.http.ResponseEntity;
@@ -92,6 +89,21 @@ public class RAProfileManagementControllerDummyImpl implements RAProfileManageme
 
     @Override
     public void deactivateAcmeForRaProfile(String authorityUuid, String raProfileUuid) throws NotFoundException {
+
+    }
+
+    @Override
+    public RaProfileScepDetailResponseDto getScepForRaProfile(String authorityUuid, String raProfileUuid) throws NotFoundException {
+        return null;
+    }
+
+    @Override
+    public RaProfileScepDetailResponseDto activateScepForRaProfile(String authorityUuid, String raProfileUuid, String scepProfileUuid, ActivateScepForRaProfileRequestDto request) throws ConnectorException {
+        return null;
+    }
+
+    @Override
+    public void deactivateScepForRaProfile(String authorityUuid, String raProfileUuid) throws NotFoundException {
 
     }
 
