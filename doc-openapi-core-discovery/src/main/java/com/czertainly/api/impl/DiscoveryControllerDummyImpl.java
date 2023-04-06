@@ -4,10 +4,13 @@ import com.czertainly.api.exception.AlreadyExistException;
 import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.DiscoveryController;
+import com.czertainly.api.model.client.certificate.DiscoveryResponseDto;
+import com.czertainly.api.model.client.certificate.SearchRequestDto;
 import com.czertainly.api.model.client.discovery.DiscoveryCertificateResponseDto;
 import com.czertainly.api.model.client.discovery.DiscoveryDto;
 import com.czertainly.api.model.client.discovery.DiscoveryHistoryDetailDto;
 import com.czertainly.api.model.client.discovery.DiscoveryHistoryDto;
+import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +21,7 @@ import java.util.List;
 public class DiscoveryControllerDummyImpl implements DiscoveryController {
 
     @Override
-    public List<DiscoveryHistoryDto> listDiscoveries() {
+    public DiscoveryResponseDto listDiscoveries(SearchRequestDto request) {
         return null;
     }
 
@@ -45,5 +48,10 @@ public class DiscoveryControllerDummyImpl implements DiscoveryController {
     @Override
     public void bulkDeleteDiscovery(List<String> discoveryUuids) throws NotFoundException {
 
+    }
+
+    @Override
+    public List<SearchFieldDataByGroupDto> getSearchableFieldInformation() {
+        return null;
     }
 }
