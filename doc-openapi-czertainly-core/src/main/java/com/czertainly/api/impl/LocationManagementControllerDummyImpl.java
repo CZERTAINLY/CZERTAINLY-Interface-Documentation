@@ -5,12 +5,15 @@ import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.exception.LocationException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.LocationManagementController;
+import com.czertainly.api.model.client.certificate.LocationsResponseDto;
+import com.czertainly.api.model.client.certificate.SearchRequestDto;
 import com.czertainly.api.model.client.location.AddLocationRequestDto;
 import com.czertainly.api.model.client.location.EditLocationRequestDto;
 import com.czertainly.api.model.client.location.IssueToLocationRequestDto;
 import com.czertainly.api.model.client.location.PushToLocationRequestDto;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.location.LocationDto;
+import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,8 +22,14 @@ import java.util.Optional;
 
 @RestController
 public class LocationManagementControllerDummyImpl implements LocationManagementController {
+
     @Override
-    public List<LocationDto> listLocations(Optional<Boolean> enabled) {
+    public LocationsResponseDto listLocations(SearchRequestDto request) {
+        return null;
+    }
+
+    @Override
+    public List<SearchFieldDataByGroupDto> getSearchableFieldInformation() {
         return null;
     }
 
