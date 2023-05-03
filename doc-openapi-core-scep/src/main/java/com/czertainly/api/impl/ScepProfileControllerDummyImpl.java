@@ -86,7 +86,7 @@ public class ScepProfileControllerDummyImpl implements ScepProfileController {
     }
 
     @Override
-    public List<CertificateDto> listScepCaCertificates() {
+    public List<CertificateDto> listScepCaCertificates(boolean intuneEnabled) {
         return null;
     }
 }
