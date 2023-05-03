@@ -3,10 +3,10 @@ package com.czertainly.api.impl;
 import com.czertainly.api.exception.AlreadyExistException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.CustomAttributeController;
-import com.czertainly.api.model.client.attribute.AttributeDefinitionDto;
 import com.czertainly.api.model.client.attribute.ResponseAttributeDto;
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeCreateRequestDto;
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeDefinitionDetailDto;
+import com.czertainly.api.model.client.attribute.custom.CustomAttributeDefinitionDto;
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeUpdateRequestDto;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.common.attribute.v2.content.BaseAttributeContent;
@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 public class CustomAttributeControllerDummyImpl implements CustomAttributeController {
     @Override
-    public List<AttributeDefinitionDto> listCustomAttributes() {
+    public List<CustomAttributeDefinitionDto> listCustomAttributes() {
         return null;
     }
 
