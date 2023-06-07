@@ -57,7 +57,6 @@ public class DiscoveryControllerDummyImpl implements DiscoveryController {
     }
 
     @Override
-    @Hidden
     public void scheduleDiscovery(SchedulerJobInfoDto schedulerJobInfo, DiscoveryDto request) throws AlreadyExistException, CertificateException, InterruptedException, ConnectorException {
 
     }
