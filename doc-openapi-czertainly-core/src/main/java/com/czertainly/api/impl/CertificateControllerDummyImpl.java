@@ -4,6 +4,7 @@ import com.czertainly.api.exception.AlreadyExistException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.CertificateController;
+import com.czertainly.api.model.client.approval.ApprovalResponseDto;
 import com.czertainly.api.model.client.certificate.*;
 import com.czertainly.api.model.common.UuidDto;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
@@ -12,6 +13,7 @@ import com.czertainly.api.model.core.certificate.CertificateDetailDto;
 import com.czertainly.api.model.core.certificate.CertificateEventHistoryDto;
 import com.czertainly.api.model.core.certificate.CertificateValidationDto;
 import com.czertainly.api.model.core.location.LocationDto;
+import com.czertainly.api.model.core.scheduler.PaginationRequestDto;
 import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
 import com.czertainly.api.model.core.search.SearchFieldDataDto;
 import com.czertainly.api.model.core.v2.ClientCertificateRequestDto;
@@ -111,6 +113,11 @@ public class CertificateControllerDummyImpl implements CertificateController {
 
     @Override
     public CertificateDetailDto createCsr(ClientCertificateRequestDto request) throws ValidationException, NotFoundException, CertificateException, IOException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException {
+        return null;
+    }
+
+    @Override
+    public ApprovalResponseDto listCertificateApprovals(String uuid, PaginationRequestDto paginationRequestDto) {
         return null;
     }
 }
