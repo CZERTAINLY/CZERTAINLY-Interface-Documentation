@@ -9,7 +9,7 @@ import com.czertainly.api.model.client.certificate.SearchRequestDto;
 import com.czertainly.api.model.client.discovery.DiscoveryCertificateResponseDto;
 import com.czertainly.api.model.client.discovery.DiscoveryDto;
 import com.czertainly.api.model.client.discovery.DiscoveryHistoryDetailDto;
-import com.czertainly.api.model.client.discovery.DiscoveryHistoryDto;
+import com.czertainly.api.model.core.scheduler.ScheduleDiscoveryDto;
 import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,6 +52,11 @@ public class DiscoveryControllerDummyImpl implements DiscoveryController {
 
     @Override
     public List<SearchFieldDataByGroupDto> getSearchableFieldInformation() {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<?> scheduleDiscovery(ScheduleDiscoveryDto scheduleDiscoveryDto) throws AlreadyExistException, CertificateException, InterruptedException, ConnectorException {
         return null;
     }
 }

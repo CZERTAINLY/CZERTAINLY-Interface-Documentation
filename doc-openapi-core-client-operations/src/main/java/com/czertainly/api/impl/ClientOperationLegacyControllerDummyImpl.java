@@ -13,6 +13,8 @@ import java.util.List;
 
 @RestController
 public class ClientOperationLegacyControllerDummyImpl implements ClientOperationController {
+
+
     @Override
     public ClientCertificateSignResponseDto issueCertificate(String raProfileName, LegacyClientCertificateSignRequestDto request) throws NotFoundException, CertificateException, AlreadyExistException, ConnectorException, NoSuchAlgorithmException {
         return null;

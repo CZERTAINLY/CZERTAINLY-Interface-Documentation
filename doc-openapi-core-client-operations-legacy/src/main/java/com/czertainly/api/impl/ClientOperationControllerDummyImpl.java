@@ -7,6 +7,7 @@ import com.czertainly.api.interfaces.core.client.ClientOperationController;
 import com.czertainly.api.model.client.authority.*;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.List;
 
