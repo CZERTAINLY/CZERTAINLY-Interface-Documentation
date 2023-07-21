@@ -41,7 +41,7 @@ public class NotificationInstanceControllerDummyImpl implements NotificationInst
     }
 
     @Override
-    public List<DataAttribute> listMappingAttributes(String kind) {
+    public List<DataAttribute> listMappingAttributes(String connectorUuid, String kind) throws ConnectorException {
         return null;
     }
 }
