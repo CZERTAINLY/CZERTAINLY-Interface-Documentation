@@ -9,6 +9,7 @@ import com.czertainly.api.model.client.attribute.custom.CustomAttributeDefinitio
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeDefinitionDto;
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeUpdateRequestDto;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.common.attribute.v2.content.AttributeContentType;
 import com.czertainly.api.model.common.attribute.v2.content.BaseAttributeContent;
 import com.czertainly.api.model.core.auth.Resource;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ import java.util.List;
 @RestController
 public class CustomAttributeControllerDummyImpl implements CustomAttributeController {
     @Override
-    public List<CustomAttributeDefinitionDto> listCustomAttributes() {
+    public List<CustomAttributeDefinitionDto> listCustomAttributes(AttributeContentType attributeContentType) {
         return null;
     }
 

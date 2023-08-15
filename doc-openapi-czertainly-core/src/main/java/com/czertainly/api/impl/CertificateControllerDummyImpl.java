@@ -72,11 +72,6 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
-    public void validateAllCertificate() {
-
-    }
-
-    @Override
     public List<SearchFieldDataByGroupDto> getSearchableFieldInformation() {
         return null;
     }
