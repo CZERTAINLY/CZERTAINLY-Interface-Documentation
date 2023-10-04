@@ -108,7 +108,12 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
-    public List<CertificateDto> getCertificateChain(String uuid) throws NotFoundException {
+    public CertificateChainResponseDto getCertificateChain(String uuid, boolean withEndCertificate) throws NotFoundException {
+        return null;
+    }
+
+    @Override
+    public CertificateChainDownloadResponseDto downloadCertificateChain(String uuid, CertificateFormat certificateFormat, boolean withEndCertificate) throws NotFoundException, CertificateException, IOException {
         return null;
     }
 
