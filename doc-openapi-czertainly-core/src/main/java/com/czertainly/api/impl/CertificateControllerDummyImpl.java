@@ -48,11 +48,6 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
-    public void check(String uuid) throws CertificateException, IOException, NotFoundException {
-
-    }
-
-    @Override
     public void bulkUpdateCertificateObjects(MultipleCertificateObjectUpdateDto request) throws NotFoundException {
 
     }
@@ -88,7 +83,7 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
-    public Map<String, CertificateValidationDto> getCertificateValidationResult(String uuid) throws NotFoundException, CertificateException, IOException {
+    public Map<CertificateValidationCheck, CertificateValidationDto> getCertificateValidationResult(String uuid) throws NotFoundException, CertificateException {
         return null;
     }
 
@@ -113,7 +108,7 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
-    public CertificateChainDownloadResponseDto downloadCertificateChain(String uuid, CertificateFormat certificateFormat, boolean withEndCertificate) throws NotFoundException, CertificateException, IOException {
+    public CertificateChainDownloadResponseDto downloadCertificateChain(String uuid, CertificateFormat certificateFormat, boolean withEndCertificate) throws NotFoundException, CertificateException {
         return null;
     }
 
