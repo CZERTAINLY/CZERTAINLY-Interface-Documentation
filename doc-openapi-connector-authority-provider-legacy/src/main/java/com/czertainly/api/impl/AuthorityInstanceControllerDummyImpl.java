@@ -6,8 +6,7 @@ import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.connector.AuthorityInstanceController;
 import com.czertainly.api.model.client.attribute.RequestAttributeDto;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
-import com.czertainly.api.model.connector.authority.AuthorityProviderInstanceDto;
-import com.czertainly.api.model.connector.authority.AuthorityProviderInstanceRequestDto;
+import com.czertainly.api.model.connector.authority.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -53,5 +52,15 @@ public class AuthorityInstanceControllerDummyImpl implements AuthorityInstanceCo
     @Override
     public void validateRAProfileAttributes(String uuid, List<RequestAttributeDto> attributes) throws ValidationException, NotFoundException {
 
+    }
+
+    @Override
+    public CertificateRevocationListResponseDto getCrl(String uuid, CertificateRevocationListRequestDto request) throws NotFoundException {
+        return null;
+    }
+
+    @Override
+    public CaCertificatesResponseDto getCaCertificates(String uuid, CaCertificatesRequestDto raProfileAttributes) throws ValidationException, NotFoundException {
+        return null;
     }
 }
