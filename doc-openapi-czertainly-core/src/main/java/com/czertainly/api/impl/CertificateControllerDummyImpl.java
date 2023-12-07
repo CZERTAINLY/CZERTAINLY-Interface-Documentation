@@ -37,6 +37,11 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
+    public CertificateDownloadResponseDto downloadCertificate(String uuid, CertificateFormat certificateFormat, CertificateFormatEncoding encoding) throws NotFoundException, CertificateException, IOException {
+        return null;
+    }
+
+    @Override
     public void deleteCertificate(String uuid) throws NotFoundException {
 
     }
@@ -107,7 +112,7 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
-    public CertificateChainDownloadResponseDto downloadCertificateChain(String uuid, CertificateFormat certificateFormat, boolean withEndCertificate) throws NotFoundException, CertificateException {
+    public CertificateChainDownloadResponseDto downloadCertificateChain(String uuid, CertificateFormat certificateFormat, boolean withEndCertificate, CertificateFormatEncoding encoding) throws NotFoundException, CertificateException {
         return null;
     }
 
