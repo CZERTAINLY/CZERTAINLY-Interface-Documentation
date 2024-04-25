@@ -41,17 +41,17 @@ public class RulesControllerDummyImpl implements RuleController {
     }
 
     @Override
-    public RuleConditionGroupDetailDto createConditionGroup(RuleConditionGroupRequestDto request) {
+    public RuleConditionGroupDto createConditionGroup(RuleConditionGroupRequestDto request) {
         return null;
     }
 
     @Override
-    public RuleConditionGroupDetailDto getConditionGroup(String conditionGroupUuid) throws NotFoundException {
+    public RuleConditionGroupDto getConditionGroup(String conditionGroupUuid) throws NotFoundException {
         return null;
     }
 
     @Override
-    public RuleConditionGroupDetailDto updateConditionGroup(String conditionGroupUuid, UpdateRuleConditionGroupRequestDto request) throws NotFoundException {
+    public RuleConditionGroupDto updateConditionGroup(String conditionGroupUuid, UpdateRuleConditionGroupRequestDto request) throws NotFoundException {
         return null;
     }
 
@@ -66,17 +66,17 @@ public class RulesControllerDummyImpl implements RuleController {
     }
 
     @Override
-    public RuleActionGroupDetailDto createActionGroup(RuleActionGroupRequestDto request) {
+    public RuleActionGroupDto createActionGroup(RuleActionGroupRequestDto request) {
         return null;
     }
 
     @Override
-    public RuleActionGroupDetailDto getActionGroup(String actionGroupUuid) throws NotFoundException {
+    public RuleActionGroupDto getActionGroup(String actionGroupUuid) throws NotFoundException {
         return null;
     }
 
     @Override
-    public RuleActionGroupDetailDto updateActionGroup(String actionGroupUuid, UpdateRuleActionGroupRequestDto request) throws NotFoundException {
+    public RuleActionGroupDto updateActionGroup(String actionGroupUuid, UpdateRuleActionGroupRequestDto request) throws NotFoundException {
         return null;
     }
 
