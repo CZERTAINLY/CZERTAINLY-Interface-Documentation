@@ -109,4 +109,9 @@ public class RulesControllerDummyImpl implements RuleController {
     public void deleteTrigger(String triggerUuid) throws NotFoundException {
 
     }
+
+    @Override
+    public List<RuleTriggerHistoryDto> getTriggerHistory(String triggerUuid, String triggerObjectUuid) {
+        return null;
+    }
 }
