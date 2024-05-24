@@ -27,7 +27,7 @@ public class OpenApiConfig {
     @Bean
     public GroupedOpenApi rulesApis() {
         return GroupedOpenApi.builder()
-                .group("core-rules")
+                .group("core-workflows")
                 .packagesToScan("com.czertainly.api.impl")
                 //.pathsToMatch("/v1/**")
                 .build()
@@ -43,7 +43,7 @@ public class OpenApiConfig {
 
         return new OpenAPI()
                 .info(new Info().title("CZERTAINLY Rules API")
-                        .description("REST API for managing Rules in the platform")
+                        .description("REST API for managing workflows resources in the platform")
                         .version(version)
                         .license(new License()
                                 .name("MIT License")
