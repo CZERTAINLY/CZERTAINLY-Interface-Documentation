@@ -41,4 +41,9 @@ public class TriggerControllerDummyImpl implements TriggerController {
     public List<TriggerHistoryDto> getTriggerHistory(String triggerUuid, String triggerObjectUuid) {
         return List.of();
     }
+
+    @Override
+    public TriggerHistorySummaryDto getTriggerHistorySummary(String associationObjectUuid) throws NotFoundException {
+        return null;
+    }
 }
