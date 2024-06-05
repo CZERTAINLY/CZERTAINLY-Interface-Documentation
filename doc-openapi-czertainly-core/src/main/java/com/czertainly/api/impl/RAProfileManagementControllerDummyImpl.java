@@ -1,9 +1,6 @@
 package com.czertainly.api.impl;
 
-import com.czertainly.api.exception.AlreadyExistException;
-import com.czertainly.api.exception.ConnectorException;
-import com.czertainly.api.exception.NotFoundException;
-import com.czertainly.api.exception.ValidationException;
+import com.czertainly.api.exception.*;
 import com.czertainly.api.interfaces.core.web.RAProfileManagementController;
 import com.czertainly.api.model.client.approvalprofile.ApprovalProfileDto;
 import com.czertainly.api.model.client.compliance.SimplifiedComplianceProfileDto;
@@ -21,13 +18,14 @@ import java.util.Optional;
 
 @RestController
 public class RAProfileManagementControllerDummyImpl implements RAProfileManagementController {
+
     @Override
     public List<RaProfileDto> listRaProfiles(Optional<Boolean> enabled) {
         return null;
     }
 
     @Override
-    public ResponseEntity<?> createRaProfile(String authorityUuid, AddRaProfileRequestDto request) throws AlreadyExistException, ValidationException, ConnectorException {
+    public ResponseEntity<?> createRaProfile(String authorityUuid, AddRaProfileRequestDto request) throws AlreadyExistException, ValidationException, ConnectorException, AttributeException {
         return null;
     }
 
@@ -42,7 +40,7 @@ public class RAProfileManagementControllerDummyImpl implements RAProfileManageme
     }
 
     @Override
-    public RaProfileDto editRaProfile(String authorityUuid, String raProfileUuid, EditRaProfileRequestDto request) throws ConnectorException {
+    public RaProfileDto editRaProfile(String authorityUuid, String raProfileUuid, EditRaProfileRequestDto request) throws ConnectorException, AttributeException {
         return null;
     }
 
@@ -87,7 +85,7 @@ public class RAProfileManagementControllerDummyImpl implements RAProfileManageme
     }
 
     @Override
-    public RaProfileAcmeDetailResponseDto activateAcmeForRaProfile(String authorityUuid, String raProfileUuid, String acmeProfileUuid, ActivateAcmeForRaProfileRequestDto request) throws ConnectorException {
+    public RaProfileAcmeDetailResponseDto activateAcmeForRaProfile(String authorityUuid, String raProfileUuid, String acmeProfileUuid, ActivateAcmeForRaProfileRequestDto request) throws ConnectorException, AttributeException {
         return null;
     }
 
@@ -102,12 +100,27 @@ public class RAProfileManagementControllerDummyImpl implements RAProfileManageme
     }
 
     @Override
-    public RaProfileScepDetailResponseDto activateScepForRaProfile(String authorityUuid, String raProfileUuid, String scepProfileUuid, ActivateScepForRaProfileRequestDto request) throws ConnectorException {
+    public RaProfileScepDetailResponseDto activateScepForRaProfile(String authorityUuid, String raProfileUuid, String scepProfileUuid, ActivateScepForRaProfileRequestDto request) throws ConnectorException, AttributeException {
         return null;
     }
 
     @Override
     public void deactivateScepForRaProfile(String authorityUuid, String raProfileUuid) throws NotFoundException {
+
+    }
+
+    @Override
+    public RaProfileCmpDetailResponseDto getCmpForRaProfile(String authorityUuid, String raProfileUuid) throws NotFoundException {
+        return null;
+    }
+
+    @Override
+    public RaProfileCmpDetailResponseDto activateCmpForRaProfile(String authorityUuid, String raProfileUuid, String cmpProfileUuid, ActivateCmpForRaProfileRequestDto request) throws ConnectorException, AttributeException {
+        return null;
+    }
+
+    @Override
+    public void deactivateCmpForRaProfile(String authorityUuid, String raProfileUuid) throws NotFoundException {
 
     }
 
@@ -150,4 +163,5 @@ public class RAProfileManagementControllerDummyImpl implements RAProfileManageme
     public List<CertificateDetailDto> getAuthorityCertificateChain(String authorityUuid, String raProfileUuid) throws ConnectorException, CertificateException, NoSuchAlgorithmException {
         return null;
     }
+
 }

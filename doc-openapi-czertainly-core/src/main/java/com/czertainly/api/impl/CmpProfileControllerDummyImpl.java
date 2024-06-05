@@ -19,7 +19,7 @@ public class CmpProfileControllerDummyImpl implements CmpProfileController {
 
     @Override
     public List<CmpProfileDto> listCmpProfiles() {
-        return List.of();
+        return null;
     }
 
     @Override
@@ -44,12 +44,12 @@ public class CmpProfileControllerDummyImpl implements CmpProfileController {
 
     @Override
     public List<BulkActionMessageDto> bulkDeleteCmpProfile(List<String> cmpProfileUuids) {
-        return List.of();
+        return null;
     }
 
     @Override
     public List<BulkActionMessageDto> forceDeleteCmpProfiles(List<String> cmpProfileUuids) throws NotFoundException, ValidationException {
-        return List.of();
+        return null;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class CmpProfileControllerDummyImpl implements CmpProfileController {
 
     @Override
     public List<CertificateDto> listCmpSigningCertificates() {
-        return List.of();
+        return null;
     }
 
 }
