@@ -1,5 +1,5 @@
 # build environment
-FROM maven:3.9.4-eclipse-temurin-17 as build
+FROM maven:3.9.8-eclipse-temurin-17 as build
 COPY ./ /home/app
 COPY settings.xml /root/.m2/settings.xml
 ARG SERVER_USERNAME
