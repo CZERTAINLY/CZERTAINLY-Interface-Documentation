@@ -22,20 +22,21 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>sleep-for-a-while</id>
-                        <phase>pre-integration-test</phase>
-                        <configuration>
-                            <target>
-                                <sleep seconds="5"/>
-                            </target>
-                        </configuration>
+                        <id>reserve-tomcat-port</id>
                         <goals>
-                            <goal>run</goal>
+                            <goal>reserve-network-port</goal>
                         </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <portNames>
+                                <portName>tomcat.http.port</portName>
+                                <portName>tomcat.jmx.port</portName>
+                            </portNames>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -48,16 +49,34 @@
                         <goals>
                             <goal>start</goal>
                         </goals>
+                        <configuration>
+                            <arguments>
+                                <argument>--server.port=${tomcat.http.port}</argument>
+                            </arguments>
+                            <jmxPort>${tomcat.jmx.port}</jmxPort>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>post-integration-test</id>
                         <goals>
                             <goal>stop</goal>
                         </goals>
+                        <configuration>
+                            <jmxPort>${tomcat.jmx.port}</jmxPort>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
                     <mainClass>com.czertainly.Application</mainClass>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <test.server.port>${tomcat.http.port}</test.server.port>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -73,7 +92,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <apiDocsUrl>http://localhost:8080/v3/api-docs.yaml</apiDocsUrl>
+                    <apiDocsUrl>http://localhost:${tomcat.http.port}/v3/api-docs.yaml</apiDocsUrl>
                     <outputFileName>${project.artifactId}.yaml</outputFileName>
                     <outputDir>${project.parent.basedir}/openapi</outputDir>
                 </configuration>
