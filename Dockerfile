@@ -1,9 +1,7 @@
 # build environment
-FROM maven:3.9.8-eclipse-temurin-17 as build
+FROM maven:3.9.9-eclipse-temurin-21 as build
 COPY ./ /home/app
 COPY settings.xml /root/.m2/settings.xml
-ARG SERVER_USERNAME
-ARG SERVER_PASSWORD
 RUN mvn -f /home/app/pom.xml clean verify
 
 # build documentation
