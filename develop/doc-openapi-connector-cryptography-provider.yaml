@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:46723
+- url: http://localhost:42563
   description: Generated server url
 tags:
 - name: Connector Info
@@ -72,6 +72,14 @@ paths:
       responses:
         "200":
           description: Attribute validation completed
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "422":
           description: Attribute validation failed
           content:
@@ -83,16 +91,8 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "500":
-          description: Internal Server Error
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -112,16 +112,16 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TokenInstanceDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -138,22 +138,22 @@ paths:
               $ref: "#/components/schemas/TokenInstanceRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Token instance created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenInstanceDto"
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -172,6 +172,12 @@ paths:
         schema:
           type: string
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "200":
@@ -182,12 +188,6 @@ paths:
                 $ref: "#/components/schemas/TokenInstanceDto"
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -217,16 +217,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenInstanceDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -244,18 +244,18 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "204":
-          description: Token instance removed
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
+        "204":
+          description: Token instance removed
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -282,16 +282,16 @@ paths:
                 $ref: "#/components/schemas/RequestAttributeDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -324,6 +324,12 @@ paths:
               $ref: "#/components/schemas/VerifyDataRequestDto"
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "422":
@@ -337,20 +343,14 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Data decrypted
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/VerifyDataResponseDto"
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -387,6 +387,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SignDataResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "422":
@@ -402,12 +408,6 @@ paths:
               - Error Message 2
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -438,8 +438,20 @@ paths:
               $ref: "#/components/schemas/CipherDataRequestDto"
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+        "200":
+          description: Data encrypted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EncryptDataResponseDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -451,20 +463,8 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "200":
-          description: Data encrypted
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EncryptDataResponseDto"
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -495,6 +495,12 @@ paths:
               $ref: "#/components/schemas/CipherDataRequestDto"
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "422":
@@ -508,20 +514,14 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Data decrypted
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/DecryptDataResponseDto"
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -546,6 +546,12 @@ paths:
               $ref: "#/components/schemas/CreateKeyRequestDto"
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "422":
@@ -559,20 +565,14 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Key created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/KeyDataResponseDto"
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -601,6 +601,12 @@ paths:
       responses:
         "204":
           description: Attributes validated
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "422":
@@ -616,12 +622,6 @@ paths:
               - Error Message 2
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -646,6 +646,12 @@ paths:
               $ref: "#/components/schemas/RandomDataRequestDto"
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "422":
@@ -661,12 +667,6 @@ paths:
               - Error Message 2
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -701,6 +701,12 @@ paths:
       responses:
         "204":
           description: Attributes validated
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "422":
@@ -716,12 +722,6 @@ paths:
               - Error Message 2
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -746,14 +746,20 @@ paths:
               $ref: "#/components/schemas/CreateKeyRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Key Pair created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/KeyPairDataResponseDto"
+        "500":
+          description: Internal Server Error
         "422":
           description: Unprocessable Entity
           content:
@@ -767,12 +773,6 @@ paths:
               - Error Message 2
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -801,6 +801,12 @@ paths:
       responses:
         "204":
           description: Attributes validated
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "422":
@@ -816,12 +822,6 @@ paths:
               - Error Message 2
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -848,18 +848,18 @@ paths:
                 $ref: "#/components/schemas/RequestAttributeDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "204":
           description: Token activation Attributes validated
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -878,18 +878,18 @@ paths:
         schema:
           type: string
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "204":
           description: Token deactivated
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -916,18 +916,18 @@ paths:
                 $ref: "#/components/schemas/RequestAttributeDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "204":
           description: Token activated
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -940,14 +940,14 @@ paths:
       description: Returns map of functional code and implemented end points
       operationId: listSupportedFunctions
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Functions found
           content:
@@ -956,8 +956,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/InfoResponse"
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -976,14 +976,14 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Attributes retrieved
           content:
@@ -992,8 +992,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -1005,6 +1005,12 @@ paths:
       summary: Health check
       operationId: checkHealth
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "200":
@@ -1015,12 +1021,6 @@ paths:
                 $ref: "#/components/schemas/HealthDto"
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -1039,6 +1039,12 @@ paths:
         schema:
           type: string
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "200":
@@ -1051,12 +1057,6 @@ paths:
                   $ref: "#/components/schemas/BaseAttributeDto"
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -1077,22 +1077,22 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Token instance status retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenInstanceStatusDto"
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -1111,6 +1111,12 @@ paths:
         schema:
           type: string
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "422":
@@ -1124,12 +1130,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Keys listed
           content:
@@ -1138,8 +1138,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/KeyDataResponseDto"
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -1164,8 +1164,20 @@ paths:
         schema:
           type: string
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+        "200":
+          description: Key data retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyDataResponseDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -1177,20 +1189,8 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "200":
-          description: Key data retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/KeyDataResponseDto"
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -1214,6 +1214,12 @@ paths:
         schema:
           type: string
       responses:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "422":
@@ -1227,16 +1233,10 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: Key destroyed
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             '*/*':
               schema:
@@ -1263,16 +1263,16 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -1299,16 +1299,16 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -1335,16 +1335,16 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -1363,6 +1363,12 @@ paths:
         schema:
           type: string
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "200":
@@ -1375,12 +1381,6 @@ paths:
                   $ref: "#/components/schemas/BaseAttributeDto"
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:

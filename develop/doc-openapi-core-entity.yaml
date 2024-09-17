@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:42473
+- url: http://localhost:44865
   description: Generated server url
 tags:
 - name: Entity Management
@@ -36,6 +36,14 @@ paths:
         schema:
           type: string
       responses:
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Authority instance details retrieved
           content:
@@ -60,14 +68,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
     put:
       tags:
       - Entity Management
@@ -87,6 +87,20 @@ paths:
               $ref: "#/components/schemas/EntityInstanceUpdateRequestDto"
         required: true
       responses:
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+        "200":
+          description: Authority instance details updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityInstanceDto"
         "400":
           description: Bad Request
           content:
@@ -95,24 +109,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Authority instance details updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EntityInstanceDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "503":
-          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -128,8 +124,12 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
     delete:
       tags:
       - Entity Management
@@ -143,8 +143,16 @@ paths:
         schema:
           type: string
       responses:
+        "503":
+          description: Connector Communication Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: Entity instance deleted
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -163,14 +171,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
   /v1/entities:
     post:
       tags:
@@ -184,6 +184,14 @@ paths:
               $ref: "#/components/schemas/EntityInstanceRequestDto"
         required: true
       responses:
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "201":
           description: Entity instance created
           content:
@@ -202,18 +210,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -225,8 +221,12 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/entities/{entityUuid}/attributes/location/validate:
     post:
       tags:
@@ -249,6 +249,14 @@ paths:
                 $ref: "#/components/schemas/RequestAttributeDto"
         required: true
       responses:
+        "503":
+          description: Connector Communication Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -257,18 +265,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "503":
-          description: Connector Communication Error
           content:
             '*/*':
               schema:
@@ -284,10 +280,14 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Attributes validated
-        "500":
-          description: Internal Server Error
         "204":
           description: No Content
   /v1/entities/list:
@@ -303,6 +303,14 @@ paths:
               $ref: "#/components/schemas/SearchRequestDto"
         required: true
       responses:
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: List of Entity instances
           content:
@@ -327,14 +335,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
   /v1/entities/{entityUuid}/attributes/location:
     get:
       tags:
@@ -349,6 +349,14 @@ paths:
         schema:
           type: string
       responses:
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -357,18 +365,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "503":
-          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -381,8 +377,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/entities/search:
     get:
       tags:
@@ -390,6 +390,14 @@ paths:
       summary: Get Entities searchable fields information
       operationId: getSearchableFieldInformation
       responses:
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -402,18 +410,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Entity searchable field information retrieved
           content:
@@ -422,8 +418,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SearchFieldDataByGroupDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
 components:
   schemas:
     AttributeCallback:

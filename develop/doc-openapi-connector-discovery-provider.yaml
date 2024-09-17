@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:38347
+- url: http://localhost:38821
   description: Generated server url
 tags:
 - name: Discovery
@@ -65,14 +65,6 @@ paths:
       responses:
         "200":
           description: Attribute validation completed
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "422":
           description: Attribute validation failed
           content:
@@ -90,6 +82,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/discoveryProvider/discover:
     post:
       tags:
@@ -103,14 +103,6 @@ paths:
               $ref: "#/components/schemas/DiscoveryRequestDto"
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "422":
           description: Unprocessable entity
           content:
@@ -122,18 +114,26 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "200":
-          description: Discovery initiated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DiscoveryProviderDto"
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: Discovery initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscoveryProviderDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/discoveryProvider/discover/{uuid}:
     post:
       tags:
@@ -154,26 +154,26 @@ paths:
               $ref: "#/components/schemas/DiscoveryDataRequestDto"
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "200":
-          description: Discovery details retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DiscoveryProviderDto"
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: Discovery details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscoveryProviderDto"
+        "500":
+          description: Internal Server Error
     delete:
       tags:
       - Discovery
@@ -187,6 +187,14 @@ paths:
         schema:
           type: string
       responses:
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: Discovery information deleted
         "400":
           description: Bad Request
           content:
@@ -195,14 +203,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "204":
-          description: Discovery information deleted
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
   /v1:
     get:
       tags:
@@ -211,14 +211,12 @@ paths:
       description: Returns map of functional code and implemented end points
       operationId: listSupportedFunctions
       responses:
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "200":
           description: Functions found
           content:
@@ -227,12 +225,14 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/InfoResponse"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/{functionalGroup}/{kind}/attributes:
     get:
       tags:
@@ -247,14 +247,12 @@ paths:
         schema:
           type: string
       responses:
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "200":
           description: Attributes retrieved
           content:
@@ -263,19 +261,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-  /v1/health:
-    get:
-      tags:
-      - Health check
-      summary: Health check
-      operationId: checkHealth
-      responses:
         "400":
           description: Bad Request
           content:
@@ -284,6 +269,13 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+  /v1/health:
+    get:
+      tags:
+      - Health check
+      summary: Health check
+      operationId: checkHealth
+      responses:
         "200":
           description: Health check completed successfully
           content:
@@ -296,6 +288,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
 components:
   schemas:
     AttributeCallback:
