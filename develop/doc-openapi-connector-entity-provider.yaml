@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:46149
+- url: http://localhost:46183
   description: Generated server url
 tags:
 - name: Connector Info
@@ -174,6 +174,17 @@ paths:
           description: Attribute validation completed
         "500":
           description: Internal Server Error
+        "422":
+          description: Attribute validation failed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "400":
           description: Bad Request
           content:
@@ -186,17 +197,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "422":
-          description: Attribute validation failed
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
   /v1/entityProvider/entities:
     get:
       tags:
@@ -247,6 +247,17 @@ paths:
                 $ref: "#/components/schemas/EntityInstanceDto"
         "500":
           description: Internal Server Error
+        "422":
+          description: Attribute validation failed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "400":
           description: Bad Request
           content:
@@ -259,17 +270,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "422":
-          description: Attribute validation failed
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
   /v1/entityProvider/entities/{entityUuid}/locations:
     post:
       tags:
@@ -417,6 +417,8 @@ paths:
                 $ref: "#/components/schemas/RequestAttributeDto"
         required: true
       responses:
+        "500":
+          description: Internal Server Error
         "422":
           description: Unprocessable Entity
           content:
@@ -428,8 +430,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -510,6 +510,8 @@ paths:
                 $ref: "#/components/schemas/RequestAttributeDto"
         required: true
       responses:
+        "500":
+          description: Internal Server Error
         "422":
           description: Unprocessable Entity
           content:
@@ -521,8 +523,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -561,10 +561,21 @@ paths:
                 $ref: "#/components/schemas/RequestAttributeDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
         "200":
           description: Entity Location Attributes validation completed
+        "500":
+          description: Internal Server Error
+        "422":
+          description: Attribute validation failed
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "400":
           description: Bad Request
           content:
@@ -577,17 +588,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "422":
-          description: Attribute validation failed
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
         "204":
           description: No Content
   /v1:
@@ -663,14 +663,14 @@ paths:
       summary: Health check
       operationId: checkHealth
       responses:
-        "500":
-          description: Internal Server Error
         "200":
           description: Health check completed successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
