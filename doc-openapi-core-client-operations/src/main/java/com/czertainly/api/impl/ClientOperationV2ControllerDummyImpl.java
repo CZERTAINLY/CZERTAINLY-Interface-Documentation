@@ -27,7 +27,7 @@ public class ClientOperationV2ControllerDummyImpl implements ClientOperationCont
     }
 
     @Override
-    public ClientCertificateDataResponseDto issueNewCertificate(String authorityUuid, String raProfileUuid, String certificateUuid) throws NotFoundException, ConnectorException, AlreadyExistException, CertificateException, NoSuchAlgorithmException {
+    public ClientCertificateDataResponseDto issueRequestedCertificate(String authorityUuid, String raProfileUuid, String certificateUuid) throws NotFoundException, ConnectorException, AlreadyExistException, CertificateException, NoSuchAlgorithmException {
         return null;
     }
 
