@@ -9,14 +9,14 @@ info:
   license:
     name: MIT License
     url: https://github.com/CZERTAINLY/CZERTAINLY/blob/develop/LICENSE.md
-  version: 2.13.1
+  version: 2.13.2-SNAPSHOT
   x-logo:
     url: images/czertainly_color_H.svg
 externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:39897
+- url: http://localhost:46097
   description: Generated server url
 tags:
 - name: Audit Log
@@ -37,6 +37,12 @@ paths:
       summary: Get platform settings
       operationId: getPlatformSettings
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "401":
           description: Unauthorized
         "404":
@@ -45,26 +51,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "200":
-          description: Platform settings retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PlatformSettingsDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: Platform settings retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformSettingsDto"
+        "500":
+          description: Internal Server Error
     put:
       tags:
       - Settings
@@ -77,30 +77,30 @@ paths:
               $ref: "#/components/schemas/PlatformSettingsDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "200":
-          description: Setting updated
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "200":
+          description: Setting updated
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/settings/notifications:
     get:
       tags:
@@ -114,6 +114,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NotificationSettingsDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "401":
           description: Unauthorized
         "404":
@@ -122,20 +128,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
     put:
       tags:
       - Settings
@@ -148,30 +148,154 @@ paths:
               $ref: "#/components/schemas/NotificationSettingsDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "200":
-          description: Setting updated
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "200":
+          description: Setting updated
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+  /v1/auditLogs:
+    post:
+      tags:
+      - Audit Log
+      summary: List Audit logs
+      operationId: listAuditLogs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequestDto"
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: List of audit logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditLogResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+  /v1/auditLogs/purge:
+    post:
+      tags:
+      - Audit Log
+      summary: Purge Audit logs
+      operationId: purgeAuditLogs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/SearchFilterRequestDto"
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: Audit logs purged
+        "500":
+          description: Internal Server Error
+  /v1/auditLogs/export:
+    post:
+      tags:
+      - Audit Log
+      summary: Export Audit logs
+      operationId: exportAuditLogs
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/SearchFilterRequestDto"
+        required: true
+      responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "200":
+          description: Export of audit logs
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/statistics:
     get:
       tags:
@@ -179,6 +303,12 @@ paths:
       summary: Get Dashboard/Statistics Details
       operationId: getStatistics
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "401":
           description: Unauthorized
         "404":
@@ -193,20 +323,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/StatisticsDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/resources:
     get:
       tags:
@@ -214,8 +338,18 @@ paths:
       summary: Retrieve list of resources with information and settings
       operationId: listResources
       responses:
-        "401":
-          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Resources retrieved
           content:
@@ -224,26 +358,16 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ResourceDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/resources/{resource}/filters/rules:
     get:
       tags:
@@ -264,22 +388,20 @@ paths:
         schema:
           type: boolean
       responses:
-        "401":
-          description: Unauthorized
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "200":
           description: Filter fields retrieved
           content:
@@ -294,6 +416,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/resources/{resource}/events:
     get:
       tags:
@@ -308,10 +432,20 @@ paths:
         schema:
           $ref: "#/components/schemas/Resource"
       responses:
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "401":
           description: Unauthorized
-        "500":
-          description: Internal Server Error
         "200":
           description: Events retrieved
           content:
@@ -320,24 +454,14 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ResourceEventDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/enums:
     get:
       tags:
@@ -353,8 +477,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Platform settings retrieved
           content:
@@ -365,65 +493,21 @@ paths:
                   type: object
                   additionalProperties:
                     $ref: "#/components/schemas/EnumItemDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-  /v1/auditLogs:
+        "500":
+          description: Internal Server Error
+  /v1/auditLogs/search:
     get:
       tags:
       - Audit Log
-      summary: List Audit logs
-      operationId: listAuditLogs
-      parameters:
-      - name: filter
-        in: query
-        required: true
-        schema:
-          $ref: "#/components/schemas/AuditLogFilter"
-      - name: pageable
-        in: query
-        required: true
-        schema:
-          $ref: "#/components/schemas/Pageable"
+      summary: Get Audit logs searchable fields information
+      operationId: getSearchableFieldInformation
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: List of audit logs
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuditLogResponseDto"
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-  /v1/auditLogs/statuses:
-    get:
-      tags:
-      - Audit Log
-      summary: List Status
-      operationId: listOperationStatuses
-      responses:
         "401":
           description: Unauthorized
         "404":
@@ -433,190 +517,21 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "200":
-          description: List of audit log status
+          description: Audit logs searchable field information retrieved
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: string
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                  $ref: "#/components/schemas/SearchFieldDataByGroupDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-  /v1/auditLogs/purge:
-    get:
-      tags:
-      - Audit Log
-      summary: Purge Audit logs
-      operationId: purgeAuditLogs
-      parameters:
-      - name: filter
-        in: query
-        required: true
-        schema:
-          $ref: "#/components/schemas/AuditLogFilter"
-      - name: pageable
-        in: query
-        required: true
-        schema:
-          $ref: "#/components/schemas/Pageable"
-      responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: Audit logs purged
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-  /v1/auditLogs/operations:
-    get:
-      tags:
-      - Audit Log
-      summary: List Audit Operations
-      operationId: listOperations
-      responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: List of audit operations
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-  /v1/auditLogs/objects:
-    get:
-      tags:
-      - Audit Log
-      summary: List Audit Objects
-      operationId: listObjects
-      responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: List of audit Objects
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-  /v1/auditLogs/export:
-    get:
-      tags:
-      - Audit Log
-      summary: Export Audit logs
-      operationId: exportAuditLogs
-      parameters:
-      - name: filter
-        in: query
-        required: true
-        schema:
-          $ref: "#/components/schemas/AuditLogFilter"
-      - name: pageable
-        in: query
-        required: true
-        schema:
-          $ref: "#/components/schemas/Pageable"
-      responses:
-        "401":
-          description: Unauthorized
-        "200":
-          description: Export of audit logs
-          content:
-            application/json:
-              schema:
-                type: string
-                format: binary
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
 components:
   schemas:
     PlatformSettingsDto:
@@ -634,15 +549,6 @@ components:
           description: URL of the Util Service
           example: http://util-service:8080
       description: Utils settings of the platform
-    ErrorMessageDto:
-      required:
-      - message
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message detail
-          example: Error message
     AuthenticationServiceExceptionDto:
       required:
       - code
@@ -660,6 +566,15 @@ components:
         message:
           type: string
           description: Exception message
+    ErrorMessageDto:
+      required:
+      - message
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          example: Error message
     NotificationSettingsDto:
       required:
       - notificationsMapping
@@ -671,6 +586,382 @@ components:
             type: string
             description: Type settings of the notification
           description: Type settings of the notification
+    FilterConditionOperator:
+      type: string
+      description: Condition for the search filter
+      enum:
+      - EQUALS
+      - NOT_EQUALS
+      - GREATER
+      - GREATER_OR_EQUAL
+      - LESSER
+      - LESSER_OR_EQUAL
+      - CONTAINS
+      - NOT_CONTAINS
+      - STARTS_WITH
+      - ENDS_WITH
+      - EMPTY
+      - NOT_EMPTY
+      - SUCCESS
+      - FAILED
+      - UNKNOWN
+      - NOT_CHECKED
+    FilterFieldSource:
+      type: string
+      description: Field group of search filter
+      enum:
+      - meta
+      - custom
+      - data
+      - property
+    SearchFilterRequestDto:
+      required:
+      - condition
+      - fieldIdentifier
+      - fieldSource
+      type: object
+      properties:
+        fieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+        fieldIdentifier:
+          type: string
+          description: "Field identifier of search filter. List of available fields\
+            \ with their identifiers can be retrieved from corresponding endpoint\
+            \ `GET /v1/{resource}/search`, e.g.: [**GET /v1/certificates/search**](../core-certificate/#tag/Certificate-Inventory/operation/getSearchableFieldInformation)"
+        condition:
+          $ref: "#/components/schemas/FilterConditionOperator"
+        value:
+          type: object
+          description: Value to match
+      description: Certificate filter input
+    SearchRequestDto:
+      type: object
+      properties:
+        filters:
+          type: array
+          description: Certificate filter input
+          items:
+            $ref: "#/components/schemas/SearchFilterRequestDto"
+        itemsPerPage:
+          maximum: 1000
+          type: integer
+          description: Number of entries per page
+          format: int32
+          default: 10
+        pageNumber:
+          type: integer
+          description: Page number for the request
+          format: int32
+          default: 1
+    ActorRecord:
+      required:
+      - authMethod
+      - type
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/ActorType"
+        authMethod:
+          $ref: "#/components/schemas/AuthMethod"
+        uuid:
+          type: string
+          format: uuid
+        name:
+          type: string
+      description: Actor of log record
+    ActorType:
+      type: string
+      enum:
+      - anonymous
+      - core
+      - user
+      - connector
+      - protocol
+    AuditLogDto:
+      required:
+      - actor
+      - id
+      - loggedAt
+      - module
+      - operation
+      - operationResult
+      - resource
+      - version
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Audit log Id
+          format: int64
+        version:
+          type: string
+          description: Log schema version
+        loggedAt:
+          type: string
+          description: Time when the audit log is stored
+          format: date-time
+        module:
+          $ref: "#/components/schemas/Module"
+        actor:
+          $ref: "#/components/schemas/ActorRecord"
+        source:
+          $ref: "#/components/schemas/SourceRecord"
+        resource:
+          $ref: "#/components/schemas/ResourceRecord"
+        affiliatedResource:
+          $ref: "#/components/schemas/ResourceRecord"
+        operation:
+          $ref: "#/components/schemas/Operation"
+        operationResult:
+          $ref: "#/components/schemas/OperationResult"
+        message:
+          type: string
+          description: Additional message
+        operationData:
+          type: object
+          description: Structured data dependent on resource and its operation
+        additionalData:
+          type: object
+          additionalProperties:
+            type: object
+            description: Additional data specific to event logged
+          description: Additional data specific to event logged
+      description: Audit log items
+    AuditLogResponseDto:
+      required:
+      - items
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          description: Number of entries per page
+          format: int32
+        pageNumber:
+          type: integer
+          description: Page number for the request
+          format: int32
+        totalPages:
+          type: integer
+          description: Number of pages available
+          format: int32
+        totalItems:
+          type: integer
+          description: Number of items available
+          format: int64
+        items:
+          type: array
+          description: Audit log items
+          items:
+            $ref: "#/components/schemas/AuditLogDto"
+    AuthMethod:
+      type: string
+      enum:
+      - none
+      - certificate
+      - token
+      - apiKey
+      - userProxy
+    Module:
+      type: string
+      description: Module of platform where log occurred
+      enum:
+      - approvals
+      - auth
+      - certificates
+      - keys
+      - compliance
+      - core
+      - discovery
+      - entities
+      - protocols
+      - scheduler
+      - workflows
+    Operation:
+      type: string
+      description: Resource operation that is being logged
+      enum:
+      - unknown
+      - list
+      - detail
+      - create
+      - update
+      - delete
+      - forceDelete
+      - add
+      - remove
+      - request
+      - register
+      - enable
+      - disable
+      - activate
+      - deactivate
+      - listAssociations
+      - associate
+      - disassociate
+      - history
+      - summary
+      - checkCompliance
+      - checkValidation
+      - issue
+      - renew
+      - rekey
+      - revoke
+      - export
+      - getStatus
+      - getContent
+      - getChain
+      - download
+      - downloadChain
+      - getProtocolInfo
+      - listProtocolCertificates
+      - updateProtocolIssueProfile
+      - activateProtocol
+      - deactivateProtocol
+      - acmeDirectory
+      - acmeNonce
+      - acmeKeyRollover
+      - acmeValidate
+      - acmeFinalize
+      - scepCaCapabilities
+      - scepCertificatePoll
+      - scepTransactionCheck
+      - cmpConfirm
+      - upload
+      - sync
+      - compromise
+      - destroy
+      - updateKeyUsage
+      - encrypt
+      - decrypt
+      - sign
+      - verify
+      - randomData
+      - pushToLocation
+      - removeFromLocation
+      - issueInLocation
+      - renewInLocation
+      - connect
+      - reconnect
+      - checkHealth
+      - statistics
+      - approve
+      - approveOverride
+      - reject
+      - rejectOverride
+      - profile
+      - profileUpdate
+      - identify
+      - markAsRead
+      - getPermissions
+      - getObjectPermissions
+      - updatePermissions
+      - updateObjectPermissions
+      - schedule
+      - listAttributes
+      - validateAttributes
+      - attributeCallback
+      - updateAttributeResources
+      - updateAttributeContent
+      - deleteAttributeContent
+      - promoteMetadata
+      - listCertificateProfiles
+      - listCas
+    OperationResult:
+      type: string
+      description: Result of the resource operation. Either success or failed
+      enum:
+      - success
+      - failure
+    Resource:
+      type: string
+      enum:
+      - NONE
+      - dashboard
+      - settings
+      - auditLogs
+      - credentials
+      - connectors
+      - attributes
+      - jobs
+      - notificationInstances
+      - users
+      - roles
+      - acmeAccounts
+      - acmeProfiles
+      - scepProfiles
+      - cmpProfiles
+      - authorities
+      - raProfiles
+      - certificates
+      - certificateRequests
+      - groups
+      - complianceProfiles
+      - discoveries
+      - entities
+      - locations
+      - tokenProfiles
+      - tokens
+      - keys
+      - approvalProfiles
+      - approvals
+      - rules
+      - actions
+      - triggers
+      - resources
+      - resourceEvents
+      - searchFilters
+      - keyItems
+      - platformEnums
+      - notifications
+      - conditions
+      - executions
+      - complianceRules
+      - complianceGroups
+      - customAttributes
+      - globalMetadata
+      - acmeOrders
+      - acmeAuthorizations
+      - acmeChallenges
+      - cmpTransactions
+      - endEntityProfile
+    ResourceRecord:
+      required:
+      - type
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/Resource"
+        uuids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        names:
+          type: array
+          items:
+            type: string
+      description: Affiliated resource that is related to subject resource
+    SourceRecord:
+      required:
+      - method
+      - path
+      type: object
+      properties:
+        method:
+          type: string
+        path:
+          type: string
+        contentType:
+          type: string
+        ipAddress:
+          type: string
+        userAgent:
+          type: string
+      description: Source of log record
     StatisticsDto:
       type: object
       properties:
@@ -801,43 +1092,6 @@ components:
             description: Map of Client count by status
             format: int64
           description: Map of Client count by status
-    Resource:
-      type: string
-      description: Resource code
-      example: certificates
-      enum:
-      - NONE
-      - dashboard
-      - settings
-      - auditLogs
-      - credentials
-      - connectors
-      - attributes
-      - jobs
-      - notificationInstances
-      - users
-      - roles
-      - acmeAccounts
-      - acmeProfiles
-      - scepProfiles
-      - cmpProfiles
-      - authorities
-      - raProfiles
-      - certificates
-      - certificateRequests
-      - groups
-      - complianceProfiles
-      - discoveries
-      - entities
-      - locations
-      - tokenProfiles
-      - tokens
-      - keys
-      - approvalProfiles
-      - approvals
-      - rules
-      - actions
-      - triggers
     ResourceDto:
       required:
       - hasCustomAttributes
@@ -887,34 +1141,6 @@ components:
       - credential
       - codeblock
       - object
-    FilterConditionOperator:
-      type: string
-      description: List of available conditions for the field
-      enum:
-      - EQUALS
-      - NOT_EQUALS
-      - GREATER
-      - GREATER_OR_EQUAL
-      - LESSER
-      - LESSER_OR_EQUAL
-      - CONTAINS
-      - NOT_CONTAINS
-      - STARTS_WITH
-      - ENDS_WITH
-      - EMPTY
-      - NOT_EMPTY
-      - SUCCESS
-      - FAILED
-      - UNKNOWN
-      - NOT_CHECKED
-    FilterFieldSource:
-      type: string
-      description: Search group
-      enum:
-      - meta
-      - custom
-      - data
-      - property
     FilterFieldType:
       type: string
       description: Type of the field
@@ -976,6 +1202,11 @@ components:
       - ConditionType
       - ExecutionType
       - ResourceEvent
+      - Module
+      - ActorType
+      - AuthMethod
+      - Operation
+      - OperationResult
     SearchFieldDataByGroupDto:
       required:
       - filterFieldSource
@@ -1051,330 +1282,3 @@ components:
           type: string
           description: Enum item description
           example: X.509 Certificate type
-    AuditLogFilter:
-      type: object
-      properties:
-        author:
-          type: string
-          description: Author of the action triggered audit log
-        createdFrom:
-          type: string
-          description: Start time of the filter
-          format: date
-        createdTo:
-          type: string
-          description: End time of the filter
-          format: date
-        operationStatus:
-          type: string
-          description: Status of the filter
-          enum:
-          - SUCCESS
-          - FAILURE
-        origination:
-          type: string
-          description: Module triggered the action
-          enum:
-          - ACCESS
-          - RA_PROFILE
-          - CLIENT
-          - ADMINISTRATOR
-          - FE
-          - BE
-          - CA
-          - END_ENTITY
-          - END_ENTITY_PROFILE
-          - END_ENTITY_CERTIFICATE
-          - AUDIT_LOG
-          - ATTRIBUTES
-          - CA_INSTANCE
-          - NOTIFICATION_INSTANCE
-          - CREDENTIAL
-          - CONNECTOR
-          - DISCOVERY
-          - HEALTH
-          - ENTITY
-          - GROUP
-          - CERTIFICATE
-          - STATISTICS
-          - ACME_PROFILE
-          - APPROVAL
-          - APPROVAL_PROFILE
-          - ACME_ACCOUNT
-          - SCEP_PROFILE
-          - CMP_PROFILE
-          - COMPLIANCE_PROFILE
-          - COMPLIANCE_RULE
-          - COMPLIANCE_GROUP
-          - LOCALHOST
-          - TOKEN_PROFILE
-          - TOKEN_INSTANCE
-          - CRYPTOGRAPHIC_KEY
-          - CRYPTOGRAPHIC_OPERATIONS
-          - SCHEDULER
-        affected:
-          type: string
-          description: Module affected by the action
-          enum:
-          - ACCESS
-          - RA_PROFILE
-          - CLIENT
-          - ADMINISTRATOR
-          - FE
-          - BE
-          - CA
-          - END_ENTITY
-          - END_ENTITY_PROFILE
-          - END_ENTITY_CERTIFICATE
-          - AUDIT_LOG
-          - ATTRIBUTES
-          - CA_INSTANCE
-          - NOTIFICATION_INSTANCE
-          - CREDENTIAL
-          - CONNECTOR
-          - DISCOVERY
-          - HEALTH
-          - ENTITY
-          - GROUP
-          - CERTIFICATE
-          - STATISTICS
-          - ACME_PROFILE
-          - APPROVAL
-          - APPROVAL_PROFILE
-          - ACME_ACCOUNT
-          - SCEP_PROFILE
-          - CMP_PROFILE
-          - COMPLIANCE_PROFILE
-          - COMPLIANCE_RULE
-          - COMPLIANCE_GROUP
-          - LOCALHOST
-          - TOKEN_PROFILE
-          - TOKEN_INSTANCE
-          - CRYPTOGRAPHIC_KEY
-          - CRYPTOGRAPHIC_OPERATIONS
-          - SCHEDULER
-        objectIdentifier:
-          type: string
-          description: Identifier of the object created
-        operation:
-          type: string
-          description: Type of the operation
-          enum:
-          - CREATE
-          - DELETE
-          - CHANGE
-          - ENABLE
-          - DISABLE
-          - AUTH
-          - REQUEST
-          - ISSUE
-          - RENEW
-          - REVOKE
-          - RESET
-          - START
-          - STOP
-          - VALIDATE
-          - CALLBACK
-          - CONNECT
-          - FORCE_DELETE
-          - ENCRYPT
-          - DECRYPT
-          - SIGN
-          - VERIFY
-          - APPROVE
-          - REJECT
-          - UPDATE
-    Pageable:
-      type: object
-      properties:
-        page:
-          minimum: 0
-          type: integer
-          format: int32
-        size:
-          minimum: 1
-          type: integer
-          format: int32
-        sort:
-          type: array
-          items:
-            type: string
-    AuditLogDto:
-      required:
-      - affected
-      - author
-      - created
-      - id
-      - objectIdentifier
-      - operation
-      - operationStatus
-      - origination
-      - uuid
-      type: object
-      properties:
-        id:
-          type: integer
-          description: Audit log Id
-          format: int64
-        uuid:
-          type: string
-          description: Audit log UUID
-        author:
-          type: string
-          description: Requestor of the change
-        created:
-          type: string
-          description: Time when the audit log is registered
-          format: date-time
-        operationStatus:
-          type: string
-          description: Status of the operation. Either success or failed
-          enum:
-          - SUCCESS
-          - FAILURE
-        origination:
-          type: string
-          description: Module triggered the action
-          enum:
-          - ACCESS
-          - RA_PROFILE
-          - CLIENT
-          - ADMINISTRATOR
-          - FE
-          - BE
-          - CA
-          - END_ENTITY
-          - END_ENTITY_PROFILE
-          - END_ENTITY_CERTIFICATE
-          - AUDIT_LOG
-          - ATTRIBUTES
-          - CA_INSTANCE
-          - NOTIFICATION_INSTANCE
-          - CREDENTIAL
-          - CONNECTOR
-          - DISCOVERY
-          - HEALTH
-          - ENTITY
-          - GROUP
-          - CERTIFICATE
-          - STATISTICS
-          - ACME_PROFILE
-          - APPROVAL
-          - APPROVAL_PROFILE
-          - ACME_ACCOUNT
-          - SCEP_PROFILE
-          - CMP_PROFILE
-          - COMPLIANCE_PROFILE
-          - COMPLIANCE_RULE
-          - COMPLIANCE_GROUP
-          - LOCALHOST
-          - TOKEN_PROFILE
-          - TOKEN_INSTANCE
-          - CRYPTOGRAPHIC_KEY
-          - CRYPTOGRAPHIC_OPERATIONS
-          - SCHEDULER
-        affected:
-          type: string
-          description: Module affected by the operation
-          enum:
-          - ACCESS
-          - RA_PROFILE
-          - CLIENT
-          - ADMINISTRATOR
-          - FE
-          - BE
-          - CA
-          - END_ENTITY
-          - END_ENTITY_PROFILE
-          - END_ENTITY_CERTIFICATE
-          - AUDIT_LOG
-          - ATTRIBUTES
-          - CA_INSTANCE
-          - NOTIFICATION_INSTANCE
-          - CREDENTIAL
-          - CONNECTOR
-          - DISCOVERY
-          - HEALTH
-          - ENTITY
-          - GROUP
-          - CERTIFICATE
-          - STATISTICS
-          - ACME_PROFILE
-          - APPROVAL
-          - APPROVAL_PROFILE
-          - ACME_ACCOUNT
-          - SCEP_PROFILE
-          - CMP_PROFILE
-          - COMPLIANCE_PROFILE
-          - COMPLIANCE_RULE
-          - COMPLIANCE_GROUP
-          - LOCALHOST
-          - TOKEN_PROFILE
-          - TOKEN_INSTANCE
-          - CRYPTOGRAPHIC_KEY
-          - CRYPTOGRAPHIC_OPERATIONS
-          - SCHEDULER
-        objectIdentifier:
-          type: string
-          description: Object identifier
-        operation:
-          type: string
-          description: Type of operation performed
-          enum:
-          - CREATE
-          - DELETE
-          - CHANGE
-          - ENABLE
-          - DISABLE
-          - AUTH
-          - REQUEST
-          - ISSUE
-          - RENEW
-          - REVOKE
-          - RESET
-          - START
-          - STOP
-          - VALIDATE
-          - CALLBACK
-          - CONNECT
-          - FORCE_DELETE
-          - ENCRYPT
-          - DECRYPT
-          - SIGN
-          - VERIFY
-          - APPROVE
-          - REJECT
-          - UPDATE
-        additionalData:
-          type: string
-      description: Audit log items
-    AuditLogResponseDto:
-      required:
-      - items
-      - itemsPerPage
-      - pageNumber
-      - totalItems
-      - totalPages
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          description: Number of entries per page
-          format: int32
-        pageNumber:
-          type: integer
-          description: Page number for the request
-          format: int32
-        totalPages:
-          type: integer
-          description: Number of pages available
-          format: int32
-        totalItems:
-          type: integer
-          description: Number of items available
-          format: int64
-        items:
-          type: array
-          description: Audit log items
-          items:
-            $ref: "#/components/schemas/AuditLogDto"
