@@ -63,5 +63,5 @@ public class SettingControllerDummyImpl implements SettingController {
     public void updateLoggingSettings(LoggingSettingsDto loggingSettingsDto) {
 
     }
-    
+
 }
