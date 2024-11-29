@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@SuppressWarnings("java:S1186")
 public class SettingControllerDummyImpl implements SettingController {
 
     @Override
