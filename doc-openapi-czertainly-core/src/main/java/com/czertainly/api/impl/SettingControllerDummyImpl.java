@@ -2,6 +2,10 @@ package com.czertainly.api.impl;
 
 import com.czertainly.api.interfaces.core.web.SettingController;
 import com.czertainly.api.model.core.settings.*;
+import com.czertainly.api.model.core.settings.authentication.AuthenticationSettingsDto;
+import com.czertainly.api.model.core.settings.authentication.AuthenticationSettingsUpdateDto;
+import com.czertainly.api.model.core.settings.authentication.OAuth2ProviderSettingsDto;
+import com.czertainly.api.model.core.settings.authentication.OAuth2ProviderSettingsUpdateDto;
 import com.czertainly.api.model.core.settings.logging.LoggingSettingsDto;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,7 +49,7 @@ public class SettingControllerDummyImpl implements SettingController {
     }
 
     @Override
-    public void updateOAuth2ProviderSettings(String providerName, @Valid OAuth2ProviderSettingsDto oauth2SettingsDto) {
+    public void updateOAuth2ProviderSettings(String providerName, @Valid OAuth2ProviderSettingsUpdateDto oauth2SettingsDto) {
 
     }
 
