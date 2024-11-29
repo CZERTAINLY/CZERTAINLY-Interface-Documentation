@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:43939
+- url: http://localhost:33221
   description: Generated server url
 tags:
 - name: Notification instances Management
@@ -123,6 +123,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Notification instance removed
         "400":
           description: Bad Request
           content:
@@ -137,8 +139,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: Notification instance removed
   /v1/{functionalGroup}/{kind}/attributes/validate:
     post:
       tags:
@@ -269,6 +269,8 @@ paths:
               $ref: "#/components/schemas/NotificationProviderNotifyRequestDto"
         required: true
       responses:
+        "204":
+          description: Notification sent
         "400":
           description: Bad Request
           content:
@@ -283,8 +285,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: Notification sent
   /v1:
     get:
       tags:
@@ -301,12 +301,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Functions found
           content:
@@ -315,6 +309,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/InfoResponse"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/{functionalGroup}/{kind}/attributes:
     get:
       tags:
@@ -337,12 +337,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Attributes retrieved
           content:
@@ -351,6 +345,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/notificationProvider/{kind}/attributes/mapping:
     get:
       tags:
@@ -373,12 +373,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: List of mapping attributes
           content:
@@ -387,6 +381,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/DataAttribute"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/health:
     get:
       tags:
@@ -1407,7 +1407,8 @@ components:
       - acmeAuthorizations
       - acmeChallenges
       - cmpTransactions
-      - endEntityProfile
+      - endEntityProfiles
+      - authenticationProviders
     EndpointDto:
       required:
       - context
