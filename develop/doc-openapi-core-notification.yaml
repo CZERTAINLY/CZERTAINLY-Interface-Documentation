@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:33129
+- url: http://localhost:43879
   description: Generated server url
 tags:
 - name: Internal Notification
@@ -58,6 +58,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -66,14 +74,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "503":
-          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -103,20 +103,39 @@ paths:
               $ref: "#/components/schemas/NotificationInstanceUpdateRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "422":
+          description: Unprocessable Entity
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "500":
+          description: Internal Server Error
         "200":
           description: Notification instance details updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/NotificationInstanceDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -129,25 +148,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "422":
-          description: Unprocessable Entity
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
         "403":
           description: Forbidden
           content:
@@ -177,6 +177,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -185,14 +193,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "503":
-          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -210,6 +210,8 @@ paths:
       summary: List of available Notification instances
       operationId: listNotificationInstances
       responses:
+        "500":
+          description: Internal Server Error
         "200":
           description: List of Notification instances
           content:
@@ -218,14 +220,20 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NotificationInstanceDto"
-        "500":
-          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -234,14 +242,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "503":
-          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -264,6 +264,17 @@ paths:
               $ref: "#/components/schemas/NotificationInstanceRequestDto"
         required: true
       responses:
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "500":
           description: Internal Server Error
         "404":
@@ -272,14 +283,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -292,23 +297,18 @@ paths:
                 $ref: "#/components/schemas/UuidDto"
         "401":
           description: Unauthorized
-        "503":
-          description: Connector Communication Error
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "422":
-          description: Unprocessable Entity
+        "502":
+          description: Connector Error
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
@@ -343,14 +343,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -383,16 +383,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: Notifications deleted
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "204":
-          description: Notifications deleted
         "403":
           description: Forbidden
           content:
@@ -427,14 +427,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -463,22 +463,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
+        "204":
+          description: Notification deleted
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: Notification deleted
     patch:
       tags:
       - Internal Notification
@@ -492,24 +492,24 @@ paths:
         schema:
           type: string
       responses:
-        "204":
-          description: Notification marked as read
         "500":
           description: Internal Server Error
+        "204":
+          description: Notification marked as read
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -544,6 +544,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "200":
+          description: List of mapping attributes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DataAttribute"
         "400":
           description: Bad Request
           content:
@@ -556,22 +572,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: List of mapping attributes
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/DataAttribute"
         "403":
           description: Forbidden
           content:
