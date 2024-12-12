@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:43257
+- url: http://localhost:46101
   description: Generated server url
 tags:
 - name: ACME operations
@@ -55,6 +55,14 @@ paths:
               $ref: "#/components/schemas/CertificateRevocationRequest"
         required: true
       responses:
+        "200":
+          description: Certificate revoked
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -67,14 +75,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "200":
-          description: Certificate revoked
         "500":
           description: Internal Server Error
   /v1/protocols/acme/{acmeProfileName}/orders/{accountId}:
@@ -105,6 +105,12 @@ paths:
           application/jose+json: {}
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -117,12 +123,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
+        "500":
+          description: Internal Server Error
         "200":
           description: Orders list retrieved
           content:
@@ -131,8 +133,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Order"
-        "500":
-          description: Internal Server Error
   /v1/protocols/acme/{acmeProfileName}/order/{orderId}:
     post:
       tags:
@@ -161,6 +161,12 @@ paths:
           application/jose+json: {}
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -169,12 +175,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "403":
           description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -217,6 +217,12 @@ paths:
               $ref: "#/components/schemas/CertificateFinalizeRequest"
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -229,20 +235,14 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
+        "500":
+          description: Internal Server Error
         "200":
           description: Order finalized
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Order"
-        "500":
-          description: Internal Server Error
   /v1/protocols/acme/{acmeProfileName}/new-order:
     post:
       tags:
@@ -267,6 +267,12 @@ paths:
               $ref: "#/components/schemas/CertificateIssuanceRequest"
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -275,12 +281,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "403":
           description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -317,14 +317,14 @@ paths:
               $ref: "#/components/schemas/NewAccountRequest"
         required: true
       responses:
-        "401":
-          description: Unauthorized
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "403":
-          description: Forbidden
+        "401":
+          description: Unauthorized
           content:
             application/problem+json:
               schema:
@@ -335,8 +335,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Account"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -373,8 +373,8 @@ paths:
               $ref: "#/components/schemas/KeyRollover"
         required: true
       responses:
-        "409":
-          description: Conflict. Key already exists
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -391,8 +391,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
+        "409":
+          description: Conflict. Key already exists
           content:
             application/problem+json:
               schema:
@@ -403,8 +405,6 @@ paths:
             application/json:
               schema:
                 type: object
-        "500":
-          description: Internal Server Error
   /v1/protocols/acme/{acmeProfileName}/chall/{challengeId}:
     post:
       tags:
@@ -436,6 +436,12 @@ paths:
             example: {}
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -448,20 +454,14 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
+        "500":
+          description: Internal Server Error
         "200":
           description: Challenge validation initiated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Challenge"
-        "500":
-          description: Internal Server Error
   /v1/protocols/acme/{acmeProfileName}/cert/{certificateId}:
     post:
       tags:
@@ -490,6 +490,12 @@ paths:
           application/jose+json: {}
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -498,12 +504,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "403":
           description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -542,6 +542,12 @@ paths:
               type: string
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -550,12 +556,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "403":
           description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -604,6 +604,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Account"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -612,12 +618,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "403":
           description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -648,6 +648,14 @@ paths:
               $ref: "#/components/schemas/CertificateRevocationRequest"
         required: true
       responses:
+        "200":
+          description: Certificate revoked
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -660,14 +668,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "200":
-          description: Certificate revoked
         "500":
           description: Internal Server Error
   /v1/protocols/acme/raProfile/{raProfileName}/orders/{accountId}:
@@ -698,6 +698,12 @@ paths:
           application/jose+json: {}
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -710,12 +716,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
+        "500":
+          description: Internal Server Error
         "200":
           description: Orders list retrieved
           content:
@@ -724,8 +726,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Order"
-        "500":
-          description: Internal Server Error
   /v1/protocols/acme/raProfile/{raProfileName}/order/{orderId}:
     post:
       tags:
@@ -754,6 +754,12 @@ paths:
           application/jose+json: {}
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -762,12 +768,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "403":
           description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -810,6 +810,12 @@ paths:
               $ref: "#/components/schemas/CertificateFinalizeRequest"
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -822,20 +828,14 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
+        "500":
+          description: Internal Server Error
         "200":
           description: Order finalized
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Order"
-        "500":
-          description: Internal Server Error
   /v1/protocols/acme/raProfile/{raProfileName}/new-order:
     post:
       tags:
@@ -860,6 +860,12 @@ paths:
               $ref: "#/components/schemas/CertificateIssuanceRequest"
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -868,12 +874,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "403":
           description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -910,14 +910,14 @@ paths:
               $ref: "#/components/schemas/NewAccountRequest"
         required: true
       responses:
-        "401":
-          description: Unauthorized
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "403":
-          description: Forbidden
+        "401":
+          description: Unauthorized
           content:
             application/problem+json:
               schema:
@@ -928,8 +928,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Account"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -966,8 +966,8 @@ paths:
               $ref: "#/components/schemas/KeyRollover"
         required: true
       responses:
-        "409":
-          description: Conflict. Key already exists
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -986,14 +986,14 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Account key updated
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
+        "409":
+          description: Conflict. Key already exists
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "500":
-          description: Internal Server Error
   /v1/protocols/acme/raProfile/{raProfileName}/chall/{challengeId}:
     post:
       tags:
@@ -1025,6 +1025,12 @@ paths:
             example: {}
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -1037,20 +1043,14 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
+        "500":
+          description: Internal Server Error
         "200":
           description: Challenge validation initiated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Challenge"
-        "500":
-          description: Internal Server Error
   /v1/protocols/acme/raProfile/{raProfileName}/cert/{certificateId}:
     post:
       tags:
@@ -1079,6 +1079,14 @@ paths:
           application/jose+json: {}
         required: true
       responses:
+        "200":
+          description: Certificate content retrieved as file
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -1087,14 +1095,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "403":
           description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "200":
-          description: Certificate content retrieved as file
-        "400":
-          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1131,6 +1131,12 @@ paths:
               type: string
         required: true
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -1139,12 +1145,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "403":
           description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1193,6 +1193,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Account"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -1201,12 +1207,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "403":
           description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1230,8 +1230,12 @@ paths:
         schema:
           type: string
       responses:
-        "204":
-          description: New Nonce retrieved
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -1244,14 +1248,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
+        "204":
+          description: New Nonce retrieved
     head:
       tags:
       - ACME operations
@@ -1268,6 +1268,12 @@ paths:
         schema:
           type: string
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -1282,12 +1288,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: New Nonce retrieved
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
   /v1/protocols/acme/raProfile/{raProfileName}/new-nonce:
@@ -1307,8 +1307,12 @@ paths:
         schema:
           type: string
       responses:
-        "204":
-          description: New Nonce retrieved
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -1321,14 +1325,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
+        "204":
+          description: New Nonce retrieved
     head:
       tags:
       - ACME RA Profile
@@ -1345,6 +1345,12 @@ paths:
         schema:
           type: string
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -1359,12 +1365,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: New Nonce retrieved
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
   /v1/protocols/acme/{acmeProfileName}/directory:
@@ -1390,6 +1390,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Directory"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -1398,12 +1404,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "403":
           description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1433,6 +1433,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Directory"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -1441,12 +1447,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "403":
           description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "400":
-          description: Bad Request
           content:
             application/problem+json:
               schema:
