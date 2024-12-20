@@ -9,14 +9,14 @@ info:
   license:
     name: MIT License
     url: https://github.com/CZERTAINLY/CZERTAINLY/blob/develop/LICENSE.md
-  version: 2.13.2-SNAPSHOT
+  version: 2.14.0
   x-logo:
     url: images/czertainly_color_H.svg
 externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:37583
+- url: http://localhost:45063
   description: Generated server url
 tags:
 - name: Connector Info
@@ -131,10 +131,10 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "200":
-          description: Attributes validated
         "500":
           description: Internal Server Error
+        "200":
+          description: Attributes validated
   /v2/authorityProvider/authorities/{uuid}/certificates/renew:
     post:
       tags:
@@ -282,10 +282,10 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "200":
-          description: Attributes validated
         "500":
           description: Internal Server Error
+        "200":
+          description: Attributes validated
   /v2/authorityProvider/authorities/{uuid}/certificates/identify:
     post:
       tags:
@@ -312,12 +312,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CertificateIdentificationResponseDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Unprocessable Entity. Certificate is found but not valid according
             to supplied RA attributes
@@ -336,6 +330,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "404":
+          description: Certificate unknown
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "500":
           description: Internal Server Error
   /v1/{functionalGroup}/{kind}/attributes/validate:
@@ -362,17 +367,6 @@ paths:
       responses:
         "200":
           description: Attribute validation completed
-        "422":
-          description: Attribute validation failed
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
         "400":
           description: Bad Request
           content:
@@ -385,6 +379,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Attribute validation failed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "500":
           description: Internal Server Error
   /v1/authorityProvider/authorities:
@@ -440,14 +445,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Authority instance created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthorityProviderInstanceDto"
-        "500":
-          description: Internal Server Error
   /v1/authorityProvider/authorities/{uuid}:
     get:
       tags:
@@ -744,6 +749,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Issue certificate attribute list retrieved
           content:
@@ -752,12 +763,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
   /v1:
@@ -833,18 +838,18 @@ paths:
       summary: Health check
       operationId: checkHealth
       responses:
-        "200":
-          description: Health check completed successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HealthDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: Health check completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthDto"
         "404":
           description: Not Found
           content:

@@ -9,14 +9,14 @@ info:
   license:
     name: MIT License
     url: https://github.com/CZERTAINLY/CZERTAINLY/blob/develop/LICENSE.md
-  version: 2.13.2-SNAPSHOT
+  version: 2.14.0
   x-logo:
     url: images/czertainly_color_H.svg
 externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:41051
+- url: http://localhost:43141
   description: Generated server url
 tags:
 - name: Discovery
@@ -65,12 +65,6 @@ paths:
       responses:
         "200":
           description: Attribute validation completed
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Attribute validation failed
           content:
@@ -82,14 +76,20 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/discoveryProvider/discover:
     post:
       tags:
@@ -109,6 +109,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Unprocessable entity
           content:
@@ -120,20 +126,14 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
+        "500":
+          description: Internal Server Error
         "200":
           description: Discovery initiated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/DiscoveryProviderDto"
-        "500":
-          description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/discoveryProvider/discover/{uuid}:
     post:
       tags:
@@ -160,14 +160,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Discovery details retrieved
           content:
@@ -193,16 +193,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: Discovery information deleted
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+        "204":
+          description: Discovery information deleted
   /v1:
     get:
       tags:
@@ -217,6 +217,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "200":
@@ -227,12 +233,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/InfoResponse"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/{functionalGroup}/{kind}/attributes:
     get:
       tags:
@@ -253,6 +253,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "200":
@@ -263,12 +269,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/health:
     get:
       tags:
@@ -282,20 +282,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Health check completed successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/HealthDto"
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+        "200":
+          description: Health check completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthDto"
 components:
   schemas:
     AttributeCallback:

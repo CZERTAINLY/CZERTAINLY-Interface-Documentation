@@ -9,14 +9,14 @@ info:
   license:
     name: MIT License
     url: https://github.com/CZERTAINLY/CZERTAINLY/blob/develop/LICENSE.md
-  version: 2.13.2-SNAPSHOT
+  version: 2.14.0
   x-logo:
     url: images/czertainly_color_H.svg
 externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:44233
+- url: http://localhost:37193
   description: Generated server url
 tags:
 - name: Certificate & Key Group
@@ -35,14 +35,14 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "200":
           description: Group details retrieved
           content:
@@ -55,12 +55,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
     put:
@@ -82,14 +82,14 @@ paths:
               $ref: "#/components/schemas/GroupRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -102,12 +102,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GroupDto"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
     delete:
@@ -123,28 +123,28 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: Group deleted
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: Group deleted
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
   /v1/groups:
@@ -154,26 +154,26 @@ paths:
       summary: List Groups
       operationId: listGroups
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: list of available Group
           content:
@@ -196,34 +196,34 @@ paths:
               $ref: "#/components/schemas/GroupRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "201":
-          description: Group created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UuidDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+        "201":
+          description: Group created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UuidDto"
     delete:
       tags:
       - Certificate & Key Group
@@ -242,14 +242,14 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -258,12 +258,12 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: Groups deleted
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
 components:
@@ -863,15 +863,6 @@ components:
         data:
           type: string
           description: Time attribute value in format HH:mm:ss
-    ErrorMessageDto:
-      required:
-      - message
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message detail
-          example: Error message
     AuthenticationServiceExceptionDto:
       required:
       - code
@@ -889,6 +880,15 @@ components:
         message:
           type: string
           description: Exception message
+    ErrorMessageDto:
+      required:
+      - message
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          example: Error message
     GroupDto:
       required:
       - name
