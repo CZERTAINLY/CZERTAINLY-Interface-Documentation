@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:34349
+- url: http://localhost:36287
   description: Generated server url
 tags:
 - name: SCEP Profile Management
@@ -38,12 +38,24 @@ paths:
       responses:
         "401":
           description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: SCEP Profile details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ScepProfileDetailDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
@@ -52,18 +64,6 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
     put:
       tags:
       - SCEP Profile Management
@@ -83,22 +83,14 @@ paths:
               $ref: "#/components/schemas/ScepProfileEditRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
         "200":
           description: SCEP Profile updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ScepProfileDetailDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
         "404":
           description: Not Found
           content:
@@ -111,6 +103,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
     delete:
       tags:
       - SCEP Profile Management
@@ -126,8 +126,20 @@ paths:
       responses:
         "401":
           description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: SCEP Profile deleted
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
@@ -136,18 +148,6 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/scepProfiles:
     get:
       tags:
@@ -155,8 +155,6 @@ paths:
       summary: Get list of SCEP Profiles
       operationId: listScepProfiles
       responses:
-        "401":
-          description: Unauthorized
         "200":
           description: SCEP Profile list retrieved
           content:
@@ -165,14 +163,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ScepProfileDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
         "404":
           description: Not Found
           content:
@@ -185,6 +177,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
     post:
       tags:
       - SCEP Profile Management
@@ -199,6 +199,18 @@ paths:
       responses:
         "401":
           description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
@@ -207,24 +219,12 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "201":
           description: SCEP Profile created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ScepProfileDetailDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/scepProfiles/{uuid}/raProfiles/{raProfileUuid}:
     patch:
       tags:
@@ -245,18 +245,10 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
         "200":
           description: RA Profile updated
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
         "404":
           description: Not Found
           content:
@@ -269,6 +261,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "204":
           description: No Content
   /v1/scepProfiles/{uuid}/enable:
@@ -287,6 +287,20 @@ paths:
       responses:
         "401":
           description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: SCEP Profile enabled
         "403":
           description: Forbidden
           content:
@@ -295,20 +309,6 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: SCEP Profile enabled
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/scepProfiles/{uuid}/disable:
     patch:
       tags:
@@ -325,16 +325,6 @@ paths:
       responses:
         "401":
           description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
-        "204":
-          description: SCEP Profile disabled
         "404":
           description: Not Found
           content:
@@ -347,6 +337,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: SCEP Profile disabled
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/scepProfiles/enable:
     patch:
       tags:
@@ -366,18 +366,10 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "401":
-          description: Unauthorized
         "204":
           description: SCEP Profiles enabled
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
         "404":
           description: Not Found
           content:
@@ -390,6 +382,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/scepProfiles/disable:
     patch:
       tags:
@@ -411,16 +411,6 @@ paths:
       responses:
         "401":
           description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: SCEP Profiles disabled
-        "500":
-          description: Internal Server Error
         "404":
           description: Not Found
           content:
@@ -433,6 +423,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: SCEP Profiles disabled
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/scepProfiles/caCertificates:
     get:
       tags:
@@ -449,16 +449,14 @@ paths:
       responses:
         "401":
           description: Unauthorized
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -471,12 +469,14 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/CertificateDto"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/scepProfiles/delete:
     delete:
       tags:
@@ -498,6 +498,18 @@ paths:
       responses:
         "401":
           description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: SCEP Profiles deleted
           content:
@@ -514,18 +526,6 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/scepProfiles/delete/force:
     delete:
       tags:
@@ -555,6 +555,12 @@ paths:
                   $ref: "#/components/schemas/BulkActionMessageDto"
         "401":
           description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Unprocessible Entity
           content:
@@ -566,6 +572,12 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
@@ -574,18 +586,6 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
 components:
   schemas:
     AttributeCallback:
@@ -1260,6 +1260,15 @@ components:
           description: Time attribute value in format HH:mm:ss
       required:
       - data
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          example: Error message
+      required:
+      - message
     AuthenticationServiceExceptionDto:
       type: object
       properties:
@@ -1277,15 +1286,6 @@ components:
       - code
       - message
       - statusCode
-    ErrorMessageDto:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message detail
-          example: Error message
-      required:
-      - message
     CertificateDto:
       type: object
       properties:

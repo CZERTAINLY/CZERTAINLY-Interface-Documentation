@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:38161
+- url: http://localhost:34371
   description: Generated server url
 tags:
 - name: Token Profile Management
@@ -48,18 +48,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenProfileDetailDto"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "400":
@@ -74,14 +76,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
     put:
       tags:
       - Token Profile Management
@@ -113,18 +113,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenProfileDetailDto"
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "400":
@@ -139,14 +141,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
         "422":
           description: Unprocessible Entity
           content:
@@ -177,20 +177,24 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+        "204":
+          description: Token Profile deleted
         "400":
           description: Bad Request
           content:
@@ -203,16 +207,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: Token Profile deleted
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
   /v1/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/usages:
     put:
       tags:
@@ -239,18 +239,20 @@ paths:
               $ref: "#/components/schemas/TokenProfileKeyUsageRequestDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "400":
@@ -265,14 +267,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
         "204":
           description: Key Usages Updated
   /v1/tokens/usages:
@@ -288,18 +288,20 @@ paths:
               $ref: "#/components/schemas/BulkTokenProfileKeyUsageRequestDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "400":
@@ -314,14 +316,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
         "204":
           description: Key Usages Updated
   /v1/tokens/{tokenInstanceUuid}/tokenProfiles:
@@ -344,14 +344,10 @@ paths:
               $ref: "#/components/schemas/AddTokenProfileRequestDto"
         required: true
       responses:
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -362,6 +358,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenProfileDetailDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
         "400":
@@ -376,14 +378,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
         "422":
           description: Unprocessible Entity
           content:
@@ -415,20 +415,22 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
         "204":
           description: Token Profile enabled
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "400":
@@ -443,14 +445,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
   /v1/tokens/{tokenInstanceUuid}/tokenProfiles/{uuid}/disable:
     patch:
       tags:
@@ -471,18 +471,20 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "400":
@@ -497,14 +499,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
         "204":
           description: Token Profile disabled
   /v1/tokenProfiles/enable:
@@ -526,20 +526,22 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: Token Profiles enabled
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
         "400":
@@ -554,14 +556,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
   /v1/tokenProfiles/disable:
     patch:
       tags:
@@ -581,18 +581,20 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "400":
@@ -607,14 +609,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
         "204":
           description: Token Profiles disabled
   /v1/tokenProfiles:
@@ -630,18 +630,20 @@ paths:
         schema:
           type: boolean
       responses:
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "400":
@@ -656,14 +658,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
         "200":
           description: Token Profiles retrieved
           content:
@@ -690,18 +690,20 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
         "400":
@@ -716,16 +718,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "204":
-          description: Token Profiles deleted
         "422":
           description: Unprocessible Entity
           content:
@@ -737,6 +735,8 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
+        "204":
+          description: Token Profiles deleted
   /v1/tokenProfiles/{uuid}:
     delete:
       tags:
@@ -751,20 +751,24 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+        "204":
+          description: Token Profile deleted
         "400":
           description: Bad Request
           content:
@@ -777,16 +781,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: Token Profile deleted
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
 components:
   schemas:
     AttributeCallback:
@@ -1438,6 +1438,15 @@ components:
           description: Time attribute value in format HH:mm:ss
       required:
       - data
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          example: Error message
+      required:
+      - message
     AuthenticationServiceExceptionDto:
       type: object
       properties:
@@ -1455,15 +1464,6 @@ components:
       - code
       - message
       - statusCode
-    ErrorMessageDto:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message detail
-          example: Error message
-      required:
-      - message
     ResponseAttributeDto:
       type: object
       description: Response attribute with content for object it belongs to
