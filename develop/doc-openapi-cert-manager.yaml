@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: CZERTAINLY Cert Manager
   description: REST API for implementations of cert-manager issuer
@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:43163
+- url: http://localhost:39125
   description: Generated server url
 tags:
 - name: Certificate Inventory
@@ -54,14 +54,10 @@ paths:
               $ref: "#/components/schemas/ClientCertificateSignRequestDto"
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -77,10 +73,28 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
+        "200":
+          description: Certificate issued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientCertificateDataResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -91,20 +105,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "200":
-          description: Certificate issued
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ClientCertificateDataResponseDto"
   /v1/raProfiles/{raProfileUuid}:
     get:
       tags:
@@ -119,6 +119,20 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: RA Profile details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaProfileDto"
         "400":
           description: Bad Request
           content:
@@ -131,10 +145,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
+        "500":
+          description: Internal Server Error
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -145,20 +159,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "200":
-          description: RA Profile details retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/RaProfileDto"
   /v1/certificates/{uuid}:
     get:
       tags:
@@ -179,12 +179,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CertificateDetailDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "404":
@@ -193,14 +187,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
   /v1/auth/profile:
     get:
       tags:
@@ -208,41 +208,37 @@ paths:
       summary: Profile Authorization
       operationId: profile
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
         "200":
           description: Authenticate a user
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailDto"
+        "401":
+          description: Unauthorized
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
 components:
   schemas:
     AttributeCallback:
-      required:
-      - callbackContext
-      - callbackMethod
-      - mappings
       type: object
       properties:
         callbackContext:
@@ -252,17 +248,16 @@ components:
           type: string
           description: HTTP method of the callback
         mappings:
-          uniqueItems: true
           type: array
           description: Mappings for the callback method
           items:
             $ref: "#/components/schemas/AttributeCallbackMapping"
-      description: Optional definition of callback for getting the content of the
-        Attribute based on the action
-    AttributeCallbackMapping:
+          uniqueItems: true
       required:
-      - targets
-      - to
+      - callbackContext
+      - callbackMethod
+      - mappings
+    AttributeCallbackMapping:
       type: object
       properties:
         from:
@@ -272,33 +267,36 @@ components:
             set only if value is not set.
         attributeType:
           $ref: "#/components/schemas/AttributeType"
+          description: Type of the attribute. It is optional and must be set only
+            if special behaviour is needed.
         attributeContentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: 'Type of the attribute content. '
         to:
           type: string
           description: Name of the path variable or request param or body field which
             is to be used to assign value of attribute
         targets:
-          uniqueItems: true
           type: array
           description: Set of targets for propagating value.
           items:
             $ref: "#/components/schemas/AttributeValueTarget"
+          uniqueItems: true
         value:
           type: object
           description: Static value to be propagated to targets. It is optional and
             is set only if the value is known at attribute creation time.
-      description: Mappings for the callback method
+      required:
+      - targets
+      - to
     AttributeConstraintType:
       type: string
-      description: Attribute Constraint Type
       enum:
       - regExp
       - range
       - dateTime
     AttributeContentType:
       type: string
-      description: 'Type of the attribute content. '
       enum:
       - string
       - text
@@ -315,8 +313,6 @@ components:
       - object
     AttributeType:
       type: string
-      description: Type of the attribute. It is optional and must be set only if special
-        behaviour is needed.
       enum:
       - data
       - group
@@ -325,16 +321,18 @@ components:
       - custom
     AttributeValueTarget:
       type: string
-      description: Set of targets for propagating value.
       enum:
       - pathVariable
       - requestParameter
       - body
     BaseAttributeConstraint:
-      required:
-      - data
-      - type
       type: object
+      description: Optional regular expressions and constraints used for validating
+        the Attribute content
+      oneOf:
+      - $ref: "#/components/schemas/RegexpAttributeConstraint"
+      - $ref: "#/components/schemas/RangeAttributeConstraint"
+      - $ref: "#/components/schemas/DateTimeAttributeConstraint"
       properties:
         description:
           type: string
@@ -344,26 +342,15 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           type: object
           description: Attribute Constraint Data
-      description: Optional regular expressions and constraints used for validating
-        the Attribute content
-      oneOf:
-      - $ref: "#/components/schemas/RegexpAttributeConstraint"
-      - $ref: "#/components/schemas/RangeAttributeConstraint"
-      - $ref: "#/components/schemas/DateTimeAttributeConstraint"
-    BaseAttributeContentDto:
       required:
       - data
+      - type
+    BaseAttributeContentDto:
       type: object
-      properties:
-        reference:
-          type: string
-          description: Content Reference
-        data:
-          type: object
-          description: Content Data
       description: Base Attribute content definition
       oneOf:
       - $ref: "#/components/schemas/BooleanAttributeContent"
@@ -379,9 +366,16 @@ components:
       - $ref: "#/components/schemas/StringAttributeContent"
       - $ref: "#/components/schemas/TextAttributeContent"
       - $ref: "#/components/schemas/TimeAttributeContent"
-    BooleanAttributeContent:
+      properties:
+        reference:
+          type: string
+          description: Content Reference
+        data:
+          type: object
+          description: Content Data
       required:
       - data
+    BooleanAttributeContent:
       type: object
       properties:
         reference:
@@ -390,17 +384,14 @@ components:
         data:
           type: boolean
           description: Boolean attribute value
+      required:
+      - data
     CertificateRequestFormat:
       type: string
-      description: Certificate signing request format
-      default: pkcs10
       enum:
       - pkcs10
       - crmf
     ClientCertificateSignRequestDto:
-      required:
-      - attributes
-      - request
       type: object
       properties:
         csrAttributes:
@@ -418,14 +409,16 @@ components:
           description: Certificate signing request encoded as Base64 string
         format:
           $ref: "#/components/schemas/CertificateRequestFormat"
+          default: pkcs10
+          description: Certificate signing request format
         tokenProfileUuid:
           type: string
-          description: Token Profile UUID. Required if CSR is not uploaded
           format: uuid
+          description: Token Profile UUID. Required if CSR is not uploaded
         keyUuid:
           type: string
-          description: Key UUID. Required if CSR is not uploaded
           format: uuid
+          description: Key UUID. Required if CSR is not uploaded
         attributes:
           type: array
           description: List of RA Profile related Attributes to issue Certificate
@@ -436,9 +429,10 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
-    CodeBlockAttributeContent:
       required:
-      - data
+      - attributes
+      - request
+    CodeBlockAttributeContent:
       type: object
       properties:
         reference:
@@ -446,22 +440,24 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/CodeBlockAttributeContentData"
-    CodeBlockAttributeContentData:
+          description: CodeBlock attribute content data
       required:
-      - code
-      - language
+      - data
+    CodeBlockAttributeContentData:
       type: object
       properties:
         language:
           $ref: "#/components/schemas/ProgrammingLanguageEnum"
+          description: Definition of programming languages used for code
+          example: "JAVA, PHP, C, etc"
         code:
           type: string
           description: Block of the code in Base64. Formatting of the code is specified
             by variable language
-      description: CodeBlock attribute content data
-    CredentialAttributeContent:
       required:
-      - data
+      - code
+      - language
+    CredentialAttributeContent:
       type: object
       properties:
         reference:
@@ -469,12 +465,10 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/CredentialAttributeContentData"
-    CredentialAttributeContentData:
+          description: Credential attribute content data
       required:
-      - attributes
-      - kind
-      - name
-      - uuid
+      - data
+    CredentialAttributeContentData:
       type: object
       properties:
         uuid:
@@ -494,15 +488,15 @@ components:
           description: List of Credential Attributes
           items:
             $ref: "#/components/schemas/DataAttribute"
-      description: Credential attribute content data
-    DataAttribute:
       required:
-      - contentType
+      - attributes
+      - kind
       - name
-      - properties
-      - type
       - uuid
+    DataAttribute:
       type: object
+      description: Data attribute allows to store and transfer dynamic data. Its content
+        can be edited and send in requests to store.
       properties:
         uuid:
           type: string
@@ -521,30 +515,51 @@ components:
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
         type:
           $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
         properties:
           $ref: "#/components/schemas/DataAttributeProperties"
+          description: Properties of the Attributes
         constraints:
           type: array
           description: Optional regular expressions and constraints used for validating
             the Attribute content
           items:
             $ref: "#/components/schemas/BaseAttributeConstraint"
+          oneOf:
+          - $ref: "#/components/schemas/RegexpAttributeConstraint"
+          - $ref: "#/components/schemas/RangeAttributeConstraint"
+          - $ref: "#/components/schemas/DateTimeAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
-      description: Data attribute allows to store and transfer dynamic data. Its content
-        can be edited and send in requests to store.
-    DataAttributeProperties:
+          description: Optional definition of callback for getting the content of
+            the Attribute based on the action
       required:
-      - label
-      - list
-      - multiSelect
-      - readOnly
-      - required
-      - visible
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
+    DataAttributeProperties:
       type: object
       properties:
         label:
@@ -553,9 +568,9 @@ components:
           example: Attribute Name
         visible:
           type: boolean
+          default: "true"
           description: "Boolean determining if the Attribute is visible and can be\
             \ displayed, otherwise it should be hidden to the user."
-          default: true
         group:
           type: string
           description: "Group of the Attribute, used for the logical grouping of the\
@@ -563,27 +578,31 @@ components:
           example: requiredAttributes
         required:
           type: boolean
+          default: "false"
           description: "Boolean determining if the Attribute is required. If true,\
             \ the Attribute must be provided."
-          default: false
         readOnly:
           type: boolean
+          default: "false"
           description: "Boolean determining if the Attribute is read only. If true,\
             \ the Attribute content cannot be changed."
-          default: false
         list:
           type: boolean
+          default: "false"
           description: Boolean determining if the Attribute contains list of values
             in the content
-          default: false
         multiSelect:
           type: boolean
+          default: "false"
           description: Boolean determining if the Attribute can have multiple values
-          default: false
-      description: Properties of the Attributes
-    DateAttributeContent:
       required:
-      - data
+      - label
+      - list
+      - multiSelect
+      - readOnly
+      - required
+      - visible
+    DateAttributeContent:
       type: object
       properties:
         reference:
@@ -591,11 +610,11 @@ components:
           description: Content Reference
         data:
           type: string
-          description: Date attribute value in format yyyy-MM-dd
           format: date
-    DateTimeAttributeConstraint:
+          description: Date attribute value in format yyyy-MM-dd
       required:
-      - type
+      - data
+    DateTimeAttributeConstraint:
       type: object
       properties:
         description:
@@ -606,23 +625,24 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           $ref: "#/components/schemas/DateTimeAttributeConstraintData"
+          description: DateTime Range Attribute Constraint Data
+      required:
+      - type
     DateTimeAttributeConstraintData:
       type: object
       properties:
         from:
           type: string
-          description: Start of the datetime for validation
           format: date-time
+          description: Start of the datetime for validation
         to:
           type: string
-          description: End of the datetime for validation
           format: date-time
-      description: DateTime Range Attribute Constraint Data
+          description: End of the datetime for validation
     DateTimeAttributeContent:
-      required:
-      - data
       type: object
       properties:
         reference:
@@ -630,11 +650,11 @@ components:
           description: Content Reference
         data:
           type: string
-          description: DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
           format: date-time
-    FileAttributeContent:
+          description: DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
       required:
       - data
+    FileAttributeContent:
       type: object
       properties:
         reference:
@@ -642,11 +662,10 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/FileAttributeContentData"
-    FileAttributeContentData:
+          description: File attribute content data
       required:
-      - content
-      - fileName
-      - mimeType
+      - data
+    FileAttributeContentData:
       type: object
       properties:
         content:
@@ -658,10 +677,11 @@ components:
         mimeType:
           type: string
           description: Type of the file uploaded
-      description: File attribute content data
-    FloatAttributeContent:
       required:
-      - data
+      - content
+      - fileName
+      - mimeType
+    FloatAttributeContent:
       type: object
       properties:
         reference:
@@ -669,11 +689,11 @@ components:
           description: Content Reference
         data:
           type: number
-          description: Float attribute value
           format: float
-    IntegerAttributeContent:
+          description: Float attribute value
       required:
       - data
+    IntegerAttributeContent:
       type: object
       properties:
         reference:
@@ -681,11 +701,11 @@ components:
           description: Content Reference
         data:
           type: integer
-          description: Integer attribute value
           format: int32
-    ObjectAttributeContent:
+          description: Integer attribute value
       required:
       - data
+    ObjectAttributeContent:
       type: object
       properties:
         reference:
@@ -694,10 +714,10 @@ components:
         data:
           type: object
           description: Object attribute content data
+      required:
+      - data
     ProgrammingLanguageEnum:
       type: string
-      description: Definition of programming languages used for code
-      example: "JAVA, PHP, C, etc"
       enum:
       - apacheconf
       - bash
@@ -741,8 +761,6 @@ components:
       - xml
       - yaml
     RangeAttributeConstraint:
-      required:
-      - type
       type: object
       properties:
         description:
@@ -753,23 +771,24 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           $ref: "#/components/schemas/RangeAttributeConstraintData"
+          description: Integer Range Attribute Constraint Data
+      required:
+      - type
     RangeAttributeConstraintData:
       type: object
       properties:
         from:
           type: integer
-          description: Start of the range for validation
           format: int32
+          description: Start of the range for validation
         to:
           type: integer
-          description: End of the range for validation
           format: int32
-      description: Integer Range Attribute Constraint Data
+          description: End of the range for validation
     RegexpAttributeConstraint:
-      required:
-      - type
       type: object
       properties:
         description:
@@ -780,16 +799,15 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           type: string
           description: Regular Expression Attribute Constraint Data
-    RequestAttributeDto:
       required:
-      - content
-      - contentType
-      - name
-      - uuid
+      - type
+    RequestAttributeDto:
       type: object
+      description: Request attribute to send attribute content for object
       properties:
         uuid:
           type: string
@@ -801,15 +819,33 @@ components:
           example: Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Content Type of the Attribute
+          example: Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
-      description: Request attribute to send attribute content for object
-    SecretAttributeContent:
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
       required:
-      - data
+      - content
+      - contentType
+      - name
+      - uuid
+    SecretAttributeContent:
       type: object
       properties:
         reference:
@@ -817,6 +853,9 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/SecretAttributeContentData"
+          description: Secret attribute content data
+      required:
+      - data
     SecretAttributeContentData:
       type: object
       properties:
@@ -826,10 +865,7 @@ components:
         protectionLevel:
           type: string
           description: Level of protection of the data
-      description: Secret attribute content data
     StringAttributeContent:
-      required:
-      - data
       type: object
       properties:
         reference:
@@ -838,9 +874,9 @@ components:
         data:
           type: string
           description: String attribute value
-    TextAttributeContent:
       required:
       - data
+    TextAttributeContent:
       type: object
       properties:
         reference:
@@ -849,9 +885,9 @@ components:
         data:
           type: string
           description: Text attribute value
-    TimeAttributeContent:
       required:
       - data
+    TimeAttributeContent:
       type: object
       properties:
         reference:
@@ -860,35 +896,35 @@ components:
         data:
           type: string
           description: Time attribute value in format HH:mm:ss
-    ErrorMessageDto:
       required:
-      - message
+      - data
+    ErrorMessageDto:
       type: object
       properties:
         message:
           type: string
           description: Error message detail
           example: Error message
-    AuthenticationServiceExceptionDto:
       required:
-      - code
       - message
-      - statusCode
+    AuthenticationServiceExceptionDto:
       type: object
       properties:
         statusCode:
           type: integer
-          description: Status code of the HTTP Request
           format: int32
+          description: Status code of the HTTP Request
         code:
           type: string
           description: Code of the result
         message:
           type: string
           description: Exception message
-    ClientCertificateDataResponseDto:
       required:
-      - uuid
+      - code
+      - message
+      - statusCode
+    ClientCertificateDataResponseDto:
       type: object
       properties:
         certificateData:
@@ -897,13 +933,9 @@ components:
         uuid:
           type: string
           description: UUID of Certificate
-    RaProfileDto:
       required:
-      - authorityInstanceName
-      - authorityInstanceUuid
-      - enabled
-      - name
       - uuid
+    RaProfileDto:
       type: object
       properties:
         uuid:
@@ -944,14 +976,15 @@ components:
           description: List of protocols enabled
           items:
             type: string
-            description: List of protocols enabled
-    ResponseAttributeDto:
       required:
-      - contentType
-      - label
+      - authorityInstanceName
+      - authorityInstanceUuid
+      - enabled
       - name
-      - type
+      - uuid
+    ResponseAttributeDto:
       type: object
+      description: Response attribute with content for object it belongs to
       properties:
         uuid:
           type: string
@@ -967,20 +1000,36 @@ components:
           example: Attribute Name
         type:
           $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Content Type of the Attribute
+          example: Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
-      description: Response attribute with content for object it belongs to
-    CertificateComplianceResultDto:
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
       required:
-      - connectorName
-      - ruleDescription
-      - ruleName
-      - status
+      - contentType
+      - label
+      - name
+      - type
+    CertificateComplianceResultDto:
       type: object
       properties:
         connectorName:
@@ -997,27 +1046,19 @@ components:
           example: Description sample
         status:
           $ref: "#/components/schemas/ComplianceRuleStatus"
+          description: Status of the rule
+          example: nok
         attributes:
           type: array
           description: Attributes of the rule
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
-      description: Certificate compliance check result
-    CertificateDetailDto:
       required:
-      - certificateContent
-      - commonName
-      - keySize
-      - keyUsage
-      - privateKeyAvailability
-      - publicKeyAlgorithm
-      - signatureAlgorithm
-      - state
-      - subjectDn
-      - subjectType
-      - trustedCa
-      - uuid
-      - validationStatus
+      - connectorName
+      - ruleDescription
+      - ruleName
+      - status
+    CertificateDetailDto:
       type: object
       properties:
         uuid:
@@ -1040,12 +1081,12 @@ components:
           description: Subject DN of the Certificate
         notBefore:
           type: string
-          description: Certificate validity start date
           format: date-time
+          description: Certificate validity start date
         notAfter:
           type: string
-          description: Certificate expiration date
           format: date-time
+          description: Certificate expiration date
         publicKeyAlgorithm:
           type: string
           description: Public key algorithm
@@ -1054,14 +1095,17 @@ components:
           description: Certificate signature algorithm
         keySize:
           type: integer
-          description: Certificate key size
           format: int32
+          description: Certificate key size
         state:
           $ref: "#/components/schemas/CertificateState"
+          description: State of the Certificate
         validationStatus:
           $ref: "#/components/schemas/CertificateValidationStatus"
+          description: Current validation status of the certificate
         raProfile:
           $ref: "#/components/schemas/SimplifiedRaProfileDto"
+          description: RA Profile associated to the Certificate
         fingerprint:
           type: string
           description: SHA256 fingerprint of the Certificate
@@ -1078,11 +1122,13 @@ components:
           description: Certificate Owner UUID
         certificateType:
           $ref: "#/components/schemas/CertificateType"
+          description: Certificate type
         issuerSerialNumber:
           type: string
           description: Serial number of the issuer
         complianceStatus:
           $ref: "#/components/schemas/ComplianceStatus"
+          description: Certificate compliance status
         issuerCertificateUuid:
           type: string
           description: UUID of the issuer certificate
@@ -1098,15 +1144,14 @@ components:
           description: Extended key usages
           items:
             type: string
-            description: Extended key usages
         keyUsage:
           type: array
           description: Key usages
           items:
             type: string
-            description: Key usages
         subjectType:
           $ref: "#/components/schemas/CertificateSubjectType"
+          description: Certificate subject type
         metadata:
           type: array
           description: Certificate metadata
@@ -1119,14 +1164,13 @@ components:
           type: object
           additionalProperties:
             type: object
-            description: Subject alternative names
           description: Subject alternative names
         locations:
-          uniqueItems: true
           type: array
           description: Locations associated to the Certificate
           items:
             $ref: "#/components/schemas/LocationDto"
+          uniqueItems: true
         nonCompliantRules:
           type: array
           description: Certificate compliance check result
@@ -1139,12 +1183,14 @@ components:
             $ref: "#/components/schemas/ResponseAttributeDto"
         key:
           $ref: "#/components/schemas/KeyDto"
+          description: Key Pair of the certificate
         certificateRequest:
           $ref: "#/components/schemas/CertificateRequestDto"
+          description: Certificate request data
         sourceCertificateUuid:
           type: string
-          description: Source certificate UUID
           format: uuid
+          description: Source certificate UUID
         issueAttributes:
           type: array
           description: List of issue attributes
@@ -1162,18 +1208,22 @@ components:
             $ref: "#/components/schemas/CertificateDto"
         protocolInfo:
           $ref: "#/components/schemas/CertificateProtocolDto"
-    CertificateDto:
+          description: Information about protocol used to issue the certificate
       required:
+      - certificateContent
       - commonName
       - keySize
+      - keyUsage
       - privateKeyAvailability
       - publicKeyAlgorithm
       - signatureAlgorithm
       - state
       - subjectDn
+      - subjectType
       - trustedCa
       - uuid
       - validationStatus
+    CertificateDto:
       type: object
       properties:
         uuid:
@@ -1196,12 +1246,12 @@ components:
           description: Subject DN of the Certificate
         notBefore:
           type: string
-          description: Certificate validity start date
           format: date-time
+          description: Certificate validity start date
         notAfter:
           type: string
-          description: Certificate expiration date
           format: date-time
+          description: Certificate expiration date
         publicKeyAlgorithm:
           type: string
           description: Public key algorithm
@@ -1210,14 +1260,17 @@ components:
           description: Certificate signature algorithm
         keySize:
           type: integer
-          description: Certificate key size
           format: int32
+          description: Certificate key size
         state:
           $ref: "#/components/schemas/CertificateState"
+          description: State of the Certificate
         validationStatus:
           $ref: "#/components/schemas/CertificateValidationStatus"
+          description: Current validation status of the certificate
         raProfile:
           $ref: "#/components/schemas/SimplifiedRaProfileDto"
+          description: RA Profile associated to the Certificate
         fingerprint:
           type: string
           description: SHA256 fingerprint of the Certificate
@@ -1234,11 +1287,13 @@ components:
           description: Certificate Owner UUID
         certificateType:
           $ref: "#/components/schemas/CertificateType"
+          description: Certificate type
         issuerSerialNumber:
           type: string
           description: Serial number of the issuer
         complianceStatus:
           $ref: "#/components/schemas/ComplianceStatus"
+          description: Certificate compliance status
         issuerCertificateUuid:
           type: string
           description: UUID of the issuer certificate
@@ -1249,14 +1304,18 @@ components:
           type: boolean
           description: "Indicator whether CA is marked as trusted, set to null if\
             \ certificate is not CA"
-      description: List of related certificates
-    CertificateInLocationDto:
       required:
-      - certificateUuid
       - commonName
-      - serialNumber
+      - keySize
+      - privateKeyAvailability
+      - publicKeyAlgorithm
+      - signatureAlgorithm
       - state
+      - subjectDn
+      - trustedCa
+      - uuid
       - validationStatus
+    CertificateInLocationDto:
       type: object
       properties:
         certificateUuid:
@@ -1264,8 +1323,10 @@ components:
           description: UUID of the Certificate
         state:
           $ref: "#/components/schemas/CertificateState"
+          description: State of the Certificate
         validationStatus:
           $ref: "#/components/schemas/CertificateValidationStatus"
+          description: Current validation status of the certificate
         commonName:
           type: string
           description: Common Name of the Subject DN field of the Certificate
@@ -1289,47 +1350,47 @@ components:
             $ref: "#/components/schemas/ResponseAttributeDto"
         withKey:
           type: boolean
+          default: "false"
           description: If the Certificate in Location has associated private key
-          default: false
-      description: List of Certificates in Location
+      required:
+      - certificateUuid
+      - commonName
+      - serialNumber
+      - state
+      - validationStatus
     CertificateProtocol:
       type: string
-      description: Protocol used to issue certificate
       enum:
       - acme
       - scep
       - cmp
     CertificateProtocolDto:
-      required:
-      - protocol
-      - protocolProfileUuid
       type: object
       properties:
         protocol:
           $ref: "#/components/schemas/CertificateProtocol"
+          description: Protocol used to issue certificate
         protocolProfileUuid:
           type: string
-          description: UUID of the protocol
           format: uuid
+          description: UUID of the protocol
         additionalProtocolUuid:
           type: string
+          format: uuid
           description: "Additional UUID for use of the protocol, for example ACME\
             \ Account UUID in case of ACME protocol"
-          format: uuid
-      description: Information about protocol used to issue the certificate
-    CertificateRequestDto:
       required:
-      - commonName
-      - content
-      - publicKeyAlgorithm
-      - signatureAlgorithm
-      - subjectDn
+      - protocol
+      - protocolProfileUuid
+    CertificateRequestDto:
       type: object
       properties:
         certificateType:
           $ref: "#/components/schemas/CertificateType"
+          description: Certificate type
         certificateRequestFormat:
           $ref: "#/components/schemas/CertificateRequestFormat"
+          description: Certificate request format
         publicKeyAlgorithm:
           type: string
           description: Public key algorithm
@@ -1349,7 +1410,6 @@ components:
           type: object
           additionalProperties:
             type: object
-            description: Subject alternative names
           description: Subject alternative names
         attributes:
           type: array
@@ -1361,10 +1421,14 @@ components:
           description: Signature Attributes
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
-      description: Certificate request data
+      required:
+      - commonName
+      - content
+      - publicKeyAlgorithm
+      - signatureAlgorithm
+      - subjectDn
     CertificateState:
       type: string
-      description: State of the Certificate
       enum:
       - requested
       - rejected
@@ -1377,7 +1441,6 @@ components:
       - archived
     CertificateSubjectType:
       type: string
-      description: Certificate subject type
       enum:
       - endEntity
       - selfSignedEndEntity
@@ -1385,13 +1448,11 @@ components:
       - rootCa
     CertificateType:
       type: string
-      description: Certificate type
       enum:
       - X.509
       - SSH
     CertificateValidationStatus:
       type: string
-      description: Current validation status of the certificate
       enum:
       - not_checked
       - failed
@@ -1403,24 +1464,18 @@ components:
       - expired
     ComplianceRuleStatus:
       type: string
-      description: Status of the rule
-      example: nok
       enum:
       - ok
       - nok
       - na
     ComplianceStatus:
       type: string
-      description: Certificate compliance status
       enum:
       - not_checked
       - ok
       - nok
       - na
     GroupDto:
-      required:
-      - name
-      - uuid
       type: object
       properties:
         uuid:
@@ -1442,10 +1497,11 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
-      description: Groups associated to the Key
+      required:
+      - name
+      - uuid
     KeyAlgorithm:
       type: string
-      description: Key Algorithm
       enum:
       - RSA
       - ECDSA
@@ -1453,14 +1509,6 @@ components:
       - CRYSTALS-Dilithium
       - SPHINCS+
     KeyDto:
-      required:
-      - creationTime
-      - description
-      - items
-      - name
-      - tokenInstanceName
-      - tokenInstanceUuid
-      - uuid
       type: object
       properties:
         uuid:
@@ -1476,9 +1524,9 @@ components:
           description: Description of the Key
         creationTime:
           type: string
+          format: date-time
           description: "Creation time of the Key. If the key is discovered from the\
             \ connector, then it will be returned"
-          format: date-time
         tokenProfileUuid:
           type: string
           description: UUID of the Token Profile
@@ -1509,12 +1557,18 @@ components:
             $ref: "#/components/schemas/KeyItemDto"
         associations:
           type: integer
-          description: Number of associated objects
           format: int32
-      description: Key Pair of the certificate
+          description: Number of associated objects
+      required:
+      - creationTime
+      - description
+      - items
+      - name
+      - tokenInstanceName
+      - tokenInstanceUuid
+      - uuid
     KeyFormat:
       type: string
-      description: Key Format
       enum:
       - Raw
       - SubjectPublicKeyInfo
@@ -1522,20 +1576,6 @@ components:
       - EncryptedPrivateKeyInfo
       - Custom
     KeyItemDto:
-      required:
-      - creationTime
-      - description
-      - enabled
-      - keyAlgorithm
-      - keyReferenceUuid
-      - keyWrapperUuid
-      - name
-      - state
-      - tokenInstanceName
-      - tokenInstanceUuid
-      - type
-      - usage
-      - uuid
       type: object
       properties:
         uuid:
@@ -1551,9 +1591,9 @@ components:
           description: Description of the Key
         creationTime:
           type: string
+          format: date-time
           description: "Creation time of the Key. If the key is discovered from the\
             \ connector, then it will be returned"
-          format: date-time
         keyWrapperUuid:
           type: string
           description: UUID of the wrapper object
@@ -1582,21 +1622,24 @@ components:
             $ref: "#/components/schemas/GroupDto"
         associations:
           type: integer
-          description: Number of associated objects
           format: int32
+          description: Number of associated objects
         keyReferenceUuid:
           type: string
           description: UUID of the key item in the Connector
         type:
           $ref: "#/components/schemas/KeyType"
+          description: Type of the Key
         keyAlgorithm:
           $ref: "#/components/schemas/KeyAlgorithm"
+          description: Key Algorithm
         format:
           $ref: "#/components/schemas/KeyFormat"
+          description: Key Format
         length:
           type: integer
-          description: Key Length
           format: int32
+          description: Key Length
         usage:
           type: array
           description: Key Usages
@@ -1607,10 +1650,23 @@ components:
           description: Boolean describing if the key is enabled or not
         state:
           $ref: "#/components/schemas/KeyState"
-      description: Key Items
+          description: Key State
+      required:
+      - creationTime
+      - description
+      - enabled
+      - keyAlgorithm
+      - keyReferenceUuid
+      - keyWrapperUuid
+      - name
+      - state
+      - tokenInstanceName
+      - tokenInstanceUuid
+      - type
+      - usage
+      - uuid
     KeyState:
       type: string
-      description: Key State
       enum:
       - pre-active
       - active
@@ -1620,7 +1676,6 @@ components:
       - destroyedCompromised
     KeyType:
       type: string
-      description: Type of the Key
       enum:
       - Secret
       - Public
@@ -1628,7 +1683,6 @@ components:
       - Split
     KeyUsage:
       type: string
-      description: Key Usages
       enum:
       - sign
       - verify
@@ -1637,16 +1691,6 @@ components:
       - wrap
       - unwrap
     LocationDto:
-      required:
-      - attributes
-      - certificates
-      - enabled
-      - entityInstanceName
-      - entityInstanceUuid
-      - name
-      - supportKeyManagement
-      - supportMultipleEntries
-      - uuid
       type: object
       properties:
         uuid:
@@ -1681,12 +1725,12 @@ components:
           description: Enabled flag - true = enabled; false = disabled
         supportMultipleEntries:
           type: boolean
+          default: "false"
           description: If the location supports multiple Certificates
-          default: false
         supportKeyManagement:
           type: boolean
+          default: "false"
           description: If the location supports key management operations
-          default: false
         certificates:
           type: array
           description: List of Certificates in Location
@@ -1697,11 +1741,19 @@ components:
           description: Location metadata
           items:
             $ref: "#/components/schemas/MetadataResponseDto"
-      description: Locations associated to the Certificate
-    MetadataResponseDto:
       required:
-      - items
+      - attributes
+      - certificates
+      - enabled
+      - entityInstanceName
+      - entityInstanceUuid
+      - name
+      - supportKeyManagement
+      - supportMultipleEntries
+      - uuid
+    MetadataResponseDto:
       type: object
+      description: Metadata response attributes with their source connector
       properties:
         connectorUuid:
           type: string
@@ -1711,16 +1763,15 @@ components:
           description: Name of the Connector
         sourceObjectType:
           $ref: "#/components/schemas/Resource"
+          description: Source Object Type
         items:
           type: array
           description: List of Metadata
           items:
             $ref: "#/components/schemas/ResponseMetadataDto"
-      description: Metadata response attributes with their source connector
-    NameAndUuidDto:
       required:
-      - name
-      - uuid
+      - items
+    NameAndUuidDto:
       type: object
       properties:
         uuid:
@@ -1731,10 +1782,11 @@ components:
           type: string
           description: Object Name
           example: Name
-      description: Source Objects
+      required:
+      - name
+      - uuid
     Resource:
       type: string
-      description: Source Object Type
       enum:
       - NONE
       - dashboard
@@ -1787,13 +1839,8 @@ components:
       - endEntityProfiles
       - authenticationProviders
     ResponseMetadataDto:
-      required:
-      - contentType
-      - label
-      - name
-      - sourceObjects
-      - type
       type: object
+      description: Response metadata attribute instance with content
       properties:
         uuid:
           type: string
@@ -1809,24 +1856,42 @@ components:
           example: Attribute Name
         type:
           $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Content Type of the Attribute
+          example: Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
         sourceObjects:
           type: array
           description: Source Objects
           items:
             $ref: "#/components/schemas/NameAndUuidDto"
-      description: Response metadata attribute instance with content
-    SimplifiedRaProfileDto:
       required:
-      - enabled
+      - contentType
+      - label
       - name
-      - uuid
+      - sourceObjects
+      - type
+    SimplifiedRaProfileDto:
       type: object
       properties:
         uuid:
@@ -1843,12 +1908,11 @@ components:
         authorityInstanceUuid:
           type: string
           description: Authority Instance UUID
-      description: RA Profile associated to the Certificate
-    RoleDto:
       required:
+      - enabled
       - name
-      - systemRole
       - uuid
+    RoleDto:
       type: object
       properties:
         uuid:
@@ -1868,11 +1932,11 @@ components:
         systemRole:
           type: boolean
           description: "Is system role. True = Yes, False = No"
-      description: Roles for the user
-    UserCertificateDto:
       required:
-      - fingerprint
+      - name
+      - systemRole
       - uuid
+    UserCertificateDto:
       type: object
       properties:
         uuid:
@@ -1881,15 +1945,10 @@ components:
         fingerprint:
           type: string
           description: Fingerprint of the certificate
-      description: User Certificate details
-    UserDetailDto:
       required:
-      - enabled
-      - groups
-      - roles
-      - systemUser
-      - username
+      - fingerprint
       - uuid
+    UserDetailDto:
       type: object
       properties:
         uuid:
@@ -1925,6 +1984,7 @@ components:
           description: "Is System user. True = Yes, False = No"
         certificate:
           $ref: "#/components/schemas/UserCertificateDto"
+          description: User Certificate details
         roles:
           type: array
           description: Roles for the user
@@ -1935,3 +1995,10 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
+      required:
+      - enabled
+      - groups
+      - roles
+      - systemUser
+      - username
+      - uuid

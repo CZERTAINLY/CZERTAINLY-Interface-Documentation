@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: CZERTAINLY Local API
   description: REST API for local administration operations without authentication
@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:44143
+- url: http://localhost:36893
   description: Generated server url
 tags:
 - name: Local operations
@@ -35,39 +35,37 @@ paths:
               $ref: "#/components/schemas/AddUserRequestDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Admin created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailDto"
-        "401":
-          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
 components:
   schemas:
     AddUserRequestDto:
-      required:
-      - username
       type: object
       properties:
         username:
@@ -91,7 +89,6 @@ components:
           description: Groups UUIDs of the user
           items:
             type: string
-            description: Groups UUIDs of the user
         enabled:
           type: boolean
           description: "Status of the user. True = Enabled, False = Disabled"
@@ -108,11 +105,9 @@ components:
             $ref: "#/components/schemas/RequestAttributeDto"
         name:
           type: string
-    AttributeCallback:
       required:
-      - callbackContext
-      - callbackMethod
-      - mappings
+      - username
+    AttributeCallback:
       type: object
       properties:
         callbackContext:
@@ -122,17 +117,16 @@ components:
           type: string
           description: HTTP method of the callback
         mappings:
-          uniqueItems: true
           type: array
           description: Mappings for the callback method
           items:
             $ref: "#/components/schemas/AttributeCallbackMapping"
-      description: Optional definition of callback for getting the content of the
-        Attribute based on the action
-    AttributeCallbackMapping:
+          uniqueItems: true
       required:
-      - targets
-      - to
+      - callbackContext
+      - callbackMethod
+      - mappings
+    AttributeCallbackMapping:
       type: object
       properties:
         from:
@@ -142,33 +136,36 @@ components:
             set only if value is not set.
         attributeType:
           $ref: "#/components/schemas/AttributeType"
+          description: Type of the attribute. It is optional and must be set only
+            if special behaviour is needed.
         attributeContentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: 'Type of the attribute content. '
         to:
           type: string
           description: Name of the path variable or request param or body field which
             is to be used to assign value of attribute
         targets:
-          uniqueItems: true
           type: array
           description: Set of targets for propagating value.
           items:
             $ref: "#/components/schemas/AttributeValueTarget"
+          uniqueItems: true
         value:
           type: object
           description: Static value to be propagated to targets. It is optional and
             is set only if the value is known at attribute creation time.
-      description: Mappings for the callback method
+      required:
+      - targets
+      - to
     AttributeConstraintType:
       type: string
-      description: Attribute Constraint Type
       enum:
       - regExp
       - range
       - dateTime
     AttributeContentType:
       type: string
-      description: 'Type of the attribute content. '
       enum:
       - string
       - text
@@ -185,8 +182,6 @@ components:
       - object
     AttributeType:
       type: string
-      description: Type of the attribute. It is optional and must be set only if special
-        behaviour is needed.
       enum:
       - data
       - group
@@ -195,16 +190,18 @@ components:
       - custom
     AttributeValueTarget:
       type: string
-      description: Set of targets for propagating value.
       enum:
       - pathVariable
       - requestParameter
       - body
     BaseAttributeConstraint:
-      required:
-      - data
-      - type
       type: object
+      description: Optional regular expressions and constraints used for validating
+        the Attribute content
+      oneOf:
+      - $ref: "#/components/schemas/RegexpAttributeConstraint"
+      - $ref: "#/components/schemas/RangeAttributeConstraint"
+      - $ref: "#/components/schemas/DateTimeAttributeConstraint"
       properties:
         description:
           type: string
@@ -214,26 +211,15 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           type: object
           description: Attribute Constraint Data
-      description: Optional regular expressions and constraints used for validating
-        the Attribute content
-      oneOf:
-      - $ref: "#/components/schemas/RegexpAttributeConstraint"
-      - $ref: "#/components/schemas/RangeAttributeConstraint"
-      - $ref: "#/components/schemas/DateTimeAttributeConstraint"
-    BaseAttributeContentDto:
       required:
       - data
+      - type
+    BaseAttributeContentDto:
       type: object
-      properties:
-        reference:
-          type: string
-          description: Content Reference
-        data:
-          type: object
-          description: Content Data
       description: Base Attribute content definition
       oneOf:
       - $ref: "#/components/schemas/BooleanAttributeContent"
@@ -249,9 +235,16 @@ components:
       - $ref: "#/components/schemas/StringAttributeContent"
       - $ref: "#/components/schemas/TextAttributeContent"
       - $ref: "#/components/schemas/TimeAttributeContent"
-    BooleanAttributeContent:
+      properties:
+        reference:
+          type: string
+          description: Content Reference
+        data:
+          type: object
+          description: Content Data
       required:
       - data
+    BooleanAttributeContent:
       type: object
       properties:
         reference:
@@ -260,9 +253,9 @@ components:
         data:
           type: boolean
           description: Boolean attribute value
-    CodeBlockAttributeContent:
       required:
       - data
+    CodeBlockAttributeContent:
       type: object
       properties:
         reference:
@@ -270,22 +263,24 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/CodeBlockAttributeContentData"
-    CodeBlockAttributeContentData:
+          description: CodeBlock attribute content data
       required:
-      - code
-      - language
+      - data
+    CodeBlockAttributeContentData:
       type: object
       properties:
         language:
           $ref: "#/components/schemas/ProgrammingLanguageEnum"
+          description: Definition of programming languages used for code
+          example: "JAVA, PHP, C, etc"
         code:
           type: string
           description: Block of the code in Base64. Formatting of the code is specified
             by variable language
-      description: CodeBlock attribute content data
-    CredentialAttributeContent:
       required:
-      - data
+      - code
+      - language
+    CredentialAttributeContent:
       type: object
       properties:
         reference:
@@ -293,12 +288,10 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/CredentialAttributeContentData"
-    CredentialAttributeContentData:
+          description: Credential attribute content data
       required:
-      - attributes
-      - kind
-      - name
-      - uuid
+      - data
+    CredentialAttributeContentData:
       type: object
       properties:
         uuid:
@@ -318,15 +311,15 @@ components:
           description: List of Credential Attributes
           items:
             $ref: "#/components/schemas/DataAttribute"
-      description: Credential attribute content data
-    DataAttribute:
       required:
-      - contentType
+      - attributes
+      - kind
       - name
-      - properties
-      - type
       - uuid
+    DataAttribute:
       type: object
+      description: Data attribute allows to store and transfer dynamic data. Its content
+        can be edited and send in requests to store.
       properties:
         uuid:
           type: string
@@ -345,30 +338,51 @@ components:
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
         type:
           $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
         properties:
           $ref: "#/components/schemas/DataAttributeProperties"
+          description: Properties of the Attributes
         constraints:
           type: array
           description: Optional regular expressions and constraints used for validating
             the Attribute content
           items:
             $ref: "#/components/schemas/BaseAttributeConstraint"
+          oneOf:
+          - $ref: "#/components/schemas/RegexpAttributeConstraint"
+          - $ref: "#/components/schemas/RangeAttributeConstraint"
+          - $ref: "#/components/schemas/DateTimeAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
-      description: Data attribute allows to store and transfer dynamic data. Its content
-        can be edited and send in requests to store.
-    DataAttributeProperties:
+          description: Optional definition of callback for getting the content of
+            the Attribute based on the action
       required:
-      - label
-      - list
-      - multiSelect
-      - readOnly
-      - required
-      - visible
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
+    DataAttributeProperties:
       type: object
       properties:
         label:
@@ -377,9 +391,9 @@ components:
           example: Attribute Name
         visible:
           type: boolean
+          default: "true"
           description: "Boolean determining if the Attribute is visible and can be\
             \ displayed, otherwise it should be hidden to the user."
-          default: true
         group:
           type: string
           description: "Group of the Attribute, used for the logical grouping of the\
@@ -387,27 +401,31 @@ components:
           example: requiredAttributes
         required:
           type: boolean
+          default: "false"
           description: "Boolean determining if the Attribute is required. If true,\
             \ the Attribute must be provided."
-          default: false
         readOnly:
           type: boolean
+          default: "false"
           description: "Boolean determining if the Attribute is read only. If true,\
             \ the Attribute content cannot be changed."
-          default: false
         list:
           type: boolean
+          default: "false"
           description: Boolean determining if the Attribute contains list of values
             in the content
-          default: false
         multiSelect:
           type: boolean
+          default: "false"
           description: Boolean determining if the Attribute can have multiple values
-          default: false
-      description: Properties of the Attributes
-    DateAttributeContent:
       required:
-      - data
+      - label
+      - list
+      - multiSelect
+      - readOnly
+      - required
+      - visible
+    DateAttributeContent:
       type: object
       properties:
         reference:
@@ -415,11 +433,11 @@ components:
           description: Content Reference
         data:
           type: string
-          description: Date attribute value in format yyyy-MM-dd
           format: date
-    DateTimeAttributeConstraint:
+          description: Date attribute value in format yyyy-MM-dd
       required:
-      - type
+      - data
+    DateTimeAttributeConstraint:
       type: object
       properties:
         description:
@@ -430,23 +448,24 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           $ref: "#/components/schemas/DateTimeAttributeConstraintData"
+          description: DateTime Range Attribute Constraint Data
+      required:
+      - type
     DateTimeAttributeConstraintData:
       type: object
       properties:
         from:
           type: string
-          description: Start of the datetime for validation
           format: date-time
+          description: Start of the datetime for validation
         to:
           type: string
-          description: End of the datetime for validation
           format: date-time
-      description: DateTime Range Attribute Constraint Data
+          description: End of the datetime for validation
     DateTimeAttributeContent:
-      required:
-      - data
       type: object
       properties:
         reference:
@@ -454,11 +473,11 @@ components:
           description: Content Reference
         data:
           type: string
-          description: DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
           format: date-time
-    FileAttributeContent:
+          description: DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
       required:
       - data
+    FileAttributeContent:
       type: object
       properties:
         reference:
@@ -466,11 +485,10 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/FileAttributeContentData"
-    FileAttributeContentData:
+          description: File attribute content data
       required:
-      - content
-      - fileName
-      - mimeType
+      - data
+    FileAttributeContentData:
       type: object
       properties:
         content:
@@ -482,10 +500,11 @@ components:
         mimeType:
           type: string
           description: Type of the file uploaded
-      description: File attribute content data
-    FloatAttributeContent:
       required:
-      - data
+      - content
+      - fileName
+      - mimeType
+    FloatAttributeContent:
       type: object
       properties:
         reference:
@@ -493,11 +512,11 @@ components:
           description: Content Reference
         data:
           type: number
-          description: Float attribute value
           format: float
-    IntegerAttributeContent:
+          description: Float attribute value
       required:
       - data
+    IntegerAttributeContent:
       type: object
       properties:
         reference:
@@ -505,11 +524,11 @@ components:
           description: Content Reference
         data:
           type: integer
-          description: Integer attribute value
           format: int32
-    ObjectAttributeContent:
+          description: Integer attribute value
       required:
       - data
+    ObjectAttributeContent:
       type: object
       properties:
         reference:
@@ -518,10 +537,10 @@ components:
         data:
           type: object
           description: Object attribute content data
+      required:
+      - data
     ProgrammingLanguageEnum:
       type: string
-      description: Definition of programming languages used for code
-      example: "JAVA, PHP, C, etc"
       enum:
       - apacheconf
       - bash
@@ -565,8 +584,6 @@ components:
       - xml
       - yaml
     RangeAttributeConstraint:
-      required:
-      - type
       type: object
       properties:
         description:
@@ -577,23 +594,24 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           $ref: "#/components/schemas/RangeAttributeConstraintData"
+          description: Integer Range Attribute Constraint Data
+      required:
+      - type
     RangeAttributeConstraintData:
       type: object
       properties:
         from:
           type: integer
-          description: Start of the range for validation
           format: int32
+          description: Start of the range for validation
         to:
           type: integer
-          description: End of the range for validation
           format: int32
-      description: Integer Range Attribute Constraint Data
+          description: End of the range for validation
     RegexpAttributeConstraint:
-      required:
-      - type
       type: object
       properties:
         description:
@@ -604,16 +622,15 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           type: string
           description: Regular Expression Attribute Constraint Data
-    RequestAttributeDto:
       required:
-      - content
-      - contentType
-      - name
-      - uuid
+      - type
+    RequestAttributeDto:
       type: object
+      description: Request attribute to send attribute content for object
       properties:
         uuid:
           type: string
@@ -625,15 +642,33 @@ components:
           example: Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Content Type of the Attribute
+          example: Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
-      description: Request attribute to send attribute content for object
-    SecretAttributeContent:
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
       required:
-      - data
+      - content
+      - contentType
+      - name
+      - uuid
+    SecretAttributeContent:
       type: object
       properties:
         reference:
@@ -641,6 +676,9 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/SecretAttributeContentData"
+          description: Secret attribute content data
+      required:
+      - data
     SecretAttributeContentData:
       type: object
       properties:
@@ -650,10 +688,7 @@ components:
         protectionLevel:
           type: string
           description: Level of protection of the data
-      description: Secret attribute content data
     StringAttributeContent:
-      required:
-      - data
       type: object
       properties:
         reference:
@@ -662,9 +697,9 @@ components:
         data:
           type: string
           description: String attribute value
-    TextAttributeContent:
       required:
       - data
+    TextAttributeContent:
       type: object
       properties:
         reference:
@@ -673,9 +708,9 @@ components:
         data:
           type: string
           description: Text attribute value
-    TimeAttributeContent:
       required:
       - data
+    TimeAttributeContent:
       type: object
       properties:
         reference:
@@ -684,36 +719,35 @@ components:
         data:
           type: string
           description: Time attribute value in format HH:mm:ss
-    ErrorMessageDto:
       required:
-      - message
+      - data
+    ErrorMessageDto:
       type: object
       properties:
         message:
           type: string
           description: Error message detail
           example: Error message
-    AuthenticationServiceExceptionDto:
       required:
-      - code
       - message
-      - statusCode
+    AuthenticationServiceExceptionDto:
       type: object
       properties:
         statusCode:
           type: integer
-          description: Status code of the HTTP Request
           format: int32
+          description: Status code of the HTTP Request
         code:
           type: string
           description: Code of the result
         message:
           type: string
           description: Exception message
-    NameAndUuidDto:
       required:
-      - name
-      - uuid
+      - code
+      - message
+      - statusCode
+    NameAndUuidDto:
       type: object
       properties:
         uuid:
@@ -724,14 +758,12 @@ components:
           type: string
           description: Object Name
           example: Name
-      description: Groups of the user
-    ResponseAttributeDto:
       required:
-      - contentType
-      - label
       - name
-      - type
+      - uuid
+    ResponseAttributeDto:
       type: object
+      description: Response attribute with content for object it belongs to
       properties:
         uuid:
           type: string
@@ -747,19 +779,36 @@ components:
           example: Attribute Name
         type:
           $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Content Type of the Attribute
+          example: Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
-      description: Response attribute with content for object it belongs to
-    RoleDto:
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
       required:
+      - contentType
+      - label
       - name
-      - systemRole
-      - uuid
+      - type
+    RoleDto:
       type: object
       properties:
         uuid:
@@ -779,11 +828,11 @@ components:
         systemRole:
           type: boolean
           description: "Is system role. True = Yes, False = No"
-      description: Roles for the user
-    UserCertificateDto:
       required:
-      - fingerprint
+      - name
+      - systemRole
       - uuid
+    UserCertificateDto:
       type: object
       properties:
         uuid:
@@ -792,15 +841,10 @@ components:
         fingerprint:
           type: string
           description: Fingerprint of the certificate
-      description: User Certificate details
-    UserDetailDto:
       required:
-      - enabled
-      - groups
-      - roles
-      - systemUser
-      - username
+      - fingerprint
       - uuid
+    UserDetailDto:
       type: object
       properties:
         uuid:
@@ -836,6 +880,7 @@ components:
           description: "Is System user. True = Yes, False = No"
         certificate:
           $ref: "#/components/schemas/UserCertificateDto"
+          description: User Certificate details
         roles:
           type: array
           description: Roles for the user
@@ -846,3 +891,10 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
+      required:
+      - enabled
+      - groups
+      - roles
+      - systemUser
+      - username
+      - uuid

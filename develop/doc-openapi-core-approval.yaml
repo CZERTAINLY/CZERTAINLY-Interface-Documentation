@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: CZERTAINLY Approvals API
   description: REST API for approvals in the platform
@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:43025
+- url: http://localhost:44613
   description: Generated server url
 tags:
 - name: Approval profile Inventory
@@ -52,18 +52,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Approval profile retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApprovalProfileDetailDto"
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: Approval profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApprovalProfileDetailDto"
         "401":
           description: Unauthorized
         "403":
@@ -105,12 +105,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "200":
           description: Approval profile updated
           content:
             application/json:
               schema:
                 type: object
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -122,14 +130,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
     delete:
       tags:
       - Approval profile Inventory
@@ -234,12 +234,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "200":
           description: New Approval profile created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UuidDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -251,14 +259,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
   /v1/approvals/{uuid}/reject:
     patch:
       tags:
@@ -281,14 +281,14 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: Approval rejected
         "404":
           description: Not Found
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: Approval rejected
         "401":
           description: Unauthorized
         "403":
@@ -371,14 +371,14 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "204":
+          description: Approval approved
         "403":
           description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: Approval approved
   /v1/approvals/{uuid}/approveRecipient:
     patch:
       tags:
@@ -415,14 +415,14 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "204":
+          description: Approval Recipient approved
         "403":
           description: Forbidden
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: Approval Recipient approved
   /v1/approvalProfiles/{uuid}/enable:
     patch:
       tags:
@@ -489,10 +489,10 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: Approval profile disabled
         "401":
           description: Unauthorized
+        "204":
+          description: Approval profile disabled
         "403":
           description: Forbidden
           content:
@@ -556,18 +556,18 @@ paths:
       responses:
         "500":
           description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Approval detail retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApprovalDetailDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "404":
           description: Not Found
           content:
@@ -632,8 +632,6 @@ paths:
 components:
   schemas:
     ApprovalProfileUpdateRequestDto:
-      required:
-      - approvalSteps
       type: object
       properties:
         description:
@@ -642,78 +640,75 @@ components:
           example: Detail description of the approval profile
         expiry:
           type: integer
-          description: Expiration of the Approval profile in hours
           format: int32
+          description: Expiration of the Approval profile in hours
           example: 30
         approvalSteps:
           type: array
           description: List of Approval steps for the Approval profile
           items:
             $ref: "#/components/schemas/ApprovalStepRequestDto"
-    ApprovalStepRequestDto:
       required:
-      - order
+      - approvalSteps
+    ApprovalStepRequestDto:
       type: object
       properties:
         userUuid:
           type: string
+          format: uuid
           description: UUID of the responsible user to approve action in approval
             step
-          format: uuid
         roleUuid:
           type: string
+          format: uuid
           description: UUID of the responsible role of the users to approve action
             in approval step
-          format: uuid
         groupUuid:
           type: string
+          format: uuid
           description: UUID of the responsible group of the users to approve action
             in approval step
-          format: uuid
         description:
           type: string
           description: Description of the approval step
         order:
           type: integer
-          description: Order of the position in the approval steps flow
           format: int32
+          description: Order of the position in the approval steps flow
         requiredApprovals:
           type: integer
+          format: int32
           description: "Count of the required approvals for the approval step, by\
             \ default there is 1 approval needed."
-          format: int32
-      description: List of Approval steps for the Approval profile
-    ErrorMessageDto:
       required:
-      - message
+      - order
+    ErrorMessageDto:
       type: object
       properties:
         message:
           type: string
           description: Error message detail
           example: Error message
-    AuthenticationServiceExceptionDto:
       required:
-      - code
       - message
-      - statusCode
+    AuthenticationServiceExceptionDto:
       type: object
       properties:
         statusCode:
           type: integer
-          description: Status code of the HTTP Request
           format: int32
+          description: Status code of the HTTP Request
         code:
           type: string
           description: Code of the result
         message:
           type: string
           description: Exception message
-    ApprovalProfileRequestDto:
       required:
-      - approvalSteps
-      - enabled
-      - name
+      - code
+      - message
+      - statusCode
+    ApprovalProfileRequestDto:
       type: object
       properties:
         name:
@@ -730,22 +725,26 @@ components:
           example: true
         expiry:
           type: integer
-          description: Expiration of the Approval profile in hours
           format: int32
+          description: Expiration of the Approval profile in hours
           example: 30
         approvalSteps:
           type: array
           description: List of Approval steps for the Approval profile
           items:
             $ref: "#/components/schemas/ApprovalStepRequestDto"
-    UuidDto:
       required:
-      - uuid
+      - approvalSteps
+      - enabled
+      - name
+    UuidDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
+      required:
+      - uuid
     UserApprovalDto:
       type: object
       properties:
@@ -755,29 +754,17 @@ components:
       type: object
       properties:
         itemsPerPage:
-          maximum: 1000
           type: integer
-          description: Number of entries per page
           format: int32
-          default: 10
+          default: "10"
+          description: Number of entries per page
+          maximum: 1000
         pageNumber:
           type: integer
-          description: Page number for the request
           format: int32
-          default: 1
+          default: "1"
+          description: Page number for the request
     ApprovalDto:
-      required:
-      - approvalProfileName
-      - approvalProfileUuid
-      - approvalUuid
-      - createdAt
-      - creatorUuid
-      - expiryAt
-      - objectUuid
-      - resource
-      - resourceAction
-      - status
-      - version
       type: object
       properties:
         approvalUuid:
@@ -791,20 +778,20 @@ components:
           description: Username of the user that requested approval
         version:
           type: integer
-          description: Version of the Approval profile
           format: int32
+          description: Version of the Approval profile
         createdAt:
           type: string
-          description: Creation date of the Approval
           format: date-time
+          description: Creation date of the Approval
         expiryAt:
           type: string
-          description: Expiry date of the Approval
           format: date-time
+          description: Expiry date of the Approval
         closedAt:
           type: string
-          description: Date of resolution of the Approval
           format: date-time
+          description: Date of resolution of the Approval
         status:
           type: string
           description: Status of the Approval
@@ -815,6 +802,7 @@ components:
           - EXPIRED
         resource:
           $ref: "#/components/schemas/Resource"
+          description: Resource of the Approval
         resourceAction:
           type: string
           description: Resource action of the Approval
@@ -827,40 +815,50 @@ components:
         approvalProfileUuid:
           type: string
           description: UUID of the Approval profile
-      description: List of the Approvals
+      required:
+      - approvalProfileName
+      - approvalProfileUuid
+      - approvalUuid
+      - createdAt
+      - creatorUuid
+      - expiryAt
+      - objectUuid
+      - resource
+      - resourceAction
+      - status
+      - version
     ApprovalResponseDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+        approvals:
+          type: array
+          description: List of the Approvals
+          items:
+            $ref: "#/components/schemas/ApprovalDto"
       required:
       - approvals
       - itemsPerPage
       - pageNumber
       - totalItems
       - totalPages
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          description: Number of entries per page
-          format: int32
-        pageNumber:
-          type: integer
-          description: Page number for the request
-          format: int32
-        totalPages:
-          type: integer
-          description: Number of pages available
-          format: int32
-        totalItems:
-          type: integer
-          description: Number of items available
-          format: int64
-        approvals:
-          type: array
-          description: List of the Approvals
-          items:
-            $ref: "#/components/schemas/ApprovalDto"
     Resource:
       type: string
-      description: Resource of the Approval
       enum:
       - NONE
       - dashboard
@@ -913,20 +911,6 @@ components:
       - endEntityProfiles
       - authenticationProviders
     ApprovalDetailDto:
-      required:
-      - approvalProfileName
-      - approvalProfileUuid
-      - approvalSteps
-      - approvalUuid
-      - createdAt
-      - creatorUuid
-      - expiry
-      - expiryAt
-      - objectUuid
-      - resource
-      - resourceAction
-      - status
-      - version
       type: object
       properties:
         approvalUuid:
@@ -940,20 +924,20 @@ components:
           description: Username of the user that requested approval
         version:
           type: integer
-          description: Version of the Approval profile
           format: int32
+          description: Version of the Approval profile
         createdAt:
           type: string
-          description: Creation date of the Approval
           format: date-time
+          description: Creation date of the Approval
         expiryAt:
           type: string
-          description: Expiry date of the Approval
           format: date-time
+          description: Expiry date of the Approval
         closedAt:
           type: string
-          description: Date of resolution of the Approval
           format: date-time
+          description: Date of resolution of the Approval
         status:
           type: string
           description: Status of the Approval
@@ -964,6 +948,7 @@ components:
           - EXPIRED
         resource:
           $ref: "#/components/schemas/Resource"
+          description: Resource of the Approval
         resourceAction:
           type: string
           description: Resource action of the Approval
@@ -978,8 +963,8 @@ components:
           description: UUID of the Approval profile
         expiry:
           type: integer
-          description: Expiration in hours
           format: int32
+          description: Expiration in hours
         description:
           type: string
           description: Description of the Approval
@@ -988,44 +973,54 @@ components:
           description: List of Approval steps related to this Approval
           items:
             $ref: "#/components/schemas/ApprovalDetailStepDto"
-    ApprovalDetailStepDto:
       required:
-      - approvalStepRecipients
-      - order
-      - uuid
+      - approvalProfileName
+      - approvalProfileUuid
+      - approvalSteps
+      - approvalUuid
+      - createdAt
+      - creatorUuid
+      - expiry
+      - expiryAt
+      - objectUuid
+      - resource
+      - resourceAction
+      - status
+      - version
+    ApprovalDetailStepDto:
       type: object
       properties:
         userUuid:
           type: string
+          format: uuid
           description: UUID of the responsible user to approve action in approval
             step
-          format: uuid
         roleUuid:
           type: string
+          format: uuid
           description: UUID of the responsible role of the users to approve action
             in approval step
-          format: uuid
         groupUuid:
           type: string
+          format: uuid
           description: UUID of the responsible group of the users to approve action
             in approval step
-          format: uuid
         description:
           type: string
           description: Description of the approval step
         order:
           type: integer
-          description: Order of the position in the approval steps flow
           format: int32
+          description: Order of the position in the approval steps flow
         requiredApprovals:
           type: integer
+          format: int32
           description: "Count of the required approvals for the approval step, by\
             \ default there is 1 approval needed."
-          format: int32
         uuid:
           type: string
-          description: UUID of the Approval step
           format: uuid
+          description: UUID of the Approval step
         username:
           type: string
           description: Username of the responsible user to approve action in approval
@@ -1043,13 +1038,11 @@ components:
           description: List of the approval recipient related for this step
           items:
             $ref: "#/components/schemas/ApprovalStepRecipientDto"
-      description: List of Approval steps related to this Approval
-    ApprovalStepRecipientDto:
       required:
-      - approvalRecipientUuid
-      - createdAt
-      - status
-      - userUuid
+      - approvalStepRecipients
+      - order
+      - uuid
+    ApprovalStepRecipientDto:
       type: object
       properties:
         approvalRecipientUuid:
@@ -1063,12 +1056,12 @@ components:
           description: Username of the recipient
         createdAt:
           type: string
-          description: Creating date of the approval recipient
           format: date-time
+          description: Creating date of the approval recipient
         closedAt:
           type: string
-          description: Resolution date of the approval recipient
           format: date-time
+          description: Resolution date of the approval recipient
         status:
           type: string
           description: Status of the approval recipient
@@ -1080,20 +1073,17 @@ components:
         comment:
           type: string
           description: Comment of the approval recipient
-      description: List of the approval recipient related for this step
+      required:
+      - approvalRecipientUuid
+      - createdAt
+      - status
+      - userUuid
     ApprovalUserDto:
       type: object
       properties:
         history:
           type: boolean
     ApprovalProfileDto:
-      required:
-      - associations
-      - enabled
-      - name
-      - numberOfSteps
-      - uuid
-      - version
       type: object
       properties:
         uuid:
@@ -1105,8 +1095,8 @@ components:
           example: ApprovalProfile1
         version:
           type: integer
-          description: Version of the Approval profile
           format: int32
+          description: Version of the Approval profile
           example: 1
         description:
           type: string
@@ -1118,46 +1108,53 @@ components:
           example: true
         expiry:
           type: integer
-          description: Expiration of the Approval profile in hours
           format: int32
+          description: Expiration of the Approval profile in hours
           example: 30
         numberOfSteps:
           type: integer
-          description: Number of the Approval profile steps
           format: int32
+          description: Number of the Approval profile steps
           example: 2
         associations:
           type: integer
-          description: Number of associated objects
           format: int32
+          description: Number of associated objects
+      required:
+      - associations
+      - enabled
+      - name
+      - numberOfSteps
+      - uuid
+      - version
     ApprovalProfileResponseDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+        approvalProfiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApprovalProfileDto"
       required:
       - itemsPerPage
       - pageNumber
       - totalItems
       - totalPages
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          description: Number of entries per page
-          format: int32
-        pageNumber:
-          type: integer
-          description: Page number for the request
-          format: int32
-        totalPages:
-          type: integer
-          description: Number of pages available
-          format: int32
-        totalItems:
-          type: integer
-          description: Number of items available
-          format: int64
-        approvalProfiles:
-          type: array
-          items:
-            $ref: "#/components/schemas/ApprovalProfileDto"
     ApprovalProfileForVersionDto:
       type: object
       properties:
@@ -1165,6 +1162,47 @@ components:
           type: integer
           format: int32
     ApprovalProfileDetailDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Approval profile
+        name:
+          type: string
+          description: Name of the Approval profile
+          example: ApprovalProfile1
+        version:
+          type: integer
+          format: int32
+          description: Version of the Approval profile
+          example: 1
+        description:
+          type: string
+          description: Description of the Approval profile
+          example: Detail description of the approval profile
+        enabled:
+          type: boolean
+          description: Enable of the Approval profile
+          example: true
+        expiry:
+          type: integer
+          format: int32
+          description: Expiration of the Approval profile in hours
+          example: 30
+        numberOfSteps:
+          type: integer
+          format: int32
+          description: Number of the Approval profile steps
+          example: 2
+        associations:
+          type: integer
+          format: int32
+          description: Number of associated objects
+        approvalSteps:
+          type: array
+          description: List of Approval steps for the Approval profile
+          items:
+            $ref: "#/components/schemas/ApprovalStepDto"
       required:
       - approvalSteps
       - associations
@@ -1173,84 +1211,40 @@ components:
       - numberOfSteps
       - uuid
       - version
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: UUID of the Approval profile
-        name:
-          type: string
-          description: Name of the Approval profile
-          example: ApprovalProfile1
-        version:
-          type: integer
-          description: Version of the Approval profile
-          format: int32
-          example: 1
-        description:
-          type: string
-          description: Description of the Approval profile
-          example: Detail description of the approval profile
-        enabled:
-          type: boolean
-          description: Enable of the Approval profile
-          example: true
-        expiry:
-          type: integer
-          description: Expiration of the Approval profile in hours
-          format: int32
-          example: 30
-        numberOfSteps:
-          type: integer
-          description: Number of the Approval profile steps
-          format: int32
-          example: 2
-        associations:
-          type: integer
-          description: Number of associated objects
-          format: int32
-        approvalSteps:
-          type: array
-          description: List of Approval steps for the Approval profile
-          items:
-            $ref: "#/components/schemas/ApprovalStepDto"
     ApprovalStepDto:
-      required:
-      - order
-      - uuid
       type: object
       properties:
         userUuid:
           type: string
+          format: uuid
           description: UUID of the responsible user to approve action in approval
             step
-          format: uuid
         roleUuid:
           type: string
+          format: uuid
           description: UUID of the responsible role of the users to approve action
             in approval step
-          format: uuid
         groupUuid:
           type: string
+          format: uuid
           description: UUID of the responsible group of the users to approve action
             in approval step
-          format: uuid
         description:
           type: string
           description: Description of the approval step
         order:
           type: integer
-          description: Order of the position in the approval steps flow
           format: int32
+          description: Order of the position in the approval steps flow
         requiredApprovals:
           type: integer
+          format: int32
           description: "Count of the required approvals for the approval step, by\
             \ default there is 1 approval needed."
-          format: int32
         uuid:
           type: string
-          description: UUID of the Approval step
           format: uuid
+          description: UUID of the Approval step
         username:
           type: string
           description: Username of the responsible user to approve action in approval
@@ -1263,4 +1257,6 @@ components:
           type: string
           description: Name of the responsible group of the users to approve action
             in approval step
-      description: List of Approval steps for the Approval profile
+      required:
+      - order
+      - uuid

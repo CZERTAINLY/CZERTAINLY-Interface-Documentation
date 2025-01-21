@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: CZERTAINLY Uncategorized API
   description: Various uncategorized REST APIs of the platform
@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:37003
+- url: http://localhost:34673
   description: Generated server url
 tags:
 - name: Audit Log
@@ -37,6 +37,14 @@ paths:
       summary: Get platform settings
       operationId: getPlatformSettings
       responses:
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
@@ -49,22 +57,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "200":
           description: Platform settings retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PlatformSettingsDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
     put:
       tags:
       - Settings
@@ -77,20 +77,8 @@ paths:
               $ref: "#/components/schemas/PlatformSettingsDto"
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
         "204":
           description: Setting updated
         "403":
@@ -99,15 +87,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
-  /v1/settings/notifications:
-    get:
-      tags:
-      - Settings
-      summary: Get notification settings
-      operationId: getNotificationsSettings
-      responses:
         "400":
           description: Bad Request
           content:
@@ -122,14 +101,35 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+  /v1/settings/notifications:
+    get:
+      tags:
+      - Settings
+      summary: Get notification settings
+      operationId: getNotificationsSettings
+      responses:
+        "401":
+          description: Unauthorized
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Notification settings retrieved
           content:
@@ -148,20 +148,8 @@ paths:
               $ref: "#/components/schemas/NotificationSettingsDto"
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
         "204":
           description: Setting updated
         "403":
@@ -170,15 +158,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
-  /v1/settings/logging:
-    get:
-      tags:
-      - Settings
-      summary: Get logging settings
-      operationId: getLoggingSettings
-      responses:
         "400":
           description: Bad Request
           content:
@@ -193,6 +172,15 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+  /v1/settings/logging:
+    get:
+      tags:
+      - Settings
+      summary: Get logging settings
+      operationId: getLoggingSettings
+      responses:
+        "401":
+          description: Unauthorized
         "200":
           description: Logging settings retrieved
           content:
@@ -205,8 +193,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
     put:
       tags:
       - Settings
@@ -219,6 +219,14 @@ paths:
               $ref: "#/components/schemas/LoggingSettingsDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
@@ -231,18 +239,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Logging settings updated
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
   /v1/settings/authentication:
     get:
       tags:
@@ -250,6 +250,20 @@ paths:
       summary: Get authentication settings
       operationId: getAuthenticationSettings
       responses:
+        "401":
+          description: Unauthorized
+        "200":
+          description: Authentication settings retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationSettingsDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
@@ -262,22 +276,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Authentication settings retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationSettingsDto"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
     put:
       tags:
       - Settings
@@ -290,6 +290,14 @@ paths:
               $ref: "#/components/schemas/AuthenticationSettingsUpdateDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
@@ -304,14 +312,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
         "200":
           description: Authentication settings updated
   /v1/settings/authentication/oauth2Providers/{providerName}:
@@ -328,6 +328,14 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
@@ -340,22 +348,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: OAuth2 Provider settings retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/OAuth2ProviderSettingsDto"
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
     put:
       tags:
       - Settings
@@ -375,6 +375,16 @@ paths:
               $ref: "#/components/schemas/OAuth2ProviderSettingsUpdateDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
+        "204":
+          description: Setting updated
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
@@ -389,16 +399,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "204":
-          description: Setting updated
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
     delete:
       tags:
       - Settings
@@ -412,14 +412,22 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: OAuth2 Provider removed.
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: OAuth2 Provider removed.
         "404":
           description: Not Found
           content:
@@ -428,14 +436,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
   /v1/auditLogs:
     post:
       tags:
@@ -449,12 +449,26 @@ paths:
               $ref: "#/components/schemas/SearchRequestDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: List of audit logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditLogResponseDto"
         "404":
           description: Not Found
           content:
@@ -463,20 +477,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "200":
-          description: List of audit logs
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuditLogResponseDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
   /v1/auditLogs/purge:
     post:
       tags:
@@ -492,6 +492,14 @@ paths:
                 $ref: "#/components/schemas/SearchFilterRequestDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
@@ -504,18 +512,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "204":
           description: Audit logs purged
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
   /v1/auditLogs/export:
     post:
       tags:
@@ -531,12 +531,6 @@ paths:
                 $ref: "#/components/schemas/SearchFilterRequestDto"
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Export of audit logs
           content:
@@ -544,29 +538,14 @@ paths:
               schema:
                 type: string
                 format: binary
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
-  /v1/statistics:
-    get:
-      tags:
-      - Statistics/Dashboard
-      summary: Get Dashboard/Statistics Details
-      operationId: getStatistics
-      responses:
         "400":
           description: Bad Request
           content:
@@ -579,22 +558,43 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+  /v1/statistics:
+    get:
+      tags:
+      - Statistics/Dashboard
+      summary: Get Dashboard/Statistics Details
+      operationId: getStatistics
+      responses:
+        "401":
+          description: Unauthorized
         "200":
           description: Details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/StatisticsDto"
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/resources:
     get:
       tags:
@@ -602,6 +602,18 @@ paths:
       summary: Retrieve list of resources with information and settings
       operationId: listResources
       responses:
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Resources retrieved
           content:
@@ -610,28 +622,16 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ResourceDto"
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/resources/{resource}/filters/rules:
     get:
       tags:
@@ -652,16 +652,22 @@ paths:
         schema:
           type: boolean
       responses:
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
@@ -674,14 +680,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SearchFieldDataByGroupDto"
-        "401":
-          description: Unauthorized
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/resources/{resource}/events:
     get:
       tags:
@@ -696,8 +696,26 @@ paths:
         schema:
           $ref: "#/components/schemas/Resource"
       responses:
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Events retrieved
           content:
@@ -706,26 +724,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ResourceEventDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/enums:
     get:
       tags:
@@ -733,6 +733,8 @@ paths:
       summary: Get platform enums
       operationId: getPlatformEnums
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -745,8 +747,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "200":
           description: Platform settings retrieved
           content:
@@ -757,8 +757,8 @@ paths:
                   type: object
                   additionalProperties:
                     $ref: "#/components/schemas/EnumItemDto"
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
   /v1/auditLogs/search:
     get:
       tags:
@@ -766,6 +766,22 @@ paths:
       summary: Get Audit logs searchable fields information
       operationId: getSearchableFieldInformation
       responses:
+        "401":
+          description: Unauthorized
+        "200":
+          description: Audit logs searchable field information retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchFieldDataByGroupDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
@@ -778,87 +794,65 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Audit logs searchable field information retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/SearchFieldDataByGroupDto"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
 components:
   schemas:
     PlatformSettingsDto:
-      required:
-      - utils
       type: object
       properties:
         utils:
           $ref: "#/components/schemas/UtilsSettingsDto"
-    UtilsSettingsDto:
+          description: Utils settings of the platform
       required:
-      - utilsServiceUrl
+      - utils
+    UtilsSettingsDto:
       type: object
       properties:
         utilsServiceUrl:
           type: string
           description: URL of the Util Service
           example: http://util-service:8080
-      description: Utils settings of the platform
-    ErrorMessageDto:
       required:
-      - message
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message detail
-          example: Error message
+      - utilsServiceUrl
     AuthenticationServiceExceptionDto:
-      required:
-      - code
-      - message
-      - statusCode
       type: object
       properties:
         statusCode:
           type: integer
-          description: Status code of the HTTP Request
           format: int32
+          description: Status code of the HTTP Request
         code:
           type: string
           description: Code of the result
         message:
           type: string
           description: Exception message
-    NotificationSettingsDto:
       required:
-      - notificationsMapping
+      - code
+      - message
+      - statusCode
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          example: Error message
+      required:
+      - message
+    NotificationSettingsDto:
       type: object
       properties:
         notificationsMapping:
           type: object
           additionalProperties:
             type: string
-            description: Map of notification instances where key is notification type
-              enum
           description: Map of notification instances where key is notification type
             enum
-    AuditLoggingSettingsDto:
       required:
-      - logAllModules
-      - logAllResources
-      - output
+      - notificationsMapping
+    AuditLoggingSettingsDto:
       type: object
       properties:
         logAllModules:
@@ -870,29 +864,29 @@ components:
           description: "Collect logs for all resources. If true, logged resources\
             \ list is not taken into account only ignored resources"
         loggedModules:
-          uniqueItems: true
           type: array
           description: List of modules for which logs are collected.
           items:
             $ref: "#/components/schemas/Module"
-        ignoredModules:
           uniqueItems: true
+        ignoredModules:
           type: array
           description: List of modules that will be ignored when logging.
           items:
             $ref: "#/components/schemas/Module"
-        loggedResources:
           uniqueItems: true
+        loggedResources:
           type: array
           description: List of resources for which logs are collected.
           items:
             $ref: "#/components/schemas/Resource"
-        ignoredResources:
           uniqueItems: true
+        ignoredResources:
           type: array
           description: List of resources that will be ignored when logging.
           items:
             $ref: "#/components/schemas/Resource"
+          uniqueItems: true
         output:
           type: string
           description: Type of audit logs output/storage channel
@@ -903,20 +897,25 @@ components:
           - DATABASE
         resourceLogging:
           $ref: "#/components/schemas/ResourceLoggingSettingsDto"
-      description: Settings of audit logging
-    LoggingSettingsDto:
+          writeOnly: true
       required:
-      - auditLogs
-      - eventLogs
+      - logAllModules
+      - logAllResources
+      - output
+    LoggingSettingsDto:
       type: object
       properties:
         auditLogs:
           $ref: "#/components/schemas/AuditLoggingSettingsDto"
+          description: Settings of audit logging
         eventLogs:
           $ref: "#/components/schemas/ResourceLoggingSettingsDto"
+          description: Settings of event logging
+      required:
+      - auditLogs
+      - eventLogs
     Module:
       type: string
-      description: List of modules that will be ignored when logging.
       enum:
       - approvals
       - auth
@@ -931,7 +930,6 @@ components:
       - workflows
     Resource:
       type: string
-      description: List of resources that will be ignored when logging.
       enum:
       - NONE
       - dashboard
@@ -984,9 +982,6 @@ components:
       - endEntityProfiles
       - authenticationProviders
     ResourceLoggingSettingsDto:
-      required:
-      - logAllModules
-      - logAllResources
       type: object
       properties:
         logAllModules:
@@ -998,33 +993,33 @@ components:
           description: "Collect logs for all resources. If true, logged resources\
             \ list is not taken into account only ignored resources"
         loggedModules:
-          uniqueItems: true
           type: array
           description: List of modules for which logs are collected.
           items:
             $ref: "#/components/schemas/Module"
-        ignoredModules:
           uniqueItems: true
+        ignoredModules:
           type: array
           description: List of modules that will be ignored when logging.
           items:
             $ref: "#/components/schemas/Module"
-        loggedResources:
           uniqueItems: true
+        loggedResources:
           type: array
           description: List of resources for which logs are collected.
           items:
             $ref: "#/components/schemas/Resource"
-        ignoredResources:
           uniqueItems: true
+        ignoredResources:
           type: array
           description: List of resources that will be ignored when logging.
           items:
             $ref: "#/components/schemas/Resource"
-      description: Settings of event logging
-    AuthenticationSettingsUpdateDto:
+          uniqueItems: true
       required:
-      - disableLocalhostUser
+      - logAllModules
+      - logAllResources
+    AuthenticationSettingsUpdateDto:
       type: object
       properties:
         disableLocalhostUser:
@@ -1034,9 +1029,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OAuth2ProviderSettingsDto"
-    OAuth2ProviderSettingsDto:
       required:
-      - name
+      - disableLocalhostUser
+    OAuth2ProviderSettingsDto:
       type: object
       properties:
         name:
@@ -1076,8 +1071,6 @@ components:
             requested by the client application.'
           items:
             type: string
-            description: ' The list of scopes that define the access levels and permissions
-              requested by the client application.'
         logoutUrl:
           type: string
           description: URL to end session on provider side.
@@ -1093,19 +1086,20 @@ components:
             \ used to match the intended recipients of the tokens."
           items:
             type: string
-            description: "A list of expected audiences for validating the issued tokens,\
-              \ used to match the intended recipients of the tokens."
         skew:
           type: integer
+          format: int32
           description: "The allowed time skew, in seconds, for token validation. This\
             \ accounts for clock differences between systems. Default value is 30\
             \ seconds."
-          format: int32
         sessionMaxInactiveInterval:
           type: integer
+          format: int32
+          default: 15m
           description: Duration in seconds after which will inactive user's session
             be terminated.
-          format: int32
+      required:
+      - name
     OAuth2ProviderSettingsUpdateDto:
       type: object
       properties:
@@ -1143,8 +1137,6 @@ components:
             requested by the client application.'
           items:
             type: string
-            description: ' The list of scopes that define the access levels and permissions
-              requested by the client application.'
         logoutUrl:
           type: string
           description: URL to end session on provider side.
@@ -1160,22 +1152,20 @@ components:
             \ used to match the intended recipients of the tokens."
           items:
             type: string
-            description: "A list of expected audiences for validating the issued tokens,\
-              \ used to match the intended recipients of the tokens."
         skew:
           type: integer
+          format: int32
           description: "The allowed time skew, in seconds, for token validation. This\
             \ accounts for clock differences between systems. Default value is 30\
             \ seconds."
-          format: int32
         sessionMaxInactiveInterval:
           type: integer
+          format: int32
+          default: 15m
           description: Duration in seconds after which will inactive user's session
             be terminated.
-          format: int32
     FilterConditionOperator:
       type: string
-      description: Condition for the search filter
       enum:
       - EQUALS
       - NOT_EQUALS
@@ -1195,21 +1185,17 @@ components:
       - NOT_CHECKED
     FilterFieldSource:
       type: string
-      description: Field group of search filter
       enum:
       - meta
       - custom
       - data
       - property
     SearchFilterRequestDto:
-      required:
-      - condition
-      - fieldIdentifier
-      - fieldSource
       type: object
       properties:
         fieldSource:
           $ref: "#/components/schemas/FilterFieldSource"
+          description: Field group of search filter
         fieldIdentifier:
           type: string
           description: "Field identifier of search filter. List of available fields\
@@ -1217,10 +1203,14 @@ components:
             \ `GET /v1/{resource}/search`, e.g.: [**GET /v1/certificates/search**](../core-certificate/#tag/Certificate-Inventory/operation/getSearchableFieldInformation)"
         condition:
           $ref: "#/components/schemas/FilterConditionOperator"
+          description: Condition for the search filter
         value:
           type: object
           description: Value to match
-      description: Certificate filter input
+      required:
+      - condition
+      - fieldIdentifier
+      - fieldSource
     SearchRequestDto:
       type: object
       properties:
@@ -1230,20 +1220,17 @@ components:
           items:
             $ref: "#/components/schemas/SearchFilterRequestDto"
         itemsPerPage:
-          maximum: 1000
           type: integer
-          description: Number of entries per page
           format: int32
-          default: 10
+          default: "10"
+          description: Number of entries per page
+          maximum: 1000
         pageNumber:
           type: integer
-          description: Page number for the request
           format: int32
-          default: 1
+          default: "1"
+          description: Page number for the request
     ActorRecord:
-      required:
-      - authMethod
-      - type
       type: object
       properties:
         type:
@@ -1255,7 +1242,9 @@ components:
           format: uuid
         name:
           type: string
-      description: Actor of log record
+      required:
+      - authMethod
+      - type
     ActorType:
       type: string
       enum:
@@ -1265,42 +1254,40 @@ components:
       - connector
       - protocol
     AuditLogDto:
-      required:
-      - actor
-      - id
-      - loggedAt
-      - module
-      - operation
-      - operationResult
-      - resource
-      - version
       type: object
       properties:
         id:
           type: integer
-          description: Audit log Id
           format: int64
+          description: Audit log Id
         version:
           type: string
           description: Log schema version
         loggedAt:
           type: string
-          description: Time when the audit log is stored
           format: date-time
+          description: Time when the audit log is stored
         module:
           $ref: "#/components/schemas/Module"
+          description: Module of platform where log occurred
         actor:
           $ref: "#/components/schemas/ActorRecord"
+          description: Actor of log record
         source:
           $ref: "#/components/schemas/SourceRecord"
+          description: Source of log record
         resource:
           $ref: "#/components/schemas/ResourceRecord"
+          description: Resource that is subject of action logged
         affiliatedResource:
           $ref: "#/components/schemas/ResourceRecord"
+          description: Affiliated resource that is related to subject resource
         operation:
           $ref: "#/components/schemas/Operation"
+          description: Resource operation that is being logged
         operationResult:
           $ref: "#/components/schemas/OperationResult"
+          description: Result of the resource operation. Either success or failed
         message:
           type: string
           description: Additional message
@@ -1311,39 +1298,46 @@ components:
           type: object
           additionalProperties:
             type: object
-            description: Additional data specific to event logged
           description: Additional data specific to event logged
-      description: Audit log items
+      required:
+      - actor
+      - id
+      - loggedAt
+      - module
+      - operation
+      - operationResult
+      - resource
+      - version
     AuditLogResponseDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+        items:
+          type: array
+          description: Audit log items
+          items:
+            $ref: "#/components/schemas/AuditLogDto"
       required:
       - items
       - itemsPerPage
       - pageNumber
       - totalItems
       - totalPages
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          description: Number of entries per page
-          format: int32
-        pageNumber:
-          type: integer
-          description: Page number for the request
-          format: int32
-        totalPages:
-          type: integer
-          description: Number of pages available
-          format: int32
-        totalItems:
-          type: integer
-          description: Number of items available
-          format: int64
-        items:
-          type: array
-          description: Audit log items
-          items:
-            $ref: "#/components/schemas/AuditLogDto"
     AuthMethod:
       type: string
       enum:
@@ -1355,7 +1349,6 @@ components:
       - userProxy
     Operation:
       type: string
-      description: Resource operation that is being logged
       enum:
       - unknown
       - list
@@ -1448,13 +1441,10 @@ components:
       - listCas
     OperationResult:
       type: string
-      description: Result of the resource operation. Either success or failed
       enum:
       - success
       - failure
     ResourceRecord:
-      required:
-      - type
       type: object
       properties:
         type:
@@ -1468,11 +1458,9 @@ components:
           type: array
           items:
             type: string
-      description: Affiliated resource that is related to subject resource
-    SourceRecord:
       required:
-      - method
-      - path
+      - type
+    SourceRecord:
       type: object
       properties:
         method:
@@ -1485,140 +1473,127 @@ components:
           type: string
         userAgent:
           type: string
-      description: Source of log record
+      required:
+      - method
+      - path
     StatisticsDto:
       type: object
       properties:
         totalCertificates:
           type: integer
-          description: Number Certificates available
           format: int64
+          description: Number Certificates available
         totalGroups:
           type: integer
-          description: Number of Groups
           format: int64
+          description: Number of Groups
         totalDiscoveries:
           type: integer
-          description: Number of Discoveries triggered
           format: int64
+          description: Number of Discoveries triggered
         totalConnectors:
           type: integer
-          description: Number of Connectors added
           format: int64
+          description: Number of Connectors added
         totalRaProfiles:
           type: integer
-          description: Number of RA Profiles in the platform
           format: int64
+          description: Number of RA Profiles in the platform
         totalCredentials:
           type: integer
-          description: Number of Credentials
           format: int64
+          description: Number of Credentials
         totalAuthorities:
           type: integer
-          description: Number of Authority instances
           format: int64
+          description: Number of Authority instances
         totalAdministrators:
           type: integer
-          description: Number of Administrators
           format: int64
+          description: Number of Administrators
         totalClients:
           type: integer
-          description: Number of Clients added
           format: int64
+          description: Number of Clients added
         groupStatByCertificateCount:
           type: object
           additionalProperties:
             type: integer
-            description: Map of Certificate count by Group
             format: int64
           description: Map of Certificate count by Group
         raProfileStatByCertificateCount:
           type: object
           additionalProperties:
             type: integer
-            description: Map of Certificate count by RA Profile
             format: int64
           description: Map of Certificate count by RA Profile
         certificateStatByType:
           type: object
           additionalProperties:
             type: integer
-            description: Map of Certificate count by Type
             format: int64
           description: Map of Certificate count by Type
         certificateStatByExpiry:
           type: object
           additionalProperties:
             type: integer
-            description: Map of Certificate count by expiry date
             format: int64
           description: Map of Certificate count by expiry date
         certificateStatByKeySize:
           type: object
           additionalProperties:
             type: integer
-            description: Map of Certificate count by key size
             format: int64
           description: Map of Certificate count by key size
         certificateStatBySubjectType:
           type: object
           additionalProperties:
             type: integer
-            description: Map of Certificate count by subject type
             format: int64
           description: Map of Certificate count by subject type
         certificateStatByState:
           type: object
           additionalProperties:
             type: integer
-            description: Map of Certificate count by state
             format: int64
           description: Map of Certificate count by state
         certificateStatByValidationStatus:
           type: object
           additionalProperties:
             type: integer
-            description: Map of Certificate count by validationStatus
             format: int64
           description: Map of Certificate count by validationStatus
         certificateStatByComplianceStatus:
           type: object
           additionalProperties:
             type: integer
-            description: Map of Certificate count by compliance status
             format: int64
           description: Map of Certificate count by compliance status
         connectorStatByStatus:
           type: object
           additionalProperties:
             type: integer
-            description: Map of Connector count by status
             format: int64
           description: Map of Connector count by status
         raProfileStatByStatus:
           type: object
           additionalProperties:
             type: integer
-            description: Map of RA Profile count by status
             format: int64
           description: Map of RA Profile count by status
         administratorStatByStatus:
           type: object
           additionalProperties:
             type: integer
-            description: Map of Administrator count by status
             format: int64
           description: Map of Administrator count by status
         clientStatByStatus:
           type: object
           additionalProperties:
             type: integer
-            description: Map of Client count by status
             format: int64
           description: Map of Client count by status
     AuthenticationSettingsDto:
-      required:
-      - disableLocalhostUser
       type: object
       properties:
         disableLocalhostUser:
@@ -1628,19 +1603,15 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/OAuth2ProviderSettingsDto"
-    ResourceDto:
       required:
-      - hasCustomAttributes
-      - hasEvents
-      - hasGroups
-      - hasObjectAccess
-      - hasOwner
-      - hasRuleEvaluator
-      - resource
+      - disableLocalhostUser
+    ResourceDto:
       type: object
       properties:
         resource:
           $ref: "#/components/schemas/Resource"
+          description: Resource code
+          example: certificates
         hasObjectAccess:
           type: boolean
           description: "If resource has Object access permissions. True = Yes, False\
@@ -1660,9 +1631,16 @@ components:
         hasRuleEvaluator:
           type: boolean
           description: Has rule evaluator that can evaluate conditions and actions
+      required:
+      - hasCustomAttributes
+      - hasEvents
+      - hasGroups
+      - hasObjectAccess
+      - hasOwner
+      - hasRuleEvaluator
+      - resource
     AttributeContentType:
       type: string
-      description: Attribute filter field content type
       enum:
       - string
       - text
@@ -1679,7 +1657,6 @@ components:
       - object
     FilterFieldType:
       type: string
-      description: Type of the field
       enum:
       - string
       - number
@@ -1689,7 +1666,6 @@ components:
       - boolean
     PlatformEnum:
       type: string
-      description: Platform enum of the field values
       enum:
       - Resource
       - FilterConditionOperator
@@ -1744,23 +1720,19 @@ components:
       - Operation
       - OperationResult
     SearchFieldDataByGroupDto:
-      required:
-      - filterFieldSource
       type: object
       properties:
         filterFieldSource:
           $ref: "#/components/schemas/FilterFieldSource"
+          description: Search group
         searchFieldData:
           type: array
           description: List of search fields for specified search group
           items:
             $ref: "#/components/schemas/SearchFieldDataDto"
-    SearchFieldDataDto:
       required:
-      - conditions
-      - fieldIdentifier
-      - fieldLabel
-      - type
+      - filterFieldSource
+    SearchFieldDataDto:
       type: object
       properties:
         fieldIdentifier:
@@ -1771,6 +1743,7 @@ components:
           description: Label for the field
         type:
           $ref: "#/components/schemas/FilterFieldType"
+          description: Type of the field
         conditions:
           type: array
           description: List of available conditions for the field
@@ -1778,32 +1751,36 @@ components:
             $ref: "#/components/schemas/FilterConditionOperator"
         platformEnum:
           $ref: "#/components/schemas/PlatformEnum"
+          description: Platform enum of the field values
         attributeContentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Attribute filter field content type
         value:
           type: object
           description: Available values for the field
         multiValue:
           type: boolean
           description: "Multivalue flag. true = yes, false = no"
-      description: List of search fields for specified search group
-    ResourceEventDto:
       required:
-      - event
+      - conditions
+      - fieldIdentifier
+      - fieldLabel
+      - type
+    ResourceEventDto:
       type: object
       properties:
         event:
           type: string
           description: Resource event code
-          example: discoveryFinished
           enum:
           - discoveryFinished
+          example: discoveryFinished
         producedResource:
           $ref: "#/components/schemas/Resource"
-    EnumItemDto:
+          description: Resource of objects that are subject of event
       required:
-      - code
-      - label
+      - event
+    EnumItemDto:
       type: object
       properties:
         code:
@@ -1818,3 +1795,6 @@ components:
           type: string
           description: Enum item description
           example: X.509 Certificate type
+      required:
+      - code
+      - label

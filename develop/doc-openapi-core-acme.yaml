@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: CZERTAINLY ACME API
   description: REST API for managing ACME Profiles and ACME Accounts in the platform
@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:46093
+- url: http://localhost:44691
   description: Generated server url
 tags:
 - name: ACME Account Management
@@ -38,8 +38,6 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -52,12 +50,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: ACME Profile details retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AcmeProfileDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -66,6 +60,12 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "401":
           description: Unauthorized
+        "200":
+          description: ACME Profile details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcmeProfileDto"
     put:
       tags:
       - ACME Profile Management
@@ -85,14 +85,6 @@ paths:
               $ref: "#/components/schemas/AcmeProfileEditRequestDto"
         required: true
       responses:
-        "200":
-          description: ACME Profile updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AcmeProfileDto"
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -105,6 +97,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+        "200":
+          description: ACME Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcmeProfileDto"
         "403":
           description: Forbidden
           content:
@@ -126,10 +126,6 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "204":
-          description: ACME Profile deleted
         "400":
           description: Bad Request
           content:
@@ -142,12 +138,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "204":
+          description: ACME Profile deleted
         "401":
           description: Unauthorized
   /v1/acmeAccounts/revoke:
@@ -169,8 +169,6 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -183,6 +181,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -200,16 +200,6 @@ paths:
       summary: Get list of ACME Profiles
       operationId: listAcmeProfiles
       responses:
-        "200":
-          description: ACME Profile list retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/AcmeProfileListDto"
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -222,6 +212,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+        "200":
+          description: ACME Profile list retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AcmeProfileListDto"
         "403":
           description: Forbidden
           content:
@@ -248,8 +248,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UuidDto"
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -262,6 +260,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -290,14 +290,6 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "200":
-          description: ACME Account details retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AcmeAccountResponseDto"
         "400":
           description: Bad Request
           content:
@@ -310,12 +302,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "200":
+          description: ACME Account details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcmeAccountResponseDto"
         "401":
           description: Unauthorized
     post:
@@ -337,10 +337,6 @@ paths:
         schema:
           type: string
       responses:
-        "204":
-          description: ACME Account revoked
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -353,12 +349,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "204":
+          description: ACME Account revoked
         "401":
           description: Unauthorized
   /v1/acmeProfiles/{uuid}/raprofile/{raProfileUuid}:
@@ -381,10 +381,6 @@ paths:
         schema:
           type: string
       responses:
-        "200":
-          description: RA Profile updated
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -397,6 +393,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+        "200":
+          description: RA Profile updated
         "403":
           description: Forbidden
           content:
@@ -421,22 +421,22 @@ paths:
         schema:
           type: string
       responses:
-        "200":
-          description: ACME Profile enabled
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: ACME Profile enabled
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -461,10 +461,6 @@ paths:
         schema:
           type: string
       responses:
-        "200":
-          description: ACME Profile disabled
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -477,12 +473,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "200":
+          description: ACME Profile disabled
         "401":
           description: Unauthorized
         "204":
@@ -509,8 +509,6 @@ paths:
       responses:
         "204":
           description: ACME Account enabled
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -523,6 +521,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -551,10 +551,6 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "204":
-          description: ACME Account disabled
         "400":
           description: Bad Request
           content:
@@ -567,12 +563,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "204":
+          description: ACME Account disabled
         "401":
           description: Unauthorized
   /v1/acmeProfiles/enable:
@@ -594,8 +594,6 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -608,8 +606,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: ACME Profiles enabled
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -618,6 +616,8 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "401":
           description: Unauthorized
+        "200":
+          description: ACME Profiles enabled
         "204":
           description: No Content
   /v1/acmeProfiles/disable:
@@ -639,10 +639,6 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "200":
-          description: ACME Profiles disabled
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -655,12 +651,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "200":
+          description: ACME Profiles disabled
         "401":
           description: Unauthorized
         "204":
@@ -684,8 +684,6 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -698,16 +696,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: ACME Accounts enabled
         "401":
           description: Unauthorized
+        "204":
+          description: ACME Accounts enabled
   /v1/acmeAccounts/disable:
     patch:
       tags:
@@ -727,10 +727,6 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "204":
-          description: ACME Accounts disabled
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -743,12 +739,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "204":
+          description: ACME Accounts disabled
         "401":
           description: Unauthorized
   /v1/acmeAccounts:
@@ -758,16 +758,6 @@ paths:
       summary: List ACME Accounts
       operationId: listAcmeAccounts
       responses:
-        "200":
-          description: ACME Accounts list retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/AcmeAccountListResponseDto"
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -780,12 +770,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "200":
+          description: ACME Accounts list retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AcmeAccountListResponseDto"
         "401":
           description: Unauthorized
   /v1/acmeProfiles/delete:
@@ -807,8 +807,6 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -821,6 +819,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -856,8 +856,6 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -870,20 +868,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: ACME Profiles forced to delete
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BulkActionMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "422":
           description: Unprocessible Entity
           content:
@@ -895,14 +881,25 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "401":
           description: Unauthorized
+        "200":
+          description: ACME Profiles forced to delete
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkActionMessageDto"
 components:
   schemas:
     AcmeProfileEditRequestDto:
-      required:
-      - issueCertificateAttributes
-      - revokeCertificateAttributes
       type: object
       properties:
         description:
@@ -919,39 +916,39 @@ components:
           example: https://sample-url.com
         dnsResolverIp:
           type: string
+          default: System Default
           description: DNS Resolver IP address
           example: 8.8.8.8
-          default: System Default
         dnsResolverPort:
           type: string
-          description: DNS Resolver port number
-          example: "53"
           default: "53"
+          description: DNS Resolver port number
+          example: 53
         raProfileUuid:
           type: string
           description: RA Profile UUID
           example: 6b55de1c-844f-11ec-a8a3-0242ac120002
         retryInterval:
           type: integer
-          description: Retry interval for the Orders
           format: int32
+          default: "30"
+          description: Retry interval for the Orders
           example: 60
-          default: 30
         termsOfServiceChangeDisable:
           type: boolean
+          default: "false"
           description: Disable new Orders due to change in Terms of Service
           example: false
-          default: false
         termsOfServiceChangeUrl:
           type: string
           description: Changes of Terms of Service URL
           example: https://sample-url.com/termsOfService/change
         validity:
           type: integer
-          description: Order Validity
           format: int32
+          default: "36000"
+          description: Order Validity
           example: 3000
-          default: 36000
         issueCertificateAttributes:
           type: array
           description: List of Attributes to issue Certificate
@@ -964,24 +961,23 @@ components:
             $ref: "#/components/schemas/RequestAttributeDto"
         requireContact:
           type: boolean
+          default: "false"
           description: Require contact information for new Account
           example: true
-          default: false
         requireTermsOfService:
           type: boolean
+          default: "false"
           description: Require new Account to agree on Terms of Service
           example: false
-          default: false
         customAttributes:
           type: array
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
-    AttributeCallback:
       required:
-      - callbackContext
-      - callbackMethod
-      - mappings
+      - issueCertificateAttributes
+      - revokeCertificateAttributes
+    AttributeCallback:
       type: object
       properties:
         callbackContext:
@@ -991,17 +987,16 @@ components:
           type: string
           description: HTTP method of the callback
         mappings:
-          uniqueItems: true
           type: array
           description: Mappings for the callback method
           items:
             $ref: "#/components/schemas/AttributeCallbackMapping"
-      description: Optional definition of callback for getting the content of the
-        Attribute based on the action
-    AttributeCallbackMapping:
+          uniqueItems: true
       required:
-      - targets
-      - to
+      - callbackContext
+      - callbackMethod
+      - mappings
+    AttributeCallbackMapping:
       type: object
       properties:
         from:
@@ -1011,33 +1006,36 @@ components:
             set only if value is not set.
         attributeType:
           $ref: "#/components/schemas/AttributeType"
+          description: Type of the attribute. It is optional and must be set only
+            if special behaviour is needed.
         attributeContentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: 'Type of the attribute content. '
         to:
           type: string
           description: Name of the path variable or request param or body field which
             is to be used to assign value of attribute
         targets:
-          uniqueItems: true
           type: array
           description: Set of targets for propagating value.
           items:
             $ref: "#/components/schemas/AttributeValueTarget"
+          uniqueItems: true
         value:
           type: object
           description: Static value to be propagated to targets. It is optional and
             is set only if the value is known at attribute creation time.
-      description: Mappings for the callback method
+      required:
+      - targets
+      - to
     AttributeConstraintType:
       type: string
-      description: Attribute Constraint Type
       enum:
       - regExp
       - range
       - dateTime
     AttributeContentType:
       type: string
-      description: 'Type of the attribute content. '
       enum:
       - string
       - text
@@ -1054,8 +1052,6 @@ components:
       - object
     AttributeType:
       type: string
-      description: Type of the attribute. It is optional and must be set only if special
-        behaviour is needed.
       enum:
       - data
       - group
@@ -1064,16 +1060,18 @@ components:
       - custom
     AttributeValueTarget:
       type: string
-      description: Set of targets for propagating value.
       enum:
       - pathVariable
       - requestParameter
       - body
     BaseAttributeConstraint:
-      required:
-      - data
-      - type
       type: object
+      description: Optional regular expressions and constraints used for validating
+        the Attribute content
+      oneOf:
+      - $ref: "#/components/schemas/RegexpAttributeConstraint"
+      - $ref: "#/components/schemas/RangeAttributeConstraint"
+      - $ref: "#/components/schemas/DateTimeAttributeConstraint"
       properties:
         description:
           type: string
@@ -1083,26 +1081,15 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           type: object
           description: Attribute Constraint Data
-      description: Optional regular expressions and constraints used for validating
-        the Attribute content
-      oneOf:
-      - $ref: "#/components/schemas/RegexpAttributeConstraint"
-      - $ref: "#/components/schemas/RangeAttributeConstraint"
-      - $ref: "#/components/schemas/DateTimeAttributeConstraint"
-    BaseAttributeContentDto:
       required:
       - data
+      - type
+    BaseAttributeContentDto:
       type: object
-      properties:
-        reference:
-          type: string
-          description: Content Reference
-        data:
-          type: object
-          description: Content Data
       description: Base Attribute content definition
       oneOf:
       - $ref: "#/components/schemas/BooleanAttributeContent"
@@ -1118,9 +1105,16 @@ components:
       - $ref: "#/components/schemas/StringAttributeContent"
       - $ref: "#/components/schemas/TextAttributeContent"
       - $ref: "#/components/schemas/TimeAttributeContent"
-    BooleanAttributeContent:
+      properties:
+        reference:
+          type: string
+          description: Content Reference
+        data:
+          type: object
+          description: Content Data
       required:
       - data
+    BooleanAttributeContent:
       type: object
       properties:
         reference:
@@ -1129,9 +1123,9 @@ components:
         data:
           type: boolean
           description: Boolean attribute value
-    CodeBlockAttributeContent:
       required:
       - data
+    CodeBlockAttributeContent:
       type: object
       properties:
         reference:
@@ -1139,22 +1133,24 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/CodeBlockAttributeContentData"
-    CodeBlockAttributeContentData:
+          description: CodeBlock attribute content data
       required:
-      - code
-      - language
+      - data
+    CodeBlockAttributeContentData:
       type: object
       properties:
         language:
           $ref: "#/components/schemas/ProgrammingLanguageEnum"
+          description: Definition of programming languages used for code
+          example: "JAVA, PHP, C, etc"
         code:
           type: string
           description: Block of the code in Base64. Formatting of the code is specified
             by variable language
-      description: CodeBlock attribute content data
-    CredentialAttributeContent:
       required:
-      - data
+      - code
+      - language
+    CredentialAttributeContent:
       type: object
       properties:
         reference:
@@ -1162,12 +1158,10 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/CredentialAttributeContentData"
-    CredentialAttributeContentData:
+          description: Credential attribute content data
       required:
-      - attributes
-      - kind
-      - name
-      - uuid
+      - data
+    CredentialAttributeContentData:
       type: object
       properties:
         uuid:
@@ -1187,15 +1181,15 @@ components:
           description: List of Credential Attributes
           items:
             $ref: "#/components/schemas/DataAttribute"
-      description: Credential attribute content data
-    DataAttribute:
       required:
-      - contentType
+      - attributes
+      - kind
       - name
-      - properties
-      - type
       - uuid
+    DataAttribute:
       type: object
+      description: Data attribute allows to store and transfer dynamic data. Its content
+        can be edited and send in requests to store.
       properties:
         uuid:
           type: string
@@ -1214,30 +1208,51 @@ components:
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
         type:
           $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
         properties:
           $ref: "#/components/schemas/DataAttributeProperties"
+          description: Properties of the Attributes
         constraints:
           type: array
           description: Optional regular expressions and constraints used for validating
             the Attribute content
           items:
             $ref: "#/components/schemas/BaseAttributeConstraint"
+          oneOf:
+          - $ref: "#/components/schemas/RegexpAttributeConstraint"
+          - $ref: "#/components/schemas/RangeAttributeConstraint"
+          - $ref: "#/components/schemas/DateTimeAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
-      description: Data attribute allows to store and transfer dynamic data. Its content
-        can be edited and send in requests to store.
-    DataAttributeProperties:
+          description: Optional definition of callback for getting the content of
+            the Attribute based on the action
       required:
-      - label
-      - list
-      - multiSelect
-      - readOnly
-      - required
-      - visible
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
+    DataAttributeProperties:
       type: object
       properties:
         label:
@@ -1246,9 +1261,9 @@ components:
           example: Attribute Name
         visible:
           type: boolean
+          default: "true"
           description: "Boolean determining if the Attribute is visible and can be\
             \ displayed, otherwise it should be hidden to the user."
-          default: true
         group:
           type: string
           description: "Group of the Attribute, used for the logical grouping of the\
@@ -1256,27 +1271,31 @@ components:
           example: requiredAttributes
         required:
           type: boolean
+          default: "false"
           description: "Boolean determining if the Attribute is required. If true,\
             \ the Attribute must be provided."
-          default: false
         readOnly:
           type: boolean
+          default: "false"
           description: "Boolean determining if the Attribute is read only. If true,\
             \ the Attribute content cannot be changed."
-          default: false
         list:
           type: boolean
+          default: "false"
           description: Boolean determining if the Attribute contains list of values
             in the content
-          default: false
         multiSelect:
           type: boolean
+          default: "false"
           description: Boolean determining if the Attribute can have multiple values
-          default: false
-      description: Properties of the Attributes
-    DateAttributeContent:
       required:
-      - data
+      - label
+      - list
+      - multiSelect
+      - readOnly
+      - required
+      - visible
+    DateAttributeContent:
       type: object
       properties:
         reference:
@@ -1284,11 +1303,11 @@ components:
           description: Content Reference
         data:
           type: string
-          description: Date attribute value in format yyyy-MM-dd
           format: date
-    DateTimeAttributeConstraint:
+          description: Date attribute value in format yyyy-MM-dd
       required:
-      - type
+      - data
+    DateTimeAttributeConstraint:
       type: object
       properties:
         description:
@@ -1299,23 +1318,24 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           $ref: "#/components/schemas/DateTimeAttributeConstraintData"
+          description: DateTime Range Attribute Constraint Data
+      required:
+      - type
     DateTimeAttributeConstraintData:
       type: object
       properties:
         from:
           type: string
-          description: Start of the datetime for validation
           format: date-time
+          description: Start of the datetime for validation
         to:
           type: string
-          description: End of the datetime for validation
           format: date-time
-      description: DateTime Range Attribute Constraint Data
+          description: End of the datetime for validation
     DateTimeAttributeContent:
-      required:
-      - data
       type: object
       properties:
         reference:
@@ -1323,11 +1343,11 @@ components:
           description: Content Reference
         data:
           type: string
-          description: DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
           format: date-time
-    FileAttributeContent:
+          description: DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
       required:
       - data
+    FileAttributeContent:
       type: object
       properties:
         reference:
@@ -1335,11 +1355,10 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/FileAttributeContentData"
-    FileAttributeContentData:
+          description: File attribute content data
       required:
-      - content
-      - fileName
-      - mimeType
+      - data
+    FileAttributeContentData:
       type: object
       properties:
         content:
@@ -1351,10 +1370,11 @@ components:
         mimeType:
           type: string
           description: Type of the file uploaded
-      description: File attribute content data
-    FloatAttributeContent:
       required:
-      - data
+      - content
+      - fileName
+      - mimeType
+    FloatAttributeContent:
       type: object
       properties:
         reference:
@@ -1362,11 +1382,11 @@ components:
           description: Content Reference
         data:
           type: number
-          description: Float attribute value
           format: float
-    IntegerAttributeContent:
+          description: Float attribute value
       required:
       - data
+    IntegerAttributeContent:
       type: object
       properties:
         reference:
@@ -1374,11 +1394,11 @@ components:
           description: Content Reference
         data:
           type: integer
-          description: Integer attribute value
           format: int32
-    ObjectAttributeContent:
+          description: Integer attribute value
       required:
       - data
+    ObjectAttributeContent:
       type: object
       properties:
         reference:
@@ -1387,10 +1407,10 @@ components:
         data:
           type: object
           description: Object attribute content data
+      required:
+      - data
     ProgrammingLanguageEnum:
       type: string
-      description: Definition of programming languages used for code
-      example: "JAVA, PHP, C, etc"
       enum:
       - apacheconf
       - bash
@@ -1434,8 +1454,6 @@ components:
       - xml
       - yaml
     RangeAttributeConstraint:
-      required:
-      - type
       type: object
       properties:
         description:
@@ -1446,23 +1464,24 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           $ref: "#/components/schemas/RangeAttributeConstraintData"
+          description: Integer Range Attribute Constraint Data
+      required:
+      - type
     RangeAttributeConstraintData:
       type: object
       properties:
         from:
           type: integer
-          description: Start of the range for validation
           format: int32
+          description: Start of the range for validation
         to:
           type: integer
-          description: End of the range for validation
           format: int32
-      description: Integer Range Attribute Constraint Data
+          description: End of the range for validation
     RegexpAttributeConstraint:
-      required:
-      - type
       type: object
       properties:
         description:
@@ -1473,16 +1492,15 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           type: string
           description: Regular Expression Attribute Constraint Data
-    RequestAttributeDto:
       required:
-      - content
-      - contentType
-      - name
-      - uuid
+      - type
+    RequestAttributeDto:
       type: object
+      description: Request attribute to send attribute content for object
       properties:
         uuid:
           type: string
@@ -1494,15 +1512,33 @@ components:
           example: Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Content Type of the Attribute
+          example: Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
-      description: Request attribute to send attribute content for object
-    SecretAttributeContent:
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
       required:
-      - data
+      - content
+      - contentType
+      - name
+      - uuid
+    SecretAttributeContent:
       type: object
       properties:
         reference:
@@ -1510,6 +1546,9 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/SecretAttributeContentData"
+          description: Secret attribute content data
+      required:
+      - data
     SecretAttributeContentData:
       type: object
       properties:
@@ -1519,10 +1558,7 @@ components:
         protectionLevel:
           type: string
           description: Level of protection of the data
-      description: Secret attribute content data
     StringAttributeContent:
-      required:
-      - data
       type: object
       properties:
         reference:
@@ -1531,9 +1567,9 @@ components:
         data:
           type: string
           description: String attribute value
-    TextAttributeContent:
       required:
       - data
+    TextAttributeContent:
       type: object
       properties:
         reference:
@@ -1542,9 +1578,9 @@ components:
         data:
           type: string
           description: Text attribute value
-    TimeAttributeContent:
       required:
       - data
+    TimeAttributeContent:
       type: object
       properties:
         reference:
@@ -1553,37 +1589,35 @@ components:
         data:
           type: string
           description: Time attribute value in format HH:mm:ss
-    ErrorMessageDto:
       required:
-      - message
+      - data
+    ErrorMessageDto:
       type: object
       properties:
         message:
           type: string
           description: Error message detail
           example: Error message
-    AuthenticationServiceExceptionDto:
       required:
-      - code
       - message
-      - statusCode
+    AuthenticationServiceExceptionDto:
       type: object
       properties:
         statusCode:
           type: integer
-          description: Status code of the HTTP Request
           format: int32
+          description: Status code of the HTTP Request
         code:
           type: string
           description: Code of the result
         message:
           type: string
           description: Exception message
-    AcmeProfileDto:
       required:
-      - enabled
-      - name
-      - uuid
+      - code
+      - message
+      - statusCode
+    AcmeProfileDto:
       type: object
       properties:
         uuid:
@@ -1616,13 +1650,14 @@ components:
         dnsResolverPort:
           type: string
           description: DNS Resolver port number
-          example: "53"
+          example: 53
         raProfile:
           $ref: "#/components/schemas/SimplifiedRaProfileDto"
+          description: RA Profile
         retryInterval:
           type: integer
-          description: Retry interval for ACME client requests
           format: int32
+          description: Retry interval for ACME client requests
           example: 30
         termsOfServiceChangeDisable:
           type: boolean
@@ -1630,8 +1665,8 @@ components:
           example: false
         validity:
           type: integer
-          description: Order validity
           format: int32
+          description: Order validity
           example: 36000
         directoryUrl:
           type: string
@@ -1664,13 +1699,13 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
-    ResponseAttributeDto:
       required:
-      - contentType
-      - label
+      - enabled
       - name
-      - type
+      - uuid
+    ResponseAttributeDto:
       type: object
+      description: Response attribute with content for object it belongs to
       properties:
         uuid:
           type: string
@@ -1686,19 +1721,36 @@ components:
           example: Attribute Name
         type:
           $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Content Type of the Attribute
+          example: Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
-      description: Response attribute with content for object it belongs to
-    SimplifiedRaProfileDto:
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
       required:
-      - enabled
+      - contentType
+      - label
       - name
-      - uuid
+      - type
+    SimplifiedRaProfileDto:
       type: object
       properties:
         uuid:
@@ -1715,12 +1767,11 @@ components:
         authorityInstanceUuid:
           type: string
           description: Authority Instance UUID
-      description: RA Profile
-    AcmeProfileRequestDto:
       required:
-      - issueCertificateAttributes
+      - enabled
       - name
-      - revokeCertificateAttributes
+      - uuid
+    AcmeProfileRequestDto:
       type: object
       properties:
         name:
@@ -1741,30 +1792,30 @@ components:
           example: https://sample-url.com
         dnsResolverIp:
           type: string
+          default: System Default
           description: DNS Resolver IP address
           example: 8.8.8.8
-          default: System Default
         dnsResolverPort:
           type: string
-          description: DNS Resolver port number
-          example: "53"
           default: "53"
+          description: DNS Resolver port number
+          example: 53
         raProfileUuid:
           type: string
           description: RA Profile UUID
           example: 6b55de1c-844f-11ec-a8a3-0242ac120002
         retryInterval:
           type: integer
-          description: Retry interval for the Orders
           format: int32
+          default: "30"
+          description: Retry interval for the Orders
           example: 60
-          default: 30
         validity:
           type: integer
-          description: Order Validity
           format: int32
+          default: "36000"
+          description: Order Validity
           example: 3000
-          default: 36000
         issueCertificateAttributes:
           type: array
           description: List of Attributes to issue Certificate
@@ -1777,32 +1828,32 @@ components:
             $ref: "#/components/schemas/RequestAttributeDto"
         requireContact:
           type: boolean
+          default: "false"
           description: Require contact information for new Account
           example: true
-          default: false
         requireTermsOfService:
           type: boolean
+          default: "false"
           description: Require new Account to agree on Terms of Service
           example: false
-          default: false
         customAttributes:
           type: array
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
-    UuidDto:
       required:
-      - uuid
+      - issueCertificateAttributes
+      - name
+      - revokeCertificateAttributes
+    UuidDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-    AcmeProfileListDto:
       required:
-      - enabled
-      - name
       - uuid
+    AcmeProfileListDto:
       type: object
       properties:
         uuid:
@@ -1823,35 +1874,22 @@ components:
           example: Some description
         raProfile:
           $ref: "#/components/schemas/SimplifiedRaProfileDto"
+          description: RA Profile
         directoryUrl:
           type: string
           description: URL of the ACME Directory
           example: https://some-server.com/api/v1/protocols/acme/profile1/directory
+      required:
+      - enabled
+      - name
+      - uuid
     AccountStatus:
       type: string
-      description: Status of the Account
-      example: VALID
       enum:
       - valid
       - deactivated
       - revoked
     AcmeAccountResponseDto:
-      required:
-      - accountId
-      - acmeProfileName
-      - acmeProfileUuid
-      - contact
-      - enabled
-      - failedOrders
-      - pendingOrders
-      - processingOrders
-      - raProfile
-      - status
-      - successfulOrders
-      - termsOfServiceAgreed
-      - totalOrders
-      - uuid
-      - validOrders
       type: object
       properties:
         accountId:
@@ -1868,50 +1906,52 @@ components:
           example: false
         totalOrders:
           type: integer
-          description: Order count for the Account
           format: int32
+          description: Order count for the Account
           example: 23
         successfulOrders:
           type: integer
-          description: Number of successful Orders
           format: int32
+          description: Number of successful Orders
           example: 2
         failedOrders:
           type: integer
-          description: Number of failed Orders
           format: int32
+          description: Number of failed Orders
           example: 239
         pendingOrders:
           type: integer
-          description: Number of pending Orders
           format: int32
+          description: Number of pending Orders
           example: 24
         validOrders:
           type: integer
-          description: Number of valid Orders
           format: int32
+          description: Number of valid Orders
           example: 23
         processingOrders:
           type: integer
-          description: Number of processing Orders
           format: int32
+          description: Number of processing Orders
           example: 27
         status:
           $ref: "#/components/schemas/AccountStatus"
+          description: Status of the Account
+          example: VALID
         contact:
           type: array
           description: Contact information
           example: "mailto: someadmin@domain.com"
           items:
             type: string
-            description: Contact information
-            example: "mailto: someadmin@domain.com"
         termsOfServiceAgreed:
           type: boolean
           description: Terms of Service Agreed
           example: true
         raProfile:
           $ref: "#/components/schemas/SimplifiedRaProfileDto"
+          description: RA Profile
+          example: RA Profile 1
         acmeProfileName:
           type: string
           description: Name of the ACME Profile
@@ -1920,16 +1960,23 @@ components:
           type: string
           description: UUID of the ACME Profile
           example: 6b55de1c-844f-11ec-a8a3-0242ac120002
-    AcmeAccountListResponseDto:
       required:
       - accountId
       - acmeProfileName
       - acmeProfileUuid
+      - contact
       - enabled
+      - failedOrders
+      - pendingOrders
+      - processingOrders
       - raProfile
       - status
+      - successfulOrders
+      - termsOfServiceAgreed
       - totalOrders
       - uuid
+      - validOrders
+    AcmeAccountListResponseDto:
       type: object
       properties:
         accountId:
@@ -1946,13 +1993,17 @@ components:
           example: false
         totalOrders:
           type: integer
-          description: Total number of Orders
           format: int32
+          description: Total number of Orders
           example: 4
         status:
           $ref: "#/components/schemas/AccountStatus"
+          description: Status of the Account
+          example: VALID
         raProfile:
           $ref: "#/components/schemas/SimplifiedRaProfileDto"
+          description: RA Profile
+          example: RAProfile1
         acmeProfileName:
           type: string
           description: Name of the ACME Profile
@@ -1961,11 +2012,16 @@ components:
           type: string
           description: UUID of the ACME Profile
           example: 6b55de1c-844f-11ec-a8a3-0242ac120002
-    BulkActionMessageDto:
       required:
-      - message
-      - name
+      - accountId
+      - acmeProfileName
+      - acmeProfileUuid
+      - enabled
+      - raProfile
+      - status
+      - totalOrders
       - uuid
+    BulkActionMessageDto:
       type: object
       properties:
         uuid:
@@ -1981,3 +2037,7 @@ components:
           description: Message describing the associations of the Objects which is
             preventing the bulk operation
           example: Object is associated with other items
+      required:
+      - message
+      - name
+      - uuid

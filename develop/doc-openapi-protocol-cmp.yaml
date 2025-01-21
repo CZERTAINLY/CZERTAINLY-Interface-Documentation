@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: CZERTAINLY CMP API
   description: CMP API according to the RFC 4210
@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:43097
+- url: http://localhost:44789
   description: Generated server url
 tags:
 - name: CMP RA Profile
@@ -49,11 +49,11 @@ paths:
         required: false
         schema:
           type: string
-          description: DER encoded CMP data
           format: binary
+          description: DER encoded CMP data
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -65,9 +65,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
-          description: Operation is not allowed
-        "403":
-          description: Forbidden
+          description: Internal Server Error
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -91,24 +91,10 @@ paths:
           application/pkixcmp:
             schema:
               type: string
-              description: Binary CMP data
               format: binary
+              description: Binary CMP data
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -121,11 +107,25 @@ paths:
             application/pkixcmp:
               schema:
                 type: string
-                description: "Response structure(s) defined in RFC 4210, section 5.3"
                 format: binary
+                description: "Response structure(s) defined in RFC 4210, section 5.3"
                 externalDocs:
                   description: RFC 4210
                   url: https://www.rfc-editor.org/rfc/rfc4210#section-5.3
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+        "500":
+          description: Internal Server Error
   /v1/protocols/cmp/raProfile/{raProfileName}:
     get:
       tags:
@@ -144,11 +144,11 @@ paths:
         required: false
         schema:
           type: string
-          description: DER encoded CMP data
           format: binary
+          description: DER encoded CMP data
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -160,9 +160,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
-          description: Operation is not allowed
-        "403":
-          description: Forbidden
+          description: Internal Server Error
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -186,24 +186,10 @@ paths:
           application/pkixcmp:
             schema:
               type: string
-              description: Binary CMP data
               format: binary
+              description: Binary CMP data
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -216,18 +202,28 @@ paths:
             application/pkixcmp:
               schema:
                 type: string
-                description: "Response structure(s) defined in RFC 4210, section 5.3"
                 format: binary
+                description: "Response structure(s) defined in RFC 4210, section 5.3"
                 externalDocs:
                   description: RFC 4210
                   url: https://www.rfc-editor.org/rfc/rfc4210#section-5.3
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+        "500":
+          description: Internal Server Error
 components:
   schemas:
     ProblemDocument:
-      required:
-      - detail
-      - instance
-      - type
       type: object
       properties:
         type:
@@ -257,5 +253,7 @@ components:
           example: ES256
           items:
             type: string
-            description: List of supported algorithms
-            example: ES256
+      required:
+      - detail
+      - instance
+      - type

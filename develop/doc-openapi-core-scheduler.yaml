@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: CZERTAINLY Scheduler API
   description: REST API for managing Scheduler and its jobs in the platform
@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:34067
+- url: http://localhost:42301
   description: Generated server url
 tags:
 - name: Scheduled Jobs Management
@@ -167,21 +167,12 @@ components:
           type: string
           description: Cron expression for job schedule
     ScheduledJobDetailDto:
-      required:
-      - cronExpression
-      - enabled
-      - jobName
-      - jobType
-      - lastExecutionStatus
-      - oneTime
-      - system
-      - uuid
       type: object
       properties:
         uuid:
           type: string
-          description: UUID of the scheduled job
           format: uuid
+          description: UUID of the scheduled job
         jobName:
           type: string
           description: Name of the scheduled job
@@ -203,14 +194,23 @@ components:
           description: Is system scheduled job
         lastExecutionStatus:
           $ref: "#/components/schemas/SchedulerJobExecutionStatus"
+          description: Execution status of last job triggered task
         userUuid:
           type: string
           format: uuid
         objectData:
           type: object
+      required:
+      - cronExpression
+      - enabled
+      - jobName
+      - jobType
+      - lastExecutionStatus
+      - oneTime
+      - system
+      - uuid
     SchedulerJobExecutionStatus:
       type: string
-      description: Execution status of last job triggered task
       enum:
       - started
       - succeeded
@@ -219,32 +219,23 @@ components:
       type: object
       properties:
         itemsPerPage:
-          maximum: 1000
           type: integer
-          description: Number of entries per page
           format: int32
-          default: 10
+          default: "10"
+          description: Number of entries per page
+          maximum: 1000
         pageNumber:
           type: integer
-          description: Page number for the request
           format: int32
-          default: 1
+          default: "1"
+          description: Page number for the request
     ScheduledJobDto:
-      required:
-      - cronExpression
-      - enabled
-      - jobName
-      - jobType
-      - lastExecutionStatus
-      - oneTime
-      - system
-      - uuid
       type: object
       properties:
         uuid:
           type: string
-          description: UUID of the scheduled job
           format: uuid
+          description: UUID of the scheduled job
         jobName:
           type: string
           description: Name of the scheduled job
@@ -266,40 +257,48 @@ components:
           description: Is system scheduled job
         lastExecutionStatus:
           $ref: "#/components/schemas/SchedulerJobExecutionStatus"
-      description: Scheduled jobs
+          description: Execution status of last job triggered task
+      required:
+      - cronExpression
+      - enabled
+      - jobName
+      - jobType
+      - lastExecutionStatus
+      - oneTime
+      - system
+      - uuid
     ScheduledJobsResponseDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+        scheduledJobs:
+          type: array
+          description: Scheduled jobs
+          items:
+            $ref: "#/components/schemas/ScheduledJobDto"
       required:
       - itemsPerPage
       - pageNumber
       - scheduledJobs
       - totalItems
       - totalPages
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          description: Number of entries per page
-          format: int32
-        pageNumber:
-          type: integer
-          description: Page number for the request
-          format: int32
-        totalPages:
-          type: integer
-          description: Number of pages available
-          format: int32
-        totalItems:
-          type: integer
-          description: Number of items available
-          format: int64
-        scheduledJobs:
-          type: array
-          description: Scheduled jobs
-          items:
-            $ref: "#/components/schemas/ScheduledJobDto"
     Resource:
       type: string
-      description: Result object type
       enum:
       - NONE
       - dashboard
@@ -352,64 +351,64 @@ components:
       - endEntityProfiles
       - authenticationProviders
     ScheduledJobHistoryDto:
-      required:
-      - startTime
-      - status
       type: object
       properties:
         jobUuid:
           type: string
-          description: Scheduled job UUID
           format: uuid
+          description: Scheduled job UUID
         startTime:
           type: string
-          description: Start time of triggered task
           format: date-time
+          description: Start time of triggered task
         endTime:
           type: string
-          description: End time of triggered task
           format: date-time
+          description: End time of triggered task
         status:
           $ref: "#/components/schemas/SchedulerJobExecutionStatus"
+          description: Execution status of triggered task
         resultMessage:
           type: string
           description: Message explaining result status
         resultObjectType:
           $ref: "#/components/schemas/Resource"
+          description: Result object type
         resultObjectIdentification:
           type: array
           description: Result object identification (UUID)
           items:
             type: string
-            description: Result object identification (UUID)
-      description: Scheduled job history
+      required:
+      - startTime
+      - status
     ScheduledJobHistoryResponseDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+        scheduledJobHistory:
+          type: array
+          description: Scheduled job history
+          items:
+            $ref: "#/components/schemas/ScheduledJobHistoryDto"
       required:
       - itemsPerPage
       - pageNumber
       - scheduledJobHistory
       - totalItems
       - totalPages
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          description: Number of entries per page
-          format: int32
-        pageNumber:
-          type: integer
-          description: Page number for the request
-          format: int32
-        totalPages:
-          type: integer
-          description: Number of pages available
-          format: int32
-        totalItems:
-          type: integer
-          description: Number of items available
-          format: int64
-        scheduledJobHistory:
-          type: array
-          description: Scheduled job history
-          items:
-            $ref: "#/components/schemas/ScheduledJobHistoryDto"

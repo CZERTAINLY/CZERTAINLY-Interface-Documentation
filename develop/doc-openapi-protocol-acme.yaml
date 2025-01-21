@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: CZERTAINLY ACME API
   description: ACME API according to the RFC 8555
@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:41865
+- url: http://localhost:35721
   description: Generated server url
 tags:
 - name: ACME operations
@@ -55,8 +55,8 @@ paths:
               $ref: "#/components/schemas/CertificateRevocationRequest"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -71,8 +71,8 @@ paths:
           description: Internal Server Error
         "200":
           description: Certificate revoked
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -105,8 +105,8 @@ paths:
           application/jose+json: {}
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -119,6 +119,12 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Orders list retrieved
           content:
@@ -127,12 +133,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Order"
-        "403":
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
   /v1/protocols/acme/{acmeProfileName}/order/{orderId}:
     post:
       tags:
@@ -161,8 +161,8 @@ paths:
           application/jose+json: {}
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -181,8 +181,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -217,8 +217,8 @@ paths:
               $ref: "#/components/schemas/CertificateFinalizeRequest"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -229,16 +229,16 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "500":
-          description: Internal Server Error
         "200":
           description: Order finalized
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Order"
-        "403":
-          description: Forbidden
+        "500":
+          description: Internal Server Error
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -267,8 +267,8 @@ paths:
               $ref: "#/components/schemas/CertificateIssuanceRequest"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -287,8 +287,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -317,14 +317,20 @@ paths:
               $ref: "#/components/schemas/NewAccountRequest"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
         "201":
           description: New Account created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+        "200":
+          description: Existing Account retrieved
           content:
             application/json:
               schema:
@@ -337,14 +343,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "200":
-          description: Existing Account retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Account"
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -373,14 +373,8 @@ paths:
               $ref: "#/components/schemas/KeyRollover"
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "409":
-          description: Conflict. Key already exists
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -393,14 +387,20 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Account key updated
           content:
             application/json:
               schema:
                 type: object
-        "403":
-          description: Forbidden
+        "409":
+          description: Conflict. Key already exists
           content:
             application/problem+json:
               schema:
@@ -436,8 +436,8 @@ paths:
             example: {}
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -450,18 +450,18 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Challenge validation initiated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Challenge"
-        "403":
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
   /v1/protocols/acme/{acmeProfileName}/cert/{certificateId}:
     post:
       tags:
@@ -490,12 +490,14 @@ paths:
           application/jose+json: {}
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
+        "200":
+          description: Certificate content retrieved
         "401":
           description: Unauthorized
           content:
@@ -504,10 +506,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "200":
-          description: Certificate content retrieved
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -542,8 +542,8 @@ paths:
               type: string
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -562,8 +562,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -604,8 +604,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Account"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -618,8 +618,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -648,8 +648,8 @@ paths:
               $ref: "#/components/schemas/CertificateRevocationRequest"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -664,8 +664,8 @@ paths:
           description: Internal Server Error
         "200":
           description: Certificate revoked
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -698,8 +698,8 @@ paths:
           application/jose+json: {}
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -712,6 +712,12 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Orders list retrieved
           content:
@@ -720,12 +726,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Order"
-        "403":
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
   /v1/protocols/acme/raProfile/{raProfileName}/order/{orderId}:
     post:
       tags:
@@ -754,8 +754,8 @@ paths:
           application/jose+json: {}
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -774,8 +774,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -810,8 +810,8 @@ paths:
               $ref: "#/components/schemas/CertificateFinalizeRequest"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -822,16 +822,16 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "500":
-          description: Internal Server Error
         "200":
           description: Order finalized
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Order"
-        "403":
-          description: Forbidden
+        "500":
+          description: Internal Server Error
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -860,8 +860,8 @@ paths:
               $ref: "#/components/schemas/CertificateIssuanceRequest"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -880,8 +880,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -910,14 +910,20 @@ paths:
               $ref: "#/components/schemas/NewAccountRequest"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
         "201":
           description: New Account created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+        "200":
+          description: Existing Account retrieved
           content:
             application/json:
               schema:
@@ -930,14 +936,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "200":
-          description: Existing Account retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Account"
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -966,20 +966,14 @@ paths:
               $ref: "#/components/schemas/KeyRollover"
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Account key updated
-        "409":
-          description: Conflict. Key already exists
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "401":
           description: Unauthorized
           content:
@@ -988,8 +982,14 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+        "409":
+          description: Conflict. Key already exists
           content:
             application/problem+json:
               schema:
@@ -1025,8 +1025,8 @@ paths:
             example: {}
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -1039,18 +1039,18 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Challenge validation initiated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Challenge"
-        "403":
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
   /v1/protocols/acme/raProfile/{raProfileName}/cert/{certificateId}:
     post:
       tags:
@@ -1079,14 +1079,14 @@ paths:
           application/jose+json: {}
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "200":
+          description: Certificate content retrieved as file
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "200":
-          description: Certificate content retrieved as file
         "401":
           description: Unauthorized
           content:
@@ -1095,8 +1095,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1131,8 +1131,8 @@ paths:
               type: string
         required: true
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -1151,8 +1151,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1193,8 +1193,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Account"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -1207,8 +1207,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1230,10 +1230,8 @@ paths:
         schema:
           type: string
       responses:
-        "204":
-          description: New Nonce retrieved
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -1246,8 +1244,10 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "204":
+          description: New Nonce retrieved
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1268,8 +1268,8 @@ paths:
         schema:
           type: string
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -1284,8 +1284,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1307,10 +1307,8 @@ paths:
         schema:
           type: string
       responses:
-        "204":
-          description: New Nonce retrieved
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -1323,8 +1321,10 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "204":
+          description: New Nonce retrieved
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1345,8 +1345,8 @@ paths:
         schema:
           type: string
       responses:
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -1361,8 +1361,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1390,8 +1390,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Directory"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -1404,8 +1404,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1433,8 +1433,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Directory"
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -1447,8 +1447,8 @@ paths:
                 $ref: "#/components/schemas/ProblemDocument"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/problem+json:
               schema:
@@ -1456,8 +1456,6 @@ paths:
 components:
   schemas:
     CertificateRevocationRequest:
-      required:
-      - certificate
       type: object
       properties:
         certificate:
@@ -1466,17 +1464,15 @@ components:
           example: <base64url-encoded version of the DER format>
         reason:
           type: integer
-          description: Revocation reason code
           format: int32
+          description: Revocation reason code
           example: 1
           externalDocs:
             description: "RFC 5280, section 5.3.1"
             url: https://datatracker.ietf.org/doc/html/rfc5280#section-5.3.1
-    ProblemDocument:
       required:
-      - detail
-      - instance
-      - type
+      - certificate
+    ProblemDocument:
       type: object
       properties:
         type:
@@ -1506,12 +1502,11 @@ components:
           example: ES256
           items:
             type: string
-            description: List of supported algorithms
-            example: ES256
-    Identifier:
       required:
+      - detail
+      - instance
       - type
-      - value
+    Identifier:
       type: object
       properties:
         type:
@@ -1522,26 +1517,26 @@ components:
           type: string
           description: Value of Identifier
           example: www.some-domain.com
-      description: List of Identifiers for the Order
-    Order:
       required:
-      - status
+      - type
+      - value
+    Order:
       type: object
       properties:
         status:
           type: string
           description: Status of the Order
-          example: pending
           enum:
           - pending
           - ready
           - processing
           - valid
           - invalid
+          example: pending
         expires:
           type: string
-          description: Expiry time of the Order
           format: date-time
+          description: Expiry time of the Order
         identifiers:
           type: array
           description: List of Order Identifiers
@@ -1549,14 +1544,15 @@ components:
             $ref: "#/components/schemas/Identifier"
         notBefore:
           type: string
-          description: Value of notBefore field in the Certificate
           format: date-time
+          description: Value of notBefore field in the Certificate
         notAfter:
           type: string
-          description: Value of notAfter field in the Certificate
           format: date-time
+          description: Value of notAfter field in the Certificate
         error:
           $ref: "#/components/schemas/ProblemDocument"
+          description: Errors in Order
         authorizations:
           type: array
           description: List of URLs to check for Authorizations
@@ -1564,9 +1560,6 @@ components:
           - https://someserver.com/api/v1/protocols/acme/authz/YT65KFut6
           items:
             type: string
-            description: List of URLs to check for Authorizations
-            example: "[\"https://someserver.com/api/v1/protocols/acme/authz/YT65KFut6\"\
-              ]"
         finalize:
           type: string
           description: URL to finalize the Order. Mandatory if the Order is in ready
@@ -1576,18 +1569,18 @@ components:
           type: string
           description: URL to download the Certificate
           example: https://someserver.com/api/v1/protocols/acme/cert/YT65KFut6
-    CertificateFinalizeRequest:
       required:
-      - csr
+      - status
+    CertificateFinalizeRequest:
       type: object
       properties:
         csr:
           type: string
           description: CSR in Base64url-encoded version of the DER format
           example: <base64url-encoded version of the DER format>
-    CertificateIssuanceRequest:
       required:
-      - identifiers
+      - csr
+    CertificateIssuanceRequest:
       type: object
       properties:
         identifiers:
@@ -1597,12 +1590,14 @@ components:
             $ref: "#/components/schemas/Identifier"
         notBefore:
           type: string
-          description: Requested value of notBefore field in the certificate
           format: date-time
+          description: Requested value of notBefore field in the certificate
         notAfter:
           type: string
-          description: Requested value of notAfter field in the certificate
           format: date-time
+          description: Requested value of notAfter field in the certificate
+      required:
+      - identifiers
     NewAccountRequest:
       type: object
       properties:
@@ -1614,9 +1609,6 @@ components:
           - mailto:someadmin@domain.com
           items:
             type: string
-            description: List of contacts for the Account. Required if the required
-              flag is set in ACME Profile
-            example: "[\"mailto:someadmin@domain.com\"]"
         termsOfServiceAgreed:
           type: boolean
           description: "Terms of Service agreed flag. true = Yes, false = No. Required\
@@ -1624,17 +1616,16 @@ components:
           example: false
         onlyReturnExisting:
           type: boolean
+          default: "false"
           description: Return existing Account only flag
           example: false
-          default: false
     Account:
-      required:
-      - orders
-      - status
       type: object
       properties:
         status:
           $ref: "#/components/schemas/AccountStatus"
+          description: Status of the ACME Account
+          example: valid
         contact:
           type: array
           description: List of contacts for ACME Account
@@ -1642,8 +1633,6 @@ components:
           - mailto:someadmin@domain.com
           items:
             type: string
-            description: List of contacts for ACME Account
-            example: "[\"mailto:someadmin@domain.com\"]"
         termsOfServiceAgreed:
           type: boolean
           description: "Terms of Service agreed flag. Yes = true, No = false"
@@ -1652,18 +1641,16 @@ components:
           type: string
           description: URL to get the list of Orders for the Account
           example: http://some-server.com/acme/orders/JHJGfgf34s
+      required:
+      - orders
+      - status
     AccountStatus:
       type: string
-      description: Status of the ACME Account
-      example: valid
       enum:
       - valid
       - deactivated
       - revoked
     KeyRollover:
-      required:
-      - account
-      - oldKey
       type: object
       properties:
         account:
@@ -1674,21 +1661,19 @@ components:
           type: string
           description: Old key of the Account
           example: <Account old key content>
-    Challenge:
       required:
-      - status
-      - token
-      - type
-      - url
+      - account
+      - oldKey
+    Challenge:
       type: object
       properties:
         type:
           type: string
           description: Type of Challenge
-          example: dns-01
           enum:
           - http-01
           - dns-01
+          example: dns-01
         url:
           type: string
           description: URL to which the response can be posted after the client completes
@@ -1704,26 +1689,29 @@ components:
           - processing
         validated:
           type: string
-          description: Timestamp at which the Challenge is validated
           format: date-time
+          description: Timestamp at which the Challenge is validated
         error:
           $ref: "#/components/schemas/ProblemDocument"
+          description: Errors in Challenge validation
         token:
           type: string
           description: Token for the Challenge
           example: JGuyIUgkRGFYTER658ykjfYFur76fkFitur7FGHRiytrkfIruFF
-    Authorization:
       required:
-      - identifier
       - status
+      - token
+      - type
+      - url
+    Authorization:
       type: object
       properties:
         identifier:
           $ref: "#/components/schemas/Identifier"
+          description: ACME Identifier
         status:
           type: string
           description: ACME Authorization status
-          example: pending
           enum:
           - pending
           - valid
@@ -1731,10 +1719,11 @@ components:
           - deactivated
           - expired
           - revoked
+          example: pending
         expires:
           type: string
-          description: Expiry of Authorization
           format: date-time
+          description: Expiry of Authorization
         challenges:
           type: array
           description: List of Challenges for the client to complete
@@ -1744,15 +1733,10 @@ components:
           type: boolean
           description: Is wildcard certificate
           example: false
-    Directory:
       required:
-      - keyChange
-      - meta
-      - newAccount
-      - newAuthz
-      - newNonce
-      - newOrder
-      - revokeCert
+      - identifier
+      - status
+    Directory:
       type: object
       properties:
         newNonce:
@@ -1781,6 +1765,15 @@ components:
           example: http://some-server.com/v1/protocols/acme/key-change
         meta:
           $ref: "#/components/schemas/DirectoryMeta"
+          description: Metadata for the Directory object
+      required:
+      - keyChange
+      - meta
+      - newAccount
+      - newAuthz
+      - newNonce
+      - newOrder
+      - revokeCert
     DirectoryMeta:
       type: object
       properties:
@@ -1794,8 +1787,8 @@ components:
           example: https://sample-company.com
         externalAccountRequired:
           type: boolean
+          default: "false"
           description: External Account Binding flag
-          default: false
         caaIdentities:
           type: array
           description: Array of CAA record validation servers
@@ -1804,6 +1797,3 @@ components:
           - example2.com
           items:
             type: string
-            description: Array of CAA record validation servers
-            example: "[\"example1.com\",\"example2.com\"]"
-      description: Metadata for the Directory object

@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: CZERTAINLY SCEP API
   description: REST API for managing SCEP Profiles in the platform
@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:37557
+- url: http://localhost:34349
   description: Generated server url
 tags:
 - name: SCEP Profile Management
@@ -36,34 +36,34 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "200":
           description: SCEP Profile details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ScepProfileDetailDto"
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
     put:
       tags:
       - SCEP Profile Management
@@ -83,34 +83,34 @@ paths:
               $ref: "#/components/schemas/ScepProfileEditRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
         "200":
           description: SCEP Profile updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ScepProfileDetailDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
     delete:
       tags:
       - SCEP Profile Management
@@ -124,30 +124,30 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: SCEP Profile deleted
         "401":
           description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: SCEP Profile deleted
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/scepProfiles:
     get:
       tags:
@@ -155,8 +155,8 @@ paths:
       summary: Get list of SCEP Profiles
       operationId: listScepProfiles
       responses:
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
         "200":
           description: SCEP Profile list retrieved
           content:
@@ -165,26 +165,26 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ScepProfileDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
     post:
       tags:
       - SCEP Profile Management
@@ -197,16 +197,16 @@ paths:
               $ref: "#/components/schemas/ScepProfileRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "400":
-          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
@@ -219,12 +219,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ScepProfileDetailDto"
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/scepProfiles/{uuid}/raProfiles/{raProfileUuid}:
     patch:
       tags:
@@ -245,30 +245,30 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "200":
-          description: RA Profile updated
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: RA Profile updated
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: No Content
   /v1/scepProfiles/{uuid}/enable:
@@ -285,16 +285,16 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "400":
-          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
@@ -303,12 +303,12 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: SCEP Profile enabled
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/scepProfiles/{uuid}/disable:
     patch:
       tags:
@@ -323,30 +323,30 @@ paths:
         schema:
           type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: SCEP Profile disabled
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "204":
+          description: SCEP Profile disabled
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/scepProfiles/enable:
     patch:
       tags:
@@ -366,30 +366,30 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "204":
-          description: SCEP Profiles enabled
-        "500":
-          description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: SCEP Profiles enabled
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/scepProfiles/disable:
     patch:
       tags:
@@ -409,30 +409,30 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "204":
-          description: SCEP Profiles disabled
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "204":
+          description: SCEP Profiles disabled
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/scepProfiles/caCertificates:
     get:
       tags:
@@ -447,16 +447,16 @@ paths:
         schema:
           type: boolean
       responses:
-        "500":
-          description: Internal Server Error
-        "400":
-          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
@@ -471,12 +471,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/CertificateDto"
-        "403":
-          description: Forbidden
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/scepProfiles/delete:
     delete:
       tags:
@@ -496,14 +496,8 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "200":
           description: SCEP Profiles deleted
           content:
@@ -512,20 +506,26 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BulkActionMessageDto"
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/scepProfiles/delete/force:
     delete:
       tags:
@@ -553,14 +553,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BulkActionMessageDto"
-        "500":
-          description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "422":
           description: Unprocessible Entity
           content:
@@ -572,27 +566,29 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
 components:
   schemas:
     AttributeCallback:
-      required:
-      - callbackContext
-      - callbackMethod
-      - mappings
       type: object
       properties:
         callbackContext:
@@ -602,17 +598,16 @@ components:
           type: string
           description: HTTP method of the callback
         mappings:
-          uniqueItems: true
           type: array
           description: Mappings for the callback method
           items:
             $ref: "#/components/schemas/AttributeCallbackMapping"
-      description: Optional definition of callback for getting the content of the
-        Attribute based on the action
-    AttributeCallbackMapping:
+          uniqueItems: true
       required:
-      - targets
-      - to
+      - callbackContext
+      - callbackMethod
+      - mappings
+    AttributeCallbackMapping:
       type: object
       properties:
         from:
@@ -622,33 +617,36 @@ components:
             set only if value is not set.
         attributeType:
           $ref: "#/components/schemas/AttributeType"
+          description: Type of the attribute. It is optional and must be set only
+            if special behaviour is needed.
         attributeContentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: 'Type of the attribute content. '
         to:
           type: string
           description: Name of the path variable or request param or body field which
             is to be used to assign value of attribute
         targets:
-          uniqueItems: true
           type: array
           description: Set of targets for propagating value.
           items:
             $ref: "#/components/schemas/AttributeValueTarget"
+          uniqueItems: true
         value:
           type: object
           description: Static value to be propagated to targets. It is optional and
             is set only if the value is known at attribute creation time.
-      description: Mappings for the callback method
+      required:
+      - targets
+      - to
     AttributeConstraintType:
       type: string
-      description: Attribute Constraint Type
       enum:
       - regExp
       - range
       - dateTime
     AttributeContentType:
       type: string
-      description: 'Type of the attribute content. '
       enum:
       - string
       - text
@@ -665,8 +663,6 @@ components:
       - object
     AttributeType:
       type: string
-      description: Type of the attribute. It is optional and must be set only if special
-        behaviour is needed.
       enum:
       - data
       - group
@@ -675,16 +671,18 @@ components:
       - custom
     AttributeValueTarget:
       type: string
-      description: Set of targets for propagating value.
       enum:
       - pathVariable
       - requestParameter
       - body
     BaseAttributeConstraint:
-      required:
-      - data
-      - type
       type: object
+      description: Optional regular expressions and constraints used for validating
+        the Attribute content
+      oneOf:
+      - $ref: "#/components/schemas/RegexpAttributeConstraint"
+      - $ref: "#/components/schemas/RangeAttributeConstraint"
+      - $ref: "#/components/schemas/DateTimeAttributeConstraint"
       properties:
         description:
           type: string
@@ -694,26 +692,15 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           type: object
           description: Attribute Constraint Data
-      description: Optional regular expressions and constraints used for validating
-        the Attribute content
-      oneOf:
-      - $ref: "#/components/schemas/RegexpAttributeConstraint"
-      - $ref: "#/components/schemas/RangeAttributeConstraint"
-      - $ref: "#/components/schemas/DateTimeAttributeConstraint"
-    BaseAttributeContentDto:
       required:
       - data
+      - type
+    BaseAttributeContentDto:
       type: object
-      properties:
-        reference:
-          type: string
-          description: Content Reference
-        data:
-          type: object
-          description: Content Data
       description: Base Attribute content definition
       oneOf:
       - $ref: "#/components/schemas/BooleanAttributeContent"
@@ -729,9 +716,16 @@ components:
       - $ref: "#/components/schemas/StringAttributeContent"
       - $ref: "#/components/schemas/TextAttributeContent"
       - $ref: "#/components/schemas/TimeAttributeContent"
-    BooleanAttributeContent:
+      properties:
+        reference:
+          type: string
+          description: Content Reference
+        data:
+          type: object
+          description: Content Data
       required:
       - data
+    BooleanAttributeContent:
       type: object
       properties:
         reference:
@@ -740,9 +734,9 @@ components:
         data:
           type: boolean
           description: Boolean attribute value
-    CodeBlockAttributeContent:
       required:
       - data
+    CodeBlockAttributeContent:
       type: object
       properties:
         reference:
@@ -750,22 +744,24 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/CodeBlockAttributeContentData"
-    CodeBlockAttributeContentData:
+          description: CodeBlock attribute content data
       required:
-      - code
-      - language
+      - data
+    CodeBlockAttributeContentData:
       type: object
       properties:
         language:
           $ref: "#/components/schemas/ProgrammingLanguageEnum"
+          description: Definition of programming languages used for code
+          example: "JAVA, PHP, C, etc"
         code:
           type: string
           description: Block of the code in Base64. Formatting of the code is specified
             by variable language
-      description: CodeBlock attribute content data
-    CredentialAttributeContent:
       required:
-      - data
+      - code
+      - language
+    CredentialAttributeContent:
       type: object
       properties:
         reference:
@@ -773,12 +769,10 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/CredentialAttributeContentData"
-    CredentialAttributeContentData:
+          description: Credential attribute content data
       required:
-      - attributes
-      - kind
-      - name
-      - uuid
+      - data
+    CredentialAttributeContentData:
       type: object
       properties:
         uuid:
@@ -798,15 +792,15 @@ components:
           description: List of Credential Attributes
           items:
             $ref: "#/components/schemas/DataAttribute"
-      description: Credential attribute content data
-    DataAttribute:
       required:
-      - contentType
+      - attributes
+      - kind
       - name
-      - properties
-      - type
       - uuid
+    DataAttribute:
       type: object
+      description: Data attribute allows to store and transfer dynamic data. Its content
+        can be edited and send in requests to store.
       properties:
         uuid:
           type: string
@@ -825,30 +819,51 @@ components:
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
         type:
           $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
         properties:
           $ref: "#/components/schemas/DataAttributeProperties"
+          description: Properties of the Attributes
         constraints:
           type: array
           description: Optional regular expressions and constraints used for validating
             the Attribute content
           items:
             $ref: "#/components/schemas/BaseAttributeConstraint"
+          oneOf:
+          - $ref: "#/components/schemas/RegexpAttributeConstraint"
+          - $ref: "#/components/schemas/RangeAttributeConstraint"
+          - $ref: "#/components/schemas/DateTimeAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
-      description: Data attribute allows to store and transfer dynamic data. Its content
-        can be edited and send in requests to store.
-    DataAttributeProperties:
+          description: Optional definition of callback for getting the content of
+            the Attribute based on the action
       required:
-      - label
-      - list
-      - multiSelect
-      - readOnly
-      - required
-      - visible
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
+    DataAttributeProperties:
       type: object
       properties:
         label:
@@ -857,9 +872,9 @@ components:
           example: Attribute Name
         visible:
           type: boolean
+          default: "true"
           description: "Boolean determining if the Attribute is visible and can be\
             \ displayed, otherwise it should be hidden to the user."
-          default: true
         group:
           type: string
           description: "Group of the Attribute, used for the logical grouping of the\
@@ -867,27 +882,31 @@ components:
           example: requiredAttributes
         required:
           type: boolean
+          default: "false"
           description: "Boolean determining if the Attribute is required. If true,\
             \ the Attribute must be provided."
-          default: false
         readOnly:
           type: boolean
+          default: "false"
           description: "Boolean determining if the Attribute is read only. If true,\
             \ the Attribute content cannot be changed."
-          default: false
         list:
           type: boolean
+          default: "false"
           description: Boolean determining if the Attribute contains list of values
             in the content
-          default: false
         multiSelect:
           type: boolean
+          default: "false"
           description: Boolean determining if the Attribute can have multiple values
-          default: false
-      description: Properties of the Attributes
-    DateAttributeContent:
       required:
-      - data
+      - label
+      - list
+      - multiSelect
+      - readOnly
+      - required
+      - visible
+    DateAttributeContent:
       type: object
       properties:
         reference:
@@ -895,11 +914,11 @@ components:
           description: Content Reference
         data:
           type: string
-          description: Date attribute value in format yyyy-MM-dd
           format: date
-    DateTimeAttributeConstraint:
+          description: Date attribute value in format yyyy-MM-dd
       required:
-      - type
+      - data
+    DateTimeAttributeConstraint:
       type: object
       properties:
         description:
@@ -910,23 +929,24 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           $ref: "#/components/schemas/DateTimeAttributeConstraintData"
+          description: DateTime Range Attribute Constraint Data
+      required:
+      - type
     DateTimeAttributeConstraintData:
       type: object
       properties:
         from:
           type: string
-          description: Start of the datetime for validation
           format: date-time
+          description: Start of the datetime for validation
         to:
           type: string
-          description: End of the datetime for validation
           format: date-time
-      description: DateTime Range Attribute Constraint Data
+          description: End of the datetime for validation
     DateTimeAttributeContent:
-      required:
-      - data
       type: object
       properties:
         reference:
@@ -934,11 +954,11 @@ components:
           description: Content Reference
         data:
           type: string
-          description: DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
           format: date-time
-    FileAttributeContent:
+          description: DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
       required:
       - data
+    FileAttributeContent:
       type: object
       properties:
         reference:
@@ -946,11 +966,10 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/FileAttributeContentData"
-    FileAttributeContentData:
+          description: File attribute content data
       required:
-      - content
-      - fileName
-      - mimeType
+      - data
+    FileAttributeContentData:
       type: object
       properties:
         content:
@@ -962,10 +981,11 @@ components:
         mimeType:
           type: string
           description: Type of the file uploaded
-      description: File attribute content data
-    FloatAttributeContent:
       required:
-      - data
+      - content
+      - fileName
+      - mimeType
+    FloatAttributeContent:
       type: object
       properties:
         reference:
@@ -973,11 +993,11 @@ components:
           description: Content Reference
         data:
           type: number
-          description: Float attribute value
           format: float
-    IntegerAttributeContent:
+          description: Float attribute value
       required:
       - data
+    IntegerAttributeContent:
       type: object
       properties:
         reference:
@@ -985,11 +1005,11 @@ components:
           description: Content Reference
         data:
           type: integer
-          description: Integer attribute value
           format: int32
-    ObjectAttributeContent:
+          description: Integer attribute value
       required:
       - data
+    ObjectAttributeContent:
       type: object
       properties:
         reference:
@@ -998,10 +1018,10 @@ components:
         data:
           type: object
           description: Object attribute content data
+      required:
+      - data
     ProgrammingLanguageEnum:
       type: string
-      description: Definition of programming languages used for code
-      example: "JAVA, PHP, C, etc"
       enum:
       - apacheconf
       - bash
@@ -1045,8 +1065,6 @@ components:
       - xml
       - yaml
     RangeAttributeConstraint:
-      required:
-      - type
       type: object
       properties:
         description:
@@ -1057,23 +1075,24 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           $ref: "#/components/schemas/RangeAttributeConstraintData"
+          description: Integer Range Attribute Constraint Data
+      required:
+      - type
     RangeAttributeConstraintData:
       type: object
       properties:
         from:
           type: integer
-          description: Start of the range for validation
           format: int32
+          description: Start of the range for validation
         to:
           type: integer
-          description: End of the range for validation
           format: int32
-      description: Integer Range Attribute Constraint Data
+          description: End of the range for validation
     RegexpAttributeConstraint:
-      required:
-      - type
       type: object
       properties:
         description:
@@ -1084,16 +1103,15 @@ components:
           description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         data:
           type: string
           description: Regular Expression Attribute Constraint Data
-    RequestAttributeDto:
       required:
-      - content
-      - contentType
-      - name
-      - uuid
+      - type
+    RequestAttributeDto:
       type: object
+      description: Request attribute to send attribute content for object
       properties:
         uuid:
           type: string
@@ -1105,16 +1123,33 @@ components:
           example: Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Content Type of the Attribute
+          example: Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
-      description: Request attribute to send attribute content for object
-    ScepProfileEditRequestDto:
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
       required:
-      - caCertificateUuid
-      - issueCertificateAttributes
+      - content
+      - contentType
+      - name
+      - uuid
+    ScepProfileEditRequestDto:
       type: object
       properties:
         description:
@@ -1141,18 +1176,19 @@ components:
             $ref: "#/components/schemas/RequestAttributeDto"
         renewalThreshold:
           type: integer
+          format: int32
+          default: Half of certificate validity
           description: Minimum expiry days to allow renewal of certificate. Empty
             or the value '0' will be considered as null and half life of the certificate
             validity will be considered for the protocol
-          format: int32
         includeCaCertificate:
           type: boolean
+          default: "False"
           description: Include CA Certificate in the SCEP Message response
-          default: false
         includeCaCertificateChain:
           type: boolean
+          default: "False"
           description: Include CA Certificate Chain in the SCEP Message response
-          default: false
         challengePassword:
           type: string
           description: Challenge Password for the SCEP Request
@@ -1168,9 +1204,10 @@ components:
         intuneApplicationKey:
           type: string
           description: Intune Application Key
-    SecretAttributeContent:
       required:
-      - data
+      - caCertificateUuid
+      - issueCertificateAttributes
+    SecretAttributeContent:
       type: object
       properties:
         reference:
@@ -1178,6 +1215,9 @@ components:
           description: Content Reference
         data:
           $ref: "#/components/schemas/SecretAttributeContentData"
+          description: Secret attribute content data
+      required:
+      - data
     SecretAttributeContentData:
       type: object
       properties:
@@ -1187,10 +1227,7 @@ components:
         protectionLevel:
           type: string
           description: Level of protection of the data
-      description: Secret attribute content data
     StringAttributeContent:
-      required:
-      - data
       type: object
       properties:
         reference:
@@ -1199,9 +1236,9 @@ components:
         data:
           type: string
           description: String attribute value
-    TextAttributeContent:
       required:
       - data
+    TextAttributeContent:
       type: object
       properties:
         reference:
@@ -1210,9 +1247,9 @@ components:
         data:
           type: string
           description: Text attribute value
-    TimeAttributeContent:
       required:
       - data
+    TimeAttributeContent:
       type: object
       properties:
         reference:
@@ -1221,44 +1258,35 @@ components:
         data:
           type: string
           description: Time attribute value in format HH:mm:ss
-    ErrorMessageDto:
       required:
-      - message
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message detail
-          example: Error message
+      - data
     AuthenticationServiceExceptionDto:
-      required:
-      - code
-      - message
-      - statusCode
       type: object
       properties:
         statusCode:
           type: integer
-          description: Status code of the HTTP Request
           format: int32
+          description: Status code of the HTTP Request
         code:
           type: string
           description: Code of the result
         message:
           type: string
           description: Exception message
-    CertificateDto:
       required:
-      - commonName
-      - keySize
-      - privateKeyAvailability
-      - publicKeyAlgorithm
-      - signatureAlgorithm
-      - state
-      - subjectDn
-      - trustedCa
-      - uuid
-      - validationStatus
+      - code
+      - message
+      - statusCode
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          example: Error message
+      required:
+      - message
+    CertificateDto:
       type: object
       properties:
         uuid:
@@ -1281,12 +1309,12 @@ components:
           description: Subject DN of the Certificate
         notBefore:
           type: string
-          description: Certificate validity start date
           format: date-time
+          description: Certificate validity start date
         notAfter:
           type: string
-          description: Certificate expiration date
           format: date-time
+          description: Certificate expiration date
         publicKeyAlgorithm:
           type: string
           description: Public key algorithm
@@ -1295,14 +1323,17 @@ components:
           description: Certificate signature algorithm
         keySize:
           type: integer
-          description: Certificate key size
           format: int32
+          description: Certificate key size
         state:
           $ref: "#/components/schemas/CertificateState"
+          description: State of the Certificate
         validationStatus:
           $ref: "#/components/schemas/CertificateValidationStatus"
+          description: Current validation status of the certificate
         raProfile:
           $ref: "#/components/schemas/SimplifiedRaProfileDto"
+          description: RA Profile associated to the Certificate
         fingerprint:
           type: string
           description: SHA256 fingerprint of the Certificate
@@ -1319,11 +1350,13 @@ components:
           description: Certificate Owner UUID
         certificateType:
           $ref: "#/components/schemas/CertificateType"
+          description: Certificate type
         issuerSerialNumber:
           type: string
           description: Serial number of the issuer
         complianceStatus:
           $ref: "#/components/schemas/ComplianceStatus"
+          description: Certificate compliance status
         issuerCertificateUuid:
           type: string
           description: UUID of the issuer certificate
@@ -1334,10 +1367,19 @@ components:
           type: boolean
           description: "Indicator whether CA is marked as trusted, set to null if\
             \ certificate is not CA"
-      description: CA Certificate for the SCEP Profile
+      required:
+      - commonName
+      - keySize
+      - privateKeyAvailability
+      - publicKeyAlgorithm
+      - signatureAlgorithm
+      - state
+      - subjectDn
+      - trustedCa
+      - uuid
+      - validationStatus
     CertificateState:
       type: string
-      description: State of the Certificate
       enum:
       - requested
       - rejected
@@ -1350,13 +1392,11 @@ components:
       - archived
     CertificateType:
       type: string
-      description: Certificate type
       enum:
       - X.509
       - SSH
     CertificateValidationStatus:
       type: string
-      description: Current validation status of the certificate
       enum:
       - not_checked
       - failed
@@ -1368,16 +1408,12 @@ components:
       - expired
     ComplianceStatus:
       type: string
-      description: Certificate compliance status
       enum:
       - not_checked
       - ok
       - nok
       - na
     GroupDto:
-      required:
-      - name
-      - uuid
       type: object
       properties:
         uuid:
@@ -1399,14 +1435,12 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
-      description: Groups associated to the Certificate
-    ResponseAttributeDto:
       required:
-      - contentType
-      - label
       - name
-      - type
+      - uuid
+    ResponseAttributeDto:
       type: object
+      description: Response attribute with content for object it belongs to
       properties:
         uuid:
           type: string
@@ -1422,21 +1456,36 @@ components:
           example: Attribute Name
         type:
           $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
+          description: Content Type of the Attribute
+          example: Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
             $ref: "#/components/schemas/BaseAttributeContentDto"
-      description: Response attribute with content for object it belongs to
-    ScepProfileDetailDto:
+          oneOf:
+          - $ref: "#/components/schemas/BooleanAttributeContent"
+          - $ref: "#/components/schemas/CodeBlockAttributeContent"
+          - $ref: "#/components/schemas/CredentialAttributeContent"
+          - $ref: "#/components/schemas/DateAttributeContent"
+          - $ref: "#/components/schemas/DateTimeAttributeContent"
+          - $ref: "#/components/schemas/FileAttributeContent"
+          - $ref: "#/components/schemas/FloatAttributeContent"
+          - $ref: "#/components/schemas/IntegerAttributeContent"
+          - $ref: "#/components/schemas/ObjectAttributeContent"
+          - $ref: "#/components/schemas/SecretAttributeContent"
+          - $ref: "#/components/schemas/StringAttributeContent"
+          - $ref: "#/components/schemas/TextAttributeContent"
+          - $ref: "#/components/schemas/TimeAttributeContent"
       required:
-      - enabled
-      - includeCaCertificate
-      - includeCaCertificateChain
+      - contentType
+      - label
       - name
-      - uuid
+      - type
+    ScepProfileDetailDto:
       type: object
       properties:
         uuid:
@@ -1456,6 +1505,7 @@ components:
           example: Sample description
         raProfile:
           $ref: "#/components/schemas/SimplifiedRaProfileDto"
+          description: RA Profile
         includeCaCertificate:
           type: boolean
           description: Include CA certificate in the SCEP response
@@ -1464,8 +1514,8 @@ components:
           description: Include CA certificate chain in the SCEP response
         renewThreshold:
           type: integer
-          description: Renewal time threshold in days
           format: int32
+          description: Renewal time threshold in days
           example: 30
         scepUrl:
           type: string
@@ -1486,17 +1536,20 @@ components:
             $ref: "#/components/schemas/ResponseAttributeDto"
         caCertificate:
           $ref: "#/components/schemas/CertificateDto"
+          description: CA Certificate for the SCEP Profile
         intuneTenant:
           type: string
           description: Intune tenant
         intuneApplicationId:
           type: string
           description: Intune application ID
-    SimplifiedRaProfileDto:
       required:
       - enabled
+      - includeCaCertificate
+      - includeCaCertificateChain
       - name
       - uuid
+    SimplifiedRaProfileDto:
       type: object
       properties:
         uuid:
@@ -1513,12 +1566,11 @@ components:
         authorityInstanceUuid:
           type: string
           description: Authority Instance UUID
-      description: RA Profile associated to the Certificate
-    ScepProfileRequestDto:
       required:
-      - caCertificateUuid
-      - issueCertificateAttributes
+      - enabled
       - name
+      - uuid
+    ScepProfileRequestDto:
       type: object
       properties:
         description:
@@ -1545,18 +1597,19 @@ components:
             $ref: "#/components/schemas/RequestAttributeDto"
         renewalThreshold:
           type: integer
+          format: int32
+          default: Half of certificate validity
           description: Minimum expiry days to allow renewal of certificate. Empty
             or the value '0' will be considered as null and half life of the certificate
             validity will be considered for the protocol
-          format: int32
         includeCaCertificate:
           type: boolean
+          default: "False"
           description: Include CA Certificate in the SCEP Message response
-          default: false
         includeCaCertificateChain:
           type: boolean
+          default: "False"
           description: Include CA Certificate Chain in the SCEP Message response
-          default: false
         challengePassword:
           type: string
           description: Challenge Password for the SCEP Request
@@ -1576,13 +1629,11 @@ components:
           type: string
           description: Name of the SCEP Profile
           example: Profile Name 1
-    ScepProfileDto:
       required:
-      - enabled
-      - includeCaCertificate
-      - includeCaCertificateChain
+      - caCertificateUuid
+      - issueCertificateAttributes
       - name
-      - uuid
+    ScepProfileDto:
       type: object
       properties:
         uuid:
@@ -1602,6 +1653,7 @@ components:
           example: Sample description
         raProfile:
           $ref: "#/components/schemas/SimplifiedRaProfileDto"
+          description: RA Profile
         includeCaCertificate:
           type: boolean
           description: Include CA certificate in the SCEP response
@@ -1610,8 +1662,8 @@ components:
           description: Include CA certificate chain in the SCEP response
         renewThreshold:
           type: integer
-          description: Renewal time threshold in days
           format: int32
+          description: Renewal time threshold in days
           example: 30
         scepUrl:
           type: string
@@ -1620,11 +1672,13 @@ components:
         enableIntune:
           type: boolean
           description: Status of Intune
-    BulkActionMessageDto:
       required:
-      - message
+      - enabled
+      - includeCaCertificate
+      - includeCaCertificateChain
       - name
       - uuid
+    BulkActionMessageDto:
       type: object
       properties:
         uuid:
@@ -1640,3 +1694,7 @@ components:
           description: Message describing the associations of the Objects which is
             preventing the bulk operation
           example: Object is associated with other items
+      required:
+      - message
+      - name
+      - uuid
