@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:35863
+- url: http://localhost:43035
   description: Generated server url
 tags:
 - name: Workflow Actions Management
@@ -46,22 +46,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TriggerDetailDto"
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
     put:
       tags:
       - Workflow Triggers Management
@@ -81,28 +81,28 @@ paths:
               $ref: "#/components/schemas/UpdateTriggerRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Trigger updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/TriggerDetailDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
     delete:
       tags:
       - Workflow Triggers Management
@@ -118,22 +118,22 @@ paths:
       responses:
         "204":
           description: Trigger deleted
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
   /v1/workflows/rules/{ruleUuid}:
     get:
       tags:
@@ -148,28 +148,28 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Rule details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/RuleDetailDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
     put:
       tags:
       - Workflow Rules Management
@@ -189,28 +189,28 @@ paths:
               $ref: "#/components/schemas/UpdateRuleRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Rule details updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/RuleDetailDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
     delete:
       tags:
       - Workflow Rules Management
@@ -224,24 +224,24 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
         "204":
           description: Rule deleted
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
   /v1/workflows/executions/{executionUuid}:
     get:
       tags:
@@ -256,16 +256,10 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -276,8 +270,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ExecutionDto"
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
     put:
       tags:
       - Workflow Actions Management
@@ -297,16 +297,10 @@ paths:
               $ref: "#/components/schemas/UpdateExecutionRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -317,8 +311,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ExecutionDto"
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
     delete:
       tags:
       - Workflow Actions Management
@@ -332,24 +332,24 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
+        "204":
+          description: Execution deleted
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: Execution deleted
-        "500":
-          description: Internal Server Error
   /v1/workflows/conditions/{conditionUuid}:
     get:
       tags:
@@ -364,28 +364,28 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "200":
           description: Condition details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConditionDto"
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
     put:
       tags:
       - Workflow Rules Management
@@ -405,16 +405,10 @@ paths:
               $ref: "#/components/schemas/UpdateConditionRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -425,8 +419,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConditionDto"
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
     delete:
       tags:
       - Workflow Rules Management
@@ -440,24 +440,24 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
+        "204":
+          description: Condition deleted
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: Condition deleted
-        "500":
-          description: Internal Server Error
   /v1/workflows/actions/{actionUuid}:
     get:
       tags:
@@ -472,28 +472,28 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Action details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDetailDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
     put:
       tags:
       - Workflow Actions Management
@@ -513,28 +513,28 @@ paths:
               $ref: "#/components/schemas/UpdateActionRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
         "200":
           description: Action updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDetailDto"
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
     delete:
       tags:
       - Workflow Actions Management
@@ -548,24 +548,24 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "204":
+          description: Action deleted
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: Action deleted
-        "500":
-          description: Internal Server Error
   /v1/workflows/triggers:
     get:
       tags:
@@ -584,8 +584,8 @@ paths:
         schema:
           $ref: "#/components/schemas/Resource"
       responses:
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
@@ -600,14 +600,14 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TriggerDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
     post:
       tags:
       - Workflow Triggers Management
@@ -626,22 +626,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TriggerDetailDto"
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
   /v1/workflows/rules:
     get:
       tags:
@@ -655,16 +655,10 @@ paths:
         schema:
           $ref: "#/components/schemas/Resource"
       responses:
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -677,8 +671,14 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RuleDto"
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
     post:
       tags:
       - Workflow Rules Management
@@ -691,28 +691,28 @@ paths:
               $ref: "#/components/schemas/RuleRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "201":
           description: Rule created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/RuleDetailDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
   /v1/workflows/executions:
     get:
       tags:
@@ -726,8 +726,6 @@ paths:
         schema:
           $ref: "#/components/schemas/Resource"
       responses:
-        "401":
-          description: Unauthorized
         "200":
           description: List of executions fetched
           content:
@@ -736,20 +734,22 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ExecutionDto"
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
     post:
       tags:
       - Workflow Actions Management
@@ -762,28 +762,28 @@ paths:
               $ref: "#/components/schemas/ExecutionRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "201":
           description: Execution created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ExecutionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
   /v1/workflows/conditions:
     get:
       tags:
@@ -805,22 +805,22 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ConditionDto"
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
     post:
       tags:
       - Workflow Rules Management
@@ -833,28 +833,28 @@ paths:
               $ref: "#/components/schemas/ConditionRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "201":
           description: Condition created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConditionDto"
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
   /v1/workflows/actions:
     get:
       tags:
@@ -868,14 +868,6 @@ paths:
         schema:
           $ref: "#/components/schemas/Resource"
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: List of actions fetched
           content:
@@ -884,14 +876,22 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ActionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
     post:
       tags:
       - Workflow Actions Management
@@ -904,28 +904,28 @@ paths:
               $ref: "#/components/schemas/ActionRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "201":
           description: Action created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDetailDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
   /v1/workflows/triggers/{triggerUuid}/history/{associationObjectUuid}:
     get:
       tags:
@@ -946,14 +946,8 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Trigger History retrieved
           content:
@@ -962,14 +956,20 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TriggerHistoryDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
   /v1/workflows/triggers/history/{associationObjectUuid}:
     get:
       tags:
@@ -984,28 +984,28 @@ paths:
         schema:
           type: string
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Trigger History Summary retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/TriggerHistorySummaryDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
 components:
   schemas:
     Resource:
