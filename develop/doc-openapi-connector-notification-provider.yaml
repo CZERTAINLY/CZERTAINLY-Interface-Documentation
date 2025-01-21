@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:33039
+- url: http://localhost:45565
   description: Generated server url
 tags:
 - name: Notification instances Management
@@ -57,6 +57,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NotificationProviderInstanceDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -65,12 +71,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
     put:
       tags:
       - Notification instances Management
@@ -90,26 +90,26 @@ paths:
               $ref: "#/components/schemas/NotificationProviderInstanceRequestDto"
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Notification instance updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/NotificationProviderInstanceDto"
-        "500":
-          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+        "200":
+          description: Notification instance updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationProviderInstanceDto"
     delete:
       tags:
       - Notification instances Management
@@ -123,6 +123,12 @@ paths:
         schema:
           type: string
       responses:
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -131,12 +137,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: Notification instance removed
   /v1/{functionalGroup}/{kind}/attributes/validate:
@@ -163,6 +163,20 @@ paths:
       responses:
         "200":
           description: Attribute validation completed
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "422":
           description: Attribute validation failed
           content:
@@ -174,20 +188,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/notificationProvider/notifications:
     get:
       tags:
@@ -195,6 +195,18 @@ paths:
       summary: List Notification instances
       operationId: listNotificationInstances
       responses:
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Notification instance list retrieved
           content:
@@ -203,20 +215,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NotificationProviderInstanceDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
     post:
       tags:
       - Notification instances Management
@@ -235,6 +235,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NotificationProviderInstanceDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -243,12 +249,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/notificationProvider/notifications/{uuid}/notify:
     post:
       tags:
@@ -269,6 +269,12 @@ paths:
               $ref: "#/components/schemas/NotificationProviderNotifyRequestDto"
         required: true
       responses:
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -277,12 +283,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: Notification sent
   /v1:
@@ -293,6 +293,12 @@ paths:
       description: Returns map of functional code and implemented end points
       operationId: listSupportedFunctions
       responses:
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -301,12 +307,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Functions found
           content:
@@ -329,6 +329,12 @@ paths:
         schema:
           type: string
       responses:
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -337,12 +343,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Attributes retrieved
           content:
@@ -365,6 +365,12 @@ paths:
         schema:
           type: string
       responses:
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -373,12 +379,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: List of mapping attributes
           content:
@@ -394,6 +394,12 @@ paths:
       summary: Health check
       operationId: checkHealth
       responses:
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Health check completed successfully
           content:
@@ -408,12 +414,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
 components:
   schemas:
     AttributeCallback:
