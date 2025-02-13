@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:38063
+- url: http://localhost:39803
   description: Generated server url
 tags:
 - name: Connector Info
@@ -247,6 +247,12 @@ paths:
                 $ref: "#/components/schemas/EntityInstanceDto"
         "500":
           description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Attribute validation failed
           content:
@@ -258,12 +264,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -376,18 +376,18 @@ paths:
       responses:
         "500":
           description: Internal Server Error
-        "200":
-          description: Certificate pushed to Location
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PushCertificateResponseDto"
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: Certificate pushed to Location
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PushCertificateResponseDto"
         "400":
           description: Bad Request
           content:
@@ -425,6 +425,14 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: Attributes validated
         "422":
           description: Unprocessable Entity
           content:
@@ -436,14 +444,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "200":
-          description: Attributes validated
-        "400":
-          description: Bad Request
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: No Content
   /v1/entityProvider/entities/{entityUuid}/locations/csr:
@@ -469,18 +469,18 @@ paths:
       responses:
         "500":
           description: Internal Server Error
-        "200":
-          description: CSR generated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/GenerateCsrResponseDto"
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: CSR generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateCsrResponseDto"
         "400":
           description: Bad Request
           content:
@@ -518,6 +518,14 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: Attributes validated
         "422":
           description: Unprocessable Entity
           content:
@@ -529,14 +537,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "200":
-          description: Attributes validated
-        "400":
-          description: Bad Request
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: No Content
   /v1/entityProvider/entities/{entityUuid}/location/attributes/validate:
@@ -565,6 +565,12 @@ paths:
           description: Internal Server Error
         "200":
           description: Entity Location Attributes validation completed
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Attribute validation failed
           content:
@@ -576,12 +582,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "404":
-          description: Not Found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -700,6 +700,12 @@ paths:
       responses:
         "500":
           description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Attributes for push retrieved
           content:
@@ -708,12 +714,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -737,6 +737,12 @@ paths:
       responses:
         "500":
           description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: CSR Attributes retrieved
           content:
@@ -745,12 +751,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -779,6 +779,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Entity Location Attributes retrieved
           content:
@@ -787,12 +793,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
 components:
   schemas:
     AttributeCallback:
@@ -1009,6 +1009,12 @@ components:
       description: Data attribute allows to store and transfer dynamic data. Its content
         can be edited and send in requests to store.
       properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          example: 2
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
@@ -1454,6 +1460,12 @@ components:
       - $ref: "#/components/schemas/MetadataAttribute"
       - $ref: "#/components/schemas/CustomAttribute"
       properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          example: 2
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
@@ -1482,6 +1494,12 @@ components:
       description: Custom attribute allows to store and transfer dynamic data. Its
         content can be edited and send in requests to store.
       properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          example: 2
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
@@ -1598,6 +1616,12 @@ components:
         attributes retrieved by callback. Its content can not be edited and is not
         send in requests to store.
       properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          example: 2
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
@@ -1637,6 +1661,12 @@ components:
         or represents additional information for object (metadata). Its content can
         not be edited and is not send in requests to store.
       properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          example: 2
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
@@ -1710,6 +1740,12 @@ components:
       description: Info attribute contains content that is for metadata. Its content
         can not be edited and is not send in requests to store.
       properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          example: 2
         uuid:
           type: string
           description: UUID of the Attribute for unique identification

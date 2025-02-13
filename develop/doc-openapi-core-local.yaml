@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:41701
+- url: http://localhost:38085
   description: Generated server url
 tags:
 - name: Local operations
@@ -35,26 +35,6 @@ paths:
               $ref: "#/components/schemas/AddUserRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Admin created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserDetailDto"
         "403":
           description: Forbidden
           content:
@@ -63,6 +43,26 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "200":
+          description: Admin created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetailDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
 components:
   schemas:
     AddUserRequestDto:
@@ -321,6 +321,12 @@ components:
       description: Data attribute allows to store and transfer dynamic data. Its content
         can be edited and send in requests to store.
       properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          example: 2
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
@@ -721,15 +727,6 @@ components:
           description: Time attribute value in format HH:mm:ss
       required:
       - data
-    ErrorMessageDto:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message detail
-          example: Error message
-      required:
-      - message
     AuthenticationServiceExceptionDto:
       type: object
       properties:
@@ -747,6 +744,15 @@ components:
       - code
       - message
       - statusCode
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          example: Error message
+      required:
+      - message
     NameAndUuidDto:
       type: object
       properties:
