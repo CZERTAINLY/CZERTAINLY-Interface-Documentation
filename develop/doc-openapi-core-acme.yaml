@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:35245
+- url: http://localhost:41447
   description: Generated server url
 tags:
 - name: ACME Account Management
@@ -38,6 +38,8 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -52,8 +54,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "200":
           description: ACME Profile details retrieved
           content:
@@ -85,14 +85,10 @@ paths:
               $ref: "#/components/schemas/AcmeProfileEditRequestDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
           content:
             application/json:
               schema:
@@ -103,10 +99,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AcmeProfileDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -126,6 +126,8 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -138,12 +140,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "401":
-          description: Unauthorized
         "204":
           description: ACME Profile deleted
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -169,6 +169,8 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -183,8 +185,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -200,14 +200,10 @@ paths:
       summary: Get list of ACME Profiles
       operationId: listAcmeProfiles
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
           content:
             application/json:
               schema:
@@ -220,10 +216,14 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AcmeProfileListDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -248,6 +248,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UuidDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -262,8 +264,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -290,6 +290,8 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -302,16 +304,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "401":
-          description: Unauthorized
         "200":
           description: ACME Account details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AcmeAccountResponseDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -337,6 +337,8 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -349,12 +351,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "204":
           description: ACME Account revoked
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -381,24 +381,24 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: RA Profile updated
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: RA Profile updated
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -421,6 +421,8 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
         "200":
           description: ACME Profile enabled
         "400":
@@ -437,8 +439,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -461,12 +461,16 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: ACME Profile disabled
         "404":
           description: Not Found
           content:
@@ -475,10 +479,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "200":
-          description: ACME Profile disabled
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -509,6 +509,8 @@ paths:
       responses:
         "204":
           description: ACME Account enabled
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -523,8 +525,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -551,6 +551,8 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -563,12 +565,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "401":
-          description: Unauthorized
         "204":
           description: ACME Account disabled
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -594,6 +594,8 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -608,8 +610,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "200":
           description: ACME Profiles enabled
         "403":
@@ -639,12 +639,16 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: ACME Profiles disabled
         "404":
           description: Not Found
           content:
@@ -653,10 +657,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "200":
-          description: ACME Profiles disabled
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -684,6 +684,8 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -698,8 +700,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -727,12 +727,16 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: ACME Accounts disabled
         "404":
           description: Not Found
           content:
@@ -741,10 +745,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "204":
-          description: ACME Accounts disabled
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -758,20 +758,14 @@ paths:
       summary: List ACME Accounts
       operationId: listAcmeAccounts
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "200":
           description: ACME Accounts list retrieved
           content:
@@ -780,8 +774,14 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AcmeAccountListResponseDto"
-        "401":
-          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -807,6 +807,8 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -821,8 +823,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -856,6 +856,8 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -870,8 +872,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "200":
           description: ACME Profiles forced to delete
           content:
@@ -880,12 +880,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BulkActionMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "422":
           description: Unprocessible Entity
           content:
@@ -897,6 +891,12 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
 components:
   schemas:
     AcmeProfileEditRequestDto:
