@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:41165
+- url: http://localhost:43745
   description: Generated server url
 tags:
 - name: Audit Log
@@ -37,12 +37,20 @@ paths:
       summary: Get platform settings
       operationId: getPlatformSettings
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: Platform settings retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformSettingsDto"
         "404":
           description: Not Found
           content:
@@ -51,14 +59,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "200":
-          description: Platform settings retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PlatformSettingsDto"
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -77,6 +77,10 @@ paths:
               $ref: "#/components/schemas/PlatformSettingsDto"
         required: true
       responses:
+        "204":
+          description: Setting updated
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -89,12 +93,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: Setting updated
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -108,6 +108,8 @@ paths:
       summary: Get notification settings
       operationId: getNotificationsSettings
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -122,8 +124,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -148,6 +148,10 @@ paths:
               $ref: "#/components/schemas/NotificationSettingsDto"
         required: true
       responses:
+        "204":
+          description: Setting updated
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -160,12 +164,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: Setting updated
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -179,6 +179,14 @@ paths:
       summary: Get logging settings
       operationId: getLoggingSettings
       responses:
+        "200":
+          description: Logging settings retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoggingSettingsDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -191,16 +199,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Logging settings retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/LoggingSettingsDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -219,6 +219,8 @@ paths:
               $ref: "#/components/schemas/LoggingSettingsDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -233,16 +235,14 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
+        "200":
+          description: Logging settings updated
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "200":
-          description: Logging settings updated
   /v1/settings/authentication:
     get:
       tags:
@@ -250,6 +250,14 @@ paths:
       summary: Get authentication settings
       operationId: getAuthenticationSettings
       responses:
+        "200":
+          description: Authentication settings retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationSettingsDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -262,16 +270,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Authentication settings retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationSettingsDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -290,6 +290,8 @@ paths:
               $ref: "#/components/schemas/AuthenticationSettingsUpdateDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -304,8 +306,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -328,6 +328,8 @@ paths:
         schema:
           type: string
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -340,22 +342,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: OAuth2 Provider settings retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/OAuth2ProviderSettingsDto"
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
     put:
       tags:
       - Settings
@@ -375,6 +375,10 @@ paths:
               $ref: "#/components/schemas/OAuth2ProviderSettingsUpdateDto"
         required: true
       responses:
+        "204":
+          description: Setting updated
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -387,12 +391,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: Setting updated
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -412,14 +412,16 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: OAuth2 Provider removed.
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: OAuth2 Provider removed.
         "404":
           description: Not Found
           content:
@@ -428,8 +430,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -449,12 +449,20 @@ paths:
               $ref: "#/components/schemas/SearchRequestDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: List of audit logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditLogResponseDto"
         "404":
           description: Not Found
           content:
@@ -463,14 +471,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "200":
-          description: List of audit logs
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuditLogResponseDto"
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -492,6 +492,8 @@ paths:
                 $ref: "#/components/schemas/SearchFilterRequestDto"
         required: true
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -504,18 +506,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: Audit logs purged
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: Audit logs purged
   /v1/auditLogs/export:
     post:
       tags:
@@ -538,6 +538,8 @@ paths:
               schema:
                 type: string
                 format: binary
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -552,8 +554,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -567,6 +567,14 @@ paths:
       summary: Get Dashboard/Statistics Details
       operationId: getStatistics
       responses:
+        "200":
+          description: Details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatisticsDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -579,16 +587,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Details retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/StatisticsDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -602,6 +602,12 @@ paths:
       summary: Retrieve list of resources with information and settings
       operationId: listResources
       responses:
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Resources retrieved
           content:
@@ -610,10 +616,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ResourceDto"
-        "500":
-          description: Internal Server Error
         "401":
           description: Unauthorized
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -622,12 +628,6 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "404":
           description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -652,22 +652,14 @@ paths:
         schema:
           type: boolean
       responses:
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "401":
           description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Filter fields retrieved
           content:
@@ -676,8 +668,16 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SearchFieldDataByGroupDto"
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -696,8 +696,14 @@ paths:
         schema:
           $ref: "#/components/schemas/Resource"
       responses:
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "401":
+          description: Unauthorized
         "200":
           description: Events retrieved
           content:
@@ -706,8 +712,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ResourceEventDto"
-        "401":
-          description: Unauthorized
+        "500":
+          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -720,12 +726,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
   /v1/enums:
     get:
       tags:
@@ -733,20 +733,14 @@ paths:
       summary: Get platform enums
       operationId: getPlatformEnums
       responses:
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "200":
           description: Platform settings retrieved
           content:
@@ -757,8 +751,14 @@ paths:
                   type: object
                   additionalProperties:
                     $ref: "#/components/schemas/EnumItemDto"
-        "401":
-          description: Unauthorized
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/auditLogs/search:
     get:
       tags:
@@ -766,6 +766,16 @@ paths:
       summary: Get Audit logs searchable fields information
       operationId: getSearchableFieldInformation
       responses:
+        "200":
+          description: Audit logs searchable field information retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchFieldDataByGroupDto"
+        "401":
+          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -778,18 +788,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Audit logs searchable field information retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/SearchFieldDataByGroupDto"
         "500":
           description: Internal Server Error
-        "401":
-          description: Unauthorized
         "403":
           description: Forbidden
           content:
