@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:33659
+- url: http://localhost:43071
   description: Generated server url
 tags:
 - name: Discovery Management
@@ -35,12 +35,20 @@ paths:
               $ref: "#/components/schemas/DiscoveryDto"
         required: true
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "201":
           description: Discovery Created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UuidDto"
+        "500":
+          description: Internal Server Error
         "422":
           description: Unprocessable Entity
           content:
@@ -54,14 +62,6 @@ paths:
               - Error Message 2
         "503":
           description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
           content:
             application/json:
               schema:
@@ -80,12 +80,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
     delete:
       tags:
       - Discovery Management
@@ -104,16 +104,16 @@ paths:
             - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "503":
-          description: Connector Communication Error
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -134,12 +134,12 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: Discoveries deleted
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/discoveries/schedule:
     post:
       tags:
@@ -153,6 +153,14 @@ paths:
               $ref: "#/components/schemas/ScheduleDiscoveryDto"
         required: true
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "422":
           description: Unprocessable Entity
           content:
@@ -164,16 +172,14 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "503":
-          description: Connector Communication Error
+        "201":
+          description: Discovery Scheduled
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+                $ref: "#/components/schemas/UuidDto"
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -192,18 +198,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "201":
-          description: Discovery Scheduled
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UuidDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/discoveries/list:
     post:
       tags:
@@ -217,6 +217,14 @@ paths:
               $ref: "#/components/schemas/SearchRequestDto"
         required: true
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: List of available Discoveries
           content:
@@ -225,14 +233,6 @@ paths:
                 $ref: "#/components/schemas/DiscoveryResponseDto"
         "503":
           description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
           content:
             application/json:
               schema:
@@ -251,12 +251,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/discoveries/{uuid}:
     get:
       tags:
@@ -271,16 +271,16 @@ paths:
         schema:
           type: string
       responses:
-        "503":
-          description: Connector Communication Error
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -305,12 +305,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DiscoveryHistoryDetailDto"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
     delete:
       tags:
       - Discovery Management
@@ -324,18 +324,18 @@ paths:
         schema:
           type: string
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "204":
           description: Discovery deleted
         "503":
           description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
           content:
             application/json:
               schema:
@@ -354,12 +354,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/discoveries/{uuid}/certificates:
     get:
       tags:
@@ -393,16 +393,16 @@ paths:
           format: int32
           default: 0
       responses:
-        "503":
-          description: Connector Communication Error
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -427,12 +427,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DiscoveryCertificateResponseDto"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/discoveries/search:
     get:
       tags:
@@ -440,12 +440,14 @@ paths:
       summary: Get Discovery searchable fields information
       operationId: getSearchableFieldInformation
       responses:
-        "503":
-          description: Connector Communication Error
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Discovery searchable field information retrieved
           content:
@@ -454,10 +456,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SearchFieldDataByGroupDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
@@ -476,12 +476,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
 components:
   schemas:
     AttributeCallback:
@@ -1138,23 +1138,6 @@ components:
           description: Time attribute value in format HH:mm:ss
       required:
       - data
-    UuidDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: Object identifier
-      required:
-      - uuid
-    ErrorMessageDto:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message detail
-          example: Error message
-      required:
-      - message
     AuthenticationServiceExceptionDto:
       type: object
       properties:
@@ -1172,6 +1155,23 @@ components:
       - code
       - message
       - statusCode
+    UuidDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+      required:
+      - uuid
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          example: Error message
+      required:
+      - message
     ScheduleDiscoveryDto:
       type: object
       properties:

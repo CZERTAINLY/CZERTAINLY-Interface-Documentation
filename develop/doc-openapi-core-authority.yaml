@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:45047
+- url: http://localhost:34295
   description: Generated server url
 tags:
 - name: Authority Management
@@ -48,12 +48,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Authority instance details retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthorityInstanceDto"
         "401":
           description: Unauthorized
         "503":
@@ -62,8 +56,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
+        "200":
+          description: Authority instance details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorityInstanceDto"
         "403":
           description: Forbidden
           content:
@@ -76,6 +74,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
     put:
       tags:
       - Authority Management
@@ -95,17 +95,6 @@ paths:
               $ref: "#/components/schemas/AuthorityInstanceUpdateRequestDto"
         required: true
       responses:
-        "422":
-          description: Unprocessable Entity
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
         "400":
           description: Bad Request
           content:
@@ -120,32 +109,43 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "200":
-          description: Authority instance details updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthorityInstanceDto"
         "503":
           description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "200":
+          description: Authority instance details updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthorityInstanceDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
     delete:
       tags:
       - Authority Management
@@ -179,22 +179,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "204":
-          description: Authority instance deleted
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "204":
+          description: Authority instance deleted
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/authorities:
     get:
       tags:
@@ -222,16 +222,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "200":
-          description: List of Authority instances
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/AuthorityInstanceDto"
         "403":
           description: Forbidden
           content:
@@ -244,6 +234,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: List of Authority instances
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuthorityInstanceDto"
+        "500":
+          description: Internal Server Error
     post:
       tags:
       - Authority Management
@@ -256,17 +256,12 @@ paths:
               $ref: "#/components/schemas/AuthorityInstanceRequestDto"
         required: true
       responses:
-        "422":
-          description: Unprocessable Entity
+        "201":
+          description: New Authority instance added
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
+                $ref: "#/components/schemas/UuidDto"
         "400":
           description: Bad Request
           content:
@@ -287,26 +282,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "201":
-          description: New Authority instance added
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UuidDto"
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
     delete:
       tags:
       - Authority Management
@@ -339,6 +339,18 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Authority instances deleted
           content:
@@ -347,8 +359,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BulkActionMessageDto"
-        "503":
-          description: Connector Communication Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -366,18 +378,6 @@ paths:
               - Error Message 2
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/authorities/{uuid}/attributes/raProfile/validate:
     post:
       tags:
@@ -420,22 +420,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Attribute information validated
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "200":
+          description: Attribute information validated
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/authorities/{uuid}/endentityprofiles:
     get:
       tags:
@@ -469,16 +469,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "200":
-          description: Entity profiles retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NameAndIdDto"
         "403":
           description: Forbidden
           content:
@@ -491,6 +481,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: Entity profiles retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NameAndIdDto"
+        "500":
+          description: Internal Server Error
   /v1/authorities/{uuid}/endentityprofiles/{endEntityProfileId}/certificateprofiles:
     get:
       tags:
@@ -530,6 +530,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Certificate profiles retrieved
           content:
@@ -538,20 +544,14 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NameAndIdDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/authorities/{uuid}/endentityprofiles/{endEntityProfileId}/cas:
     get:
       tags:
@@ -599,8 +599,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -613,6 +611,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/authorities/{uuid}/attributes/raProfile:
     get:
       tags:
@@ -627,14 +627,6 @@ paths:
         schema:
           type: string
       responses:
-        "200":
-          description: Attribute information retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BaseAttributeDto"
         "400":
           description: Bad Request
           content:
@@ -647,6 +639,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "200":
+          description: Attribute information retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
         "401":
           description: Unauthorized
         "503":
@@ -655,8 +655,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
@@ -669,6 +667,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/authorities/force:
     delete:
       tags:
@@ -704,6 +704,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "200":
+          description: Authority instances forced to delete
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkActionMessageDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Unprocessible Entity
           content:
@@ -715,28 +735,8 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "200":
-          description: Authority instances forced to delete
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BulkActionMessageDto"
         "500":
           description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
 components:
   schemas:
     AttributeCallback:

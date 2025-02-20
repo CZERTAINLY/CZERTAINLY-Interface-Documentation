@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:39439
+- url: http://localhost:39321
   description: Generated server url
 tags:
 - name: Compliance
@@ -78,12 +78,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "422":
           description: Attribute validation failed
           content:
@@ -95,8 +91,12 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/complianceProvider/{kind}/compliance:
     post:
       tags:
@@ -123,6 +123,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ComplianceResponseDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Unprocessable entity
           content:
@@ -134,20 +148,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
   /v1:
     get:
       tags:
@@ -162,12 +162,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Functions found
           content:
@@ -176,8 +172,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/InfoResponse"
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/{functionalGroup}/{kind}/attributes:
     get:
       tags:
@@ -198,12 +198,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "200":
           description: Attributes retrieved
           content:
@@ -212,8 +208,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "500":
-          description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/health:
     get:
       tags:
@@ -221,26 +221,26 @@ paths:
       summary: Health check
       operationId: checkHealth
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Health check completed successfully
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthDto"
-        "400":
-          description: Bad Request
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/complianceProvider/{kind}/rules:
     get:
       tags:
@@ -261,6 +261,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -275,8 +277,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ComplianceRulesResponseDto"
-        "500":
-          description: Internal Server Error
   /v1/complianceProvider/{kind}/groups:
     get:
       tags:
@@ -297,12 +297,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Groups retrieved successfully
           content:
@@ -313,6 +307,12 @@ paths:
                   $ref: "#/components/schemas/ComplianceGroupsResponseDto"
         "500":
           description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/complianceProvider/{kind}/groups/{uuid}:
     get:
       tags:
@@ -339,6 +339,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -353,8 +355,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ComplianceRulesResponseDto"
-        "500":
-          description: Internal Server Error
 components:
   schemas:
     AttributeCallback:

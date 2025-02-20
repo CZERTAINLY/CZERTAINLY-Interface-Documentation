@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:33317
+- url: http://localhost:46827
   description: Generated server url
 tags:
 - name: Local operations
@@ -35,8 +35,6 @@ paths:
               $ref: "#/components/schemas/AddUserRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
         "400":
           description: Bad Request
           content:
@@ -49,20 +47,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
         "200":
           description: Admin created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
 components:
   schemas:
     AddUserRequestDto:
