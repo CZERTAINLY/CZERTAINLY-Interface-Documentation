@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:46827
+- url: http://localhost:32895
   description: Generated server url
 tags:
 - name: Local operations
@@ -35,34 +35,34 @@ paths:
               $ref: "#/components/schemas/AddUserRequestDto"
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
-        "401":
-          description: Unauthorized
-        "200":
-          description: Admin created
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserDetailDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+        "200":
+          description: Admin created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDetailDto"
 components:
   schemas:
     AddUserRequestDto:
@@ -727,15 +727,6 @@ components:
           description: Time attribute value in format HH:mm:ss
       required:
       - data
-    ErrorMessageDto:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message detail
-          example: Error message
-      required:
-      - message
     AuthenticationServiceExceptionDto:
       type: object
       properties:
@@ -753,6 +744,15 @@ components:
       - code
       - message
       - statusCode
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          example: Error message
+      required:
+      - message
     NameAndUuidDto:
       type: object
       properties:
