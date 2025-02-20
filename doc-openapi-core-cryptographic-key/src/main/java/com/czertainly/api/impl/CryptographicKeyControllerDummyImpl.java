@@ -8,7 +8,6 @@ import com.czertainly.api.model.client.cryptography.key.*;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.cryptography.key.*;
 import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
-import com.czertainly.api.model.core.search.SearchFieldDataDto;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -122,6 +121,11 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
     }
 
     @Override
+    public void enableKey(String uuid, List<String> keyItemUuids) throws NotFoundException {
+
+    }
+
+    @Override
     public void enableKey(String tokenInstanceUuid, String uuid, List<String> keyItemUuids) throws NotFoundException {
 
     }
@@ -137,6 +141,11 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
     }
 
     @Override
+    public void disableKey(String uuid, List<String> keyItemUuids) throws NotFoundException {
+
+    }
+
+    @Override
     public void disableKey(String tokenInstanceUuid, String uuid, List<String> keyItemUuids) throws NotFoundException {
 
     }
@@ -148,6 +157,11 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
 
     @Override
     public void disableKeyItems(List<String> uuids) {
+
+    }
+
+    @Override
+    public void updateKeyUsages(String uuid, UpdateKeyUsageRequestDto request) throws NotFoundException, ValidationException {
 
     }
 
@@ -169,6 +183,11 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
     @Override
     public List<BaseAttribute> listCreateKeyAttributes(String tokenInstanceUuid, String tokenProfileUuid, KeyRequestType type) throws ConnectorException {
         return null;
+    }
+
+    @Override
+    public List<KeyEventHistoryDto> getEventHistory(String uuid, String keyItemUuid) throws NotFoundException {
+        return List.of();
     }
 
     @Override
