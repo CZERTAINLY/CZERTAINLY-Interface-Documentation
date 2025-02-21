@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@SuppressWarnings("java:S1186")
 public class CryptographicKeyControllerDummyImpl implements CryptographicKeyController {
     @Override
     public List<SearchFieldDataByGroupDto> getSearchableFieldInformation() {
