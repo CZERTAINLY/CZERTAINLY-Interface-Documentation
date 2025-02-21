@@ -72,6 +72,11 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
     }
 
     @Override
+    public void compromiseKey(String uuid, CompromiseKeyRequestDto request) throws NotFoundException {
+
+    }
+
+    @Override
     public void compromiseKey(String tokenInstanceUuid, String uuid, CompromiseKeyRequestDto request) throws NotFoundException {
 
     }
@@ -83,6 +88,11 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
 
     @Override
     public void compromiseKeyItems(BulkCompromiseKeyItemRequestDto request) {
+
+    }
+
+    @Override
+    public void destroyKey(String uuid, List<String> keyItemUuids) throws ConnectorException {
 
     }
 
