@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:39379
+- url: http://localhost:36071
   description: Generated server url
 tags:
 - name: Entity Management
@@ -36,18 +36,20 @@ paths:
         schema:
           type: string
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Authority instance details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/EntityInstanceDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -66,8 +68,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
     put:
       tags:
       - Entity Management
@@ -87,12 +87,20 @@ paths:
               $ref: "#/components/schemas/EntityInstanceUpdateRequestDto"
         required: true
       responses:
+        "200":
+          description: Authority instance details updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntityInstanceDto"
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -105,12 +113,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "200":
-          description: Authority instance details updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EntityInstanceDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -128,8 +130,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
     delete:
       tags:
       - Entity Management
@@ -151,6 +151,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -169,8 +171,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
   /v1/entities:
     post:
       tags:
@@ -190,6 +190,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -225,8 +227,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UuidDto"
-        "500":
-          description: Internal Server Error
   /v1/entities/{entityUuid}/attributes/location/validate:
     post:
       tags:
@@ -255,6 +255,8 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -284,8 +286,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "200":
           description: Attributes validated
         "204":
@@ -303,18 +303,20 @@ paths:
               $ref: "#/components/schemas/SearchRequestDto"
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: List of Entity instances
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/EntityInstanceResponseDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -333,8 +335,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
   /v1/entities/{entityUuid}/attributes/location:
     get:
       tags:
@@ -355,6 +355,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -373,8 +375,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "200":
           description: Location attributes retrieved
           content:
@@ -396,6 +396,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "400":
           description: Bad Request
           content:
@@ -408,12 +410,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Entity searchable field information retrieved
           content:
@@ -422,8 +418,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SearchFieldDataByGroupDto"
-        "500":
-          description: Internal Server Error
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
 components:
   schemas:
     AttributeCallback:
