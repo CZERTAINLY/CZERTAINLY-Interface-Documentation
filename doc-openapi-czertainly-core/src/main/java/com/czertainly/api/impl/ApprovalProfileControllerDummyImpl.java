@@ -2,16 +2,12 @@ package com.czertainly.api.impl;
 
 import com.czertainly.api.exception.AlreadyExistException;
 import com.czertainly.api.exception.NotFoundException;
-import com.czertainly.api.exception.SchedulerException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.ApprovalProfileController;
 import com.czertainly.api.model.client.approvalprofile.*;
 import com.czertainly.api.model.core.scheduler.PaginationRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
-import java.security.cert.CertificateException;
 
 @RestController
 public class ApprovalProfileControllerDummyImpl implements ApprovalProfileController {
@@ -28,17 +24,6 @@ public class ApprovalProfileControllerDummyImpl implements ApprovalProfileContro
 
     @Override
     public void deleteApprovalProfile(String uuid) throws NotFoundException {
-
-    }
-
-    @Override
-    public void enableApprovalProfile(String uuid) throws NotFoundException {
-
-    }
-
-    @Override
-    public void disableApprovalProfile(String uuid) throws NotFoundException {
-
     }
 
     @Override
