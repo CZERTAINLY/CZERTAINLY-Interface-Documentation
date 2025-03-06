@@ -28,3 +28,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         run: mvn --batch-mode --update-snapshots install
+      - name: Setup npm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '>=18.17.0'
+      - name: Install redocly
+        run: |
+          yarn global add @redocly/cli
+      - name: Lint
+        run: |
+          ./lint.sh
+      - name: Build-docs
+        run: |
+          ./bundle.sh
