@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:53460
+- url: http://localhost:65118
   description: Generated server url
 tags:
 - name: Cryptographic Operations Controller
@@ -60,6 +60,12 @@ paths:
               $ref: "#/components/schemas/VerifyDataRequestDto"
         required: true
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -71,12 +77,16 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "500":
-          description: Internal Server Error
         "401":
           description: Unauthorized
         "404":
           description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -87,18 +97,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/VerifyDataResponseDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/operations/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/keys/{uuid}/items/{keyItemUuid}/sign:
     post:
       tags:
@@ -143,6 +143,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SignDataResponseDto"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -154,8 +160,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "500":
-          description: Internal Server Error
         "401":
           description: Unauthorized
         "404":
@@ -170,12 +174,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/operations/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/keys/{uuid}/items/{keyItemUuid}/encrypt:
     post:
       tags:
@@ -214,6 +214,12 @@ paths:
               $ref: "#/components/schemas/CipherDataRequestDto"
         required: true
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -225,16 +231,14 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "500":
-          description: Internal Server Error
+        "401":
+          description: Unauthorized
         "200":
           description: Data encrypted
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/EncryptDataResponseDto"
-        "401":
-          description: Unauthorized
         "404":
           description: Not Found
           content:
@@ -247,12 +251,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/operations/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/keys/{uuid}/items/{keyItemUuid}/decrypt:
     post:
       tags:
@@ -291,6 +291,12 @@ paths:
               $ref: "#/components/schemas/CipherDataRequestDto"
         required: true
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -302,12 +308,16 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "500":
-          description: Internal Server Error
         "401":
           description: Unauthorized
         "404":
           description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -318,18 +328,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DecryptDataResponseDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/operations/tokens/{tokenInstanceUuid}/random:
     post:
       tags:
@@ -350,6 +350,12 @@ paths:
               $ref: "#/components/schemas/RandomDataRequestDto"
         required: true
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -361,8 +367,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "500":
-          description: Internal Server Error
         "401":
           description: Unauthorized
         "404":
@@ -377,18 +381,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Random data generated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/RandomDataResponseDto"
+        "500":
+          description: Internal Server Error
   ? /v1/operations/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/keys/{uuid}/items/{keyItemUuid}/signature/{algorithm}/attributes
   : get:
       tags:
@@ -427,6 +427,12 @@ paths:
         schema:
           $ref: "#/components/schemas/KeyAlgorithm"
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: List of Attributes retrieved
           content:
@@ -435,8 +441,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttribute"
-        "500":
-          description: Internal Server Error
         "401":
           description: Unauthorized
         "404":
@@ -451,12 +455,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   ? /v1/operations/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/keys/{uuid}/items/{keyItemUuid}/cipher/{algorithm}/attributes
   : get:
       tags:
@@ -495,6 +495,12 @@ paths:
         schema:
           $ref: "#/components/schemas/KeyAlgorithm"
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: List of Attributes retrieved
           content:
@@ -503,8 +509,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttribute"
-        "500":
-          description: Internal Server Error
         "401":
           description: Unauthorized
         "404":
@@ -519,12 +523,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/operations/tokens/{tokenInstanceUuid}/random/attributes:
     get:
       tags:
@@ -539,6 +539,12 @@ paths:
         schema:
           type: string
       responses:
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: List of Attributes retrieved
           content:
@@ -547,8 +553,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttribute"
-        "500":
-          description: Internal Server Error
         "401":
           description: Unauthorized
         "404":
@@ -563,12 +567,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
 components:
   schemas:
     AttributeCallback:
@@ -1163,15 +1163,6 @@ components:
       - data
       - signatureAttributes
       - signatures
-    ErrorMessageDto:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message detail
-          example: Error message
-      required:
-      - message
     AuthenticationServiceExceptionDto:
       type: object
       properties:
@@ -1189,6 +1180,15 @@ components:
       - code
       - message
       - statusCode
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          example: Error message
+      required:
+      - message
     VerificationResponseData:
       type: object
       properties:
