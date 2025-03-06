@@ -9,6 +9,7 @@ import com.czertainly.api.model.client.raprofile.*;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.certificate.CertificateDetailDto;
 import com.czertainly.api.model.core.raprofile.RaProfileDto;
+import com.czertainly.api.model.core.raprofile.RaProfileValidationUpdateDto;
 import com.czertainly.api.model.core.scheduler.PaginationRequestDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,6 +45,11 @@ public class RAProfileManagementControllerDummyImpl implements RAProfileManageme
     @Override
     public RaProfileDto editRaProfile(String authorityUuid, String raProfileUuid, EditRaProfileRequestDto request) throws ConnectorException, AttributeException {
         return null;
+    }
+
+    @Override
+    public void updateRaProfileValidationConfiguration(String authorityUuid, String raProfileUuid, RaProfileValidationUpdateDto request) {
+
     }
 
     @Override
