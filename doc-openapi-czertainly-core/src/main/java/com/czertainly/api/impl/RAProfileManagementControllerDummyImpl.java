@@ -46,8 +46,8 @@ public class RAProfileManagementControllerDummyImpl implements RAProfileManageme
     }
 
     @Override
-    public void updateRaProfileValidationConfiguration(String authorityUuid, String raProfileUuid, RaProfileValidationUpdateDto request) {
-
+    public RaProfileDto updateRaProfileValidationConfiguration(String authorityUuid, String raProfileUuid, RaProfileValidationUpdateDto request) {
+        return null;
     }
 
     @Override
