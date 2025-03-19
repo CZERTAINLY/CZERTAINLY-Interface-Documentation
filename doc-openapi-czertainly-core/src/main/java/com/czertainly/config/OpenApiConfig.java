@@ -1,5 +1,10 @@
 package com.czertainly.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import io.swagger.v3.oas.annotations.security.SecuritySchemes;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -13,9 +18,27 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+// example how to override servers and security schemas to not generate additional code to handle headers for Auth in generated API files
 @Configuration
+@SecuritySchemes(value = {
+        @SecurityScheme(
+                name = "DummyAuth",
+                type = SecuritySchemeType.HTTP,
+                scheme = "Basic",
+                description = "No authentication"
+        )
+})
+@OpenAPIDefinition(
+        servers = {
+                @Server(
+                        url = "https://demo.czertainly.online/api",
+                        description = "CZERTAINLY Demo server"
+                )
+        }
+)
 public class OpenApiConfig {
 	
 	@Autowired
@@ -53,6 +76,7 @@ public class OpenApiConfig {
                                 .name("CZERTAINLY")
                                 .url("https://www.czertainly.com")
                                 .email("info@czertainly.com")))
+                .security(List.of())
                 .externalDocs(new ExternalDocumentation()
                         .description("CZERTAINLY Documentation")
                         .url("https://docs.czertainly.com"))
