@@ -5,11 +5,16 @@ import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.NotificationController;
 import com.czertainly.api.model.client.notification.NotificationRequestDto;
 import com.czertainly.api.model.client.notification.NotificationResponseDto;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class NotificationControllerDummyImpl implements NotificationController {
     @Override
     public NotificationResponseDto listNotifications(NotificationRequestDto request) throws ValidationException {

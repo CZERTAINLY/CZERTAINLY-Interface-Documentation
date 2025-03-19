@@ -12,11 +12,16 @@ import com.czertainly.api.model.common.UuidDto;
 import com.czertainly.api.model.core.acme.AcmeProfileDto;
 import com.czertainly.api.model.core.acme.AcmeProfileListDto;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class AcmeProfileControllerDummyImpl implements AcmeProfileController {
     @Override
     public List<AcmeProfileListDto> listAcmeProfiles() {

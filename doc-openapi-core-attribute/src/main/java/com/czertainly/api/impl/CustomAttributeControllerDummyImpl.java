@@ -30,7 +30,7 @@ public class CustomAttributeControllerDummyImpl implements CustomAttributeContro
     }
 
     @Override
-    public ResponseEntity<CustomAttributeDefinitionDetailDto> createCustomAttribute(CustomAttributeCreateRequestDto request) throws AlreadyExistException, NotFoundException {
+    public ResponseEntity<CustomAttributeDefinitionDetailDto> createCustomAttribute(CustomAttributeCreateRequestDto request) throws AlreadyExistException {
         return null;
     }
 

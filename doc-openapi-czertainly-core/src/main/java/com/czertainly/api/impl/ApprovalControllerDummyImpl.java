@@ -8,9 +8,14 @@ import com.czertainly.api.model.client.approval.ApprovalResponseDto;
 import com.czertainly.api.model.client.approval.ApprovalUserDto;
 import com.czertainly.api.model.client.approval.UserApprovalDto;
 import com.czertainly.api.model.core.scheduler.PaginationRequestDto;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class ApprovalControllerDummyImpl implements ApprovalController {
 
     @Override

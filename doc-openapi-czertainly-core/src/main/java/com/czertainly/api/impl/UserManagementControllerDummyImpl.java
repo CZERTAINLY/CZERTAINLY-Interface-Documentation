@@ -10,12 +10,17 @@ import com.czertainly.api.model.core.auth.SubjectPermissionsDto;
 import com.czertainly.api.model.core.auth.UserDetailDto;
 import com.czertainly.api.model.core.auth.UserDto;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.cert.CertificateException;
 import java.util.List;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class UserManagementControllerDummyImpl implements UserManagementController {
     @Override
     public List<UserDto> listUsers() {

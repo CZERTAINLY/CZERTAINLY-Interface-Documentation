@@ -8,13 +8,18 @@ import com.czertainly.api.model.client.cryptography.key.*;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.cryptography.key.*;
 import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
 
-@RestController
 @SuppressWarnings("java:S1186")
+@RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class CryptographicKeyControllerDummyImpl implements CryptographicKeyController {
 
     @Override

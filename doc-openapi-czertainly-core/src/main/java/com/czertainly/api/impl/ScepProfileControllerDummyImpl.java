@@ -4,25 +4,25 @@ import com.czertainly.api.exception.AlreadyExistException;
 import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
-import com.czertainly.api.interfaces.core.web.AcmeProfileController;
 import com.czertainly.api.interfaces.core.web.ScepProfileController;
-import com.czertainly.api.model.client.acme.AcmeProfileEditRequestDto;
-import com.czertainly.api.model.client.acme.AcmeProfileRequestDto;
 import com.czertainly.api.model.client.scep.ScepProfileEditRequestDto;
 import com.czertainly.api.model.client.scep.ScepProfileRequestDto;
 import com.czertainly.api.model.common.BulkActionMessageDto;
-import com.czertainly.api.model.common.UuidDto;
-import com.czertainly.api.model.core.acme.AcmeProfileDto;
-import com.czertainly.api.model.core.acme.AcmeProfileListDto;
 import com.czertainly.api.model.core.certificate.CertificateDto;
 import com.czertainly.api.model.core.scep.ScepProfileDetailDto;
 import com.czertainly.api.model.core.scep.ScepProfileDto;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@SuppressWarnings("java:S1186")
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class ScepProfileControllerDummyImpl implements ScepProfileController {
 
     @Override
@@ -56,7 +56,7 @@ public class ScepProfileControllerDummyImpl implements ScepProfileController {
     }
 
     @Override
-    public List<BulkActionMessageDto> forceDeleteScepProfiles(List<String> uuids) throws NotFoundException, ValidationException {
+    public List<BulkActionMessageDto> forceDeleteScepProfiles(List<String> uuids) throws ValidationException {
         return null;
     }
 

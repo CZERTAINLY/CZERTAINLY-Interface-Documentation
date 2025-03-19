@@ -24,7 +24,7 @@ public class GlobalMetadataControllerDummyImpl implements GlobalMetadataControll
     }
 
     @Override
-    public ResponseEntity<GlobalMetadataDefinitionDetailDto> createGlobalMetadata(GlobalMetadataCreateRequestDto request) throws AlreadyExistException, NotFoundException {
+    public ResponseEntity<GlobalMetadataDefinitionDetailDto> createGlobalMetadata(GlobalMetadataCreateRequestDto request) throws AlreadyExistException {
         return null;
     }
 
@@ -44,7 +44,7 @@ public class GlobalMetadataControllerDummyImpl implements GlobalMetadataControll
     }
 
     @Override
-    public List<ConnectorMetadataResponseDto> getConnectorMetadata(Optional<String> connectorUuid) throws NotFoundException {
+    public List<ConnectorMetadataResponseDto> getConnectorMetadata(Optional<String> connectorUuid) {
         return null;
     }
 

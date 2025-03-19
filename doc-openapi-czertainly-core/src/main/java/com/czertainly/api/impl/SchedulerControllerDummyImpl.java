@@ -9,9 +9,14 @@ import com.czertainly.api.model.core.scheduler.ScheduledJobHistoryResponseDto;
 import com.czertainly.api.model.core.scheduler.ScheduledJobsResponseDto;
 import com.czertainly.api.model.scheduler.UpdateScheduledJob;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class SchedulerControllerDummyImpl implements SchedulerController {
 
     @Override

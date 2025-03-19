@@ -9,11 +9,16 @@ import com.czertainly.api.model.client.credential.CredentialRequestDto;
 import com.czertainly.api.model.client.credential.CredentialUpdateRequestDto;
 import com.czertainly.api.model.core.credential.CredentialDto;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class CredentialControllerDummyImpl implements CredentialController {
     @Override
     public List<CredentialDto> listCredentials() {

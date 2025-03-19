@@ -15,12 +15,17 @@ import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.location.LocationDto;
 import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class LocationManagementControllerDummyImpl implements LocationManagementController {
 
     @Override

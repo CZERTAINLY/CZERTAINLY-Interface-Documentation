@@ -6,12 +6,17 @@ import com.czertainly.api.interfaces.core.web.GlobalMetadataController;
 import com.czertainly.api.model.client.attribute.AttributeDefinitionDto;
 import com.czertainly.api.model.client.attribute.metadata.*;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class GlobalMetadataControllerDummyImpl implements GlobalMetadataController {
     @Override
     public List<AttributeDefinitionDto> listGlobalMetadata() {
@@ -24,7 +29,7 @@ public class GlobalMetadataControllerDummyImpl implements GlobalMetadataControll
     }
 
     @Override
-    public ResponseEntity<GlobalMetadataDefinitionDetailDto> createGlobalMetadata(GlobalMetadataCreateRequestDto request) throws AlreadyExistException, NotFoundException {
+    public ResponseEntity<GlobalMetadataDefinitionDetailDto> createGlobalMetadata(GlobalMetadataCreateRequestDto request) throws AlreadyExistException {
         return null;
     }
 
@@ -44,7 +49,7 @@ public class GlobalMetadataControllerDummyImpl implements GlobalMetadataControll
     }
 
     @Override
-    public List<ConnectorMetadataResponseDto> getConnectorMetadata(Optional<String> connectorUuid) throws NotFoundException {
+    public List<ConnectorMetadataResponseDto> getConnectorMetadata(Optional<String> connectorUuid) {
         return null;
     }
 
