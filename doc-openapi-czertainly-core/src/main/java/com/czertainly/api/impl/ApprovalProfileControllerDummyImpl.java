@@ -7,9 +7,14 @@ import com.czertainly.api.interfaces.core.web.ApprovalProfileController;
 import com.czertainly.api.model.client.approvalprofile.*;
 import com.czertainly.api.model.core.scheduler.PaginationRequestDto;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class ApprovalProfileControllerDummyImpl implements ApprovalProfileController {
 
     @Override

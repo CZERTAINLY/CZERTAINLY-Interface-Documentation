@@ -8,10 +8,15 @@ import com.czertainly.api.model.core.settings.authentication.OAuth2ProviderSetti
 import com.czertainly.api.model.core.settings.authentication.OAuth2ProviderSettingsUpdateDto;
 import com.czertainly.api.model.core.settings.logging.LoggingSettingsDto;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
 @SuppressWarnings("java:S1186")
+@RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class SettingControllerDummyImpl implements SettingController {
     
     @Override

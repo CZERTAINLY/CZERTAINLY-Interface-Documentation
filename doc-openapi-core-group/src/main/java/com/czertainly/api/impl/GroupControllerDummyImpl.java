@@ -38,7 +38,7 @@ public class GroupControllerDummyImpl implements GroupController {
     }
 
     @Override
-    public void bulkDeleteGroup(List<String> groupUuids) throws NotFoundException {
+    public void bulkDeleteGroup(List<String> groupUuids) {
 
     }
 }

@@ -5,11 +5,16 @@ import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.TriggerController;
 import com.czertainly.api.model.core.auth.Resource;
 import com.czertainly.api.model.core.workflows.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class TriggerControllerDummyImpl implements TriggerController {
 
     @Override

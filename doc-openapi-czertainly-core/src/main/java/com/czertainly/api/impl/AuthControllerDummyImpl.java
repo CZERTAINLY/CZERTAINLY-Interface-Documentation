@@ -7,31 +7,36 @@ import com.czertainly.api.model.common.NameAndUuidDto;
 import com.czertainly.api.model.core.auth.Resource;
 import com.czertainly.api.model.core.auth.AuthResourceDto;
 import com.czertainly.api.model.core.auth.UserDetailDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.cert.CertificateException;
 import java.util.List;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class AuthControllerDummyImpl implements AuthController {
+
     @Override
-    public UserDetailDto profile() throws NotFoundException, JsonProcessingException {
+    public UserDetailDto profile() {
         return null;
     }
 
     @Override
-    public UserDetailDto updateUserProfile(UpdateUserRequestDto request) throws NotFoundException, JsonProcessingException, CertificateException {
+    public UserDetailDto updateUserProfile(UpdateUserRequestDto request) throws NotFoundException, CertificateException {
         return null;
     }
 
     @Override
-    public List<AuthResourceDto> getAuthResources() throws NotFoundException {
-        return null;
+    public List<AuthResourceDto> getAuthResources() {
+        return List.of();
     }
 
     @Override
     public List<NameAndUuidDto> getObjectsForResource(Resource resourceName) throws NotFoundException {
-        return null;
+        return List.of();
     }
 }

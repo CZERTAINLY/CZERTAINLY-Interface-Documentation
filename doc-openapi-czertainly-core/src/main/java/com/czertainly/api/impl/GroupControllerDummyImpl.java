@@ -6,11 +6,17 @@ import com.czertainly.api.interfaces.core.web.GroupController;
 import com.czertainly.api.model.core.certificate.group.GroupDto;
 import com.czertainly.api.model.core.certificate.group.GroupRequestDto;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@SuppressWarnings("java:S1186")
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class GroupControllerDummyImpl implements GroupController {
     @Override
     public List<GroupDto> listGroups() {
@@ -38,7 +44,7 @@ public class GroupControllerDummyImpl implements GroupController {
     }
 
     @Override
-    public void bulkDeleteGroup(List<String> groupUuids) throws NotFoundException {
+    public void bulkDeleteGroup(List<String> groupUuids) {
 
     }
 }

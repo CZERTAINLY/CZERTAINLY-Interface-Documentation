@@ -7,7 +7,6 @@ import com.czertainly.api.model.common.NameAndUuidDto;
 import com.czertainly.api.model.core.auth.AuthResourceDto;
 import com.czertainly.api.model.core.auth.Resource;
 import com.czertainly.api.model.core.auth.UserDetailDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,19 +17,19 @@ import java.util.List;
 public class AuthControllerDummyImpl implements AuthController {
 
     @Override
-    public UserDetailDto profile() throws NotFoundException, JsonProcessingException {
+    public UserDetailDto profile() {
         return null;
     }
 
     @Hidden
     @Override
-    public UserDetailDto updateUserProfile(UpdateUserRequestDto request) throws NotFoundException, JsonProcessingException, CertificateException {
+    public UserDetailDto updateUserProfile(UpdateUserRequestDto request) throws NotFoundException, CertificateException {
         return null;
     }
 
     @Hidden
     @Override
-    public List<AuthResourceDto> getAuthResources() throws NotFoundException {
+    public List<AuthResourceDto> getAuthResources() {
         return null;
     }
 
