@@ -16,25 +16,19 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:65294
-  description: Generated server url
+  - url: https://demo.czertainly.online/api
+    description: CZERTAINLY Demo server
 tags:
-- name: Compliance Profile Management
-  description: Compliance Profile Management API
+  - name: Compliance Profile Management
+    description: Compliance Profile Management API
 paths:
   /v1/complianceProfiles:
     get:
       tags:
-      - Compliance Profile Management
+        - Compliance Profile Management
       summary: List of available Compliance Profiles
       operationId: listComplianceProfiles
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Compliance Profiles retrieved
           content:
@@ -43,24 +37,24 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ComplianceProfilesListDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -71,9 +65,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     post:
       tags:
-      - Compliance Profile Management
+        - Compliance Profile Management
       summary: Add Compliance Profile
       operationId: createComplianceProfile
       requestBody:
@@ -83,36 +87,41 @@ paths:
               $ref: "#/components/schemas/ComplianceProfileRequestDto"
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "201":
           description: New Compliance profile added
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UuidDto"
-        "503":
-          description: Connector Communication Error
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+                - Error Message 1
+                - Error Message 2
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -123,20 +132,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "422":
-          description: Unprocessable Entity
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - Compliance Profile Management
+        - Compliance Profile Management
       summary: Delete multiple Compliance Profiles
       operationId: bulkDeleteComplianceProfiles
       requestBody:
@@ -148,16 +156,18 @@ paths:
               items:
                 type: string
             example:
-            - c2f685d4-6a3e-11ec-90d6-0242ac120003
-            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+              - c2f685d4-6a3e-11ec-90d6-0242ac120003
+              - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "404":
-          description: Not Found
+        "200":
+          description: Compliance Profiles deleted
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkActionMessageDto"
         "422":
           description: Unprocessible Entity
           content:
@@ -167,34 +177,26 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
-        "500":
-          description: Internal Server Error
-        "200":
-          description: Compliance Profiles deleted
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BulkActionMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
+                - Error Message 1
+                - Error Message 2
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -205,19 +207,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/complianceProfiles/{uuid}/rules:
     post:
       tags:
-      - Compliance Profile Management
+        - Compliance Profile Management
       summary: Add rule to a Compliance Profile
       operationId: addRule
       parameters:
-      - name: uuid
-        in: path
-        description: Compliance Profile UUID
-        required: true
-        schema:
-          type: string
+        - name: uuid
+          in: path
+          description: Compliance Profile UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -225,40 +237,6 @@ paths:
               $ref: "#/components/schemas/ComplianceRuleAdditionRequestDto"
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: New rule added to the profile
           content:
@@ -274,51 +252,26 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
-    delete:
-      tags:
-      - Compliance Profile Management
-      summary: Delete rule from a Compliance Profile
-      operationId: removeRule
-      parameters:
-      - name: uuid
-        in: path
-        description: Compliance Profile UUID
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComplianceRuleDeletionRequestDto"
-        required: true
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
+                - Error Message 1
+                - Error Message 2
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -329,6 +282,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+    delete:
+      tags:
+        - Compliance Profile Management
+      summary: Delete rule from a Compliance Profile
+      operationId: removeRule
+      parameters:
+        - name: uuid
+          in: path
+          description: Compliance Profile UUID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComplianceRuleDeletionRequestDto"
+        required: true
+      responses:
         "204":
           description: New group is added to the profile
         "422":
@@ -340,52 +322,26 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
-  /v1/complianceProfiles/{uuid}/groups:
-    post:
-      tags:
-      - Compliance Profile Management
-      summary: Add group to a Compliance Profile
-      operationId: addGroup
-      parameters:
-      - name: uuid
-        in: path
-        description: Compliance Profile UUID
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComplianceGroupRequestDto"
-        required: true
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
+                - Error Message 1
+                - Error Message 2
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -396,6 +352,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/complianceProfiles/{uuid}/groups:
+    post:
+      tags:
+        - Compliance Profile Management
+      summary: Add group to a Compliance Profile
+      operationId: addGroup
+      parameters:
+        - name: uuid
+          in: path
+          description: Compliance Profile UUID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComplianceGroupRequestDto"
+        required: true
+      responses:
         "204":
           description: New group is deleted from the profile
         "422":
@@ -407,51 +393,26 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
-    delete:
-      tags:
-      - Compliance Profile Management
-      summary: Delete group from a Compliance Profile
-      operationId: removeGroup
-      parameters:
-      - name: uuid
-        in: path
-        description: Compliance Profile UUID
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ComplianceGroupRequestDto"
-        required: true
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
+                - Error Message 1
+                - Error Message 2
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -462,6 +423,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+    delete:
+      tags:
+        - Compliance Profile Management
+      summary: Delete group from a Compliance Profile
+      operationId: removeGroup
+      parameters:
+        - name: uuid
+          in: path
+          description: Compliance Profile UUID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComplianceGroupRequestDto"
+        required: true
+      responses:
         "204":
           description: New rule is added to the profile
         "422":
@@ -473,12 +463,50 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
+                - Error Message 1
+                - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/complianceProfiles/compliance:
     post:
       tags:
-      - Compliance Profile Management
+        - Compliance Profile Management
       summary: Initiate Certificate Compliance Check
       operationId: checkCompliance
       requestBody:
@@ -490,36 +518,30 @@ paths:
               items:
                 type: string
             example:
-            - c2f685d4-6a3e-11ec-90d6-0242ac120003
-            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+              - c2f685d4-6a3e-11ec-90d6-0242ac120003
+              - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "204":
           description: Compliance check initiated
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -530,19 +552,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/complianceProfiles/{uuid}/raProfiles/disassociate:
     patch:
       tags:
-      - Compliance Profile Management
+        - Compliance Profile Management
       summary: Disassociate Compliance Profile to RA Profile
       operationId: disassociateProfiles
       parameters:
-      - name: uuid
-        in: path
-        description: Compliance Profile UUID
-        required: true
-        schema:
-          type: string
+        - name: uuid
+          in: path
+          description: Compliance Profile UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -550,40 +582,6 @@ paths:
               $ref: "#/components/schemas/RaProfileAssociationRequestDto"
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: RA Profile disassociation successful
         "422":
@@ -595,56 +593,26 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
-        "204":
-          description: No Content
-  /v1/complianceProfiles/{uuid}/raProfiles/associate:
-    patch:
-      tags:
-      - Compliance Profile Management
-      summary: Associate Compliance Profile to RA Profile
-      operationId: associateProfiles
-      parameters:
-      - name: uuid
-        in: path
-        description: Compliance Profile UUID
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RaProfileAssociationRequestDto"
-        required: true
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "200":
-          description: RA Profile association successful
-        "503":
-          description: Connector Communication Error
+                - Error Message 1
+                - Error Message 2
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -655,6 +623,40 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: No Content
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/complianceProfiles/{uuid}/raProfiles/associate:
+    patch:
+      tags:
+        - Compliance Profile Management
+      summary: Associate Compliance Profile to RA Profile
+      operationId: associateProfiles
+      parameters:
+        - name: uuid
+          in: path
+          description: Compliance Profile UUID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaProfileAssociationRequestDto"
+        required: true
+      responses:
+        "200":
+          description: RA Profile association successful
         "422":
           description: Unprocessable Entity
           content:
@@ -664,54 +666,86 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
-        "204":
-          description: No Content
-  /v1/complianceProfiles/{uuid}:
-    get:
-      tags:
-      - Compliance Profile Management
-      summary: Details of a Compliance Profiles
-      operationId: getComplianceProfile
-      parameters:
-      - name: uuid
-        in: path
-        description: Compliance Profile UUID
-        required: true
-        schema:
-          type: string
-      responses:
+                - Error Message 1
+                - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: No Content
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/complianceProfiles/{uuid}:
+    get:
+      tags:
+        - Compliance Profile Management
+      summary: Details of a Compliance Profiles
+      operationId: getComplianceProfile
+      parameters:
+        - name: uuid
+          in: path
+          description: Compliance Profile UUID
+          required: true
+          schema:
+            type: string
+      responses:
         "200":
           description: Compliance Profile details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ComplianceProfileDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -722,45 +756,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - Compliance Profile Management
+        - Compliance Profile Management
       summary: Delete Compliance Profile
       operationId: deleteComplianceProfile
       parameters:
-      - name: uuid
-        in: path
-        description: Compliance Profile UUID
-        required: true
-        schema:
-          type: string
+        - name: uuid
+          in: path
+          description: Compliance Profile UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "204":
           description: Compliance Profile deleted
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -771,26 +809,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-  /v1/complianceProfiles/{uuid}/raProfiles:
-    get:
-      tags:
-      - Compliance Profile Management
-      summary: Get RA Profiles for a Compliance Profile
-      operationId: getAssociatedRAProfiles
-      parameters:
-      - name: uuid
-        in: path
-        description: Compliance Profile UUID
-        required: true
-        schema:
-          type: string
-      responses:
-        "404":
-          description: Not Found
+        "503":
+          description: Connector Communication Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/complianceProfiles/{uuid}/raProfiles:
+    get:
+      tags:
+        - Compliance Profile Management
+      summary: Get RA Profiles for a Compliance Profile
+      operationId: getAssociatedRAProfiles
+      parameters:
+        - name: uuid
+          in: path
+          description: Compliance Profile UUID
+          required: true
+          schema:
+            type: string
+      responses:
         "200":
           description: RA Profiles retrieved
           content:
@@ -799,93 +841,69 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SimplifiedRaProfileDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-  /v1/complianceProfiles/rules:
-    get:
-      tags:
-      - Compliance Profile Management
-      summary: Get Compliance rules
-      operationId: getComplianceRules
-      parameters:
-      - name: complianceProvider
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: kind
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: certificateType
-        in: query
-        required: false
-        schema:
-          type: array
-          items:
-            $ref: "#/components/schemas/CertificateType"
-      responses:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/complianceProfiles/rules:
+    get:
+      tags:
+        - Compliance Profile Management
+      summary: Get Compliance rules
+      operationId: getComplianceRules
+      parameters:
+        - name: complianceProvider
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: kind
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: certificateType
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/CertificateType"
+      responses:
         "200":
           description: Compliance rules retrieved
           content:
@@ -903,50 +921,26 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
-  /v1/complianceProfiles/groups:
-    get:
-      tags:
-      - Compliance Profile Management
-      summary: Get Compliance groups
-      operationId: getComplianceGroups
-      parameters:
-      - name: complianceProvider
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: kind
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
+                - Error Message 1
+                - Error Message 2
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -957,6 +951,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/complianceProfiles/groups:
+    get:
+      tags:
+        - Compliance Profile Management
+      summary: Get Compliance groups
+      operationId: getComplianceGroups
+      parameters:
+        - name: complianceProvider
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: kind
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
         "200":
           description: Compliance groups retrieved
           content:
@@ -974,12 +996,50 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
+                - Error Message 1
+                - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/complianceProfiles/force:
     delete:
       tags:
-      - Compliance Profile Management
+        - Compliance Profile Management
       summary: Force delete Compliance Profiles
       operationId: forceDeleteComplianceProfiles
       requestBody:
@@ -991,12 +1051,6 @@ paths:
                 type: string
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Compliance Profiles forced to delete
           content:
@@ -1014,26 +1068,26 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "503":
-          description: Connector Communication Error
+                - Error Message 1
+                - Error Message 2
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "400":
-          description: Bad Request
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -1044,6 +1098,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
 components:
   schemas:
     AttributeCallback:
@@ -1062,28 +1126,24 @@ components:
             $ref: "#/components/schemas/AttributeCallbackMapping"
           uniqueItems: true
       required:
-      - callbackContext
-      - callbackMethod
-      - mappings
+        - callbackContext
+        - callbackMethod
+        - mappings
     AttributeCallbackMapping:
       type: object
       properties:
         from:
           type: string
-          description: Name of the attribute whose value is to be used as value of
-            path variable or request param or body field.It is optional and must be
-            set only if value is not set.
+          description: Name of the attribute whose value is to be used as value of path variable or request param or body field.It is optional and must be set only if value is not set.
         attributeType:
           $ref: "#/components/schemas/AttributeType"
-          description: Type of the attribute. It is optional and must be set only
-            if special behaviour is needed.
+          description: Type of the attribute. It is optional and must be set only if special behaviour is needed.
         attributeContentType:
           $ref: "#/components/schemas/AttributeContentType"
           description: 'Type of the attribute content. '
         to:
           type: string
-          description: Name of the path variable or request param or body field which
-            is to be used to assign value of attribute
+          description: Name of the path variable or request param or body field which is to be used to assign value of attribute
         targets:
           type: array
           description: Set of targets for propagating value.
@@ -1092,89 +1152,95 @@ components:
           uniqueItems: true
         value:
           type: object
-          description: Static value to be propagated to targets. It is optional and
-            is set only if the value is known at attribute creation time.
+          description: Static value to be propagated to targets. It is optional and is set only if the value is known at attribute creation time.
       required:
-      - targets
-      - to
+        - targets
+        - to
     AttributeConstraintType:
       type: string
       enum:
-      - regExp
-      - range
-      - dateTime
+        - regExp
+        - range
+        - dateTime
     AttributeContentType:
       type: string
       enum:
-      - string
-      - text
-      - integer
-      - boolean
-      - float
-      - date
-      - time
-      - datetime
-      - secret
-      - file
-      - credential
-      - codeblock
-      - object
+        - string
+        - text
+        - integer
+        - boolean
+        - float
+        - date
+        - time
+        - datetime
+        - secret
+        - file
+        - credential
+        - codeblock
+        - object
     AttributeType:
       type: string
       enum:
-      - data
-      - group
-      - info
-      - meta
-      - custom
+        - data
+        - group
+        - info
+        - meta
+        - custom
     AttributeValueTarget:
       type: string
       enum:
-      - pathVariable
-      - requestParameter
-      - body
-    BaseAttributeConstraint:
+        - pathVariable
+        - requestParameter
+        - body
+    BaseAttributeConstraintDto:
       type: object
       description: Base Attribute Constraint definition
+      discriminator:
+        propertyName: type
+        mapping:
+          regExp: "#/components/schemas/RegexpAttributeConstraint"
+          range: "#/components/schemas/RangeAttributeConstraint"
+          dateTime: "#/components/schemas/DateTimeAttributeConstraint"
       oneOf:
-      - $ref: "#/components/schemas/RegexpAttributeConstraint"
-      - $ref: "#/components/schemas/RangeAttributeConstraint"
-      - $ref: "#/components/schemas/DateTimeAttributeConstraint"
+        - $ref: "#/components/schemas/RegexpAttributeConstraint"
+        - $ref: "#/components/schemas/RangeAttributeConstraint"
+        - $ref: "#/components/schemas/DateTimeAttributeConstraint"
       properties:
-        description:
-          type: string
-          description: Description of the constraint
-        errorMessage:
-          type: string
-          description: Error message to be displayed for wrong data
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
           description: Attribute Constraint Type
+        errorMessage:
+          type: string
+          description: Error message to be displayed for wrong data
+        description:
+          type: string
+          description: Description of the constraint
       required:
-      - type
-    BaseAttributeContent:
+        - type
+    BaseAttributeContentDto:
       type: object
       description: Base Attribute content definition
       oneOf:
-      - $ref: "#/components/schemas/BooleanAttributeContent"
-      - $ref: "#/components/schemas/CodeBlockAttributeContent"
-      - $ref: "#/components/schemas/CredentialAttributeContent"
-      - $ref: "#/components/schemas/DateAttributeContent"
-      - $ref: "#/components/schemas/DateTimeAttributeContent"
-      - $ref: "#/components/schemas/FileAttributeContent"
-      - $ref: "#/components/schemas/FloatAttributeContent"
-      - $ref: "#/components/schemas/IntegerAttributeContent"
-      - $ref: "#/components/schemas/ObjectAttributeContent"
-      - $ref: "#/components/schemas/SecretAttributeContent"
-      - $ref: "#/components/schemas/StringAttributeContent"
-      - $ref: "#/components/schemas/TextAttributeContent"
-      - $ref: "#/components/schemas/TimeAttributeContent"
+        - $ref: "#/components/schemas/BooleanAttributeContent"
+        - $ref: "#/components/schemas/CodeBlockAttributeContent"
+        - $ref: "#/components/schemas/CredentialAttributeContent"
+        - $ref: "#/components/schemas/DateAttributeContent"
+        - $ref: "#/components/schemas/DateTimeAttributeContent"
+        - $ref: "#/components/schemas/FileAttributeContent"
+        - $ref: "#/components/schemas/FloatAttributeContent"
+        - $ref: "#/components/schemas/IntegerAttributeContent"
+        - $ref: "#/components/schemas/ObjectAttributeContent"
+        - $ref: "#/components/schemas/SecretAttributeContent"
+        - $ref: "#/components/schemas/StringAttributeContent"
+        - $ref: "#/components/schemas/TextAttributeContent"
+        - $ref: "#/components/schemas/TimeAttributeContent"
       properties:
         reference:
           type: string
           description: Content Reference
     BooleanAttributeContent:
       type: object
+      description: Boolean attribute content to store true/false values
       properties:
         reference:
           type: string
@@ -1183,9 +1249,10 @@ components:
           type: boolean
           description: Boolean attribute value
       required:
-      - data
+        - data
     CodeBlockAttributeContent:
       type: object
+      description: Codeblock attribute content to store encoded snippets of programming language code
       properties:
         reference:
           type: string
@@ -1194,36 +1261,37 @@ components:
           $ref: "#/components/schemas/CodeBlockAttributeContentData"
           description: CodeBlock attribute content data
       required:
-      - data
+        - data
     CodeBlockAttributeContentData:
       type: object
       properties:
         language:
           $ref: "#/components/schemas/ProgrammingLanguageEnum"
           description: Definition of programming languages used for code
-          example: "JAVA, PHP, C, etc"
+          examples:
+            - "JAVA, PHP, C, etc"
         code:
           type: string
-          description: Block of the code in Base64. Formatting of the code is specified
-            by variable language
+          description: Block of the code in Base64. Formatting of the code is specified by variable language
       required:
-      - code
-      - language
+        - code
+        - language
     ComplianceProfileRequestDto:
       type: object
       properties:
         name:
           type: string
           description: Name of the Compliance Profile
-          example: Profile 1
+          examples:
+            - Profile 1
         description:
           type: string
           description: Description of the Compliance Profile
-          example: Profile 1
+          examples:
+            - Profile 1
         rules:
           type: array
-          description: Rules to be associated with the Compliance Profile. Profiles
-            can be created without rules and can be added later
+          description: Rules to be associated with the Compliance Profile. Profiles can be created without rules and can be added later
           items:
             $ref: "#/components/schemas/ComplianceProfileRulesRequestDto"
         customAttributes:
@@ -1232,18 +1300,20 @@ components:
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
       required:
-      - name
+        - name
     ComplianceProfileRulesRequestDto:
       type: object
       properties:
         connectorUuid:
           type: string
           description: UUID of the Compliance Provider
-          example: c35bc88c-d0ef-11ec-9d64-0242ac120005
+          examples:
+            - c35bc88c-d0ef-11ec-9d64-0242ac120005
         kind:
           type: string
           description: Kind of the Compliance Provider
-          example: x509
+          examples:
+            - x509
         rules:
           type: array
           description: Rules for new Compliance Profiles
@@ -1255,24 +1325,26 @@ components:
           items:
             type: string
       required:
-      - connectorUuid
-      - kind
+        - connectorUuid
+        - kind
     ComplianceRequestRulesDto:
       type: object
       properties:
         uuid:
           type: string
           description: UUID of the rule
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         attributes:
           type: array
           description: Attributes for the rule
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
       required:
-      - uuid
+        - uuid
     CredentialAttributeContent:
       type: object
+      description: Credential attribute content carrying information about credential to use
       properties:
         reference:
           type: string
@@ -1281,110 +1353,130 @@ components:
           $ref: "#/components/schemas/CredentialAttributeContentData"
           description: Credential attribute content data
       required:
-      - data
+        - data
     CredentialAttributeContentData:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         kind:
           type: string
           description: Credential Kind
-          example: "SoftKeyStore, Basic, ApiKey, etc"
+          examples:
+            - "SoftKeyStore, Basic, ApiKey, etc"
         attributes:
           type: array
           description: List of Credential Attributes
           items:
             $ref: "#/components/schemas/DataAttribute"
       required:
-      - attributes
-      - kind
-      - name
-      - uuid
+        - attributes
+        - kind
+        - name
+        - uuid
     DataAttribute:
-      allOf:
-      - $ref: "#/components/schemas/BaseAttribute"
-      - type: object
+      type: object
+      description: Data attribute allows to store and transfer dynamic data. Its content can be edited and send in requests to store.
+      properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          examples:
+            - "2"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+            - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper text on what is expected"
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDto"
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
         properties:
-          content:
-            type: array
-            description: Content of the Attribute
-            items:
-              $ref: "#/components/schemas/BaseAttributeContent"
-          contentType:
-            $ref: "#/components/schemas/AttributeContentType"
-            description: Type of the Content
-          properties:
-            $ref: "#/components/schemas/DataAttributeProperties"
-            description: Properties of the Attributes
-          constraints:
-            type: array
-            description: Optional constraints used for validating the Attribute content
-            items:
-              $ref: "#/components/schemas/BaseAttributeConstraint"
-          attributeCallback:
-            $ref: "#/components/schemas/AttributeCallback"
-            description: Optional definition of callback for getting the content of
-              the Attribute based on the action
-      description: Data attribute allows to store and transfer dynamic data. Its content
-        can be edited and send in requests to store.
+          $ref: "#/components/schemas/DataAttributeProperties"
+          description: Properties of the Attributes
+        constraints:
+          type: array
+          description: Optional constraints used for validating the Attribute content
+          items:
+            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+        attributeCallback:
+          $ref: "#/components/schemas/AttributeCallback"
+          description: Optional definition of callback for getting the content of the Attribute based on the action
       required:
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
+        - contentType
+        - name
+        - properties
+        - type
+        - uuid
     DataAttributeProperties:
       type: object
       properties:
         label:
           type: string
           description: Friendly name of the the Attribute
-          example: Attribute Name
+          examples:
+            - Attribute Name
         visible:
           type: boolean
           default: "true"
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
+          description: "Boolean determining if the Attribute is visible and can be displayed, otherwise it should be hidden to the user."
         group:
           type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          example: requiredAttributes
+          description: "Group of the Attribute, used for the logical grouping of the Attribute"
+          examples:
+            - requiredAttributes
         required:
           type: boolean
           default: "false"
-          description: "Boolean determining if the Attribute is required. If true,\
-            \ the Attribute must be provided."
+          description: "Boolean determining if the Attribute is required. If true, the Attribute must be provided."
         readOnly:
           type: boolean
           default: "false"
-          description: "Boolean determining if the Attribute is read only. If true,\
-            \ the Attribute content cannot be changed."
+          description: "Boolean determining if the Attribute is read only. If true, the Attribute content cannot be changed."
         list:
           type: boolean
           default: "false"
-          description: Boolean determining if the Attribute contains list of values
-            in the content
+          description: Boolean determining if the Attribute contains list of values in the content
         multiSelect:
           type: boolean
           default: "false"
           description: Boolean determining if the Attribute can have multiple values
       required:
-      - label
-      - list
-      - multiSelect
-      - readOnly
-      - required
-      - visible
+        - label
+        - list
+        - multiSelect
+        - readOnly
+        - required
+        - visible
     DateAttributeContent:
       type: object
+      description: Date attribute content in predefined format
       properties:
         reference:
           type: string
@@ -1394,9 +1486,10 @@ components:
           format: date
           description: Date attribute value in format yyyy-MM-dd
       required:
-      - data
+        - data
     DateTimeAttributeConstraint:
       type: object
+      description: DateTime attribute constraint to specify boundaries for date value
       properties:
         description:
           type: string
@@ -1411,7 +1504,7 @@ components:
           $ref: "#/components/schemas/DateTimeAttributeConstraintData"
           description: DateTime Range Attribute Constraint Data
       required:
-      - type
+        - type
     DateTimeAttributeConstraintData:
       type: object
       properties:
@@ -1425,6 +1518,7 @@ components:
           description: End of the datetime for validation
     DateTimeAttributeContent:
       type: object
+      description: DateTime attribute content in predefined format with timezone
       properties:
         reference:
           type: string
@@ -1434,9 +1528,10 @@ components:
           format: date-time
           description: DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
       required:
-      - data
+        - data
     FileAttributeContent:
       type: object
+      description: File attribute content for storing encoded file content with additional info
       properties:
         reference:
           type: string
@@ -1445,7 +1540,7 @@ components:
           $ref: "#/components/schemas/FileAttributeContentData"
           description: File attribute content data
       required:
-      - data
+        - data
     FileAttributeContentData:
       type: object
       properties:
@@ -1459,11 +1554,12 @@ components:
           type: string
           description: Type of the file uploaded
       required:
-      - content
-      - fileName
-      - mimeType
+        - content
+        - fileName
+        - mimeType
     FloatAttributeContent:
       type: object
+      description: Float attribute content for decimal numbers
       properties:
         reference:
           type: string
@@ -1473,9 +1569,10 @@ components:
           format: float
           description: Float attribute value
       required:
-      - data
+        - data
     IntegerAttributeContent:
       type: object
+      description: Integer attribute content for integer numbers
       properties:
         reference:
           type: string
@@ -1485,9 +1582,10 @@ components:
           format: int32
           description: Integer attribute value
       required:
-      - data
+        - data
     ObjectAttributeContent:
       type: object
+      description: Object attribute content for data with custom structure
       properties:
         reference:
           type: string
@@ -1496,53 +1594,54 @@ components:
           type: object
           description: Object attribute content data
       required:
-      - data
+        - data
     ProgrammingLanguageEnum:
       type: string
       enum:
-      - apacheconf
-      - bash
-      - basic
-      - c
-      - csharp
-      - cpp
-      - css
-      - docker
-      - fsharp
-      - gherkin
-      - git
-      - go
-      - graphql
-      - html
-      - http
-      - ini
-      - java
-      - javascript
-      - json
-      - kotlin
-      - latex
-      - lisp
-      - makefile
-      - markdown
-      - matlab
-      - nginx
-      - objectivec
-      - perl
-      - php
-      - powershell
-      - properties
-      - python
-      - ruby
-      - rust
-      - smalltalk
-      - sql
-      - typescript
-      - vbnet
-      - xquery
-      - xml
-      - yaml
+        - apacheconf
+        - bash
+        - basic
+        - c
+        - csharp
+        - cpp
+        - css
+        - docker
+        - fsharp
+        - gherkin
+        - git
+        - go
+        - graphql
+        - html
+        - http
+        - ini
+        - java
+        - javascript
+        - json
+        - kotlin
+        - latex
+        - lisp
+        - makefile
+        - markdown
+        - matlab
+        - nginx
+        - objectivec
+        - perl
+        - php
+        - powershell
+        - properties
+        - python
+        - ruby
+        - rust
+        - smalltalk
+        - sql
+        - typescript
+        - vbnet
+        - xquery
+        - xml
+        - yaml
     RangeAttributeConstraint:
       type: object
+      description: Range attribute constraint to specify boundaries for integer value
       properties:
         description:
           type: string
@@ -1557,7 +1656,7 @@ components:
           $ref: "#/components/schemas/RangeAttributeConstraintData"
           description: Integer Range Attribute Constraint Data
       required:
-      - type
+        - type
     RangeAttributeConstraintData:
       type: object
       properties:
@@ -1571,6 +1670,7 @@ components:
           description: End of the range for validation
     RegexpAttributeConstraint:
       type: object
+      description: RegExp attribute constraint to restrict string value by regular expression
       properties:
         description:
           type: string
@@ -1585,7 +1685,7 @@ components:
           type: string
           description: Regular Expression Attribute Constraint Data
       required:
-      - type
+        - type
     RequestAttributeDto:
       type: object
       description: Request attribute to send attribute content for object
@@ -1593,27 +1693,31 @@ components:
         uuid:
           type: string
           description: UUID of the Attribute
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
           description: Content Type of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
-            $ref: "#/components/schemas/BaseAttributeContent"
+            $ref: "#/components/schemas/BaseAttributeContentDto"
       required:
-      - content
-      - contentType
-      - name
-      - uuid
+        - content
+        - contentType
+        - name
+        - uuid
     SecretAttributeContent:
       type: object
+      description: Secret attribute content carrying secrets with defined protection level
       properties:
         reference:
           type: string
@@ -1622,7 +1726,7 @@ components:
           $ref: "#/components/schemas/SecretAttributeContentData"
           description: Secret attribute content data
       required:
-      - data
+        - data
     SecretAttributeContentData:
       type: object
       properties:
@@ -1634,6 +1738,7 @@ components:
           description: Level of protection of the data
     StringAttributeContent:
       type: object
+      description: String attribute content
       properties:
         reference:
           type: string
@@ -1642,9 +1747,10 @@ components:
           type: string
           description: String attribute value
       required:
-      - data
+        - data
     TextAttributeContent:
       type: object
+      description: Text attribute content used to store longer formatted strings
       properties:
         reference:
           type: string
@@ -1653,9 +1759,10 @@ components:
           type: string
           description: Text attribute value
       required:
-      - data
+        - data
     TimeAttributeContent:
       type: object
+      description: Time attribute content in predefined format
       properties:
         reference:
           type: string
@@ -1664,16 +1771,17 @@ components:
           type: string
           description: Time attribute value in format HH:mm:ss
       required:
-      - data
+        - data
     ErrorMessageDto:
       type: object
       properties:
         message:
           type: string
           description: Error message detail
-          example: Error message
+          examples:
+            - Error message
       required:
-      - message
+        - message
     AuthenticationServiceExceptionDto:
       type: object
       properties:
@@ -1688,9 +1796,9 @@ components:
           type: string
           description: Exception message
       required:
-      - code
-      - message
-      - statusCode
+        - code
+        - message
+        - statusCode
     UuidDto:
       type: object
       properties:
@@ -1698,51 +1806,57 @@ components:
           type: string
           description: Object identifier
       required:
-      - uuid
+        - uuid
     ComplianceRuleAdditionRequestDto:
       type: object
       properties:
         connectorUuid:
           type: string
           description: UUID of the Compliance Provider
-          example: 1212a-34dddf34-4334f-34ddfvfdg1y3
+          examples:
+            - 1212a-34dddf34-4334f-34ddfvfdg1y3
         kind:
           type: string
           description: Kind of the Compliance Provider
-          example: default
+          examples:
+            - default
         ruleUuid:
           type: string
           description: UUID of the rule
-          example: 1212a-34dddf34-4334f-34ddfvfdg1y3
+          examples:
+            - 1212a-34dddf34-4334f-34ddfvfdg1y3
         attributes:
           type: array
           description: Attributes for the rule
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
       required:
-      - connectorUuid
-      - kind
-      - ruleUuid
+        - connectorUuid
+        - kind
+        - ruleUuid
     CertificateType:
       type: string
       enum:
-      - X.509
-      - SSH
+        - X.509
+        - SSH
     ComplianceProfileRuleDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the rule
-          example: Sample rule description
+          examples:
+            - Sample rule description
         connectorName:
           type: string
           description: Connector Name
@@ -1758,7 +1872,8 @@ components:
         certificateType:
           $ref: "#/components/schemas/CertificateType"
           description: Certificate type for the rule
-          example: X509
+          examples:
+            - X509
         attributes:
           type: array
           description: List of attributes for the rule
@@ -1771,15 +1886,15 @@ components:
           type: string
           description: Name of the Compliance Profile
       required:
-      - attributes
-      - certificateType
-      - complianceProfileName
-      - complianceProfileUuid
-      - connectorName
-      - connectorUuid
-      - kind
-      - name
-      - uuid
+        - attributes
+        - certificateType
+        - complianceProfileName
+        - complianceProfileUuid
+        - connectorName
+        - connectorUuid
+        - kind
+        - name
+        - uuid
     ResponseAttributeDto:
       type: object
       description: Response attribute with content for object it belongs to
@@ -1787,75 +1902,83 @@ components:
         uuid:
           type: string
           description: UUID of the Attribute
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         label:
           type: string
           description: Label of the the Attribute
-          example: Attribute Name
+          examples:
+            - Attribute Name
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
           description: Content Type of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
-            $ref: "#/components/schemas/BaseAttributeContent"
+            $ref: "#/components/schemas/BaseAttributeContentDto"
       required:
-      - contentType
-      - label
-      - name
-      - type
+        - contentType
+        - label
+        - name
+        - type
     ComplianceGroupRequestDto:
       type: object
       properties:
         connectorUuid:
           type: string
           description: UUID of the Compliance Provider
-          example: 1212a-34dddf34-4334f-34ddfvfdg1y3
+          examples:
+            - 1212a-34dddf34-4334f-34ddfvfdg1y3
         kind:
           type: string
           description: Kind of the Compliance Provider
-          example: default
+          examples:
+            - default
         groupUuid:
           type: string
           description: UUID of the group
-          example: 1212a-34dddf34-4334f-34ddfvfdg1y3
+          examples:
+            - 1212a-34dddf34-4334f-34ddfvfdg1y3
       required:
-      - connectorUuid
-      - groupUuid
-      - kind
+        - connectorUuid
+        - groupUuid
+        - kind
     RaProfileAssociationRequestDto:
       type: object
       properties:
         raProfileUuids:
           type: array
           description: List of UUIDs of RA Profiles to be associated
-          example:
-          - 18324af0-e95c-11ec-8fea-0242ac120002
-          - 18324c94-e95c-11ec-8fea-0242ac120002
+          examples:
+            - "[\"18324af0-e95c-11ec-8fea-0242ac120002\",\"18324c94-e95c-11ec-8fea-0242ac120002\""
           items:
             type: string
       required:
-      - raProfileUuids
+        - raProfileUuids
     ComplianceProfilesListDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Compliance Profile description
@@ -1865,9 +1988,9 @@ components:
           items:
             $ref: "#/components/schemas/ComplianceProviderSummaryDto"
       required:
-      - name
-      - rules
-      - uuid
+        - name
+        - rules
+        - uuid
     ComplianceProviderSummaryDto:
       type: object
       properties:
@@ -1883,7 +2006,7 @@ components:
           format: int32
           description: Number of groups for the Provider
       required:
-      - connectorName
+        - connectorName
     ComplianceConnectorAndGroupsDto:
       type: object
       properties:
@@ -1924,29 +2047,34 @@ components:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the group
-          example: Sample group description
+          examples:
+            - Sample group description
       required:
-      - name
-      - uuid
+        - name
+        - uuid
     ComplianceProfileDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the Compliance Profile
@@ -1971,49 +2099,55 @@ components:
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
       required:
-      - groups
-      - name
-      - rules
-      - uuid
+        - groups
+        - name
+        - rules
+        - uuid
     ComplianceRulesDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the rule
-          example: Sample rule description
+          examples:
+            - Sample rule description
         certificateType:
           $ref: "#/components/schemas/CertificateType"
           description: Certificate type for the rule
-          example: X509
+          examples:
+            - X509
         attributes:
           type: array
           description: Attributes of the rule
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
       required:
-      - certificateType
-      - name
-      - uuid
+        - certificateType
+        - name
+        - uuid
     SimplifiedRaProfileDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         enabled:
           type: boolean
           description: Enabled flag - true = enabled; false = disabled
@@ -2021,10 +2155,10 @@ components:
           type: string
           description: Authority Instance UUID
       required:
-      - enabled
-      - name
-      - uuid
-    BaseAttribute:
+        - enabled
+        - name
+        - uuid
+    BaseAttributeDto:
       type: object
       description: Base Attribute definition
       discriminator:
@@ -2036,267 +2170,332 @@ components:
           meta: "#/components/schemas/MetadataAttribute"
           custom: "#/components/schemas/CustomAttribute"
       oneOf:
-      - $ref: "#/components/schemas/DataAttribute"
-      - $ref: "#/components/schemas/InfoAttribute"
-      - $ref: "#/components/schemas/GroupAttribute"
-      - $ref: "#/components/schemas/MetadataAttribute"
-      - $ref: "#/components/schemas/CustomAttribute"
-      properties:
-        version:
-          type: integer
-          format: int32
-          default: "2"
-          description: Version of the Attribute
-          example: 2
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          example: Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          default: data
-          description: Type of the Attribute
+        - $ref: "#/components/schemas/DataAttribute"
+        - $ref: "#/components/schemas/InfoAttribute"
+        - $ref: "#/components/schemas/GroupAttribute"
+        - $ref: "#/components/schemas/MetadataAttribute"
+        - $ref: "#/components/schemas/CustomAttribute"
       required:
-      - name
-      - type
-      - uuid
+        - name
+        - type
+        - uuid
     ComplianceRulesListResponseDto:
       type: object
       properties:
         connectorName:
           type: string
           description: Name of the Compliance Provider
-          example: Provider1
+          examples:
+            - Provider1
         connectorUuid:
           type: string
           description: UUID of the Compliance Provider
-          example: c35bc88c-d0ef-11ec-9d64-0242ac120003
+          examples:
+            - c35bc88c-d0ef-11ec-9d64-0242ac120003
         kind:
           type: string
           description: Kind of the Compliance Provider
-          example: Kind1
+          examples:
+            - Kind1
         rules:
           type: array
           description: Rules from Compliance Provider
           items:
             $ref: "#/components/schemas/ComplianceRulesResponseDto"
       required:
-      - connectorName
-      - connectorUuid
-      - kind
-      - rules
+        - connectorName
+        - connectorUuid
+        - kind
+        - rules
     ComplianceRulesResponseDto:
       type: object
       properties:
         uuid:
           type: string
           description: UUID of the rule
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         groupUuid:
           type: string
           description: UUID of the group to which the rule belongs to
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the rule
-          example: Rule1
+          examples:
+            - Rule1
         certificateType:
           $ref: "#/components/schemas/CertificateType"
           description: Type of the certificate to which this rule can be applied
-          example: X509
+          examples:
+            - X509
         attributes:
           type: array
           description: Rule attributes
           items:
-            $ref: "#/components/schemas/BaseAttribute"
+            $ref: "#/components/schemas/BaseAttributeDto"
         description:
           type: string
           description: Description of the rule
-          example: Sample rule description
+          examples:
+            - Sample rule description
       required:
-      - certificateType
-      - name
-      - uuid
+        - certificateType
+        - name
+        - uuid
     CustomAttribute:
-      allOf:
-      - $ref: "#/components/schemas/BaseAttribute"
-      - type: object
+      type: object
+      description: Custom attribute allows to store and transfer dynamic data. Its content can be edited and send in requests to store.
+      properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          examples:
+            - "2"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+            - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper text on what is expected"
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDto"
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
         properties:
-          content:
-            type: array
-            description: Content of the Attribute
-            items:
-              $ref: "#/components/schemas/BaseAttributeContent"
-          contentType:
-            $ref: "#/components/schemas/AttributeContentType"
-            description: Type of the Content
-          properties:
-            $ref: "#/components/schemas/CustomAttributeProperties"
-            description: Properties of the Attributes
-      description: Custom attribute allows to store and transfer dynamic data. Its
-        content can be edited and send in requests to store.
+          $ref: "#/components/schemas/CustomAttributeProperties"
+          description: Properties of the Attributes
       required:
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
+        - contentType
+        - name
+        - properties
+        - type
+        - uuid
     CustomAttributeProperties:
       type: object
       properties:
         label:
           type: string
           description: Friendly name of the the Attribute
-          example: Attribute Name
+          examples:
+            - Attribute Name
         visible:
           type: boolean
           default: "true"
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
+          description: "Boolean determining if the Attribute is visible and can be displayed, otherwise it should be hidden to the user."
         group:
           type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          example: requiredAttributes
+          description: "Group of the Attribute, used for the logical grouping of the Attribute"
+          examples:
+            - requiredAttributes
         required:
           type: boolean
           default: "false"
-          description: "Boolean determining if the Attribute is required. If true,\
-            \ the Attribute must be provided."
+          description: "Boolean determining if the Attribute is required. If true, the Attribute must be provided."
         readOnly:
           type: boolean
           default: "false"
-          description: "Boolean determining if the Attribute is read only. If true,\
-            \ the Attribute content cannot be changed."
+          description: "Boolean determining if the Attribute is read only. If true, the Attribute content cannot be changed."
         list:
           type: boolean
           default: "false"
-          description: Boolean determining if the Attribute contains list of values
-            in the content
+          description: Boolean determining if the Attribute contains list of values in the content
         multiSelect:
           type: boolean
           default: "false"
           description: Boolean determining if the Attribute can have multiple values
       required:
-      - label
-      - list
-      - multiSelect
-      - readOnly
-      - required
-      - visible
+        - label
+        - list
+        - multiSelect
+        - readOnly
+        - required
+        - visible
     GroupAttribute:
-      allOf:
-      - $ref: "#/components/schemas/BaseAttribute"
-      - type: object
-        properties:
-          content:
-            description: List of all different types of attributes
-          attributeCallback:
-            $ref: "#/components/schemas/AttributeCallback"
-            description: Optional definition of callback for getting the content of
-              the Attribute based on the action
-      description: Group attribute and its content represents dynamic list of additional
-        attributes retrieved by callback. Its content can not be edited and is not
-        send in requests to store.
+      type: object
+      description: Group attribute and its content represents dynamic list of additional attributes retrieved by callback. Its content can not be edited and is not send in requests to store.
+      properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          examples:
+            - "2"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+            - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper text on what is expected"
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/BaseAttributeDto"
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
+        attributeCallback:
+          $ref: "#/components/schemas/AttributeCallback"
+          description: Optional definition of callback for getting the content of the Attribute based on the action
       required:
-      - name
-      - type
-      - uuid
+        - name
+        - type
+        - uuid
     InfoAttribute:
-      allOf:
-      - $ref: "#/components/schemas/BaseAttribute"
-      - type: object
+      type: object
+      description: Info attribute contains content that is for information purpose or represents additional information for object (metadata). Its content can not be edited and is not send in requests to store.
+      properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          examples:
+            - "2"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+            - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper text on what is expected"
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDto"
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
         properties:
-          content:
-            type: array
-            description: Content of the Attribute
-            items:
-              $ref: "#/components/schemas/BaseAttributeContent"
-          contentType:
-            $ref: "#/components/schemas/AttributeContentType"
-            description: Type of the Content
-          properties:
-            $ref: "#/components/schemas/InfoAttributeProperties"
-            description: Properties of the Attributes
-      description: Info attribute contains content that is for information purpose
-        or represents additional information for object (metadata). Its content can
-        not be edited and is not send in requests to store.
+          $ref: "#/components/schemas/InfoAttributeProperties"
+          description: Properties of the Attributes
       required:
-      - content
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
+        - content
+        - contentType
+        - name
+        - properties
+        - type
+        - uuid
     InfoAttributeProperties:
       type: object
       properties:
         label:
           type: string
           description: Friendly name of the the Attribute
-          example: Attribute Name
+          examples:
+            - Attribute Name
         visible:
           type: boolean
           default: "true"
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
+          description: "Boolean determining if the Attribute is visible and can be displayed, otherwise it should be hidden to the user."
         group:
           type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          example: requiredAttributes
+          description: "Group of the Attribute, used for the logical grouping of the Attribute"
+          examples:
+            - requiredAttributes
       required:
-      - label
-      - visible
+        - label
+        - visible
     MetadataAttribute:
-      allOf:
-      - $ref: "#/components/schemas/BaseAttribute"
-      - type: object
+      type: object
+      description: Info attribute contains content that is for metadata. Its content can not be edited and is not send in requests to store.
+      properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          examples:
+            - "2"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+            - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper text on what is expected"
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDto"
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
         properties:
-          content:
-            type: array
-            description: Content of the Attribute
-            items:
-              $ref: "#/components/schemas/BaseAttributeContent"
-          contentType:
-            $ref: "#/components/schemas/AttributeContentType"
-            description: Type of the Content
-          properties:
-            $ref: "#/components/schemas/MetadataAttributeProperties"
-            description: Properties of the Attributes
-      description: Info attribute contains content that is for metadata. Its content
-        can not be edited and is not send in requests to store.
+          $ref: "#/components/schemas/MetadataAttributeProperties"
+          description: Properties of the Attributes
       required:
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
+        - contentType
+        - name
+        - properties
+        - type
+        - uuid
     MetadataAttributeProperties:
       type: object
       properties:
         label:
           type: string
           description: Friendly name of the the Attribute
-          example: Attribute Name
+          examples:
+            - Attribute Name
         visible:
           type: boolean
           default: "true"
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
+          description: "Boolean determining if the Attribute is visible and can be displayed, otherwise it should be hidden to the user."
         group:
           type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          example: requiredAttributes
+          description: "Group of the Attribute, used for the logical grouping of the Attribute"
+          examples:
+            - requiredAttributes
         global:
           type: boolean
           default: "false"
@@ -2304,90 +2503,130 @@ components:
         overwrite:
           type: boolean
           default: "false"
-          description: Boolean determining if the new metadata content should overwrite
-            (replace) existing content instead of appending.
+          description: Boolean determining if the new metadata content should overwrite (replace) existing content instead of appending.
       required:
-      - label
-      - visible
+        - label
+        - visible
     ComplianceGroupsListResponseDto:
       type: object
       properties:
         connectorName:
           type: string
           description: Name of the Compliance Provider
-          example: Provider1
+          examples:
+            - Provider1
         connectorUuid:
           type: string
           description: UUID of the Compliance Provider
-          example: c35bc88c-d0ef-11ec-9d64-0242ac120003
+          examples:
+            - c35bc88c-d0ef-11ec-9d64-0242ac120003
         kind:
           type: string
           description: Kind of the Compliance Provider
-          example: Kind1
+          examples:
+            - Kind1
         groups:
           type: array
           description: Groups from Compliance Provider
           items:
             $ref: "#/components/schemas/ComplianceGroupsResponseDto"
       required:
-      - connectorName
-      - connectorUuid
-      - groups
-      - kind
+        - connectorName
+        - connectorUuid
+        - groups
+        - kind
     ComplianceGroupsResponseDto:
       type: object
       properties:
         uuid:
           type: string
           description: UUID of the group
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the group
-          example: RFC
+          examples:
+            - RFC
         description:
           type: string
           description: Description of the group
-          example: Sample description of the group
+          examples:
+            - Sample description of the group
       required:
-      - name
-      - uuid
+        - name
+        - uuid
     BulkActionMessageDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         message:
           type: string
-          description: Message describing the associations of the Objects which is
-            preventing the bulk operation
-          example: Object is associated with other items
+          description: Message describing the associations of the Objects which is preventing the bulk operation
+          examples:
+            - Object is associated with other items
       required:
-      - message
-      - name
-      - uuid
+        - message
+        - name
+        - uuid
     ComplianceRuleDeletionRequestDto:
       type: object
       properties:
         connectorUuid:
           type: string
           description: UUID of the Compliance Provider
-          example: 1212a-34dddf34-4334f-34ddfvfdg1y3
+          examples:
+            - 1212a-34dddf34-4334f-34ddfvfdg1y3
         kind:
           type: string
           description: Kind of the Compliance Provider
-          example: default
+          examples:
+            - default
         ruleUuid:
           type: string
           description: UUID of the rule
-          example: 1212a-34dddf34-4334f-34ddfvfdg1y3
+          examples:
+            - 1212a-34dddf34-4334f-34ddfvfdg1y3
       required:
-      - connectorUuid
-      - kind
-      - ruleUuid
+        - connectorUuid
+        - kind
+        - ruleUuid
+  securitySchemes:
+    ConnectorAPIKeyAuth:
+      type: apiKey
+      description: API Key in header configured for connector
+      name: ApiKeyHeaderAttribute
+      in: header
+    SessionAuth:
+      type: apiKey
+      description: Session-based authentication with session ID stored in 'czertainly-session' cookie
+      name: czertainly-session
+      in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
+    CertificateAuth:
+      type: apiKey
+      description: Base64 encoded X.509 certificate passed in header
+      name: X-APP-CERTIFICATE
+      in: header
+    CertificateTLSAuth:
+      type: mutualTLS
+      description: Client certificate authentication
+    NoAuth:
+      type: http
+      description: No authentication
+      scheme: none
+    BearerJWTAuth:
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT

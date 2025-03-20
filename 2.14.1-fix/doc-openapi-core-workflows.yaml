@@ -16,32 +16,30 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:65447
-  description: Generated server url
+  - url: https://demo.czertainly.online/api
+    description: CZERTAINLY Demo server
 tags:
-- name: Workflow Actions Management
-  description: Workflow Actions Management API
-- name: Workflow Rules Management
-  description: Workflow Rules Management API
-- name: Workflow Triggers Management
-  description: Workflow Triggers Management API
+  - name: Workflow Actions Management
+    description: Workflow Actions Management API
+  - name: Workflow Rules Management
+    description: Workflow Rules Management API
+  - name: Workflow Triggers Management
+    description: Workflow Triggers Management API
 paths:
   /v1/workflows/triggers/{triggerUuid}:
     get:
       tags:
-      - Workflow Triggers Management
+        - Workflow Triggers Management
       summary: Get Trigger details
       operationId: getTrigger
       parameters:
-      - name: triggerUuid
-        in: path
-        description: Trigger UUID
-        required: true
-        schema:
-          type: string
+        - name: triggerUuid
+          in: path
+          description: Trigger UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "500":
-          description: Internal Server Error
         "200":
           description: Trigger details retrieved
           content:
@@ -49,31 +47,43 @@ paths:
               schema:
                 $ref: "#/components/schemas/TriggerDetailDto"
         "404":
-          description: Not Found
+          description: Trigger not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     put:
       tags:
-      - Workflow Triggers Management
+        - Workflow Triggers Management
       summary: Update Trigger
       operationId: updateTrigger
       parameters:
-      - name: triggerUuid
-        in: path
-        description: Trigger UUID
-        required: true
-        schema:
-          type: string
+        - name: triggerUuid
+          in: path
+          description: Trigger UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -81,107 +91,137 @@ paths:
               $ref: "#/components/schemas/UpdateTriggerRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Trigger updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/TriggerDetailDto"
+        "404":
+          description: "Trigger, Rule or Action not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - Workflow Triggers Management
+        - Workflow Triggers Management
       summary: Delete Trigger
       operationId: deleteTrigger
       parameters:
-      - name: triggerUuid
-        in: path
-        description: Trigger UUID
-        required: true
-        schema:
-          type: string
+        - name: triggerUuid
+          in: path
+          description: Trigger UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "500":
-          description: Internal Server Error
         "204":
           description: Trigger deleted
         "404":
-          description: Not Found
+          description: Trigger not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/workflows/rules/{ruleUuid}:
     get:
       tags:
-      - Workflow Rules Management
+        - Workflow Rules Management
       summary: Get Rule details
       operationId: getRule
       parameters:
-      - name: ruleUuid
-        in: path
-        description: Rule UUID
-        required: true
-        schema:
-          type: string
+        - name: ruleUuid
+          in: path
+          description: Rule UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Rule details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/RuleDetailDto"
+        "404":
+          description: Rule not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     put:
       tags:
-      - Workflow Rules Management
+        - Workflow Rules Management
       summary: Update Rule
       operationId: updateRule
       parameters:
-      - name: ruleUuid
-        in: path
-        description: Rule UUID
-        required: true
-        schema:
-          type: string
+        - name: ruleUuid
+          in: path
+          description: Rule UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -189,107 +229,137 @@ paths:
               $ref: "#/components/schemas/UpdateRuleRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Rule details updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/RuleDetailDto"
+        "404":
+          description: Rule or condition not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - Workflow Rules Management
+        - Workflow Rules Management
       summary: Delete Rule
       operationId: deleteRule
       parameters:
-      - name: ruleUuid
-        in: path
-        description: Rule UUID
-        required: true
-        schema:
-          type: string
+        - name: ruleUuid
+          in: path
+          description: Rule UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "500":
-          description: Internal Server Error
+        "204":
+          description: Rule deleted
         "404":
-          description: Not Found
+          description: Rule not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: Rule deleted
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/workflows/executions/{executionUuid}:
     get:
       tags:
-      - Workflow Actions Management
+        - Workflow Actions Management
       summary: Get Execution Details
       operationId: getExecution
       parameters:
-      - name: executionUuid
-        in: path
-        description: Execution UUID
-        required: true
-        schema:
-          type: string
+        - name: executionUuid
+          in: path
+          description: Execution UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
         "200":
           description: Execution details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ExecutionDto"
+        "404":
+          description: Execution not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     put:
       tags:
-      - Workflow Actions Management
+        - Workflow Actions Management
       summary: Update Execution
       operationId: updateExecution
       parameters:
-      - name: executionUuid
-        in: path
-        description: Execution UUID
-        required: true
-        schema:
-          type: string
+        - name: executionUuid
+          in: path
+          description: Execution UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -297,107 +367,137 @@ paths:
               $ref: "#/components/schemas/UpdateExecutionRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
         "200":
           description: Execution updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ExecutionDto"
+        "404":
+          description: Execution not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - Workflow Actions Management
+        - Workflow Actions Management
       summary: Delete Execution
       operationId: deleteExecution
       parameters:
-      - name: executionUuid
-        in: path
-        description: Execution UUID
-        required: true
-        schema:
-          type: string
+        - name: executionUuid
+          in: path
+          description: Execution UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "500":
-          description: Internal Server Error
+        "204":
+          description: Execution deleted
         "404":
-          description: Not Found
+          description: Execution not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "204":
-          description: Execution deleted
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/workflows/conditions/{conditionUuid}:
     get:
       tags:
-      - Workflow Rules Management
+        - Workflow Rules Management
       summary: Get Condition details
       operationId: getCondition
       parameters:
-      - name: conditionUuid
-        in: path
-        description: Condition UUID
-        required: true
-        schema:
-          type: string
+        - name: conditionUuid
+          in: path
+          description: Condition UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
         "200":
           description: Condition details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConditionDto"
+        "404":
+          description: Condition not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     put:
       tags:
-      - Workflow Rules Management
+        - Workflow Rules Management
       summary: Update Condition
       operationId: updateCondition
       parameters:
-      - name: conditionUuid
-        in: path
-        description: Condition UUID
-        required: true
-        schema:
-          type: string
+        - name: conditionUuid
+          in: path
+          description: Condition UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -405,107 +505,137 @@ paths:
               $ref: "#/components/schemas/UpdateConditionRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
         "200":
           description: Condition updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConditionDto"
+        "404":
+          description: Condition not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - Workflow Rules Management
+        - Workflow Rules Management
       summary: Delete Condition
       operationId: deleteCondition
       parameters:
-      - name: conditionUuid
-        in: path
-        description: Condition UUID
-        required: true
-        schema:
-          type: string
+        - name: conditionUuid
+          in: path
+          description: Condition UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "500":
-          description: Internal Server Error
+        "204":
+          description: Condition deleted
         "404":
-          description: Not Found
+          description: Condition not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "204":
-          description: Condition deleted
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/workflows/actions/{actionUuid}:
     get:
       tags:
-      - Workflow Actions Management
+        - Workflow Actions Management
       summary: Get Action Details
       operationId: getAction
       parameters:
-      - name: actionUuid
-        in: path
-        description: Action UUID
-        required: true
-        schema:
-          type: string
+        - name: actionUuid
+          in: path
+          description: Action UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Action details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDetailDto"
+        "404":
+          description: Action not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     put:
       tags:
-      - Workflow Actions Management
+        - Workflow Actions Management
       summary: Update Action
       operationId: updateAction
       parameters:
-      - name: actionUuid
-        in: path
-        description: Action UUID
-        required: true
-        schema:
-          type: string
+        - name: actionUuid
+          in: path
+          description: Action UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -513,91 +643,97 @@ paths:
               $ref: "#/components/schemas/UpdateActionRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: Action updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDetailDto"
+        "404":
+          description: Action or Execution not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - Workflow Actions Management
+        - Workflow Actions Management
       summary: Delete Action
       operationId: deleteAction
       parameters:
-      - name: actionUuid
-        in: path
-        description: Action UUID
-        required: true
-        schema:
-          type: string
+        - name: actionUuid
+          in: path
+          description: Action UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "500":
-          description: Internal Server Error
+        "204":
+          description: Action deleted
         "404":
-          description: Not Found
+          description: Action not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "204":
-          description: Action deleted
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/workflows/triggers:
     get:
       tags:
-      - Workflow Triggers Management
+        - Workflow Triggers Management
       summary: List Triggers
       operationId: listTriggers
       parameters:
-      - name: resource
-        in: query
-        required: false
-        schema:
-          $ref: "#/components/schemas/Resource"
-      - name: eventResource
-        in: query
-        required: false
-        schema:
-          $ref: "#/components/schemas/Resource"
+        - name: resource
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Resource"
+        - name: eventResource
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Resource"
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: List of triggers
           content:
@@ -606,11 +742,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TriggerDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     post:
       tags:
-      - Workflow Triggers Management
+        - Workflow Triggers Management
       summary: Create Trigger
       operationId: createTrigger
       requestBody:
@@ -620,8 +774,6 @@ paths:
               $ref: "#/components/schemas/TriggerRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
         "201":
           description: Trigger created
           content:
@@ -629,48 +781,44 @@ paths:
               schema:
                 $ref: "#/components/schemas/TriggerDetailDto"
         "404":
-          description: Not Found
+          description: Rule or Action not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/workflows/rules:
     get:
       tags:
-      - Workflow Rules Management
+        - Workflow Rules Management
       summary: List Rules
       operationId: listRules
       parameters:
-      - name: resource
-        in: query
-        required: false
-        schema:
-          $ref: "#/components/schemas/Resource"
+        - name: resource
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Resource"
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
         "200":
           description: List of rules fetched
           content:
@@ -679,9 +827,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RuleDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     post:
       tags:
-      - Workflow Rules Management
+        - Workflow Rules Management
       summary: Create Rule
       operationId: createRule
       requestBody:
@@ -691,49 +859,51 @@ paths:
               $ref: "#/components/schemas/RuleRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "201":
           description: Rule created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/RuleDetailDto"
+        "404":
+          description: Condition not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-  /v1/workflows/executions:
-    get:
-      tags:
-      - Workflow Actions Management
-      summary: List executions
-      operationId: listExecutions
-      parameters:
-      - name: resource
-        in: query
-        required: false
-        schema:
-          $ref: "#/components/schemas/Resource"
-      responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
+        "403":
+          description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/workflows/executions:
+    get:
+      tags:
+        - Workflow Actions Management
+      summary: List executions
+      operationId: listExecutions
+      parameters:
+        - name: resource
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Resource"
+      responses:
         "200":
           description: List of executions fetched
           content:
@@ -747,12 +917,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     post:
       tags:
-      - Workflow Actions Management
+        - Workflow Actions Management
       summary: Create Execution
       operationId: createExecution
       requestBody:
@@ -762,43 +944,45 @@ paths:
               $ref: "#/components/schemas/ExecutionRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "201":
           description: Execution created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ExecutionDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/workflows/conditions:
     get:
       tags:
-      - Workflow Rules Management
+        - Workflow Rules Management
       summary: List Conditions
       operationId: listConditions
       parameters:
-      - name: resource
-        in: query
-        required: false
-        schema:
-          $ref: "#/components/schemas/Resource"
+        - name: resource
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Resource"
       responses:
-        "500":
-          description: Internal Server Error
         "200":
           description: List of conditions fetched
           content:
@@ -807,23 +991,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ConditionDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     post:
       tags:
-      - Workflow Rules Management
+        - Workflow Rules Management
       summary: Create Condition
       operationId: createCondition
       requestBody:
@@ -833,55 +1023,45 @@ paths:
               $ref: "#/components/schemas/ConditionRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
         "201":
           description: Condition created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ConditionDto"
-  /v1/workflows/actions:
-    get:
-      tags:
-      - Workflow Actions Management
-      summary: List Actions
-      operationId: listActions
-      parameters:
-      - name: resource
-        in: query
-        required: false
-        schema:
-          $ref: "#/components/schemas/Resource"
-      responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/workflows/actions:
+    get:
+      tags:
+        - Workflow Actions Management
+      summary: List Actions
+      operationId: listActions
+      parameters:
+        - name: resource
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Resource"
+      responses:
         "200":
           description: List of actions fetched
           content:
@@ -890,11 +1070,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ActionDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     post:
       tags:
-      - Workflow Actions Management
+        - Workflow Actions Management
       summary: Create Action
       operationId: createAction
       requestBody:
@@ -904,62 +1102,58 @@ paths:
               $ref: "#/components/schemas/ActionRequestDto"
         required: true
       responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "201":
           description: Action created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDetailDto"
-        "401":
-          description: Unauthorized
-  /v1/workflows/triggers/{triggerUuid}/history/{associationObjectUuid}:
-    get:
-      tags:
-      - Workflow Triggers Management
-      summary: Get Trigger History
-      operationId: getTriggerHistory
-      parameters:
-      - name: triggerUuid
-        in: path
-        description: Trigger UUID
-        required: true
-        schema:
-          type: string
-      - name: associationObjectUuid
-        in: path
-        description: Trigger Association Object UUID
-        required: true
-        schema:
-          type: string
-      responses:
-        "500":
-          description: Internal Server Error
         "404":
-          description: Not Found
+          description: Execution not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/workflows/triggers/{triggerUuid}/history/{associationObjectUuid}:
+    get:
+      tags:
+        - Workflow Triggers Management
+      summary: Get Trigger History
+      operationId: getTriggerHistory
+      parameters:
+        - name: triggerUuid
+          in: path
+          description: Trigger UUID
+          required: true
+          schema:
+            type: string
+        - name: associationObjectUuid
+          in: path
+          description: Trigger Association Object UUID
+          required: true
+          schema:
+            type: string
+      responses:
         "200":
           description: Trigger History retrieved
           content:
@@ -968,104 +1162,132 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/TriggerHistoryDto"
-        "401":
-          description: Unauthorized
-  /v1/workflows/triggers/history/{associationObjectUuid}:
-    get:
-      tags:
-      - Workflow Triggers Management
-      summary: Get Trigger History Summary
-      operationId: getTriggerHistorySummary
-      parameters:
-      - name: associationObjectUuid
-        in: path
-        description: Trigger Association Object UUID
-        required: true
-        schema:
-          type: string
-      responses:
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/workflows/triggers/history/{associationObjectUuid}:
+    get:
+      tags:
+        - Workflow Triggers Management
+      summary: Get Trigger History Summary
+      operationId: getTriggerHistorySummary
+      parameters:
+        - name: associationObjectUuid
+          in: path
+          description: Trigger Association Object UUID
+          required: true
+          schema:
+            type: string
+      responses:
         "200":
           description: Trigger History Summary retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/TriggerHistorySummaryDto"
+        "404":
+          description: Trigger not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
 components:
   schemas:
     Resource:
       type: string
       enum:
-      - NONE
-      - dashboard
-      - settings
-      - auditLogs
-      - credentials
-      - connectors
-      - attributes
-      - jobs
-      - notificationInstances
-      - users
-      - roles
-      - acmeAccounts
-      - acmeProfiles
-      - scepProfiles
-      - cmpProfiles
-      - authorities
-      - raProfiles
-      - certificates
-      - certificateRequests
-      - groups
-      - complianceProfiles
-      - discoveries
-      - entities
-      - locations
-      - tokenProfiles
-      - tokens
-      - keys
-      - approvalProfiles
-      - approvals
-      - rules
-      - actions
-      - triggers
-      - resources
-      - resourceEvents
-      - searchFilters
-      - keyItems
-      - platformEnums
-      - notifications
-      - conditions
-      - executions
-      - complianceRules
-      - complianceGroups
-      - customAttributes
-      - globalMetadata
-      - acmeOrders
-      - acmeAuthorizations
-      - acmeChallenges
-      - cmpTransactions
-      - endEntityProfiles
-      - authenticationProviders
+        - NONE
+        - dashboard
+        - settings
+        - auditLogs
+        - credentials
+        - connectors
+        - attributes
+        - jobs
+        - notificationInstances
+        - users
+        - roles
+        - acmeAccounts
+        - acmeProfiles
+        - scepProfiles
+        - cmpProfiles
+        - authorities
+        - raProfiles
+        - certificates
+        - certificateRequests
+        - groups
+        - complianceProfiles
+        - discoveries
+        - entities
+        - locations
+        - tokenProfiles
+        - tokens
+        - keys
+        - approvalProfiles
+        - approvals
+        - rules
+        - actions
+        - triggers
+        - resources
+        - resourceEvents
+        - searchFilters
+        - keyItems
+        - platformEnums
+        - notifications
+        - conditions
+        - executions
+        - complianceRules
+        - complianceGroups
+        - customAttributes
+        - globalMetadata
+        - acmeOrders
+        - acmeAuthorizations
+        - acmeChallenges
+        - cmpTransactions
+        - endEntityProfiles
+        - authenticationProviders
     TriggerType:
       type: string
       enum:
-      - event
-      - manual
+        - event
+        - manual
     UpdateTriggerRequestDto:
       type: object
       properties:
@@ -1080,15 +1302,12 @@ components:
           description: Resource associated with the trigger
         ignoreTrigger:
           type: boolean
-          description: "Flag if to ignore object when trigger rules are matched and\
-            \ do not perform any actions and stop evaluating other triggers. Based\
-            \ on context could have other implications to object processing. If ignore\
-            \ is set, trigger does not have any actions."
+          description: "Flag if to ignore object when trigger rules are matched and do not perform any actions and stop evaluating other triggers. Based on context could have other implications to object processing. If ignore is set, trigger does not have any actions."
         event:
           type: string
           description: Event of the trigger
           enum:
-          - discoveryFinished
+            - discoveryFinished
         eventResource:
           $ref: "#/components/schemas/Resource"
           description: Type of the the trigger event source object
@@ -1103,9 +1322,19 @@ components:
           items:
             type: string
       required:
-      - ignoreTrigger
-      - resource
-      - type
+        - ignoreTrigger
+        - resource
+        - type
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          examples:
+            - Error message
+      required:
+        - message
     AuthenticationServiceExceptionDto:
       type: object
       properties:
@@ -1120,20 +1349,22 @@ components:
           type: string
           description: Exception message
       required:
-      - code
-      - message
-      - statusCode
+        - code
+        - message
+        - statusCode
     ActionDetailDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the action
@@ -1146,21 +1377,23 @@ components:
           items:
             $ref: "#/components/schemas/ExecutionDto"
       required:
-      - executions
-      - name
-      - resource
-      - uuid
+        - executions
+        - name
+        - resource
+        - uuid
     ConditionDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the condition
@@ -1176,11 +1409,11 @@ components:
           items:
             $ref: "#/components/schemas/ConditionItemDto"
       required:
-      - items
-      - name
-      - resource
-      - type
-      - uuid
+        - items
+        - name
+        - resource
+        - type
+        - uuid
     ConditionItemDto:
       type: object
       properties:
@@ -1197,24 +1430,26 @@ components:
           type: object
           description: Value of the condition item
       required:
-      - fieldIdentifier
-      - fieldSource
-      - operator
+        - fieldIdentifier
+        - fieldSource
+        - operator
     ConditionType:
       type: string
       enum:
-      - checkField
+        - checkField
     ExecutionDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the execution
@@ -1230,11 +1465,11 @@ components:
           items:
             $ref: "#/components/schemas/ExecutionItemDto"
       required:
-      - items
-      - name
-      - resource
-      - type
-      - uuid
+        - items
+        - name
+        - resource
+        - type
+        - uuid
     ExecutionItemDto:
       type: object
       properties:
@@ -1248,49 +1483,51 @@ components:
           type: object
           description: Data of the execution item
       required:
-      - fieldIdentifier
-      - fieldSource
+        - fieldIdentifier
+        - fieldSource
     ExecutionType:
       type: string
       enum:
-      - setField
+        - setField
     FilterConditionOperator:
       type: string
       enum:
-      - EQUALS
-      - NOT_EQUALS
-      - GREATER
-      - GREATER_OR_EQUAL
-      - LESSER
-      - LESSER_OR_EQUAL
-      - CONTAINS
-      - NOT_CONTAINS
-      - STARTS_WITH
-      - ENDS_WITH
-      - EMPTY
-      - NOT_EMPTY
-      - SUCCESS
-      - FAILED
-      - UNKNOWN
-      - NOT_CHECKED
+        - EQUALS
+        - NOT_EQUALS
+        - GREATER
+        - GREATER_OR_EQUAL
+        - LESSER
+        - LESSER_OR_EQUAL
+        - CONTAINS
+        - NOT_CONTAINS
+        - STARTS_WITH
+        - ENDS_WITH
+        - EMPTY
+        - NOT_EMPTY
+        - SUCCESS
+        - FAILED
+        - UNKNOWN
+        - NOT_CHECKED
     FilterFieldSource:
       type: string
       enum:
-      - meta
-      - custom
-      - data
-      - property
+        - meta
+        - custom
+        - data
+        - property
     RuleDetailDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the Rule
@@ -1303,21 +1540,23 @@ components:
           items:
             $ref: "#/components/schemas/ConditionDto"
       required:
-      - conditions
-      - name
-      - resource
-      - uuid
+        - conditions
+        - name
+        - resource
+        - uuid
     TriggerDetailDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the trigger
@@ -1329,15 +1568,12 @@ components:
           description: Resource associated with the trigger
         ignoreTrigger:
           type: boolean
-          description: "Flag if to ignore object when trigger rules are matched and\
-            \ do not perform any actions and stop evaluating other triggers. Based\
-            \ on context could have other implications to object processing. If ignore\
-            \ is set, trigger does not have any actions."
+          description: "Flag if to ignore object when trigger rules are matched and do not perform any actions and stop evaluating other triggers. Based on context could have other implications to object processing. If ignore is set, trigger does not have any actions."
         event:
           type: string
           description: Event that should fire trigger
           enum:
-          - discoveryFinished
+            - discoveryFinished
         eventResource:
           $ref: "#/components/schemas/Resource"
           description: Resource associated with trigger event
@@ -1352,13 +1588,13 @@ components:
           items:
             $ref: "#/components/schemas/ActionDetailDto"
       required:
-      - actions
-      - ignoreTrigger
-      - name
-      - resource
-      - rules
-      - type
-      - uuid
+        - actions
+        - ignoreTrigger
+        - name
+        - resource
+        - rules
+        - type
+        - uuid
     UpdateRuleRequestDto:
       type: object
       properties:
@@ -1371,7 +1607,7 @@ components:
           items:
             type: string
       required:
-      - conditionsUuids
+        - conditionsUuids
     ExecutionItemRequestDto:
       type: object
       properties:
@@ -1385,8 +1621,8 @@ components:
           type: object
           description: Data of the execution item
       required:
-      - fieldIdentifier
-      - fieldSource
+        - fieldIdentifier
+        - fieldSource
     UpdateExecutionRequestDto:
       type: object
       properties:
@@ -1399,7 +1635,7 @@ components:
           items:
             $ref: "#/components/schemas/ExecutionItemRequestDto"
       required:
-      - items
+        - items
     ConditionItemRequestDto:
       type: object
       properties:
@@ -1416,9 +1652,9 @@ components:
           type: object
           description: Value of the condition item
       required:
-      - fieldIdentifier
-      - fieldSource
-      - operator
+        - fieldIdentifier
+        - fieldSource
+        - operator
     UpdateConditionRequestDto:
       type: object
       properties:
@@ -1431,7 +1667,7 @@ components:
           items:
             $ref: "#/components/schemas/ConditionItemRequestDto"
       required:
-      - items
+        - items
     UpdateActionRequestDto:
       type: object
       properties:
@@ -1444,7 +1680,7 @@ components:
           items:
             type: string
       required:
-      - executionsUuids
+        - executionsUuids
     TriggerRequestDto:
       type: object
       properties:
@@ -1462,15 +1698,12 @@ components:
           description: Resource associated with the trigger
         ignoreTrigger:
           type: boolean
-          description: "Flag if to ignore object when trigger rules are matched and\
-            \ do not perform any actions and stop evaluating other triggers. Based\
-            \ on context could have other implications to object processing. If ignore\
-            \ is set, trigger does not have any actions."
+          description: "Flag if to ignore object when trigger rules are matched and do not perform any actions and stop evaluating other triggers. Based on context could have other implications to object processing. If ignore is set, trigger does not have any actions."
         event:
           type: string
           description: Event that should fire trigger
           enum:
-          - discoveryFinished
+            - discoveryFinished
         eventResource:
           $ref: "#/components/schemas/Resource"
           description: Type of the the trigger event source object
@@ -1485,10 +1718,10 @@ components:
           items:
             type: string
       required:
-      - ignoreTrigger
-      - name
-      - resource
-      - type
+        - ignoreTrigger
+        - name
+        - resource
+        - type
     RuleRequestDto:
       type: object
       properties:
@@ -1507,9 +1740,9 @@ components:
           items:
             type: string
       required:
-      - conditionsUuids
-      - name
-      - resource
+        - conditionsUuids
+        - name
+        - resource
     ExecutionRequestDto:
       type: object
       properties:
@@ -1531,10 +1764,10 @@ components:
           items:
             $ref: "#/components/schemas/ExecutionItemRequestDto"
       required:
-      - items
-      - name
-      - resource
-      - type
+        - items
+        - name
+        - resource
+        - type
     ConditionRequestDto:
       type: object
       properties:
@@ -1556,10 +1789,10 @@ components:
           items:
             $ref: "#/components/schemas/ConditionItemRequestDto"
       required:
-      - items
-      - name
-      - resource
-      - type
+        - items
+        - name
+        - resource
+        - type
     ActionRequestDto:
       type: object
       properties:
@@ -1578,20 +1811,22 @@ components:
           items:
             type: string
       required:
-      - executionsUuids
-      - name
-      - resource
+        - executionsUuids
+        - name
+        - resource
     TriggerDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the trigger
@@ -1603,24 +1838,21 @@ components:
           description: Resource associated with the trigger
         ignoreTrigger:
           type: boolean
-          description: "Flag if to ignore object when trigger rules are matched and\
-            \ do not perform any actions and stop evaluating other triggers. Based\
-            \ on context could have other implications to object processing. If ignore\
-            \ is set, trigger does not have any actions."
+          description: "Flag if to ignore object when trigger rules are matched and do not perform any actions and stop evaluating other triggers. Based on context could have other implications to object processing. If ignore is set, trigger does not have any actions."
         event:
           type: string
           description: Event that should fire trigger
           enum:
-          - discoveryFinished
+            - discoveryFinished
         eventResource:
           $ref: "#/components/schemas/Resource"
           description: Resource associated with trigger event
       required:
-      - ignoreTrigger
-      - name
-      - resource
-      - type
-      - uuid
+        - ignoreTrigger
+        - name
+        - resource
+        - type
+        - uuid
     TriggerHistoryDto:
       type: object
       properties:
@@ -1635,8 +1867,7 @@ components:
           description: UUID of the object that the trigger has been evaluated on.
         referenceObjectUuid:
           type: string
-          description: Reference UUID of the object that the trigger has been evaluated
-            on.
+          description: Reference UUID of the object that the trigger has been evaluated on.
         conditionsMatched:
           type: boolean
           description: All conditions in the trigger have been matched.
@@ -1652,17 +1883,16 @@ components:
           description: 'Additional message. '
         records:
           type: array
-          description: List of records for each action that has not been performed
-            and each condition that has not been evaluated.
+          description: List of records for each action that has not been performed and each condition that has not been evaluated.
           items:
             $ref: "#/components/schemas/TriggerHistoryRecordDto"
       required:
-      - actionsPerformed
-      - conditionsMatched
-      - records
-      - triggerUuid
-      - triggeredAt
-      - uuid
+        - actionsPerformed
+        - conditionsMatched
+        - records
+        - triggerUuid
+        - triggeredAt
+        - uuid
     TriggerHistoryRecordDto:
       type: object
       properties:
@@ -1676,7 +1906,7 @@ components:
           $ref: "#/components/schemas/ExecutionDto"
           description: Execution that is referenced by history record
       required:
-      - message
+        - message
     TriggerHistoryObjectSummaryDto:
       type: object
       properties:
@@ -1687,8 +1917,7 @@ components:
         referenceObjectUuid:
           type: string
           format: uuid
-          description: Reference UUID of the object that the trigger has been evaluated
-            on.
+          description: Reference UUID of the object that the trigger has been evaluated on.
         matched:
           type: boolean
           description: Was matched at least by one trigger.
@@ -1701,9 +1930,9 @@ components:
           items:
             $ref: "#/components/schemas/TriggerHistoryObjectTriggerSummaryDto"
       required:
-      - ignored
-      - matched
-      - triggers
+        - ignored
+        - matched
+        - triggers
     TriggerHistoryObjectTriggerSummaryDto:
       type: object
       properties:
@@ -1713,8 +1942,7 @@ components:
           description: UUID of the object that the trigger has been evaluated on.
         triggerName:
           type: string
-          description: Reference UUID of the object that the trigger has been evaluated
-            on.
+          description: Reference UUID of the object that the trigger has been evaluated on.
         triggeredAt:
           type: string
           format: date-time
@@ -1724,15 +1952,14 @@ components:
           description: 'Additional message. '
         records:
           type: array
-          description: List of records for each action that has not been performed
-            and each condition that has not been evaluated.
+          description: List of records for each action that has not been performed and each condition that has not been evaluated.
           items:
             $ref: "#/components/schemas/TriggerHistoryRecordDto"
       required:
-      - records
-      - triggerName
-      - triggerUuid
-      - triggeredAt
+        - records
+        - triggerName
+        - triggerUuid
+        - triggeredAt
     TriggerHistorySummaryDto:
       type: object
       properties:
@@ -1759,29 +1986,30 @@ components:
           description: Number of objects matched by ignore triggers.
         objects:
           type: array
-          description: List of history of objects that triggers has been evaluated
-            on.
+          description: List of history of objects that triggers has been evaluated on.
           items:
             $ref: "#/components/schemas/TriggerHistoryObjectSummaryDto"
       required:
-      - associationObjectUuid
-      - associationResource
-      - objects
-      - objectsEvaluated
-      - objectsIgnored
-      - objectsMatched
-      - objectsResource
+        - associationObjectUuid
+        - associationResource
+        - objects
+        - objectsEvaluated
+        - objectsIgnored
+        - objectsMatched
+        - objectsResource
     RuleDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the Rule
@@ -1789,20 +2017,22 @@ components:
           $ref: "#/components/schemas/Resource"
           description: Resource associated with the Rule
       required:
-      - name
-      - resource
-      - uuid
+        - name
+        - resource
+        - uuid
     ActionDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the action
@@ -1810,6 +2040,36 @@ components:
           $ref: "#/components/schemas/Resource"
           description: Resource associated with the action
       required:
-      - name
-      - resource
-      - uuid
+        - name
+        - resource
+        - uuid
+  securitySchemes:
+    ConnectorAPIKeyAuth:
+      type: apiKey
+      description: API Key in header configured for connector
+      name: ApiKeyHeaderAttribute
+      in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
+    SessionAuth:
+      type: apiKey
+      description: Session-based authentication with session ID stored in 'czertainly-session' cookie
+      name: czertainly-session
+      in: cookie
+    CertificateAuth:
+      type: apiKey
+      description: Base64 encoded X.509 certificate passed in header
+      name: X-APP-CERTIFICATE
+      in: header
+    CertificateTLSAuth:
+      type: mutualTLS
+      description: Client certificate authentication
+    NoAuth:
+      type: http
+      description: No authentication
+      scheme: none
+    BearerJWTAuth:
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT

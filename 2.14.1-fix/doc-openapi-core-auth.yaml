@@ -16,36 +16,48 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:64950
-  description: Generated server url
+  - url: https://demo.czertainly.online/api
+    description: CZERTAINLY Demo server
 tags:
-- name: User Management
-  description: User Management API
-- name: Authentication Management
-  description: Authentication Management API
-- name: Role Management
-  description: Role Management API
+  - name: User Management
+    description: User Management API
+  - name: Authentication Management
+    description: Authentication Management API
+  - name: Role Management
+    description: Role Management API
 paths:
   /v1/users/{userUuid}:
     get:
       tags:
-      - User Management
+        - User Management
       summary: Get user details
       operationId: getUser
       parameters:
-      - name: userUuid
-        in: path
-        description: User UUID
-        required: true
-        schema:
-          type: string
+        - name: userUuid
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "404":
-          description: Not Found
+        "200":
+          description: User details retrieved
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/UserDetailDto"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -54,32 +66,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "200":
-          description: User details retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserDetailDto"
         "500":
           description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     put:
       tags:
-      - User Management
+        - User Management
       summary: Update User
       operationId: updateUser
       parameters:
-      - name: userUuid
-        in: path
-        description: User UUID
-        required: true
-        schema:
-          type: string
+        - name: userUuid
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -94,11 +98,17 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserDetailDto"
         "404":
-          description: Not Found
+          description: User not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -109,33 +119,37 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - User Management
+        - User Management
       summary: Delete User
       operationId: deleteUser
       parameters:
-      - name: userUuid
-        in: path
-        description: User UUID
-        required: true
-        schema:
-          type: string
+        - name: userUuid
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
       responses:
         "204":
           description: User deleted
         "404":
-          description: Not Found
+          description: User not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -146,85 +160,48 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/users/{userUuid}/roles/{roleUuid}:
     put:
       tags:
-      - User Management
+        - User Management
       summary: Add role to User
       operationId: addRole
       parameters:
-      - name: userUuid
-        in: path
-        description: User UUID
-        required: true
-        schema:
-          type: string
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
+        - name: userUuid
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: User roles updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: User or Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-    delete:
-      tags:
-      - User Management
-      summary: Remove role from User
-      operationId: removeRole
-      parameters:
-      - name: userUuid
-        in: path
-        description: User UUID
-        required: true
-        schema:
-          type: string
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -233,40 +210,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+    delete:
+      tags:
+        - User Management
+      summary: Remove role from User
+      operationId: removeRole
+      parameters:
+        - name: userUuid
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
+      responses:
         "200":
           description: User roles removed
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: User or Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-  /v1/roles/{roleUuid}:
-    get:
-      tags:
-      - Role Management
-      summary: Get role details
-      operationId: getRole
-      parameters:
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -275,32 +261,70 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/roles/{roleUuid}:
+    get:
+      tags:
+        - Role Management
+      summary: Get role details
+      operationId: getRole
+      parameters:
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
+      responses:
         "200":
           description: Role details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoleDetailDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     put:
       tags:
-      - Role Management
+        - Role Management
       summary: Update Role
       operationId: updateRole
       parameters:
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -314,12 +338,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoleDetailDto"
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -330,31 +354,37 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - Role Management
+        - Role Management
       summary: Delete Role
       operationId: deleteRole
       parameters:
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
       responses:
+        "204":
+          description: Role deleted
         "404":
-          description: Not Found
+          description: Role not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -363,41 +393,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: Role deleted
         "500":
           description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/roles/{roleUuid}/permissions/{resourceUuid}/objects/{objectUuid}:
     put:
       tags:
-      - Role Management
+        - Role Management
       summary: Update Resource Objects to a Role
       operationId: updateResourcePermissionObjects
       parameters:
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
-      - name: resourceUuid
-        in: path
-        description: Resource UUID
-        required: true
-        schema:
-          type: string
-      - name: objectUuid
-        in: path
-        description: Object UUID
-        required: true
-        schema:
-          type: string
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
+        - name: resourceUuid
+          in: path
+          description: Resource UUID
+          required: true
+          schema:
+            type: string
+        - name: objectUuid
+          in: path
+          description: Object UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -405,12 +431,20 @@ paths:
               $ref: "#/components/schemas/ObjectPermissionsRequestDto"
         required: true
       responses:
+        "204":
+          description: Resource Objects added
         "404":
-          description: Not Found
+          description: Role not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -419,47 +453,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: Resource Objects added
         "500":
           description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - Role Management
+        - Role Management
       summary: Update Resource Objects to a Role
       operationId: removeResourcePermissionObjects
       parameters:
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
-      - name: resourceUuid
-        in: path
-        description: Resource UUID
-        required: true
-        schema:
-          type: string
-      - name: objectUuid
-        in: path
-        description: Object UUID
-        required: true
-        schema:
-          type: string
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
+        - name: resourceUuid
+          in: path
+          description: Resource UUID
+          required: true
+          schema:
+            type: string
+        - name: objectUuid
+          in: path
+          description: Object UUID
+          required: true
+          schema:
+            type: string
       responses:
+        "204":
+          description: Resource Objects added
         "404":
-          description: Not Found
+          description: Role not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -468,20 +506,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "204":
-          description: Resource Objects added
         "500":
           description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/auth/profile:
     get:
       tags:
-      - Authentication Management
+        - Authentication Management
       summary: Profile Authorization
       operationId: profile
       responses:
@@ -491,31 +525,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailDto"
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     put:
       tags:
-      - Authentication Management
+        - Authentication Management
       summary: Update User Profile
       operationId: updateUserProfile
       requestBody:
@@ -531,41 +563,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailDto"
-        "401":
-          description: Unauthorized
         "404":
-          description: Not Found
+          description: User not found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-  /v1/users:
-    get:
-      tags:
-      - User Management
-      summary: List Users
-      operationId: listUsers
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "401":
           description: Unauthorized
         "403":
@@ -576,6 +585,17 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/users:
+    get:
+      tags:
+        - User Management
+      summary: List Users
+      operationId: listUsers
+      responses:
         "200":
           description: List of users fetched
           content:
@@ -589,10 +609,24 @@ paths:
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     post:
       tags:
-      - User Management
+        - User Management
       summary: Create User
       operationId: createUser
       requestBody:
@@ -602,18 +636,24 @@ paths:
               $ref: "#/components/schemas/AddUserRequestDto"
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "201":
           description: User details retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailDto"
+        "404":
+          description: "Group, Certificate or Attribute definition not found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -624,16 +664,14 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/users/identify:
     post:
       tags:
-      - User Management
+        - User Management
       summary: Identify User
       operationId: identifyUser
       requestBody:
@@ -643,12 +681,24 @@ paths:
               $ref: "#/components/schemas/UserIdentificationRequestDto"
         required: true
       responses:
-        "404":
-          description: Not Found
+        "200":
+          description: User identified
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/UserDetailDto"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -659,39 +709,17 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "200":
-          description: User identified
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserDetailDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/roles:
     get:
       tags:
-      - Role Management
+        - Role Management
       summary: List Roles
       operationId: listRoles
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: List of roles fetched
           content:
@@ -700,17 +728,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RoleDto"
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     post:
       tags:
-      - Role Management
+        - Role Management
       summary: Create Role
       operationId: createRole
       requestBody:
@@ -726,48 +766,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoleDetailDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-  /v1/roles/{roleUuid}/permissions:
-    get:
-      tags:
-      - Role Management
-      summary: Get Permissions of a Role
-      operationId: getRolePermissions
-      parameters:
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -778,30 +782,68 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/roles/{roleUuid}/permissions:
+    get:
+      tags:
+        - Role Management
+      summary: Get Permissions of a Role
+      operationId: getRolePermissions
+      parameters:
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
+      responses:
         "200":
           description: Role permissions retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/SubjectPermissionsDto"
+        "404":
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     post:
       tags:
-      - Role Management
+        - Role Management
       summary: Add permissions to Role
       operationId: savePermissions
       parameters:
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -809,60 +851,24 @@ paths:
               $ref: "#/components/schemas/RolePermissionsRequestDto"
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: User roles updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/SubjectPermissionsDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-  /v1/roles/{roleUuid}/permissions/{resourceUuid}/objects:
-    get:
-      tags:
-      - Role Management
-      summary: Get Resource Objects of a Role
-      operationId: getResourcePermissionObjects
-      parameters:
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
-      - name: resourceUuid
-        in: path
-        description: Resource UUID
-        required: true
-        schema:
-          type: string
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -871,6 +877,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/roles/{roleUuid}/permissions/{resourceUuid}/objects:
+    get:
+      tags:
+        - Role Management
+      summary: Get Resource Objects of a Role
+      operationId: getResourcePermissionObjects
+      parameters:
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
+        - name: resourceUuid
+          in: path
+          description: Resource UUID
+          required: true
+          schema:
+            type: string
+      responses:
         "200":
           description: Resource Objects retrieved
           content:
@@ -879,32 +911,50 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ObjectPermissionsDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     post:
       tags:
-      - Role Management
+        - Role Management
       summary: Add Resource Objects to a Role
       operationId: addResourcePermissionObjects
       parameters:
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
-      - name: resourceUuid
-        in: path
-        description: Resource UUID
-        required: true
-        schema:
-          type: string
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
+        - name: resourceUuid
+          in: path
+          description: Resource UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -914,50 +964,20 @@ paths:
                 $ref: "#/components/schemas/ObjectPermissionsRequestDto"
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "204":
           description: Resource Objects added
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-  /v1/users/{userUuid}/roles:
-    get:
-      tags:
-      - User Management
-      summary: Get User Roles
-      operationId: getUserRoles
-      parameters:
-      - name: userUuid
-        in: path
-        description: User UUID
-        required: true
-        schema:
-          type: string
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -966,6 +986,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/users/{userUuid}/roles:
+    get:
+      tags:
+        - User Management
+      summary: Get User Roles
+      operationId: getUserRoles
+      parameters:
+        - name: userUuid
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
+      responses:
         "200":
           description: User roles retrieved
           content:
@@ -974,26 +1014,44 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RoleDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     patch:
       tags:
-      - User Management
+        - User Management
       summary: Add roles to User
       operationId: updateRoles
       parameters:
-      - name: userUuid
-        in: path
-        description: User UUID
-        required: true
-        schema:
-          type: string
+        - name: userUuid
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         description: Role UUIDs
         content:
@@ -1003,16 +1061,28 @@ paths:
               items:
                 type: string
             example:
-            - c2f685d4-6a3e-11ec-90d6-0242ac120003
-            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+              - c2f685d4-6a3e-11ec-90d6-0242ac120003
+              - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "404":
-          description: Not Found
+        "200":
+          description: User roles updated
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/UserDetailDto"
+        "404":
+          description: User or Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -1021,33 +1091,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "200":
-          description: User roles updated
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserDetailDto"
         "500":
           description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/users/{userUuid}/enable:
     patch:
       tags:
-      - User Management
+        - User Management
       summary: Enable User
       operationId: enableUser
       parameters:
-      - name: userUuid
-        in: path
-        description: User UUID
-        required: true
-        schema:
-          type: string
+        - name: userUuid
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: User enabled
@@ -1056,11 +1118,17 @@ paths:
               schema:
                 $ref: "#/components/schemas/UserDetailDto"
         "404":
-          description: Not Found
+          description: User not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -1071,74 +1139,42 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/users/{userUuid}/disable:
     patch:
       tags:
-      - User Management
+        - User Management
       summary: Disable User
       operationId: disableUser
       parameters:
-      - name: userUuid
-        in: path
-        description: User UUID
-        required: true
-        schema:
-          type: string
+        - name: userUuid
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "200":
           description: User disabled
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-  /v1/roles/{roleUuid}/users:
-    get:
-      tags:
-      - Role Management
-      summary: Get Role Users
-      operationId: getRoleUsers
-      parameters:
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -1147,6 +1183,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/roles/{roleUuid}/users:
+    get:
+      tags:
+        - Role Management
+      summary: Get Role Users
+      operationId: getRoleUsers
+      parameters:
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
+      responses:
         "200":
           description: Role users retrieved
           content:
@@ -1155,26 +1211,44 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UserDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     patch:
       tags:
-      - Role Management
+        - Role Management
       summary: Add users to Role
       operationId: updateUsers
       parameters:
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         description: User UUIDs
         content:
@@ -1184,58 +1258,28 @@ paths:
               items:
                 type: string
             example:
-            - c2f685d4-6a3e-11ec-90d6-0242ac120003
-            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+              - c2f685d4-6a3e-11ec-90d6-0242ac120003
+              - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "401":
-          description: Unauthorized
         "200":
           description: Role users updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/RoleDetailDto"
-        "403":
-          description: Forbidden
+        "404":
+          description: Role not found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-  /v1/users/{userUuid}/permissions:
-    get:
-      tags:
-      - User Management
-      summary: Get User permissions
-      operationId: getPermissions
-      parameters:
-      - name: userUuid
-        in: path
-        description: User UUID
-        required: true
-        schema:
-          type: string
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -1244,46 +1288,44 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/users/{userUuid}/permissions:
+    get:
+      tags:
+        - User Management
+      summary: Get User permissions
+      operationId: getPermissions
+      parameters:
+        - name: userUuid
+          in: path
+          description: User UUID
+          required: true
+          schema:
+            type: string
+      responses:
         "200":
           description: User permissions removed
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/SubjectPermissionsDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-  /v1/roles/{roleUuid}/permissions/{resourceUuid}:
-    get:
-      tags:
-      - Role Management
-      summary: Get Resources of a Role
-      operationId: getRoleResourcePermissions
-      parameters:
-      - name: roleUuid
-        in: path
-        description: Role UUID
-        required: true
-        schema:
-          type: string
-      - name: resourceUuid
-        in: path
-        description: Resource UUID
-        required: true
-        schema:
-          type: string
-      responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -1292,41 +1334,71 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/roles/{roleUuid}/permissions/{resourceUuid}:
+    get:
+      tags:
+        - Role Management
+      summary: Get Resources of a Role
+      operationId: getRoleResourcePermissions
+      parameters:
+        - name: roleUuid
+          in: path
+          description: Role UUID
+          required: true
+          schema:
+            type: string
+        - name: resourceUuid
+          in: path
+          description: Resource UUID
+          required: true
+          schema:
+            type: string
+      responses:
         "200":
           description: Role resources retrieved
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ResourcePermissionsDto"
-        "500":
-          description: Internal Server Error
+        "404":
+          description: Role not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-  /v1/auth/resources:
-    get:
-      tags:
-      - Authentication Management
-      summary: Get Auth Resources
-      operationId: getAuthResources
-      responses:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/auth/resources:
+    get:
+      tags:
+        - Authentication Management
+      summary: Get Auth Resources
+      operationId: getAuthResources
+      responses:
         "200":
           description: Resources retrieved successfully
           content:
@@ -1341,36 +1413,34 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-  /v1/auth/resources/{resourceName}/objects:
-    get:
-      tags:
-      - Authentication Management
-      summary: Get List of objects for Object Access
-      operationId: getObjectsForResource
-      parameters:
-      - name: resourceName
-        in: path
-        description: Resource Name
-        required: true
-        schema:
-          $ref: "#/components/schemas/Resource"
-      responses:
         "401":
           description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/auth/resources/{resourceName}/objects:
+    get:
+      tags:
+        - Authentication Management
+      summary: Get List of objects for Object Access
+      operationId: getObjectsForResource
+      parameters:
+        - name: resourceName
+          in: path
+          description: Resource Name
+          required: true
+          schema:
+            $ref: "#/components/schemas/Resource"
+      responses:
         "200":
           description: Objects retrieved
           content:
@@ -1379,14 +1449,32 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NameAndUuidDto"
+        "404":
+          description: Resource object not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
 components:
   schemas:
     AttributeCallback:
@@ -1405,28 +1493,24 @@ components:
             $ref: "#/components/schemas/AttributeCallbackMapping"
           uniqueItems: true
       required:
-      - callbackContext
-      - callbackMethod
-      - mappings
+        - callbackContext
+        - callbackMethod
+        - mappings
     AttributeCallbackMapping:
       type: object
       properties:
         from:
           type: string
-          description: Name of the attribute whose value is to be used as value of
-            path variable or request param or body field.It is optional and must be
-            set only if value is not set.
+          description: Name of the attribute whose value is to be used as value of path variable or request param or body field.It is optional and must be set only if value is not set.
         attributeType:
           $ref: "#/components/schemas/AttributeType"
-          description: Type of the attribute. It is optional and must be set only
-            if special behaviour is needed.
+          description: Type of the attribute. It is optional and must be set only if special behaviour is needed.
         attributeContentType:
           $ref: "#/components/schemas/AttributeContentType"
           description: 'Type of the attribute content. '
         to:
           type: string
-          description: Name of the path variable or request param or body field which
-            is to be used to assign value of attribute
+          description: Name of the path variable or request param or body field which is to be used to assign value of attribute
         targets:
           type: array
           description: Set of targets for propagating value.
@@ -1435,89 +1519,95 @@ components:
           uniqueItems: true
         value:
           type: object
-          description: Static value to be propagated to targets. It is optional and
-            is set only if the value is known at attribute creation time.
+          description: Static value to be propagated to targets. It is optional and is set only if the value is known at attribute creation time.
       required:
-      - targets
-      - to
+        - targets
+        - to
     AttributeConstraintType:
       type: string
       enum:
-      - regExp
-      - range
-      - dateTime
+        - regExp
+        - range
+        - dateTime
     AttributeContentType:
       type: string
       enum:
-      - string
-      - text
-      - integer
-      - boolean
-      - float
-      - date
-      - time
-      - datetime
-      - secret
-      - file
-      - credential
-      - codeblock
-      - object
+        - string
+        - text
+        - integer
+        - boolean
+        - float
+        - date
+        - time
+        - datetime
+        - secret
+        - file
+        - credential
+        - codeblock
+        - object
     AttributeType:
       type: string
       enum:
-      - data
-      - group
-      - info
-      - meta
-      - custom
+        - data
+        - group
+        - info
+        - meta
+        - custom
     AttributeValueTarget:
       type: string
       enum:
-      - pathVariable
-      - requestParameter
-      - body
-    BaseAttributeConstraint:
+        - pathVariable
+        - requestParameter
+        - body
+    BaseAttributeConstraintDto:
       type: object
       description: Base Attribute Constraint definition
+      discriminator:
+        propertyName: type
+        mapping:
+          regExp: "#/components/schemas/RegexpAttributeConstraint"
+          range: "#/components/schemas/RangeAttributeConstraint"
+          dateTime: "#/components/schemas/DateTimeAttributeConstraint"
       oneOf:
-      - $ref: "#/components/schemas/RegexpAttributeConstraint"
-      - $ref: "#/components/schemas/RangeAttributeConstraint"
-      - $ref: "#/components/schemas/DateTimeAttributeConstraint"
+        - $ref: "#/components/schemas/RegexpAttributeConstraint"
+        - $ref: "#/components/schemas/RangeAttributeConstraint"
+        - $ref: "#/components/schemas/DateTimeAttributeConstraint"
       properties:
+        type:
+          $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         description:
           type: string
           description: Description of the constraint
         errorMessage:
           type: string
           description: Error message to be displayed for wrong data
-        type:
-          $ref: "#/components/schemas/AttributeConstraintType"
-          description: Attribute Constraint Type
       required:
-      - type
-    BaseAttributeContent:
+        - type
+    BaseAttributeContentDto:
       type: object
       description: Base Attribute content definition
       oneOf:
-      - $ref: "#/components/schemas/BooleanAttributeContent"
-      - $ref: "#/components/schemas/CodeBlockAttributeContent"
-      - $ref: "#/components/schemas/CredentialAttributeContent"
-      - $ref: "#/components/schemas/DateAttributeContent"
-      - $ref: "#/components/schemas/DateTimeAttributeContent"
-      - $ref: "#/components/schemas/FileAttributeContent"
-      - $ref: "#/components/schemas/FloatAttributeContent"
-      - $ref: "#/components/schemas/IntegerAttributeContent"
-      - $ref: "#/components/schemas/ObjectAttributeContent"
-      - $ref: "#/components/schemas/SecretAttributeContent"
-      - $ref: "#/components/schemas/StringAttributeContent"
-      - $ref: "#/components/schemas/TextAttributeContent"
-      - $ref: "#/components/schemas/TimeAttributeContent"
+        - $ref: "#/components/schemas/BooleanAttributeContent"
+        - $ref: "#/components/schemas/CodeBlockAttributeContent"
+        - $ref: "#/components/schemas/CredentialAttributeContent"
+        - $ref: "#/components/schemas/DateAttributeContent"
+        - $ref: "#/components/schemas/DateTimeAttributeContent"
+        - $ref: "#/components/schemas/FileAttributeContent"
+        - $ref: "#/components/schemas/FloatAttributeContent"
+        - $ref: "#/components/schemas/IntegerAttributeContent"
+        - $ref: "#/components/schemas/ObjectAttributeContent"
+        - $ref: "#/components/schemas/SecretAttributeContent"
+        - $ref: "#/components/schemas/StringAttributeContent"
+        - $ref: "#/components/schemas/TextAttributeContent"
+        - $ref: "#/components/schemas/TimeAttributeContent"
       properties:
         reference:
           type: string
           description: Content Reference
     BooleanAttributeContent:
       type: object
+      description: Boolean attribute content to store true/false values
       properties:
         reference:
           type: string
@@ -1526,9 +1616,10 @@ components:
           type: boolean
           description: Boolean attribute value
       required:
-      - data
+        - data
     CodeBlockAttributeContent:
       type: object
+      description: Codeblock attribute content to store encoded snippets of programming language code
       properties:
         reference:
           type: string
@@ -1537,23 +1628,24 @@ components:
           $ref: "#/components/schemas/CodeBlockAttributeContentData"
           description: CodeBlock attribute content data
       required:
-      - data
+        - data
     CodeBlockAttributeContentData:
       type: object
       properties:
         language:
           $ref: "#/components/schemas/ProgrammingLanguageEnum"
           description: Definition of programming languages used for code
-          example: "JAVA, PHP, C, etc"
+          examples:
+            - "JAVA, PHP, C, etc"
         code:
           type: string
-          description: Block of the code in Base64. Formatting of the code is specified
-            by variable language
+          description: Block of the code in Base64. Formatting of the code is specified by variable language
       required:
-      - code
-      - language
+        - code
+        - language
     CredentialAttributeContent:
       type: object
+      description: Credential attribute content carrying information about credential to use
       properties:
         reference:
           type: string
@@ -1562,57 +1654,63 @@ components:
           $ref: "#/components/schemas/CredentialAttributeContentData"
           description: Credential attribute content data
       required:
-      - data
+        - data
     CredentialAttributeContentData:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         kind:
           type: string
           description: Credential Kind
-          example: "SoftKeyStore, Basic, ApiKey, etc"
+          examples:
+            - "SoftKeyStore, Basic, ApiKey, etc"
         attributes:
           type: array
           description: List of Credential Attributes
           items:
             $ref: "#/components/schemas/DataAttribute"
       required:
-      - attributes
-      - kind
-      - name
-      - uuid
+        - attributes
+        - kind
+        - name
+        - uuid
     DataAttribute:
       type: object
-      description: Data attribute allows to store and transfer dynamic data. Its content
-        can be edited and send in requests to store.
+      description: Data attribute allows to store and transfer dynamic data. Its content can be edited and send in requests to store.
       properties:
         version:
           type: integer
           format: int32
           default: "2"
           description: Version of the Attribute
-          example: 2
+          examples:
+            - "2"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the Attribute that is used for identification
-          example: Attribute
+          examples:
+            - Attribute
         description:
           type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
+          description: "Optional description of the Attribute, should contain helper text on what is expected"
         content:
-          description: Content of the Attribute
+          type: array
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDto"
         type:
           $ref: "#/components/schemas/AttributeType"
           default: data
@@ -1627,62 +1725,59 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraint"
+            $ref: "#/components/schemas/BaseAttributeConstraintDto"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
-          description: Optional definition of callback for getting the content of
-            the Attribute based on the action
+          description: Optional definition of callback for getting the content of the Attribute based on the action
       required:
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
+        - contentType
+        - name
+        - properties
+        - type
+        - uuid
     DataAttributeProperties:
       type: object
       properties:
         label:
           type: string
           description: Friendly name of the the Attribute
-          example: Attribute Name
+          examples:
+            - Attribute Name
         visible:
           type: boolean
           default: "true"
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
+          description: "Boolean determining if the Attribute is visible and can be displayed, otherwise it should be hidden to the user."
         group:
           type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          example: requiredAttributes
+          description: "Group of the Attribute, used for the logical grouping of the Attribute"
+          examples:
+            - requiredAttributes
         required:
           type: boolean
           default: "false"
-          description: "Boolean determining if the Attribute is required. If true,\
-            \ the Attribute must be provided."
+          description: "Boolean determining if the Attribute is required. If true, the Attribute must be provided."
         readOnly:
           type: boolean
           default: "false"
-          description: "Boolean determining if the Attribute is read only. If true,\
-            \ the Attribute content cannot be changed."
+          description: "Boolean determining if the Attribute is read only. If true, the Attribute content cannot be changed."
         list:
           type: boolean
           default: "false"
-          description: Boolean determining if the Attribute contains list of values
-            in the content
+          description: Boolean determining if the Attribute contains list of values in the content
         multiSelect:
           type: boolean
           default: "false"
           description: Boolean determining if the Attribute can have multiple values
       required:
-      - label
-      - list
-      - multiSelect
-      - readOnly
-      - required
-      - visible
+        - label
+        - list
+        - multiSelect
+        - readOnly
+        - required
+        - visible
     DateAttributeContent:
       type: object
+      description: Date attribute content in predefined format
       properties:
         reference:
           type: string
@@ -1692,9 +1787,10 @@ components:
           format: date
           description: Date attribute value in format yyyy-MM-dd
       required:
-      - data
+        - data
     DateTimeAttributeConstraint:
       type: object
+      description: DateTime attribute constraint to specify boundaries for date value
       properties:
         description:
           type: string
@@ -1709,7 +1805,7 @@ components:
           $ref: "#/components/schemas/DateTimeAttributeConstraintData"
           description: DateTime Range Attribute Constraint Data
       required:
-      - type
+        - type
     DateTimeAttributeConstraintData:
       type: object
       properties:
@@ -1723,6 +1819,7 @@ components:
           description: End of the datetime for validation
     DateTimeAttributeContent:
       type: object
+      description: DateTime attribute content in predefined format with timezone
       properties:
         reference:
           type: string
@@ -1732,9 +1829,10 @@ components:
           format: date-time
           description: DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
       required:
-      - data
+        - data
     FileAttributeContent:
       type: object
+      description: File attribute content for storing encoded file content with additional info
       properties:
         reference:
           type: string
@@ -1743,7 +1841,7 @@ components:
           $ref: "#/components/schemas/FileAttributeContentData"
           description: File attribute content data
       required:
-      - data
+        - data
     FileAttributeContentData:
       type: object
       properties:
@@ -1757,11 +1855,12 @@ components:
           type: string
           description: Type of the file uploaded
       required:
-      - content
-      - fileName
-      - mimeType
+        - content
+        - fileName
+        - mimeType
     FloatAttributeContent:
       type: object
+      description: Float attribute content for decimal numbers
       properties:
         reference:
           type: string
@@ -1771,9 +1870,10 @@ components:
           format: float
           description: Float attribute value
       required:
-      - data
+        - data
     IntegerAttributeContent:
       type: object
+      description: Integer attribute content for integer numbers
       properties:
         reference:
           type: string
@@ -1783,9 +1883,10 @@ components:
           format: int32
           description: Integer attribute value
       required:
-      - data
+        - data
     ObjectAttributeContent:
       type: object
+      description: Object attribute content for data with custom structure
       properties:
         reference:
           type: string
@@ -1794,53 +1895,54 @@ components:
           type: object
           description: Object attribute content data
       required:
-      - data
+        - data
     ProgrammingLanguageEnum:
       type: string
       enum:
-      - apacheconf
-      - bash
-      - basic
-      - c
-      - csharp
-      - cpp
-      - css
-      - docker
-      - fsharp
-      - gherkin
-      - git
-      - go
-      - graphql
-      - html
-      - http
-      - ini
-      - java
-      - javascript
-      - json
-      - kotlin
-      - latex
-      - lisp
-      - makefile
-      - markdown
-      - matlab
-      - nginx
-      - objectivec
-      - perl
-      - php
-      - powershell
-      - properties
-      - python
-      - ruby
-      - rust
-      - smalltalk
-      - sql
-      - typescript
-      - vbnet
-      - xquery
-      - xml
-      - yaml
+        - apacheconf
+        - bash
+        - basic
+        - c
+        - csharp
+        - cpp
+        - css
+        - docker
+        - fsharp
+        - gherkin
+        - git
+        - go
+        - graphql
+        - html
+        - http
+        - ini
+        - java
+        - javascript
+        - json
+        - kotlin
+        - latex
+        - lisp
+        - makefile
+        - markdown
+        - matlab
+        - nginx
+        - objectivec
+        - perl
+        - php
+        - powershell
+        - properties
+        - python
+        - ruby
+        - rust
+        - smalltalk
+        - sql
+        - typescript
+        - vbnet
+        - xquery
+        - xml
+        - yaml
     RangeAttributeConstraint:
       type: object
+      description: Range attribute constraint to specify boundaries for integer value
       properties:
         description:
           type: string
@@ -1855,7 +1957,7 @@ components:
           $ref: "#/components/schemas/RangeAttributeConstraintData"
           description: Integer Range Attribute Constraint Data
       required:
-      - type
+        - type
     RangeAttributeConstraintData:
       type: object
       properties:
@@ -1869,6 +1971,7 @@ components:
           description: End of the range for validation
     RegexpAttributeConstraint:
       type: object
+      description: RegExp attribute constraint to restrict string value by regular expression
       properties:
         description:
           type: string
@@ -1883,7 +1986,7 @@ components:
           type: string
           description: Regular Expression Attribute Constraint Data
       required:
-      - type
+        - type
     RequestAttributeDto:
       type: object
       description: Request attribute to send attribute content for object
@@ -1891,27 +1994,31 @@ components:
         uuid:
           type: string
           description: UUID of the Attribute
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
           description: Content Type of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
-            $ref: "#/components/schemas/BaseAttributeContent"
+            $ref: "#/components/schemas/BaseAttributeContentDto"
       required:
-      - content
-      - contentType
-      - name
-      - uuid
+        - content
+        - contentType
+        - name
+        - uuid
     SecretAttributeContent:
       type: object
+      description: Secret attribute content carrying secrets with defined protection level
       properties:
         reference:
           type: string
@@ -1920,7 +2027,7 @@ components:
           $ref: "#/components/schemas/SecretAttributeContentData"
           description: Secret attribute content data
       required:
-      - data
+        - data
     SecretAttributeContentData:
       type: object
       properties:
@@ -1932,6 +2039,7 @@ components:
           description: Level of protection of the data
     StringAttributeContent:
       type: object
+      description: String attribute content
       properties:
         reference:
           type: string
@@ -1940,9 +2048,10 @@ components:
           type: string
           description: String attribute value
       required:
-      - data
+        - data
     TextAttributeContent:
       type: object
+      description: Text attribute content used to store longer formatted strings
       properties:
         reference:
           type: string
@@ -1951,9 +2060,10 @@ components:
           type: string
           description: Text attribute value
       required:
-      - data
+        - data
     TimeAttributeContent:
       type: object
+      description: Time attribute content in predefined format
       properties:
         reference:
           type: string
@@ -1962,7 +2072,7 @@ components:
           type: string
           description: Time attribute value in format HH:mm:ss
       required:
-      - data
+        - data
     UpdateUserRequestDto:
       type: object
       properties:
@@ -1980,8 +2090,7 @@ components:
           description: Email of the user
         groupUuids:
           type: array
-          description: Groups UUIDs of the user (set to empty list to remove certificate
-            from all groups)
+          description: Groups UUIDs of the user (set to empty list to remove certificate from all groups)
           items:
             type: string
         certificateData:
@@ -1989,15 +2098,24 @@ components:
           description: Base64 Content of the admin certificate
         certificateUuid:
           type: string
-          description: UUID of the existing certificate in the Inventory. Mandatory
-            if certificate is not provided
+          description: UUID of the existing certificate in the Inventory. Mandatory if certificate is not provided
         customAttributes:
           type: array
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
       required:
-      - email
+        - email
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          examples:
+            - Error message
+      required:
+        - message
     AuthenticationServiceExceptionDto:
       type: object
       properties:
@@ -2012,23 +2130,25 @@ components:
           type: string
           description: Exception message
       required:
-      - code
-      - message
-      - statusCode
+        - code
+        - message
+        - statusCode
     NameAndUuidDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
       required:
-      - name
-      - uuid
+        - name
+        - uuid
     ResponseAttributeDto:
       type: object
       description: Response attribute with content for object it belongs to
@@ -2036,43 +2156,49 @@ components:
         uuid:
           type: string
           description: UUID of the Attribute
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         label:
           type: string
           description: Label of the the Attribute
-          example: Attribute Name
+          examples:
+            - Attribute Name
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
           description: Content Type of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
-            $ref: "#/components/schemas/BaseAttributeContent"
+            $ref: "#/components/schemas/BaseAttributeContentDto"
       required:
-      - contentType
-      - label
-      - name
-      - type
+        - contentType
+        - label
+        - name
+        - type
     RoleDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the user
@@ -2083,9 +2209,9 @@ components:
           type: boolean
           description: "Is system role. True = Yes, False = No"
       required:
-      - name
-      - systemRole
-      - uuid
+        - name
+        - systemRole
+        - uuid
     UserCertificateDto:
       type: object
       properties:
@@ -2096,19 +2222,21 @@ components:
           type: string
           description: Fingerprint of the certificate
       required:
-      - fingerprint
-      - uuid
+        - fingerprint
+        - uuid
     UserDetailDto:
       type: object
       properties:
         uuid:
           type: string
           description: UUID of the User
-          example: 5b5f0784-2519-11ed-861d-0242ac120002
+          examples:
+            - 5b5f0784-2519-11ed-861d-0242ac120002
         username:
           type: string
           description: Username of the user
-          example: user1
+          examples:
+            - user1
         firstName:
           type: string
           description: First name of the user
@@ -2146,12 +2274,12 @@ components:
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
       required:
-      - enabled
-      - groups
-      - roles
-      - systemUser
-      - username
-      - uuid
+        - enabled
+        - groups
+        - roles
+        - systemUser
+        - username
+        - uuid
     RoleRequestDto:
       type: object
       properties:
@@ -2175,11 +2303,13 @@ components:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the user
@@ -2200,21 +2330,23 @@ components:
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
       required:
-      - name
-      - systemRole
-      - users
-      - uuid
+        - name
+        - systemRole
+        - users
+        - uuid
     UserDto:
       type: object
       properties:
         uuid:
           type: string
           description: UUID of the User
-          example: 5b5f0784-2519-11ed-861d-0242ac120002
+          examples:
+            - 5b5f0784-2519-11ed-861d-0242ac120002
         username:
           type: string
           description: Username of the user
-          example: user1
+          examples:
+            - user1
         firstName:
           type: string
           description: First name of the user
@@ -2239,11 +2371,11 @@ components:
           type: boolean
           description: "Is System user. True = Yes, False = No"
       required:
-      - enabled
-      - groups
-      - systemUser
-      - username
-      - uuid
+        - enabled
+        - groups
+        - systemUser
+        - username
+        - uuid
     ObjectPermissionsRequestDto:
       type: object
       properties:
@@ -2264,24 +2396,16 @@ components:
           items:
             type: string
       required:
-      - name
-      - uuid
-    ErrorMessageDto:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message detail
-          example: Error message
-      required:
-      - message
+        - name
+        - uuid
     AddUserRequestDto:
       type: object
       properties:
         username:
           type: string
           description: Username of the user
-          example: user1
+          examples:
+            - user1
         description:
           type: string
           description: Description of the user
@@ -2316,7 +2440,7 @@ components:
         name:
           type: string
       required:
-      - username
+        - username
     UserIdentificationRequestDto:
       type: object
       properties:
@@ -2346,8 +2470,8 @@ components:
           items:
             $ref: "#/components/schemas/ObjectPermissionsRequestDto"
       required:
-      - allowAllActions
-      - name
+        - allowAllActions
+        - name
     RolePermissionsRequestDto:
       type: object
       properties:
@@ -2360,7 +2484,7 @@ components:
           items:
             $ref: "#/components/schemas/ResourcePermissionsRequestDto"
       required:
-      - allowAllResources
+        - allowAllResources
     ObjectPermissionsDto:
       type: object
       properties:
@@ -2381,10 +2505,10 @@ components:
           items:
             type: string
       required:
-      - allow
-      - deny
-      - name
-      - uuid
+        - allow
+        - deny
+        - name
+        - uuid
     ResourcePermissionsDto:
       type: object
       properties:
@@ -2405,10 +2529,10 @@ components:
           items:
             $ref: "#/components/schemas/ObjectPermissionsDto"
       required:
-      - actions
-      - allowAllActions
-      - name
-      - objects
+        - actions
+        - allowAllActions
+        - name
+        - objects
     SubjectPermissionsDto:
       type: object
       properties:
@@ -2421,37 +2545,41 @@ components:
           items:
             $ref: "#/components/schemas/ResourcePermissionsDto"
       required:
-      - allowAllResources
-      - resources
+        - allowAllResources
+        - resources
     AuthActionDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         displayName:
           type: string
           description: Resource label
       required:
-      - displayName
-      - name
-      - uuid
+        - displayName
+        - name
+        - uuid
     AuthResourceDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           $ref: "#/components/schemas/Resource"
           description: Resource Name
-          example: Name
+          examples:
+            - Name
         displayName:
           type: string
           description: Resource label
@@ -2460,71 +2588,101 @@ components:
           description: Listing Endpoint
         objectAccess:
           type: boolean
-          description: "If resource has Object access permissions. True = Yes, False\
-            \ = No"
+          description: "If resource has Object access permissions. True = Yes, False = No"
         actions:
           type: array
           description: List of Actions for the Resource
           items:
             $ref: "#/components/schemas/AuthActionDto"
       required:
-      - actions
-      - displayName
-      - name
-      - objectAccess
-      - uuid
+        - actions
+        - displayName
+        - name
+        - objectAccess
+        - uuid
     Resource:
       type: string
       description: Resource Name
       enum:
-      - NONE
-      - dashboard
-      - settings
-      - auditLogs
-      - credentials
-      - connectors
-      - attributes
-      - jobs
-      - notificationInstances
-      - users
-      - roles
-      - acmeAccounts
-      - acmeProfiles
-      - scepProfiles
-      - cmpProfiles
-      - authorities
-      - raProfiles
-      - certificates
-      - certificateRequests
-      - groups
-      - complianceProfiles
-      - discoveries
-      - entities
-      - locations
-      - tokenProfiles
-      - tokens
-      - keys
-      - approvalProfiles
-      - approvals
-      - rules
-      - actions
-      - triggers
-      - resources
-      - resourceEvents
-      - searchFilters
-      - keyItems
-      - platformEnums
-      - notifications
-      - conditions
-      - executions
-      - complianceRules
-      - complianceGroups
-      - customAttributes
-      - globalMetadata
-      - acmeOrders
-      - acmeAuthorizations
-      - acmeChallenges
-      - cmpTransactions
-      - endEntityProfiles
-      - authenticationProviders
-      example: Name
+        - NONE
+        - dashboard
+        - settings
+        - auditLogs
+        - credentials
+        - connectors
+        - attributes
+        - jobs
+        - notificationInstances
+        - users
+        - roles
+        - acmeAccounts
+        - acmeProfiles
+        - scepProfiles
+        - cmpProfiles
+        - authorities
+        - raProfiles
+        - certificates
+        - certificateRequests
+        - groups
+        - complianceProfiles
+        - discoveries
+        - entities
+        - locations
+        - tokenProfiles
+        - tokens
+        - keys
+        - approvalProfiles
+        - approvals
+        - rules
+        - actions
+        - triggers
+        - resources
+        - resourceEvents
+        - searchFilters
+        - keyItems
+        - platformEnums
+        - notifications
+        - conditions
+        - executions
+        - complianceRules
+        - complianceGroups
+        - customAttributes
+        - globalMetadata
+        - acmeOrders
+        - acmeAuthorizations
+        - acmeChallenges
+        - cmpTransactions
+        - endEntityProfiles
+        - authenticationProviders
+      examples:
+        - Name
+  securitySchemes:
+    ConnectorAPIKeyAuth:
+      type: apiKey
+      description: API Key in header configured for connector
+      name: ApiKeyHeaderAttribute
+      in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
+    SessionAuth:
+      type: apiKey
+      description: Session-based authentication with session ID stored in 'czertainly-session' cookie
+      name: czertainly-session
+      in: cookie
+    CertificateAuth:
+      type: apiKey
+      description: Base64 encoded X.509 certificate passed in header
+      name: X-APP-CERTIFICATE
+      in: header
+    CertificateTLSAuth:
+      type: mutualTLS
+      description: Client certificate authentication
+    NoAuth:
+      type: http
+      description: No authentication
+      scheme: none
+    BearerJWTAuth:
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT

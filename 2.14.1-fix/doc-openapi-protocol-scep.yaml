@@ -16,55 +16,42 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:65430
-  description: Generated server url
+  - url: https://demo.czertainly.online/api
+    description: CZERTAINLY Demo server
 tags:
-- name: SCEP RA Profile
-  description: Interfaces used by SCEP clients to request SCEP related operations
-    on top of RA Profile. SCEP Profile defines the behaviour for the specific SCEP
-    configuration. SCEP Profile is bound with specific RA Profile and it can be used
-    by the SCEP clients to request operations on their specific URL. These operations
-    are always specific only for the RA Profile.
-- name: SCEP operations
-  description: "Interfaces used by SCEP clients to request SCEP related operations.\
-    \ SCEP Profile defines the behaviour for the specific SCEP configuration. When\
-    \ the SCEP Profile contains default RA Profile, it can be used by the SCEP clients\
-    \ to request operations on their specific URL."
+  - name: SCEP RA Profile
+    description: Interfaces used by SCEP clients to request SCEP related operations on top of RA Profile. SCEP Profile defines the behaviour for the specific SCEP configuration. SCEP Profile is bound with specific RA Profile and it can be used by the SCEP clients to request operations on their specific URL. These operations are always specific only for the RA Profile.
+  - name: SCEP operations
+    description: "Interfaces used by SCEP clients to request SCEP related operations. SCEP Profile defines the behaviour for the specific SCEP configuration. When the SCEP Profile contains default RA Profile, it can be used by the SCEP clients to request operations on their specific URL."
 paths:
   /v1/protocols/scep/{scepProfileName}/pkiclient.exe:
     get:
       tags:
-      - SCEP operations
+        - SCEP operations
       summary: SCEP Get Operations
       externalDocs:
         description: "RFC 8894, section 4.1"
         url: https://datatracker.ietf.org/doc/html/rfc8894/#section-4.1
       operationId: doGet
       parameters:
-      - name: scepProfileName
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: operation
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: message
-        in: query
-        description: Base64 encoded CMS data
-        required: false
-        schema:
-          type: string
+        - name: scepProfileName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: operation
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: message
+          in: query
           description: Base64 encoded CMS data
+          required: false
+          schema:
+            type: string
+            description: Base64 encoded CMS data
       responses:
-        "403":
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Operation executed
           content:
@@ -73,39 +60,52 @@ paths:
                 type: string
                 format: binary
                 description: "Response structure defined in RFC 8894, section 4"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "400":
           description: Bad Request
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+        "403":
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+      security: []
     post:
       tags:
-      - SCEP operations
+        - SCEP operations
       summary: SCEP Post Operations
       externalDocs:
         description: "RFC 8894, section 4.1"
         url: https://datatracker.ietf.org/doc/html/rfc8894/#section-4.1
       operationId: doPost
       parameters:
-      - name: scepProfileName
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: operation
-        in: query
-        required: true
-        schema:
-          type: string
+        - name: scepProfileName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: operation
+          in: query
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           '*/*':
@@ -115,12 +115,6 @@ paths:
               description: Binary CMS data
         required: true
       responses:
-        "403":
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Operation executed
           content:
@@ -129,54 +123,61 @@ paths:
                 type: string
                 format: binary
                 description: "Response structure defined in RFC 8894, section 4"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "400":
           description: Bad Request
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+        "403":
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+      security: []
   /v1/protocols/scep/raProfile/{raProfileName}/pkiclient.exe:
     get:
       tags:
-      - SCEP RA Profile
+        - SCEP RA Profile
       summary: SCEP Get Operations
       externalDocs:
         description: "RFC 8894, section 4.1"
         url: https://datatracker.ietf.org/doc/html/rfc8894/#section-4.1
       operationId: doGet_1
       parameters:
-      - name: raProfileName
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: operation
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: message
-        in: query
-        description: Base64 encoded CMS data
-        required: false
-        schema:
-          type: string
+        - name: raProfileName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: operation
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: message
+          in: query
           description: Base64 encoded CMS data
+          required: false
+          schema:
+            type: string
+            description: Base64 encoded CMS data
       responses:
-        "403":
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Operation executed
           content:
@@ -185,39 +186,52 @@ paths:
                 type: string
                 format: binary
                 description: "Response structure defined in RFC 8894, section 4"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "400":
           description: Bad Request
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+        "403":
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+      security: []
     post:
       tags:
-      - SCEP RA Profile
+        - SCEP RA Profile
       summary: SCEP Post Operations
       externalDocs:
         description: "RFC 8894, section 4.1"
         url: https://datatracker.ietf.org/doc/html/rfc8894/#section-4.1
       operationId: doPost_1
       parameters:
-      - name: raProfileName
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: operation
-        in: query
-        required: true
-        schema:
-          type: string
+        - name: raProfileName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: operation
+          in: query
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           '*/*':
@@ -227,12 +241,6 @@ paths:
               description: Binary CMS data
         required: true
       responses:
-        "403":
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Operation executed
           content:
@@ -241,41 +249,68 @@ paths:
                 type: string
                 format: binary
                 description: "Response structure defined in RFC 8894, section 4"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "400":
           description: Bad Request
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "500":
           description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+        "403":
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+      security: []
 components:
   schemas:
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          examples:
+            - Error message
+      required:
+        - message
     ProblemDocument:
       type: object
       properties:
         type:
           type: string
           description: Type of the ACME problem
-          example: notFound
+          examples:
+            - notFound
         title:
           type: string
           description: ACME problem title
-          example: Not Found
+          examples:
+            - Not Found
         detail:
           type: string
           description: ACME problem details
-          example: Requested object is not found
+          examples:
+            - Requested object is not found
         instance:
           type: string
           description: URL of the changes if something needs to be approved
-          example: https://some-company.com/instances/changes
+          examples:
+            - https://some-company.com/instances/changes
         subproblems:
           type: array
           description: List of subproblems related to error
@@ -284,10 +319,41 @@ components:
         algorithms:
           type: array
           description: List of supported algorithms
-          example: ES256
+          examples:
+            - ES256
           items:
             type: string
       required:
-      - detail
-      - instance
-      - type
+        - detail
+        - instance
+        - type
+  securitySchemes:
+    ConnectorAPIKeyAuth:
+      type: apiKey
+      description: API Key in header configured for connector
+      name: ApiKeyHeaderAttribute
+      in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
+    SessionAuth:
+      type: apiKey
+      description: Session-based authentication with session ID stored in 'czertainly-session' cookie
+      name: czertainly-session
+      in: cookie
+    CertificateAuth:
+      type: apiKey
+      description: Base64 encoded X.509 certificate passed in header
+      name: X-APP-CERTIFICATE
+      in: header
+    CertificateTLSAuth:
+      type: mutualTLS
+      description: Client certificate authentication
+    NoAuth:
+      type: http
+      description: No authentication
+      scheme: none
+    BearerJWTAuth:
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT

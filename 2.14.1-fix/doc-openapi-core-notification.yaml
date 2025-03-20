@@ -16,33 +16,27 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:65353
-  description: Generated server url
+  - url: https://demo.czertainly.online/api
+    description: CZERTAINLY Demo server
 tags:
-- name: Internal Notification
-  description: "Internal Notifications API that manages notifications for logged user\
-    \ in the platform. Note that this API does not manage nor trigger external notifications.\
-    \ For external notifications, please refer to the External Notification Management\
-    \ API."
-- name: External Notification Management
-  description: "External Notification Management API for managing notification instances\
-    \ that can be used to notify recipient(s) about events that were triggered in\
-    \ the platform. Note that this API does not handle internal notifications. For\
-    \ internal notifications, please refer to the Internal Notification API"
+  - name: Internal Notification
+    description: "Internal Notifications API that manages notifications for logged user in the platform. Note that this API does not manage nor trigger external notifications. For external notifications, please refer to the External Notification Management API."
+  - name: External Notification Management
+    description: "External Notification Management API for managing notification instances that can be used to notify recipient(s) about events that were triggered in the platform. Note that this API does not handle internal notifications. For internal notifications, please refer to the Internal Notification API"
 paths:
   /v1/notificationInstances/{uuid}:
     get:
       tags:
-      - External Notification Management
+        - External Notification Management
       summary: Details of an Notification instance
       operationId: getNotificationInstance
       parameters:
-      - name: uuid
-        in: path
-        description: Notification instance UUID
-        required: true
-        schema:
-          type: string
+        - name: uuid
+          in: path
+          description: Notification instance UUID
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Notification instance details retrieved
@@ -51,7 +45,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/NotificationInstanceDto"
         "404":
-          description: Not Found
+          description: Notification instance not found
           content:
             application/json:
               schema:
@@ -62,20 +56,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
@@ -84,18 +66,34 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     put:
       tags:
-      - External Notification Management
+        - External Notification Management
       summary: Edit Notification instance
       operationId: editNotificationInstance
       parameters:
-      - name: uuid
-        in: path
-        description: Notification instance UUID
-        required: true
-        schema:
-          type: string
+        - name: uuid
+          in: path
+          description: Notification instance UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -103,12 +101,6 @@ paths:
               $ref: "#/components/schemas/NotificationInstanceUpdateRequestDto"
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: Notification instance details updated
           content:
@@ -124,28 +116,22 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
+                - Error Message 1
+                - Error Message 2
+        "404":
+          description: Notification instance or connector not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
@@ -154,23 +140,39 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - External Notification Management
+        - External Notification Management
       summary: Delete Notification instance
       operationId: deleteNotificationInstance
       parameters:
-      - name: uuid
-        in: path
-        description: Notification instance UUID
-        required: true
-        schema:
-          type: string
+        - name: uuid
+          in: path
+          description: Notification instance UUID
+          required: true
+          schema:
+            type: string
       responses:
         "204":
           description: Notification instance deleted
         "404":
-          description: Not Found
+          description: Notification instance not found
           content:
             application/json:
               schema:
@@ -181,20 +183,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
@@ -203,10 +193,26 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/notificationInstances:
     get:
       tags:
-      - External Notification Management
+        - External Notification Management
       summary: List of available Notification instances
       operationId: listNotificationInstances
       responses:
@@ -218,32 +224,14 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NotificationInstanceDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
@@ -252,9 +240,25 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     post:
       tags:
-      - External Notification Management
+        - External Notification Management
       summary: Add Notification instance
       operationId: createNotificationInstance
       requestBody:
@@ -264,12 +268,12 @@ paths:
               $ref: "#/components/schemas/NotificationInstanceRequestDto"
         required: true
       responses:
-        "404":
-          description: Not Found
+        "201":
+          description: New Notification instance added
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+                $ref: "#/components/schemas/UuidDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -279,34 +283,22 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
+                - Error Message 1
+                - Error Message 2
+        "404":
+          description: Connector not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "201":
-          description: New Notification instance added
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UuidDto"
         "401":
           description: Unauthorized
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "403":
           description: Forbidden
           content:
@@ -315,19 +307,35 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/notifications:
     get:
       tags:
-      - Internal Notification
+        - Internal Notification
       summary: List notifications for logged user
       operationId: listNotifications
       parameters:
-      - name: request
-        in: query
-        description: Show only unread notifications
-        required: true
-        schema:
-          $ref: "#/components/schemas/NotificationRequestDto"
+        - name: request
+          in: query
+          description: Show only unread notifications
+          required: true
+          schema:
+            $ref: "#/components/schemas/NotificationRequestDto"
       responses:
         "200":
           description: List of notifications
@@ -335,12 +343,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NotificationResponseDto"
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -357,9 +359,13 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - Internal Notification
+        - Internal Notification
       summary: Delete a list of notifications for logged user
       operationId: bulkDeleteNotification
       requestBody:
@@ -371,16 +377,12 @@ paths:
               items:
                 type: string
             example:
-            - c2f685d4-6a3e-11ec-90d6-0242ac120003
-            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+              - c2f685d4-6a3e-11ec-90d6-0242ac120003
+              - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: Notifications deleted
         "400":
           description: Bad Request
           content:
@@ -389,8 +391,6 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
-        "204":
-          description: Notifications deleted
         "403":
           description: Forbidden
           content:
@@ -399,9 +399,13 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     patch:
       tags:
-      - Internal Notification
+        - Internal Notification
       summary: Mark a list of notifications as read for logged user
       operationId: bulkMarkNotificationAsRead
       requestBody:
@@ -413,18 +417,12 @@ paths:
               items:
                 type: string
             example:
-            - c2f685d4-6a3e-11ec-90d6-0242ac120003
-            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+              - c2f685d4-6a3e-11ec-90d6-0242ac120003
+              - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
         "204":
           description: Notifications marked as read
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -441,22 +439,28 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/notifications/{uuid}:
     delete:
       tags:
-      - Internal Notification
+        - Internal Notification
       summary: Delete a notification for logged user
       operationId: deleteNotification
       parameters:
-      - name: uuid
-        in: path
-        description: Notification UUID
-        required: true
-        schema:
-          type: string
+        - name: uuid
+          in: path
+          description: Notification UUID
+          required: true
+          schema:
+            type: string
       responses:
+        "204":
+          description: Notification deleted
         "404":
-          description: Not Found
+          description: Notification not found
           content:
             application/json:
               schema:
@@ -477,25 +481,27 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
-        "204":
-          description: Notification deleted
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     patch:
       tags:
-      - Internal Notification
+        - Internal Notification
       summary: Mark notification as read for logged user
       operationId: markNotificationAsRead
       parameters:
-      - name: uuid
-        in: path
-        description: Notification UUID
-        required: true
-        schema:
-          type: string
+        - name: uuid
+          in: path
+          description: Notification UUID
+          required: true
+          schema:
+            type: string
       responses:
         "204":
           description: Notification marked as read
         "404":
-          description: Not Found
+          description: Notification not found
           content:
             application/json:
               schema:
@@ -516,52 +522,30 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/notificationInstances/attributes/mapping/{connectorUuid}/{kind}:
     get:
       tags:
-      - External Notification Management
+        - External Notification Management
       summary: List of mapping attributes
       operationId: listMappingAttributes
       parameters:
-      - name: connectorUuid
-        in: path
-        description: Connector UUID
-        required: true
-        schema:
-          type: string
-      - name: kind
-        in: path
-        description: Kind
-        required: true
-        schema:
-          type: string
+        - name: connectorUuid
+          in: path
+          description: Connector UUID
+          required: true
+          schema:
+            type: string
+        - name: kind
+          in: path
+          description: Kind
+          required: true
+          schema:
+            type: string
       responses:
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: List of mapping attributes
           content:
@@ -570,6 +554,20 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/DataAttribute"
+        "404":
+          description: Connector not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "403":
           description: Forbidden
           content:
@@ -578,6 +576,22 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
 components:
   schemas:
     AttributeCallback:
@@ -596,28 +610,24 @@ components:
             $ref: "#/components/schemas/AttributeCallbackMapping"
           uniqueItems: true
       required:
-      - callbackContext
-      - callbackMethod
-      - mappings
+        - callbackContext
+        - callbackMethod
+        - mappings
     AttributeCallbackMapping:
       type: object
       properties:
         from:
           type: string
-          description: Name of the attribute whose value is to be used as value of
-            path variable or request param or body field.It is optional and must be
-            set only if value is not set.
+          description: Name of the attribute whose value is to be used as value of path variable or request param or body field.It is optional and must be set only if value is not set.
         attributeType:
           $ref: "#/components/schemas/AttributeType"
-          description: Type of the attribute. It is optional and must be set only
-            if special behaviour is needed.
+          description: Type of the attribute. It is optional and must be set only if special behaviour is needed.
         attributeContentType:
           $ref: "#/components/schemas/AttributeContentType"
           description: 'Type of the attribute content. '
         to:
           type: string
-          description: Name of the path variable or request param or body field which
-            is to be used to assign value of attribute
+          description: Name of the path variable or request param or body field which is to be used to assign value of attribute
         targets:
           type: array
           description: Set of targets for propagating value.
@@ -626,33 +636,32 @@ components:
           uniqueItems: true
         value:
           type: object
-          description: Static value to be propagated to targets. It is optional and
-            is set only if the value is known at attribute creation time.
+          description: Static value to be propagated to targets. It is optional and is set only if the value is known at attribute creation time.
       required:
-      - targets
-      - to
+        - targets
+        - to
     AttributeConstraintType:
       type: string
       enum:
-      - regExp
-      - range
-      - dateTime
+        - regExp
+        - range
+        - dateTime
     AttributeContentType:
       type: string
       enum:
-      - string
-      - text
-      - integer
-      - boolean
-      - float
-      - date
-      - time
-      - datetime
-      - secret
-      - file
-      - credential
-      - codeblock
-      - object
+        - string
+        - text
+        - integer
+        - boolean
+        - float
+        - date
+        - time
+        - datetime
+        - secret
+        - file
+        - credential
+        - codeblock
+        - object
     AttributeMappingDto:
       type: object
       properties:
@@ -669,66 +678,73 @@ components:
           type: string
           description: Custom Attribute Label
       required:
-      - customAttributeLabel
-      - customAttributeUuid
-      - mappingAttributeName
-      - mappingAttributeUuid
+        - customAttributeLabel
+        - customAttributeUuid
+        - mappingAttributeName
+        - mappingAttributeUuid
     AttributeType:
       type: string
       enum:
-      - data
-      - group
-      - info
-      - meta
-      - custom
+        - data
+        - group
+        - info
+        - meta
+        - custom
     AttributeValueTarget:
       type: string
       enum:
-      - pathVariable
-      - requestParameter
-      - body
-    BaseAttributeConstraint:
+        - pathVariable
+        - requestParameter
+        - body
+    BaseAttributeConstraintDto:
       type: object
       description: Base Attribute Constraint definition
+      discriminator:
+        propertyName: type
+        mapping:
+          regExp: "#/components/schemas/RegexpAttributeConstraint"
+          range: "#/components/schemas/RangeAttributeConstraint"
+          dateTime: "#/components/schemas/DateTimeAttributeConstraint"
       oneOf:
-      - $ref: "#/components/schemas/RegexpAttributeConstraint"
-      - $ref: "#/components/schemas/RangeAttributeConstraint"
-      - $ref: "#/components/schemas/DateTimeAttributeConstraint"
+        - $ref: "#/components/schemas/RegexpAttributeConstraint"
+        - $ref: "#/components/schemas/RangeAttributeConstraint"
+        - $ref: "#/components/schemas/DateTimeAttributeConstraint"
       properties:
+        type:
+          $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         description:
           type: string
           description: Description of the constraint
         errorMessage:
           type: string
           description: Error message to be displayed for wrong data
-        type:
-          $ref: "#/components/schemas/AttributeConstraintType"
-          description: Attribute Constraint Type
       required:
-      - type
-    BaseAttributeContent:
+        - type
+    BaseAttributeContentDto:
       type: object
       description: Base Attribute content definition
       oneOf:
-      - $ref: "#/components/schemas/BooleanAttributeContent"
-      - $ref: "#/components/schemas/CodeBlockAttributeContent"
-      - $ref: "#/components/schemas/CredentialAttributeContent"
-      - $ref: "#/components/schemas/DateAttributeContent"
-      - $ref: "#/components/schemas/DateTimeAttributeContent"
-      - $ref: "#/components/schemas/FileAttributeContent"
-      - $ref: "#/components/schemas/FloatAttributeContent"
-      - $ref: "#/components/schemas/IntegerAttributeContent"
-      - $ref: "#/components/schemas/ObjectAttributeContent"
-      - $ref: "#/components/schemas/SecretAttributeContent"
-      - $ref: "#/components/schemas/StringAttributeContent"
-      - $ref: "#/components/schemas/TextAttributeContent"
-      - $ref: "#/components/schemas/TimeAttributeContent"
+        - $ref: "#/components/schemas/BooleanAttributeContent"
+        - $ref: "#/components/schemas/CodeBlockAttributeContent"
+        - $ref: "#/components/schemas/CredentialAttributeContent"
+        - $ref: "#/components/schemas/DateAttributeContent"
+        - $ref: "#/components/schemas/DateTimeAttributeContent"
+        - $ref: "#/components/schemas/FileAttributeContent"
+        - $ref: "#/components/schemas/FloatAttributeContent"
+        - $ref: "#/components/schemas/IntegerAttributeContent"
+        - $ref: "#/components/schemas/ObjectAttributeContent"
+        - $ref: "#/components/schemas/SecretAttributeContent"
+        - $ref: "#/components/schemas/StringAttributeContent"
+        - $ref: "#/components/schemas/TextAttributeContent"
+        - $ref: "#/components/schemas/TimeAttributeContent"
       properties:
         reference:
           type: string
           description: Content Reference
     BooleanAttributeContent:
       type: object
+      description: Boolean attribute content to store true/false values
       properties:
         reference:
           type: string
@@ -737,9 +753,10 @@ components:
           type: boolean
           description: Boolean attribute value
       required:
-      - data
+        - data
     CodeBlockAttributeContent:
       type: object
+      description: Codeblock attribute content to store encoded snippets of programming language code
       properties:
         reference:
           type: string
@@ -748,23 +765,24 @@ components:
           $ref: "#/components/schemas/CodeBlockAttributeContentData"
           description: CodeBlock attribute content data
       required:
-      - data
+        - data
     CodeBlockAttributeContentData:
       type: object
       properties:
         language:
           $ref: "#/components/schemas/ProgrammingLanguageEnum"
           description: Definition of programming languages used for code
-          example: "JAVA, PHP, C, etc"
+          examples:
+            - "JAVA, PHP, C, etc"
         code:
           type: string
-          description: Block of the code in Base64. Formatting of the code is specified
-            by variable language
+          description: Block of the code in Base64. Formatting of the code is specified by variable language
       required:
-      - code
-      - language
+        - code
+        - language
     CredentialAttributeContent:
       type: object
+      description: Credential attribute content carrying information about credential to use
       properties:
         reference:
           type: string
@@ -773,57 +791,63 @@ components:
           $ref: "#/components/schemas/CredentialAttributeContentData"
           description: Credential attribute content data
       required:
-      - data
+        - data
     CredentialAttributeContentData:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         kind:
           type: string
           description: Credential Kind
-          example: "SoftKeyStore, Basic, ApiKey, etc"
+          examples:
+            - "SoftKeyStore, Basic, ApiKey, etc"
         attributes:
           type: array
           description: List of Credential Attributes
           items:
             $ref: "#/components/schemas/DataAttribute"
       required:
-      - attributes
-      - kind
-      - name
-      - uuid
+        - attributes
+        - kind
+        - name
+        - uuid
     DataAttribute:
       type: object
-      description: Data attribute allows to store and transfer dynamic data. Its content
-        can be edited and send in requests to store.
+      description: Data attribute allows to store and transfer dynamic data. Its content can be edited and send in requests to store.
       properties:
         version:
           type: integer
           format: int32
           default: "2"
           description: Version of the Attribute
-          example: 2
+          examples:
+            - "2"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the Attribute that is used for identification
-          example: Attribute
+          examples:
+            - Attribute
         description:
           type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
+          description: "Optional description of the Attribute, should contain helper text on what is expected"
         content:
-          description: Content of the Attribute
+          type: array
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDto"
         type:
           $ref: "#/components/schemas/AttributeType"
           default: data
@@ -838,62 +862,59 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraint"
+            $ref: "#/components/schemas/BaseAttributeConstraintDto"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
-          description: Optional definition of callback for getting the content of
-            the Attribute based on the action
+          description: Optional definition of callback for getting the content of the Attribute based on the action
       required:
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
+        - contentType
+        - name
+        - properties
+        - type
+        - uuid
     DataAttributeProperties:
       type: object
       properties:
         label:
           type: string
           description: Friendly name of the the Attribute
-          example: Attribute Name
+          examples:
+            - Attribute Name
         visible:
           type: boolean
           default: "true"
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
+          description: "Boolean determining if the Attribute is visible and can be displayed, otherwise it should be hidden to the user."
         group:
           type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          example: requiredAttributes
+          description: "Group of the Attribute, used for the logical grouping of the Attribute"
+          examples:
+            - requiredAttributes
         required:
           type: boolean
           default: "false"
-          description: "Boolean determining if the Attribute is required. If true,\
-            \ the Attribute must be provided."
+          description: "Boolean determining if the Attribute is required. If true, the Attribute must be provided."
         readOnly:
           type: boolean
           default: "false"
-          description: "Boolean determining if the Attribute is read only. If true,\
-            \ the Attribute content cannot be changed."
+          description: "Boolean determining if the Attribute is read only. If true, the Attribute content cannot be changed."
         list:
           type: boolean
           default: "false"
-          description: Boolean determining if the Attribute contains list of values
-            in the content
+          description: Boolean determining if the Attribute contains list of values in the content
         multiSelect:
           type: boolean
           default: "false"
           description: Boolean determining if the Attribute can have multiple values
       required:
-      - label
-      - list
-      - multiSelect
-      - readOnly
-      - required
-      - visible
+        - label
+        - list
+        - multiSelect
+        - readOnly
+        - required
+        - visible
     DateAttributeContent:
       type: object
+      description: Date attribute content in predefined format
       properties:
         reference:
           type: string
@@ -903,9 +924,10 @@ components:
           format: date
           description: Date attribute value in format yyyy-MM-dd
       required:
-      - data
+        - data
     DateTimeAttributeConstraint:
       type: object
+      description: DateTime attribute constraint to specify boundaries for date value
       properties:
         description:
           type: string
@@ -920,7 +942,7 @@ components:
           $ref: "#/components/schemas/DateTimeAttributeConstraintData"
           description: DateTime Range Attribute Constraint Data
       required:
-      - type
+        - type
     DateTimeAttributeConstraintData:
       type: object
       properties:
@@ -934,6 +956,7 @@ components:
           description: End of the datetime for validation
     DateTimeAttributeContent:
       type: object
+      description: DateTime attribute content in predefined format with timezone
       properties:
         reference:
           type: string
@@ -943,9 +966,10 @@ components:
           format: date-time
           description: DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
       required:
-      - data
+        - data
     FileAttributeContent:
       type: object
+      description: File attribute content for storing encoded file content with additional info
       properties:
         reference:
           type: string
@@ -954,7 +978,7 @@ components:
           $ref: "#/components/schemas/FileAttributeContentData"
           description: File attribute content data
       required:
-      - data
+        - data
     FileAttributeContentData:
       type: object
       properties:
@@ -968,11 +992,12 @@ components:
           type: string
           description: Type of the file uploaded
       required:
-      - content
-      - fileName
-      - mimeType
+        - content
+        - fileName
+        - mimeType
     FloatAttributeContent:
       type: object
+      description: Float attribute content for decimal numbers
       properties:
         reference:
           type: string
@@ -982,9 +1007,10 @@ components:
           format: float
           description: Float attribute value
       required:
-      - data
+        - data
     IntegerAttributeContent:
       type: object
+      description: Integer attribute content for integer numbers
       properties:
         reference:
           type: string
@@ -994,7 +1020,7 @@ components:
           format: int32
           description: Integer attribute value
       required:
-      - data
+        - data
     NotificationInstanceUpdateRequestDto:
       type: object
       properties:
@@ -1008,14 +1034,14 @@ components:
             $ref: "#/components/schemas/RequestAttributeDto"
         attributeMappings:
           type: array
-          description: List of attribute mappings between mapping attributes and (recipient)
-            custom attributes
+          description: List of attribute mappings between mapping attributes and (recipient) custom attributes
           items:
             $ref: "#/components/schemas/AttributeMappingDto"
       required:
-      - attributes
+        - attributes
     ObjectAttributeContent:
       type: object
+      description: Object attribute content for data with custom structure
       properties:
         reference:
           type: string
@@ -1024,53 +1050,54 @@ components:
           type: object
           description: Object attribute content data
       required:
-      - data
+        - data
     ProgrammingLanguageEnum:
       type: string
       enum:
-      - apacheconf
-      - bash
-      - basic
-      - c
-      - csharp
-      - cpp
-      - css
-      - docker
-      - fsharp
-      - gherkin
-      - git
-      - go
-      - graphql
-      - html
-      - http
-      - ini
-      - java
-      - javascript
-      - json
-      - kotlin
-      - latex
-      - lisp
-      - makefile
-      - markdown
-      - matlab
-      - nginx
-      - objectivec
-      - perl
-      - php
-      - powershell
-      - properties
-      - python
-      - ruby
-      - rust
-      - smalltalk
-      - sql
-      - typescript
-      - vbnet
-      - xquery
-      - xml
-      - yaml
+        - apacheconf
+        - bash
+        - basic
+        - c
+        - csharp
+        - cpp
+        - css
+        - docker
+        - fsharp
+        - gherkin
+        - git
+        - go
+        - graphql
+        - html
+        - http
+        - ini
+        - java
+        - javascript
+        - json
+        - kotlin
+        - latex
+        - lisp
+        - makefile
+        - markdown
+        - matlab
+        - nginx
+        - objectivec
+        - perl
+        - php
+        - powershell
+        - properties
+        - python
+        - ruby
+        - rust
+        - smalltalk
+        - sql
+        - typescript
+        - vbnet
+        - xquery
+        - xml
+        - yaml
     RangeAttributeConstraint:
       type: object
+      description: Range attribute constraint to specify boundaries for integer value
       properties:
         description:
           type: string
@@ -1085,7 +1112,7 @@ components:
           $ref: "#/components/schemas/RangeAttributeConstraintData"
           description: Integer Range Attribute Constraint Data
       required:
-      - type
+        - type
     RangeAttributeConstraintData:
       type: object
       properties:
@@ -1099,6 +1126,7 @@ components:
           description: End of the range for validation
     RegexpAttributeConstraint:
       type: object
+      description: RegExp attribute constraint to restrict string value by regular expression
       properties:
         description:
           type: string
@@ -1113,7 +1141,7 @@ components:
           type: string
           description: Regular Expression Attribute Constraint Data
       required:
-      - type
+        - type
     RequestAttributeDto:
       type: object
       description: Request attribute to send attribute content for object
@@ -1121,27 +1149,31 @@ components:
         uuid:
           type: string
           description: UUID of the Attribute
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
           description: Content Type of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
-            $ref: "#/components/schemas/BaseAttributeContent"
+            $ref: "#/components/schemas/BaseAttributeContentDto"
       required:
-      - content
-      - contentType
-      - name
-      - uuid
+        - content
+        - contentType
+        - name
+        - uuid
     SecretAttributeContent:
       type: object
+      description: Secret attribute content carrying secrets with defined protection level
       properties:
         reference:
           type: string
@@ -1150,7 +1182,7 @@ components:
           $ref: "#/components/schemas/SecretAttributeContentData"
           description: Secret attribute content data
       required:
-      - data
+        - data
     SecretAttributeContentData:
       type: object
       properties:
@@ -1162,6 +1194,7 @@ components:
           description: Level of protection of the data
     StringAttributeContent:
       type: object
+      description: String attribute content
       properties:
         reference:
           type: string
@@ -1170,9 +1203,10 @@ components:
           type: string
           description: String attribute value
       required:
-      - data
+        - data
     TextAttributeContent:
       type: object
+      description: Text attribute content used to store longer formatted strings
       properties:
         reference:
           type: string
@@ -1181,9 +1215,10 @@ components:
           type: string
           description: Text attribute value
       required:
-      - data
+        - data
     TimeAttributeContent:
       type: object
+      description: Time attribute content in predefined format
       properties:
         reference:
           type: string
@@ -1192,16 +1227,17 @@ components:
           type: string
           description: Time attribute value in format HH:mm:ss
       required:
-      - data
+        - data
     ErrorMessageDto:
       type: object
       properties:
         message:
           type: string
           description: Error message detail
-          example: Error message
+          examples:
+            - Error message
       required:
-      - message
+        - message
     AuthenticationServiceExceptionDto:
       type: object
       properties:
@@ -1216,20 +1252,22 @@ components:
           type: string
           description: Exception message
       required:
-      - code
-      - message
-      - statusCode
+        - code
+        - message
+        - statusCode
     NotificationInstanceDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Notification instance description
@@ -1249,17 +1287,16 @@ components:
             $ref: "#/components/schemas/ResponseAttributeDto"
         attributeMappings:
           type: array
-          description: List of attribute mappings between mapping attributes and (recipient)
-            custom attributes
+          description: List of attribute mappings between mapping attributes and (recipient) custom attributes
           items:
             $ref: "#/components/schemas/AttributeMappingDto"
       required:
-      - attributes
-      - connectorName
-      - connectorUuid
-      - kind
-      - name
-      - uuid
+        - attributes
+        - connectorName
+        - connectorUuid
+        - kind
+        - name
+        - uuid
     ResponseAttributeDto:
       type: object
       description: Response attribute with content for object it belongs to
@@ -1267,32 +1304,36 @@ components:
         uuid:
           type: string
           description: UUID of the Attribute
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         label:
           type: string
           description: Label of the the Attribute
-          example: Attribute Name
+          examples:
+            - Attribute Name
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
           description: Content Type of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
-            $ref: "#/components/schemas/BaseAttributeContent"
+            $ref: "#/components/schemas/BaseAttributeContentDto"
       required:
-      - contentType
-      - label
-      - name
-      - type
+        - contentType
+        - label
+        - name
+        - type
     NotificationInstanceRequestDto:
       type: object
       properties:
@@ -1306,8 +1347,7 @@ components:
             $ref: "#/components/schemas/RequestAttributeDto"
         attributeMappings:
           type: array
-          description: List of attribute mappings between mapping attributes and (recipient)
-            custom attributes
+          description: List of attribute mappings between mapping attributes and (recipient) custom attributes
           items:
             $ref: "#/components/schemas/AttributeMappingDto"
         name:
@@ -1320,10 +1360,10 @@ components:
           type: string
           description: Notification instance Kind
       required:
-      - attributes
-      - connectorUuid
-      - kind
-      - name
+        - attributes
+        - connectorUuid
+        - kind
+        - name
     UuidDto:
       type: object
       properties:
@@ -1331,7 +1371,7 @@ components:
           type: string
           description: Object identifier
       required:
-      - uuid
+        - uuid
     NotificationRequestDto:
       type: object
       properties:
@@ -1380,9 +1420,9 @@ components:
           items:
             type: string
       required:
-      - message
-      - sentAt
-      - uuid
+        - message
+        - sentAt
+        - uuid
     NotificationResponseDto:
       type: object
       properties:
@@ -1408,61 +1448,91 @@ components:
           items:
             $ref: "#/components/schemas/NotificationDto"
       required:
-      - items
-      - itemsPerPage
-      - pageNumber
-      - totalItems
-      - totalPages
+        - items
+        - itemsPerPage
+        - pageNumber
+        - totalItems
+        - totalPages
     Resource:
       type: string
       enum:
-      - NONE
-      - dashboard
-      - settings
-      - auditLogs
-      - credentials
-      - connectors
-      - attributes
-      - jobs
-      - notificationInstances
-      - users
-      - roles
-      - acmeAccounts
-      - acmeProfiles
-      - scepProfiles
-      - cmpProfiles
-      - authorities
-      - raProfiles
-      - certificates
-      - certificateRequests
-      - groups
-      - complianceProfiles
-      - discoveries
-      - entities
-      - locations
-      - tokenProfiles
-      - tokens
-      - keys
-      - approvalProfiles
-      - approvals
-      - rules
-      - actions
-      - triggers
-      - resources
-      - resourceEvents
-      - searchFilters
-      - keyItems
-      - platformEnums
-      - notifications
-      - conditions
-      - executions
-      - complianceRules
-      - complianceGroups
-      - customAttributes
-      - globalMetadata
-      - acmeOrders
-      - acmeAuthorizations
-      - acmeChallenges
-      - cmpTransactions
-      - endEntityProfiles
-      - authenticationProviders
+        - NONE
+        - dashboard
+        - settings
+        - auditLogs
+        - credentials
+        - connectors
+        - attributes
+        - jobs
+        - notificationInstances
+        - users
+        - roles
+        - acmeAccounts
+        - acmeProfiles
+        - scepProfiles
+        - cmpProfiles
+        - authorities
+        - raProfiles
+        - certificates
+        - certificateRequests
+        - groups
+        - complianceProfiles
+        - discoveries
+        - entities
+        - locations
+        - tokenProfiles
+        - tokens
+        - keys
+        - approvalProfiles
+        - approvals
+        - rules
+        - actions
+        - triggers
+        - resources
+        - resourceEvents
+        - searchFilters
+        - keyItems
+        - platformEnums
+        - notifications
+        - conditions
+        - executions
+        - complianceRules
+        - complianceGroups
+        - customAttributes
+        - globalMetadata
+        - acmeOrders
+        - acmeAuthorizations
+        - acmeChallenges
+        - cmpTransactions
+        - endEntityProfiles
+        - authenticationProviders
+  securitySchemes:
+    ConnectorAPIKeyAuth:
+      type: apiKey
+      description: API Key in header configured for connector
+      name: ApiKeyHeaderAttribute
+      in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
+    SessionAuth:
+      type: apiKey
+      description: Session-based authentication with session ID stored in 'czertainly-session' cookie
+      name: czertainly-session
+      in: cookie
+    CertificateAuth:
+      type: apiKey
+      description: Base64 encoded X.509 certificate passed in header
+      name: X-APP-CERTIFICATE
+      in: header
+    CertificateTLSAuth:
+      type: mutualTLS
+      description: Client certificate authentication
+    NoAuth:
+      type: http
+      description: No authentication
+      scheme: none
+    BearerJWTAuth:
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT

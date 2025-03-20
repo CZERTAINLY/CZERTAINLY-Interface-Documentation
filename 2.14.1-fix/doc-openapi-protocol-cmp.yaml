@@ -16,42 +16,56 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:65415
-  description: Generated server url
+  - url: https://demo.czertainly.online/api
+    description: CZERTAINLY Demo server
 tags:
-- name: CMP RA Profile
-  description: Interfaces used by CMP clients to request CMP related operations on
-    top of RA Profile. CMP Profile defines the behaviour for the specific CMP configuration.
-    CMP Profile is bound with specific RA Profile and it can be used by the CMP clients
-    to request operations on their specific URL. These operations are always specific
-    only for the RA Profile.
-- name: CMP operations
-  description: "Interfaces used by CMP clients to request CMP related operations.\
-    \ CMP Profile defines the behaviour for the specific CMP configuration. When the\
-    \ CMP Profile contains default RA Profile, it can be used by the CMP clients to\
-    \ request operations on their specific URL."
+  - name: CMP RA Profile
+    description: Interfaces used by CMP clients to request CMP related operations on top of RA Profile. CMP Profile defines the behaviour for the specific CMP configuration. CMP Profile is bound with specific RA Profile and it can be used by the CMP clients to request operations on their specific URL. These operations are always specific only for the RA Profile.
+  - name: CMP operations
+    description: "Interfaces used by CMP clients to request CMP related operations. CMP Profile defines the behaviour for the specific CMP configuration. When the CMP Profile contains default RA Profile, it can be used by the CMP clients to request operations on their specific URL."
 paths:
   /v1/protocols/cmp/{cmpProfileName}:
     get:
       tags:
-      - CMP operations
+        - CMP operations
       summary: CMP Get Operations
       operationId: doGet
       parameters:
-      - name: cmpProfileName
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: message
-        in: query
-        description: DER encoded CMP data
-        required: false
-        schema:
-          type: string
-          format: binary
+        - name: cmpProfileName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: message
+          in: query
           description: DER encoded CMP data
+          required: false
+          schema:
+            type: string
+            format: binary
+            description: DER encoded CMP data
       responses:
+        "200":
+          description: CMP Operations retrieved
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+        "500":
+          description: Internal Server Error
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
           content:
@@ -64,28 +78,21 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-        "500":
-          description: Internal Server Error
-        "400":
-          description: Bad Request
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
+      security: []
     post:
       tags:
-      - CMP operations
+        - CMP operations
       summary: CMP Post Operation
       externalDocs:
         description: RFC 4210
         url: https://www.rfc-editor.org/rfc/rfc4210
       operationId: doPost
       parameters:
-      - name: cmpProfileName
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: cmpProfileName
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/pkixcmp:
@@ -95,12 +102,6 @@ paths:
               description: Binary CMP data
         required: true
       responses:
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Operation executed
           content:
@@ -112,41 +113,20 @@ paths:
                 externalDocs:
                   description: RFC 4210
                   url: https://www.rfc-editor.org/rfc/rfc4210#section-5.3
-        "403":
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
-  /v1/protocols/cmp/raProfile/{raProfileName}:
-    get:
-      tags:
-      - CMP RA Profile
-      summary: CMP Get Operations
-      operationId: doGet_1
-      parameters:
-      - name: raProfileName
-        in: path
-        required: true
-        schema:
-          type: string
-      - name: message
-        in: query
-        description: DER encoded CMP data
-        required: false
-        schema:
-          type: string
-          format: binary
-          description: DER encoded CMP data
-      responses:
+        "404":
+          description: Not Found
+          content:
+            application/pkixcmp:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "401":
           description: Unauthorized
           content:
@@ -159,6 +139,35 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
+      security: []
+  /v1/protocols/cmp/raProfile/{raProfileName}:
+    get:
+      tags:
+        - CMP RA Profile
+      summary: CMP Get Operations
+      operationId: doGet_1
+      parameters:
+        - name: raProfileName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: message
+          in: query
+          description: DER encoded CMP data
+          required: false
+          schema:
+            type: string
+            format: binary
+            description: DER encoded CMP data
+      responses:
+        "200":
+          description: CMP Operations retrieved
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
         "500":
           description: Internal Server Error
         "400":
@@ -167,20 +176,39 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+        "403":
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+      security: []
     post:
       tags:
-      - CMP RA Profile
+        - CMP RA Profile
       summary: CMP Post Operation
       externalDocs:
         description: RFC 4210
         url: https://www.rfc-editor.org/rfc/rfc4210
       operationId: doPost_1
       parameters:
-      - name: raProfileName
-        in: path
-        required: true
-        schema:
-          type: string
+        - name: raProfileName
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/pkixcmp:
@@ -190,12 +218,6 @@ paths:
               description: Binary CMP data
         required: true
       responses:
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
         "200":
           description: Operation executed
           content:
@@ -207,41 +229,68 @@ paths:
                 externalDocs:
                   description: RFC 4210
                   url: https://www.rfc-editor.org/rfc/rfc4210#section-5.3
-        "403":
-          description: Forbidden
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDocument"
-        "500":
-          description: Internal Server Error
         "400":
           description: Bad Request
           content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDocument"
+        "404":
+          description: Not Found
+          content:
+            application/pkixcmp:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+        "403":
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDocument"
+      security: []
 components:
   schemas:
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          examples:
+            - Error message
+      required:
+        - message
     ProblemDocument:
       type: object
       properties:
         type:
           type: string
           description: Type of the ACME problem
-          example: notFound
+          examples:
+            - notFound
         title:
           type: string
           description: ACME problem title
-          example: Not Found
+          examples:
+            - Not Found
         detail:
           type: string
           description: ACME problem details
-          example: Requested object is not found
+          examples:
+            - Requested object is not found
         instance:
           type: string
           description: URL of the changes if something needs to be approved
-          example: https://some-company.com/instances/changes
+          examples:
+            - https://some-company.com/instances/changes
         subproblems:
           type: array
           description: List of subproblems related to error
@@ -250,10 +299,41 @@ components:
         algorithms:
           type: array
           description: List of supported algorithms
-          example: ES256
+          examples:
+            - ES256
           items:
             type: string
       required:
-      - detail
-      - instance
-      - type
+        - detail
+        - instance
+        - type
+  securitySchemes:
+    ConnectorAPIKeyAuth:
+      type: apiKey
+      description: API Key in header configured for connector
+      name: ApiKeyHeaderAttribute
+      in: header
+    SessionAuth:
+      type: apiKey
+      description: Session-based authentication with session ID stored in 'czertainly-session' cookie
+      name: czertainly-session
+      in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
+    CertificateAuth:
+      type: apiKey
+      description: Base64 encoded X.509 certificate passed in header
+      name: X-APP-CERTIFICATE
+      in: header
+    CertificateTLSAuth:
+      type: mutualTLS
+      description: Client certificate authentication
+    NoAuth:
+      type: http
+      description: No authentication
+      scheme: none
+    BearerJWTAuth:
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT

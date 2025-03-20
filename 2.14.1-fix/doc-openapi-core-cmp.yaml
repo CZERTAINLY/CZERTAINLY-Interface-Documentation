@@ -16,25 +16,25 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:64999
-  description: Generated server url
+  - url: https://demo.czertainly.online/api
+    description: CZERTAINLY Demo server
 tags:
-- name: CMP Profile Management
-  description: CMP Profile Management API
+  - name: CMP Profile Management
+    description: CMP Profile Management API
 paths:
   /v1/cmpProfiles/{cmpProfileUuid}:
     get:
       tags:
-      - CMP Profile Management
+        - CMP Profile Management
       summary: Get details of CMP Profile
       operationId: getCmpProfile
       parameters:
-      - name: cmpProfileUuid
-        in: path
-        description: CMP Profile UUID
-        required: true
-        schema:
-          type: string
+        - name: cmpProfileUuid
+          in: path
+          description: CMP Profile UUID
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: CMP Profile details retrieved
@@ -42,40 +42,44 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CmpProfileDetailDto"
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     put:
       tags:
-      - CMP Profile Management
+        - CMP Profile Management
       summary: Edit CMP Profile
       operationId: editCmpProfile
       parameters:
-      - name: cmpProfileUuid
-        in: path
-        description: CMP Profile UUID
-        required: true
-        schema:
-          type: string
+        - name: cmpProfileUuid
+          in: path
+          description: CMP Profile UUID
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -83,94 +87,86 @@ paths:
               $ref: "#/components/schemas/CmpProfileEditRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "200":
           description: CMP Profile updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/CmpProfileDetailDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     delete:
       tags:
-      - CMP Profile Management
+        - CMP Profile Management
       summary: Delete CMP Profile
       operationId: deleteCmpProfile
       parameters:
-      - name: cmpProfileUuid
-        in: path
-        description: CMP Profile UUID
-        required: true
-        schema:
-          type: string
+        - name: cmpProfileUuid
+          in: path
+          description: CMP Profile UUID
+          required: true
+          schema:
+            type: string
       responses:
         "204":
           description: CMP Profile deleted
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-  /v1/cmpProfiles:
-    get:
-      tags:
-      - CMP Profile Management
-      summary: Get list of CMP Profiles
-      operationId: listCmpProfiles
-      responses:
         "401":
           description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/cmpProfiles:
+    get:
+      tags:
+        - CMP Profile Management
+      summary: Get list of CMP Profiles
+      operationId: listCmpProfiles
+      responses:
         "200":
           description: CMP Profile list retrieved
           content:
@@ -185,9 +181,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
     post:
       tags:
-      - CMP Profile Management
+        - CMP Profile Management
       summary: Create CMP Profile
       operationId: createCmpProfile
       requestBody:
@@ -197,160 +213,176 @@ paths:
               $ref: "#/components/schemas/CmpProfileRequestDto"
         required: true
       responses:
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
         "201":
           description: CMP Profile created
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/CmpProfileDetailDto"
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-  /v1/cmpProfiles/{cmpProfileUuid}/raProfiles/{raProfileUuid}:
-    patch:
-      tags:
-      - CMP Profile Management
-      summary: Update RA Profile for CMP Profile
-      operationId: updateRaProfile
-      parameters:
-      - name: cmpProfileUuid
-        in: path
-        description: CMP Profile UUID
-        required: true
-        schema:
-          type: string
-      - name: raProfileUuid
-        in: path
-        description: RA Profile UUID
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: RA Profile updated
         "401":
           description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
         "404":
           description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
+  /v1/cmpProfiles/{cmpProfileUuid}/raProfiles/{raProfileUuid}:
+    patch:
+      tags:
+        - CMP Profile Management
+      summary: Update RA Profile for CMP Profile
+      operationId: updateRaProfile
+      parameters:
+        - name: cmpProfileUuid
+          in: path
+          description: CMP Profile UUID
+          required: true
+          schema:
+            type: string
+        - name: raProfileUuid
+          in: path
+          description: RA Profile UUID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: RA Profile updated
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "400":
-          description: Bad Request
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: No Content
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/cmpProfiles/{cmpProfileUuid}/enable:
     patch:
       tags:
-      - CMP Profile Management
+        - CMP Profile Management
       summary: Enable CMP Profile
       operationId: enableCmpProfile
       parameters:
-      - name: cmpProfileUuid
-        in: path
-        description: CMP Profile UUID
-        required: true
-        schema:
-          type: string
+        - name: cmpProfileUuid
+          in: path
+          description: CMP Profile UUID
+          required: true
+          schema:
+            type: string
       responses:
-        "401":
-          description: Unauthorized
         "204":
           description: CMP Profile enabled
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/cmpProfiles/{cmpProfileUuid}/disable:
     patch:
       tags:
-      - CMP Profile Management
+        - CMP Profile Management
       summary: Disable CMP Profile
       operationId: disableCmpProfile
       parameters:
-      - name: cmpProfileUuid
-        in: path
-        description: CMP Profile UUID
-        required: true
-        schema:
-          type: string
+        - name: cmpProfileUuid
+          in: path
+          description: CMP Profile UUID
+          required: true
+          schema:
+            type: string
       responses:
         "204":
           description: CMP Profile disabled
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/cmpProfiles/enable:
     patch:
       tags:
-      - CMP Profile Management
+        - CMP Profile Management
       summary: Enable multiple CMP Profiles
       operationId: bulkEnableCmpProfile
       requestBody:
@@ -362,38 +394,42 @@ paths:
               items:
                 type: string
             example:
-            - c2f685d4-6a3e-11ec-90d6-0242ac120003
-            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+              - c2f685d4-6a3e-11ec-90d6-0242ac120003
+              - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
         "204":
           description: CMP Profiles enabled
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/cmpProfiles/disable:
     patch:
       tags:
-      - CMP Profile Management
+        - CMP Profile Management
       summary: Disable multiple CMP Profile
       operationId: bulkDisableCmpProfile
       requestBody:
@@ -405,38 +441,42 @@ paths:
               items:
                 type: string
             example:
-            - c2f685d4-6a3e-11ec-90d6-0242ac120003
-            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+              - c2f685d4-6a3e-11ec-90d6-0242ac120003
+              - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
         "204":
           description: CMP Profiles disabled
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/cmpProfiles/signingCertificates:
     get:
       tags:
-      - CMP Profile Management
+        - CMP Profile Management
       summary: Get list of certificates eligible for signing of CMP responses
       operationId: listCmpSigningCertificates
       responses:
@@ -448,32 +488,36 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/CertificateDto"
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/cmpProfiles/delete:
     delete:
       tags:
-      - CMP Profile Management
+        - CMP Profile Management
       summary: Delete multiple CMP Profiles
       operationId: bulkDeleteCmpProfile
       requestBody:
@@ -485,8 +529,8 @@ paths:
               items:
                 type: string
             example:
-            - c2f685d4-6a3e-11ec-90d6-0242ac120003
-            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+              - c2f685d4-6a3e-11ec-90d6-0242ac120003
+              - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
         "200":
@@ -497,32 +541,36 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BulkActionMessageDto"
-        "401":
-          description: Unauthorized
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
   /v1/cmpProfiles/delete/force:
     delete:
       tags:
-      - CMP Profile Management
+        - CMP Profile Management
       summary: Force delete multiple CMP Profiles
       operationId: forceDeleteCmpProfiles
       requestBody:
@@ -534,8 +582,8 @@ paths:
               items:
                 type: string
             example:
-            - c2f685d4-6a3e-11ec-90d6-0242ac120003
-            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+              - c2f685d4-6a3e-11ec-90d6-0242ac120003
+              - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
         required: true
       responses:
         "200":
@@ -546,8 +594,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BulkActionMessageDto"
-        "401":
-          description: Unauthorized
         "422":
           description: Unprocessable Entity
           content:
@@ -557,28 +603,34 @@ paths:
                 items:
                   type: string
               example:
-              - Error Message 1
-              - Error Message 2
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "500":
-          description: Internal Server Error
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+                - Error Message 1
+                - Error Message 2
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+        - BearerJWTAuth: []
+        - CertificateAuth: []
+        - SessionAuth: []
 components:
   schemas:
     AttributeCallback:
@@ -597,28 +649,24 @@ components:
             $ref: "#/components/schemas/AttributeCallbackMapping"
           uniqueItems: true
       required:
-      - callbackContext
-      - callbackMethod
-      - mappings
+        - callbackContext
+        - callbackMethod
+        - mappings
     AttributeCallbackMapping:
       type: object
       properties:
         from:
           type: string
-          description: Name of the attribute whose value is to be used as value of
-            path variable or request param or body field.It is optional and must be
-            set only if value is not set.
+          description: Name of the attribute whose value is to be used as value of path variable or request param or body field.It is optional and must be set only if value is not set.
         attributeType:
           $ref: "#/components/schemas/AttributeType"
-          description: Type of the attribute. It is optional and must be set only
-            if special behaviour is needed.
+          description: Type of the attribute. It is optional and must be set only if special behaviour is needed.
         attributeContentType:
           $ref: "#/components/schemas/AttributeContentType"
           description: 'Type of the attribute content. '
         to:
           type: string
-          description: Name of the path variable or request param or body field which
-            is to be used to assign value of attribute
+          description: Name of the path variable or request param or body field which is to be used to assign value of attribute
         targets:
           type: array
           description: Set of targets for propagating value.
@@ -627,89 +675,95 @@ components:
           uniqueItems: true
         value:
           type: object
-          description: Static value to be propagated to targets. It is optional and
-            is set only if the value is known at attribute creation time.
+          description: Static value to be propagated to targets. It is optional and is set only if the value is known at attribute creation time.
       required:
-      - targets
-      - to
+        - targets
+        - to
     AttributeConstraintType:
       type: string
       enum:
-      - regExp
-      - range
-      - dateTime
+        - regExp
+        - range
+        - dateTime
     AttributeContentType:
       type: string
       enum:
-      - string
-      - text
-      - integer
-      - boolean
-      - float
-      - date
-      - time
-      - datetime
-      - secret
-      - file
-      - credential
-      - codeblock
-      - object
+        - string
+        - text
+        - integer
+        - boolean
+        - float
+        - date
+        - time
+        - datetime
+        - secret
+        - file
+        - credential
+        - codeblock
+        - object
     AttributeType:
       type: string
       enum:
-      - data
-      - group
-      - info
-      - meta
-      - custom
+        - data
+        - group
+        - info
+        - meta
+        - custom
     AttributeValueTarget:
       type: string
       enum:
-      - pathVariable
-      - requestParameter
-      - body
-    BaseAttributeConstraint:
+        - pathVariable
+        - requestParameter
+        - body
+    BaseAttributeConstraintDto:
       type: object
       description: Base Attribute Constraint definition
+      discriminator:
+        propertyName: type
+        mapping:
+          regExp: "#/components/schemas/RegexpAttributeConstraint"
+          range: "#/components/schemas/RangeAttributeConstraint"
+          dateTime: "#/components/schemas/DateTimeAttributeConstraint"
       oneOf:
-      - $ref: "#/components/schemas/RegexpAttributeConstraint"
-      - $ref: "#/components/schemas/RangeAttributeConstraint"
-      - $ref: "#/components/schemas/DateTimeAttributeConstraint"
+        - $ref: "#/components/schemas/RegexpAttributeConstraint"
+        - $ref: "#/components/schemas/RangeAttributeConstraint"
+        - $ref: "#/components/schemas/DateTimeAttributeConstraint"
       properties:
+        type:
+          $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
         description:
           type: string
           description: Description of the constraint
         errorMessage:
           type: string
           description: Error message to be displayed for wrong data
-        type:
-          $ref: "#/components/schemas/AttributeConstraintType"
-          description: Attribute Constraint Type
       required:
-      - type
-    BaseAttributeContent:
+        - type
+    BaseAttributeContentDto:
       type: object
       description: Base Attribute content definition
       oneOf:
-      - $ref: "#/components/schemas/BooleanAttributeContent"
-      - $ref: "#/components/schemas/CodeBlockAttributeContent"
-      - $ref: "#/components/schemas/CredentialAttributeContent"
-      - $ref: "#/components/schemas/DateAttributeContent"
-      - $ref: "#/components/schemas/DateTimeAttributeContent"
-      - $ref: "#/components/schemas/FileAttributeContent"
-      - $ref: "#/components/schemas/FloatAttributeContent"
-      - $ref: "#/components/schemas/IntegerAttributeContent"
-      - $ref: "#/components/schemas/ObjectAttributeContent"
-      - $ref: "#/components/schemas/SecretAttributeContent"
-      - $ref: "#/components/schemas/StringAttributeContent"
-      - $ref: "#/components/schemas/TextAttributeContent"
-      - $ref: "#/components/schemas/TimeAttributeContent"
+        - $ref: "#/components/schemas/BooleanAttributeContent"
+        - $ref: "#/components/schemas/CodeBlockAttributeContent"
+        - $ref: "#/components/schemas/CredentialAttributeContent"
+        - $ref: "#/components/schemas/DateAttributeContent"
+        - $ref: "#/components/schemas/DateTimeAttributeContent"
+        - $ref: "#/components/schemas/FileAttributeContent"
+        - $ref: "#/components/schemas/FloatAttributeContent"
+        - $ref: "#/components/schemas/IntegerAttributeContent"
+        - $ref: "#/components/schemas/ObjectAttributeContent"
+        - $ref: "#/components/schemas/SecretAttributeContent"
+        - $ref: "#/components/schemas/StringAttributeContent"
+        - $ref: "#/components/schemas/TextAttributeContent"
+        - $ref: "#/components/schemas/TimeAttributeContent"
       properties:
         reference:
           type: string
           description: Content Reference
     BooleanAttributeContent:
       type: object
+      description: Boolean attribute content to store true/false values
       properties:
         reference:
           type: string
@@ -718,28 +772,28 @@ components:
           type: boolean
           description: Boolean attribute value
       required:
-      - data
+        - data
     CmpProfileEditRequestDto:
       type: object
       properties:
         description:
           type: string
           description: Description of the CMP Profile
-          example: Sample text description
+          examples:
+            - Sample text description
         raProfileUuid:
           type: string
           description: RA Profile UUID that the CMP Profile is associated with
-          example: 6b55de1c-844f-11ec-a8a3-0242ac120002
+          examples:
+            - 6b55de1c-844f-11ec-a8a3-0242ac120002
         issueCertificateAttributes:
           type: array
-          description: List of Attributes to issue Certificate for the associated
-            RA Profile. Required when raProfileUuid is provided
+          description: List of Attributes to issue Certificate for the associated RA Profile. Required when raProfileUuid is provided
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
         revokeCertificateAttributes:
           type: array
-          description: List of Attributes to revoke Certificate for the associated
-            RA Profile. Required when raProfileUuid is provided
+          description: List of Attributes to revoke Certificate for the associated RA Profile. Required when raProfileUuid is provided
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
         customAttributes:
@@ -755,30 +809,30 @@ components:
           description: Protection Method for the CMP Response
         sharedSecret:
           type: string
-          description: Shared secret for the CMP Request. Required when requestProtectionMethod
-            is sharedSecret
+          description: Shared secret for the CMP Request. Required when requestProtectionMethod is sharedSecret
         signingCertificateUuid:
           type: string
-          description: UUID of the Certificate to be used as signing certificate for
-            CMP responses. Required when responseProtectionMethod is signature
+          description: UUID of the Certificate to be used as signing certificate for CMP responses. Required when responseProtectionMethod is signature
         name:
           type: string
           description: Name of the CMP Profile
-          example: Example CMP Profile
+          examples:
+            - Example CMP Profile
         variant:
           type: string
           description: Variant of the CMP Profile
           enum:
-          - v2
-          - v2_3gpp
-          - v3
+            - v2
+            - v2_3gpp
+            - v3
       required:
-      - name
-      - requestProtectionMethod
-      - responseProtectionMethod
-      - variant
+        - name
+        - requestProtectionMethod
+        - responseProtectionMethod
+        - variant
     CodeBlockAttributeContent:
       type: object
+      description: Codeblock attribute content to store encoded snippets of programming language code
       properties:
         reference:
           type: string
@@ -787,23 +841,24 @@ components:
           $ref: "#/components/schemas/CodeBlockAttributeContentData"
           description: CodeBlock attribute content data
       required:
-      - data
+        - data
     CodeBlockAttributeContentData:
       type: object
       properties:
         language:
           $ref: "#/components/schemas/ProgrammingLanguageEnum"
           description: Definition of programming languages used for code
-          example: "JAVA, PHP, C, etc"
+          examples:
+            - "JAVA, PHP, C, etc"
         code:
           type: string
-          description: Block of the code in Base64. Formatting of the code is specified
-            by variable language
+          description: Block of the code in Base64. Formatting of the code is specified by variable language
       required:
-      - code
-      - language
+        - code
+        - language
     CredentialAttributeContent:
       type: object
+      description: Credential attribute content carrying information about credential to use
       properties:
         reference:
           type: string
@@ -812,57 +867,63 @@ components:
           $ref: "#/components/schemas/CredentialAttributeContentData"
           description: Credential attribute content data
       required:
-      - data
+        - data
     CredentialAttributeContentData:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         kind:
           type: string
           description: Credential Kind
-          example: "SoftKeyStore, Basic, ApiKey, etc"
+          examples:
+            - "SoftKeyStore, Basic, ApiKey, etc"
         attributes:
           type: array
           description: List of Credential Attributes
           items:
             $ref: "#/components/schemas/DataAttribute"
       required:
-      - attributes
-      - kind
-      - name
-      - uuid
+        - attributes
+        - kind
+        - name
+        - uuid
     DataAttribute:
       type: object
-      description: Data attribute allows to store and transfer dynamic data. Its content
-        can be edited and send in requests to store.
+      description: Data attribute allows to store and transfer dynamic data. Its content can be edited and send in requests to store.
       properties:
         version:
           type: integer
           format: int32
           default: "2"
           description: Version of the Attribute
-          example: 2
+          examples:
+            - "2"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the Attribute that is used for identification
-          example: Attribute
+          examples:
+            - Attribute
         description:
           type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
+          description: "Optional description of the Attribute, should contain helper text on what is expected"
         content:
-          description: Content of the Attribute
+          type: array
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDto"
         type:
           $ref: "#/components/schemas/AttributeType"
           default: data
@@ -877,62 +938,59 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraint"
+            $ref: "#/components/schemas/BaseAttributeConstraintDto"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
-          description: Optional definition of callback for getting the content of
-            the Attribute based on the action
+          description: Optional definition of callback for getting the content of the Attribute based on the action
       required:
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
+        - contentType
+        - name
+        - properties
+        - type
+        - uuid
     DataAttributeProperties:
       type: object
       properties:
         label:
           type: string
           description: Friendly name of the the Attribute
-          example: Attribute Name
+          examples:
+            - Attribute Name
         visible:
           type: boolean
           default: "true"
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
+          description: "Boolean determining if the Attribute is visible and can be displayed, otherwise it should be hidden to the user."
         group:
           type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          example: requiredAttributes
+          description: "Group of the Attribute, used for the logical grouping of the Attribute"
+          examples:
+            - requiredAttributes
         required:
           type: boolean
           default: "false"
-          description: "Boolean determining if the Attribute is required. If true,\
-            \ the Attribute must be provided."
+          description: "Boolean determining if the Attribute is required. If true, the Attribute must be provided."
         readOnly:
           type: boolean
           default: "false"
-          description: "Boolean determining if the Attribute is read only. If true,\
-            \ the Attribute content cannot be changed."
+          description: "Boolean determining if the Attribute is read only. If true, the Attribute content cannot be changed."
         list:
           type: boolean
           default: "false"
-          description: Boolean determining if the Attribute contains list of values
-            in the content
+          description: Boolean determining if the Attribute contains list of values in the content
         multiSelect:
           type: boolean
           default: "false"
           description: Boolean determining if the Attribute can have multiple values
       required:
-      - label
-      - list
-      - multiSelect
-      - readOnly
-      - required
-      - visible
+        - label
+        - list
+        - multiSelect
+        - readOnly
+        - required
+        - visible
     DateAttributeContent:
       type: object
+      description: Date attribute content in predefined format
       properties:
         reference:
           type: string
@@ -942,9 +1000,10 @@ components:
           format: date
           description: Date attribute value in format yyyy-MM-dd
       required:
-      - data
+        - data
     DateTimeAttributeConstraint:
       type: object
+      description: DateTime attribute constraint to specify boundaries for date value
       properties:
         description:
           type: string
@@ -959,7 +1018,7 @@ components:
           $ref: "#/components/schemas/DateTimeAttributeConstraintData"
           description: DateTime Range Attribute Constraint Data
       required:
-      - type
+        - type
     DateTimeAttributeConstraintData:
       type: object
       properties:
@@ -973,6 +1032,7 @@ components:
           description: End of the datetime for validation
     DateTimeAttributeContent:
       type: object
+      description: DateTime attribute content in predefined format with timezone
       properties:
         reference:
           type: string
@@ -982,9 +1042,10 @@ components:
           format: date-time
           description: DateTime attribute value in format yyyy-MM-ddTHH:mm:ss.SSSXXX
       required:
-      - data
+        - data
     FileAttributeContent:
       type: object
+      description: File attribute content for storing encoded file content with additional info
       properties:
         reference:
           type: string
@@ -993,7 +1054,7 @@ components:
           $ref: "#/components/schemas/FileAttributeContentData"
           description: File attribute content data
       required:
-      - data
+        - data
     FileAttributeContentData:
       type: object
       properties:
@@ -1007,11 +1068,12 @@ components:
           type: string
           description: Type of the file uploaded
       required:
-      - content
-      - fileName
-      - mimeType
+        - content
+        - fileName
+        - mimeType
     FloatAttributeContent:
       type: object
+      description: Float attribute content for decimal numbers
       properties:
         reference:
           type: string
@@ -1021,9 +1083,10 @@ components:
           format: float
           description: Float attribute value
       required:
-      - data
+        - data
     IntegerAttributeContent:
       type: object
+      description: Integer attribute content for integer numbers
       properties:
         reference:
           type: string
@@ -1033,9 +1096,10 @@ components:
           format: int32
           description: Integer attribute value
       required:
-      - data
+        - data
     ObjectAttributeContent:
       type: object
+      description: Object attribute content for data with custom structure
       properties:
         reference:
           type: string
@@ -1044,58 +1108,59 @@ components:
           type: object
           description: Object attribute content data
       required:
-      - data
+        - data
     ProgrammingLanguageEnum:
       type: string
       enum:
-      - apacheconf
-      - bash
-      - basic
-      - c
-      - csharp
-      - cpp
-      - css
-      - docker
-      - fsharp
-      - gherkin
-      - git
-      - go
-      - graphql
-      - html
-      - http
-      - ini
-      - java
-      - javascript
-      - json
-      - kotlin
-      - latex
-      - lisp
-      - makefile
-      - markdown
-      - matlab
-      - nginx
-      - objectivec
-      - perl
-      - php
-      - powershell
-      - properties
-      - python
-      - ruby
-      - rust
-      - smalltalk
-      - sql
-      - typescript
-      - vbnet
-      - xquery
-      - xml
-      - yaml
+        - apacheconf
+        - bash
+        - basic
+        - c
+        - csharp
+        - cpp
+        - css
+        - docker
+        - fsharp
+        - gherkin
+        - git
+        - go
+        - graphql
+        - html
+        - http
+        - ini
+        - java
+        - javascript
+        - json
+        - kotlin
+        - latex
+        - lisp
+        - makefile
+        - markdown
+        - matlab
+        - nginx
+        - objectivec
+        - perl
+        - php
+        - powershell
+        - properties
+        - python
+        - ruby
+        - rust
+        - smalltalk
+        - sql
+        - typescript
+        - vbnet
+        - xquery
+        - xml
+        - yaml
     ProtectionMethod:
       type: string
       enum:
-      - sharedSecret
-      - signature
+        - sharedSecret
+        - signature
     RangeAttributeConstraint:
       type: object
+      description: Range attribute constraint to specify boundaries for integer value
       properties:
         description:
           type: string
@@ -1110,7 +1175,7 @@ components:
           $ref: "#/components/schemas/RangeAttributeConstraintData"
           description: Integer Range Attribute Constraint Data
       required:
-      - type
+        - type
     RangeAttributeConstraintData:
       type: object
       properties:
@@ -1124,6 +1189,7 @@ components:
           description: End of the range for validation
     RegexpAttributeConstraint:
       type: object
+      description: RegExp attribute constraint to restrict string value by regular expression
       properties:
         description:
           type: string
@@ -1138,7 +1204,7 @@ components:
           type: string
           description: Regular Expression Attribute Constraint Data
       required:
-      - type
+        - type
     RequestAttributeDto:
       type: object
       description: Request attribute to send attribute content for object
@@ -1146,27 +1212,31 @@ components:
         uuid:
           type: string
           description: UUID of the Attribute
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
           description: Content Type of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
-            $ref: "#/components/schemas/BaseAttributeContent"
+            $ref: "#/components/schemas/BaseAttributeContentDto"
       required:
-      - content
-      - contentType
-      - name
-      - uuid
+        - content
+        - contentType
+        - name
+        - uuid
     SecretAttributeContent:
       type: object
+      description: Secret attribute content carrying secrets with defined protection level
       properties:
         reference:
           type: string
@@ -1175,7 +1245,7 @@ components:
           $ref: "#/components/schemas/SecretAttributeContentData"
           description: Secret attribute content data
       required:
-      - data
+        - data
     SecretAttributeContentData:
       type: object
       properties:
@@ -1187,6 +1257,7 @@ components:
           description: Level of protection of the data
     StringAttributeContent:
       type: object
+      description: String attribute content
       properties:
         reference:
           type: string
@@ -1195,9 +1266,10 @@ components:
           type: string
           description: String attribute value
       required:
-      - data
+        - data
     TextAttributeContent:
       type: object
+      description: Text attribute content used to store longer formatted strings
       properties:
         reference:
           type: string
@@ -1206,9 +1278,10 @@ components:
           type: string
           description: Text attribute value
       required:
-      - data
+        - data
     TimeAttributeContent:
       type: object
+      description: Time attribute content in predefined format
       properties:
         reference:
           type: string
@@ -1217,16 +1290,17 @@ components:
           type: string
           description: Time attribute value in format HH:mm:ss
       required:
-      - data
+        - data
     ErrorMessageDto:
       type: object
       properties:
         message:
           type: string
           description: Error message detail
-          example: Error message
+          examples:
+            - Error message
       required:
-      - message
+        - message
     AuthenticationServiceExceptionDto:
       type: object
       properties:
@@ -1241,9 +1315,9 @@ components:
           type: string
           description: Exception message
       required:
-      - code
-      - message
-      - statusCode
+        - code
+        - message
+        - statusCode
     CertificateDto:
       type: object
       properties:
@@ -1323,58 +1397,59 @@ components:
           description: Private Key Availability
         trustedCa:
           type: boolean
-          description: "Indicator whether CA is marked as trusted, set to null if\
-            \ certificate is not CA"
+          description: "Indicator whether CA is marked as trusted, set to null if certificate is not CA"
       required:
-      - commonName
-      - keySize
-      - privateKeyAvailability
-      - publicKeyAlgorithm
-      - signatureAlgorithm
-      - state
-      - subjectDn
-      - trustedCa
-      - uuid
-      - validationStatus
+        - commonName
+        - keySize
+        - privateKeyAvailability
+        - publicKeyAlgorithm
+        - signatureAlgorithm
+        - state
+        - subjectDn
+        - trustedCa
+        - uuid
+        - validationStatus
     CertificateState:
       type: string
       enum:
-      - requested
-      - rejected
-      - pending_approval
-      - pending_issue
-      - pending_revoke
-      - failed
-      - issued
-      - revoked
-      - archived
+        - requested
+        - rejected
+        - pending_approval
+        - pending_issue
+        - pending_revoke
+        - failed
+        - issued
+        - revoked
+        - archived
     CertificateType:
       type: string
       enum:
-      - X.509
-      - SSH
+        - X.509
+        - SSH
     CertificateValidationStatus:
       type: string
       enum:
-      - not_checked
-      - failed
-      - inactive
-      - invalid
-      - valid
-      - revoked
-      - expiring
-      - expired
+        - not_checked
+        - failed
+        - inactive
+        - invalid
+        - valid
+        - revoked
+        - expiring
+        - expired
     CmpProfileDetailDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         enabled:
           type: boolean
           description: Enabled flag - true = enabled; false = disabled
@@ -1382,30 +1457,30 @@ components:
           type: string
           description: Variant of the CMP Profile
           enum:
-          - v2
-          - v2_3gpp
-          - v3
+            - v2
+            - v2_3gpp
+            - v3
         description:
           type: string
           description: CMP Profile description
-          example: Sample text description
+          examples:
+            - Sample text description
         raProfile:
           $ref: "#/components/schemas/SimplifiedRaProfileDto"
           description: RA Profile associated with the CMP Profile
         cmpUrl:
           type: string
           description: CMP URL
-          example: https://your-domain.com/api/v1/protocols/cmp/cmpProfile
+          examples:
+            - https://your-domain.com/api/v1/protocols/cmp/cmpProfile
         issueCertificateAttributes:
           type: array
-          description: List of Attributes to issue a Certificate for the associated
-            RA Profile
+          description: List of Attributes to issue a Certificate for the associated RA Profile
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
         revokeCertificateAttributes:
           type: array
-          description: List of Attributes to revoke a Certificate for the associated
-            RA Profile
+          description: List of Attributes to revoke a Certificate for the associated RA Profile
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
         customAttributes:
@@ -1423,30 +1498,32 @@ components:
           $ref: "#/components/schemas/CertificateDto"
           description: Signing certificate for the CMP responses
       required:
-      - enabled
-      - name
-      - requestProtectionMethod
-      - responseProtectionMethod
-      - uuid
-      - variant
+        - enabled
+        - name
+        - requestProtectionMethod
+        - responseProtectionMethod
+        - uuid
+        - variant
     ComplianceStatus:
       type: string
       enum:
-      - not_checked
-      - ok
-      - nok
-      - na
+        - not_checked
+        - ok
+        - nok
+        - na
     GroupDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         description:
           type: string
           description: Description of the Group
@@ -1459,8 +1536,8 @@ components:
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
       required:
-      - name
-      - uuid
+        - name
+        - uuid
     ResponseAttributeDto:
       type: object
       description: Response attribute with content for object it belongs to
@@ -1468,43 +1545,49 @@ components:
         uuid:
           type: string
           description: UUID of the Attribute
-          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
+          examples:
+            - 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         label:
           type: string
           description: Label of the the Attribute
-          example: Attribute Name
+          examples:
+            - Attribute Name
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
         contentType:
           $ref: "#/components/schemas/AttributeContentType"
           description: Content Type of the Attribute
-          example: Attribute
+          examples:
+            - Attribute
         content:
           type: array
           description: Content of the Attribute
           items:
-            $ref: "#/components/schemas/BaseAttributeContent"
+            $ref: "#/components/schemas/BaseAttributeContentDto"
       required:
-      - contentType
-      - label
-      - name
-      - type
+        - contentType
+        - label
+        - name
+        - type
     SimplifiedRaProfileDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         enabled:
           type: boolean
           description: Enabled flag - true = enabled; false = disabled
@@ -1512,30 +1595,30 @@ components:
           type: string
           description: Authority Instance UUID
       required:
-      - enabled
-      - name
-      - uuid
+        - enabled
+        - name
+        - uuid
     CmpProfileRequestDto:
       type: object
       properties:
         description:
           type: string
           description: Description of the CMP Profile
-          example: Sample text description
+          examples:
+            - Sample text description
         raProfileUuid:
           type: string
           description: RA Profile UUID that the CMP Profile is associated with
-          example: 6b55de1c-844f-11ec-a8a3-0242ac120002
+          examples:
+            - 6b55de1c-844f-11ec-a8a3-0242ac120002
         issueCertificateAttributes:
           type: array
-          description: List of Attributes to issue Certificate for the associated
-            RA Profile. Required when raProfileUuid is provided
+          description: List of Attributes to issue Certificate for the associated RA Profile. Required when raProfileUuid is provided
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
         revokeCertificateAttributes:
           type: array
-          description: List of Attributes to revoke Certificate for the associated
-            RA Profile. Required when raProfileUuid is provided
+          description: List of Attributes to revoke Certificate for the associated RA Profile. Required when raProfileUuid is provided
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
         customAttributes:
@@ -1551,39 +1634,40 @@ components:
           description: Protection Method for the CMP Response
         sharedSecret:
           type: string
-          description: Shared secret for the CMP Request. Required when requestProtectionMethod
-            is sharedSecret
+          description: Shared secret for the CMP Request. Required when requestProtectionMethod is sharedSecret
         signingCertificateUuid:
           type: string
-          description: UUID of the Certificate to be used as signing certificate for
-            CMP responses. Required when responseProtectionMethod is signature
+          description: UUID of the Certificate to be used as signing certificate for CMP responses. Required when responseProtectionMethod is signature
         name:
           type: string
           description: Name of the CMP Profile
-          example: Example CMP Profile
+          examples:
+            - Example CMP Profile
         variant:
           type: string
           description: Variant of the CMP Profile
           enum:
-          - v2
-          - v2_3gpp
-          - v3
+            - v2
+            - v2_3gpp
+            - v3
       required:
-      - name
-      - requestProtectionMethod
-      - responseProtectionMethod
-      - variant
+        - name
+        - requestProtectionMethod
+        - responseProtectionMethod
+        - variant
     CmpProfileDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         enabled:
           type: boolean
           description: Enabled flag - true = enabled; false = disabled
@@ -1591,42 +1675,76 @@ components:
           type: string
           description: Variant of the CMP Profile
           enum:
-          - v2
-          - v2_3gpp
-          - v3
+            - v2
+            - v2_3gpp
+            - v3
         description:
           type: string
           description: CMP Profile description
-          example: Sample text description
+          examples:
+            - Sample text description
         raProfile:
           $ref: "#/components/schemas/SimplifiedRaProfileDto"
           description: RA Profile associated with the CMP Profile
         cmpUrl:
           type: string
           description: CMP URL
-          example: https://your-domain.com/api/v1/protocols/cmp/cmpProfile
+          examples:
+            - https://your-domain.com/api/v1/protocols/cmp/cmpProfile
       required:
-      - enabled
-      - name
-      - uuid
-      - variant
+        - enabled
+        - name
+        - uuid
+        - variant
     BulkActionMessageDto:
       type: object
       properties:
         uuid:
           type: string
           description: Object identifier
-          example: 7b55ge1c-844f-11dc-a8a3-0242ac120002
+          examples:
+            - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
           description: Object Name
-          example: Name
+          examples:
+            - Name
         message:
           type: string
-          description: Message describing the associations of the Objects which is
-            preventing the bulk operation
-          example: Object is associated with other items
+          description: Message describing the associations of the Objects which is preventing the bulk operation
+          examples:
+            - Object is associated with other items
       required:
-      - message
-      - name
-      - uuid
+        - message
+        - name
+        - uuid
+  securitySchemes:
+    ConnectorAPIKeyAuth:
+      type: apiKey
+      description: API Key in header configured for connector
+      name: ApiKeyHeaderAttribute
+      in: header
+    SessionAuth:
+      type: apiKey
+      description: Session-based authentication with session ID stored in 'czertainly-session' cookie
+      name: czertainly-session
+      in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
+    CertificateAuth:
+      type: apiKey
+      description: Base64 encoded X.509 certificate passed in header
+      name: X-APP-CERTIFICATE
+      in: header
+    CertificateTLSAuth:
+      type: mutualTLS
+      description: Client certificate authentication
+    NoAuth:
+      type: http
+      description: No authentication
+      scheme: none
+    BearerJWTAuth:
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT
