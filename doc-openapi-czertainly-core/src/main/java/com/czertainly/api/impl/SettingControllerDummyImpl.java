@@ -1,6 +1,5 @@
 package com.czertainly.api.impl;
 
-import com.czertainly.api.interfaces.core.web.SettingController;
 import com.czertainly.api.model.core.settings.*;
 import com.czertainly.api.model.core.settings.authentication.AuthenticationSettingsDto;
 import com.czertainly.api.model.core.settings.authentication.AuthenticationSettingsUpdateDto;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirements(value = {
         @SecurityRequirement(name = "")
 })
-public class SettingControllerDummyImpl implements SettingController {
+public class SettingControllerDummyImpl implements SettingControllerDummy {
     
     @Override
     public PlatformSettingsDto getPlatformSettings() {

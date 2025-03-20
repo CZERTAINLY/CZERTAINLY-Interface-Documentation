@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @SuppressWarnings("java:S1186")
-public class SettingControllerDummyImpl implements SettingController {
+public class SettingControllerDummyImpl implements SettingControllerDummy {
 
     @Override
     public PlatformSettingsDto getPlatformSettings() {
