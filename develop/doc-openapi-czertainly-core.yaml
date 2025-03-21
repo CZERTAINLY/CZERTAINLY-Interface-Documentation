@@ -21891,6 +21891,28 @@ components:
             $ref: "#/components/schemas/OAuth2ProviderSettingsDto"
       required:
       - disableLocalhostUser
+    JwkDto:
+      type: object
+      properties:
+        kid:
+          type: string
+          description: The key ID parameter used to match a specific key in provider
+        publicKey:
+          type: string
+          description: Base64 encoded value of public key
+        keyType:
+          type: string
+          description: "The cryptographic algorithm family used with the key, such\
+            \ as \"RSA\" or \"EC\""
+        algorithm:
+          type: string
+          description: The algorithm intended for use with the key
+        use:
+          type: string
+          description: The intended use of the public key
+      required:
+      - kid
+      - publicKey
     OAuth2ProviderSettingsDto:
       type: object
       properties:
@@ -21958,7 +21980,13 @@ components:
           default: 15m
           description: Duration in seconds after which will inactive user's session
             be terminated.
+        jwkSetKeys:
+          type: array
+          description: List of public keys used by the provider
+          items:
+            $ref: "#/components/schemas/JwkDto"
       required:
+      - jwkSetKeys
       - name
     OAuth2ProviderSettingsUpdateDto:
       type: object

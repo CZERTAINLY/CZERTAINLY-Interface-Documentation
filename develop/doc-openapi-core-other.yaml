@@ -1027,6 +1027,28 @@ components:
             $ref: "#/components/schemas/OAuth2ProviderSettingsDto"
       required:
       - disableLocalhostUser
+    JwkDto:
+      type: object
+      properties:
+        kid:
+          type: string
+          description: The key ID parameter used to match a specific key in provider
+        publicKey:
+          type: string
+          description: Base64 encoded value of public key
+        keyType:
+          type: string
+          description: "The cryptographic algorithm family used with the key, such\
+            \ as \"RSA\" or \"EC\""
+        algorithm:
+          type: string
+          description: The algorithm intended for use with the key
+        use:
+          type: string
+          description: The intended use of the public key
+      required:
+      - kid
+      - publicKey
     OAuth2ProviderSettingsDto:
       type: object
       properties:
@@ -1094,7 +1116,13 @@ components:
           default: 15m
           description: Duration in seconds after which will inactive user's session
             be terminated.
+        jwkSetKeys:
+          type: array
+          description: List of public keys used by the provider
+          items:
+            $ref: "#/components/schemas/JwkDto"
       required:
+      - jwkSetKeys
       - name
     OAuth2ProviderSettingsUpdateDto:
       type: object
@@ -1803,17 +1831,17 @@ components:
     ConnectorAPIKeyAuth:
       type: apiKey
       description: API Key in header configured for connector
-      name: ApiKeyHeaderAttribute
+      name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header
