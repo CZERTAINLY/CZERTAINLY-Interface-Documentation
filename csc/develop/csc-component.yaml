@@ -16,8 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: http://localhost:8091
-  description: Generated server url
+- url: https://csc.czertainly.online
 tags:
 - name: Info
   description: Info API as defined in the CSC API v2.0.0.2 specification. This API
@@ -67,7 +66,7 @@ paths:
         "200":
           description: Successful operation
       security:
-      - BearerJWTAuth: []
+      - BearerAuthCredentialManagement: []
   /management/v1/credentials/rekey:
     post:
       tags:
@@ -103,7 +102,7 @@ paths:
         "200":
           description: Successful operation
       security:
-      - BearerJWTAuth: []
+      - BearerAuthCredentialManagement: []
   /management/v1/credentials/enable:
     post:
       tags:
@@ -139,7 +138,7 @@ paths:
         "200":
           description: Successful operation
       security:
-      - BearerJWTAuth: []
+      - BearerAuthCredentialManagement: []
   /management/v1/credentials/disable:
     post:
       tags:
@@ -175,7 +174,7 @@ paths:
         "200":
           description: Successful operation
       security:
-      - BearerJWTAuth: []
+      - BearerAuthCredentialManagement: []
   /management/v1/credentials/create:
     post:
       tags:
@@ -215,7 +214,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/CredentialIdDto"
       security:
-      - BearerJWTAuth: []
+      - BearerAuthCredentialManagement: []
   /csc/v2/signatures/signHash:
     post:
       tags:
@@ -257,6 +256,8 @@ paths:
                 $ref: "#/components/schemas/SignHashResponseDto"
         "501":
           description: Not Implemented
+      security:
+      - BearerAuthSignature: []
   /csc/v2/signatures/signDoc:
     post:
       tags:
@@ -299,6 +300,8 @@ paths:
                 $ref: "#/components/schemas/SignDocResponseDto"
         "501":
           description: Not Implemented
+      security:
+      - BearerAuthSignature: []
   /csc/v2/credentials/list:
     post:
       tags:
@@ -344,6 +347,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CredentialsListDto"
+      security:
+      - BearerAuthCredential: []
   /csc/v2/credentials/info:
     post:
       tags:
@@ -389,6 +394,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CredentialDto"
+      security:
+      - BearerAuthCredential: []
   /csc/v2/info:
     get:
       tags:
@@ -1323,8 +1330,21 @@ components:
       required:
       - formats
   securitySchemes:
-    BearerJWTAuth:
+    BearerAuthSignature:
       type: http
-      description: Bearer JWT authentication with `manageCredentials` scope
-      scheme: Bearer
-      bearerFormat: JWT
+      description: |
+        Bearer authentication with `credential` or `service` scope. If the access token passed
+        in the `Authorization` HTTP header has scope `service`, the signing application MUST pass an
+        access token with scope `credential` in the `SAD` request parameter. This is not required,
+        if the the access token passed in the `Authorization` HTTP header has scope `credential`.
+      scheme: bearer
+    BearerAuthCredential:
+      type: http
+      description: |
+        Bearer authentication with `credential` or `service` scope.
+      scheme: bearer
+    BearerAuthCredentialManagement:
+      type: http
+      description: |
+        Bearer authentication with `manageCredentials` scope.
+      scheme: bearer
