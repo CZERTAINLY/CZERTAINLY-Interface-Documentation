@@ -8,8 +8,8 @@ info:
     email: info@czertainly.com
   license:
     name: MIT License
-    url: https://github.com/CZERTAINLY/CZERTAINLY/blob/develop/LICENSE.md
-  version: v2.0.0.2
+    url: https://github.com/3KeyCompany/CZERTAINLY/blob/develop/LICENSE.md
+  version: 0.0.1-SNAPSHOT
   x-logo:
     url: https://github.com/CZERTAINLY/CZERTAINLY/blob/develop/czertainly-logo/czertainly_color_H.svg
 externalDocs:
@@ -46,6 +46,9 @@ paths:
               $ref: "#/components/schemas/SelectCredentialDto"
         required: true
       responses:
+        "500":
+          description: Internal Server Error
+          content: {}
         "403":
           description: Forbidden
           content:
@@ -55,9 +58,6 @@ paths:
         "401":
           description: Unauthorized
           content: {}
-        "500":
-          description: Internal Server Error
-          content: {}
         "400":
           description: Bad Request
           content:
@@ -66,6 +66,8 @@ paths:
                 $ref: "#/components/schemas/ErrorDto"
         "200":
           description: Successful operation
+      security:
+      - BearerJWTAuth: []
   /management/v1/credentials/rekey:
     post:
       tags:
@@ -80,6 +82,9 @@ paths:
               $ref: "#/components/schemas/RekeyCredentialDto"
         required: true
       responses:
+        "500":
+          description: Internal Server Error
+          content: {}
         "403":
           description: Forbidden
           content:
@@ -89,9 +94,6 @@ paths:
         "401":
           description: Unauthorized
           content: {}
-        "500":
-          description: Internal Server Error
-          content: {}
         "400":
           description: Bad Request
           content:
@@ -100,6 +102,8 @@ paths:
                 $ref: "#/components/schemas/ErrorDto"
         "200":
           description: Successful operation
+      security:
+      - BearerJWTAuth: []
   /management/v1/credentials/enable:
     post:
       tags:
@@ -114,6 +118,9 @@ paths:
               $ref: "#/components/schemas/SelectCredentialDto"
         required: true
       responses:
+        "500":
+          description: Internal Server Error
+          content: {}
         "403":
           description: Forbidden
           content:
@@ -123,9 +130,6 @@ paths:
         "401":
           description: Unauthorized
           content: {}
-        "500":
-          description: Internal Server Error
-          content: {}
         "400":
           description: Bad Request
           content:
@@ -134,6 +138,8 @@ paths:
                 $ref: "#/components/schemas/ErrorDto"
         "200":
           description: Successful operation
+      security:
+      - BearerJWTAuth: []
   /management/v1/credentials/disable:
     post:
       tags:
@@ -148,6 +154,9 @@ paths:
               $ref: "#/components/schemas/SelectCredentialDto"
         required: true
       responses:
+        "500":
+          description: Internal Server Error
+          content: {}
         "403":
           description: Forbidden
           content:
@@ -157,9 +166,6 @@ paths:
         "401":
           description: Unauthorized
           content: {}
-        "500":
-          description: Internal Server Error
-          content: {}
         "400":
           description: Bad Request
           content:
@@ -168,6 +174,8 @@ paths:
                 $ref: "#/components/schemas/ErrorDto"
         "200":
           description: Successful operation
+      security:
+      - BearerJWTAuth: []
   /management/v1/credentials/create:
     post:
       tags:
@@ -182,6 +190,9 @@ paths:
               $ref: "#/components/schemas/CreateCredentialDto"
         required: true
       responses:
+        "500":
+          description: Internal Server Error
+          content: {}
         "403":
           description: Forbidden
           content:
@@ -190,9 +201,6 @@ paths:
                 $ref: "#/components/schemas/ErrorDto"
         "401":
           description: Unauthorized
-          content: {}
-        "500":
-          description: Internal Server Error
           content: {}
         "400":
           description: Bad Request
@@ -206,6 +214,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CredentialIdDto"
+      security:
+      - BearerJWTAuth: []
   /csc/v2/signatures/signHash:
     post:
       tags:
@@ -221,6 +231,9 @@ paths:
               $ref: "#/components/schemas/SignHashRequestDto"
         required: true
       responses:
+        "500":
+          description: Internal Server Error
+          content: {}
         "403":
           description: Forbidden
           content:
@@ -230,23 +243,20 @@ paths:
         "401":
           description: Unauthorized
           content: {}
-        "500":
-          description: Internal Server Error
-          content: {}
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorDto"
-        "501":
-          description: Not Implemented
         "200":
           description: Successful operation
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/SignHashResponseDto"
+        "501":
+          description: Not Implemented
   /csc/v2/signatures/signDoc:
     post:
       tags:
@@ -263,6 +273,9 @@ paths:
               $ref: "#/components/schemas/SignDocRequestDto"
         required: true
       responses:
+        "500":
+          description: Internal Server Error
+          content: {}
         "403":
           description: Forbidden
           content:
@@ -272,23 +285,20 @@ paths:
         "401":
           description: Unauthorized
           content: {}
-        "500":
-          description: Internal Server Error
-          content: {}
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorDto"
-        "501":
-          description: Not Implemented
         "200":
           description: Successful operation
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/SignDocResponseDto"
+        "501":
+          description: Not Implemented
   /csc/v2/credentials/list:
     post:
       tags:
@@ -304,6 +314,12 @@ paths:
               $ref: "#/components/schemas/ListCredentialsRequestDto"
         required: true
       responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
         "403":
           description: Forbidden
           content:
@@ -312,12 +328,6 @@ paths:
                 $ref: "#/components/schemas/ErrorDto"
         "401":
           description: Unauthorized
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorDto"
-        "500":
-          description: Internal Server Error
           content:
             '*/*':
               schema:
@@ -349,6 +359,12 @@ paths:
               $ref: "#/components/schemas/GetCredentialInfoDto"
         required: true
       responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorDto"
         "403":
           description: Forbidden
           content:
@@ -357,12 +373,6 @@ paths:
                 $ref: "#/components/schemas/ErrorDto"
         "401":
           description: Unauthorized
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ErrorDto"
-        "500":
-          description: Internal Server Error
           content:
             '*/*':
               schema:
@@ -389,6 +399,9 @@ paths:
         \ section `11.1 info`."
       operationId: getInfo
       responses:
+        "500":
+          description: Internal Server Error
+          content: {}
         "403":
           description: Forbidden
           content:
@@ -397,9 +410,6 @@ paths:
                 $ref: "#/components/schemas/ErrorDto"
         "401":
           description: Unauthorized
-          content: {}
-        "500":
-          description: Internal Server Error
           content: {}
         "400":
           description: Bad Request
@@ -1312,3 +1322,9 @@ components:
               type: string
       required:
       - formats
+  securitySchemes:
+    BearerJWTAuth:
+      type: http
+      description: Bearer JWT authentication with `manageCredentials` scope
+      scheme: Bearer
+      bearerFormat: JWT
