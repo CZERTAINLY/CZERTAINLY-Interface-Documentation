@@ -20,7 +20,7 @@ public class SettingControllerDummyImpl implements SettingController {
     }
 
     @Override
-    public void updatePlatformSettings(PlatformSettingsDto platformSettingsDto) {
+    public void updatePlatformSettings(PlatformSettingsUpdateDto platformSettingsDto) {
 
     }
 
