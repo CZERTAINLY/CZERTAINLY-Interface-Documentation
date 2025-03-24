@@ -72,7 +72,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PlatformSettingsDto"
+              $ref: "#/components/schemas/PlatformSettingsUpdateDto"
         required: true
       responses:
         "204":
@@ -770,40 +770,42 @@ paths:
       - SessionAuth: []
 components:
   schemas:
-    CertificateSettingsDto:
+    CertificateSettingsUpdateDto:
       type: object
       properties:
-        certificateValidationSettingsDto:
-          $ref: "#/components/schemas/CertificateValidationSettingsDto"
-    CertificateValidationSettingsDto:
+        validation:
+          $ref: "#/components/schemas/CertificateValidationSettingsUpdateDto"
+          description: Settings of validation of certificates
+    CertificateValidationSettingsUpdateDto:
       type: object
       properties:
-        validationEnabled:
+        enabled:
           type: boolean
+          default: "true"
           description: Indicator whether validation of certificates should be enabled
-        validationFrequency:
+        frequency:
           type: integer
           format: int32
-          default: 1 day
+          default: "1"
           description: Frequency of validation of certificates in days
           minimum: 1
         expiringThreshold:
           type: integer
           format: int32
-          default: 30 days
+          default: "30"
           description: How many days before expiration should certificate validation
             status change to Expiring
           minimum: 1
       required:
-      - validationEnabled
-    PlatformSettingsDto:
+      - enabled
+    PlatformSettingsUpdateDto:
       type: object
       properties:
         utils:
           $ref: "#/components/schemas/UtilsSettingsDto"
           description: Utils settings of the platform
         certificates:
-          $ref: "#/components/schemas/CertificateSettingsDto"
+          $ref: "#/components/schemas/CertificateSettingsUpdateDto"
           description: Settings applicable to all certificates in inventory by default
     UtilsSettingsDto:
       type: object
@@ -1617,6 +1619,39 @@ components:
             type: integer
             format: int64
           description: Map of Client count by status
+    CertificateSettingsDto:
+      type: object
+      properties:
+        validation:
+          $ref: "#/components/schemas/CertificateValidationSettingsDto"
+    CertificateValidationSettingsDto:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: Indicator whether validation of certificates should be enabled
+        frequency:
+          type: integer
+          format: int32
+          description: Frequency of validation of certificates in days
+          minimum: 1
+        expiringThreshold:
+          type: integer
+          format: int32
+          description: How many days before expiration should certificate validation
+            status change to Expiring
+          minimum: 1
+      required:
+      - enabled
+    PlatformSettingsDto:
+      type: object
+      properties:
+        utils:
+          $ref: "#/components/schemas/UtilsSettingsDto"
+          description: Utils settings of the platform
+        certificates:
+          $ref: "#/components/schemas/CertificateSettingsDto"
+          description: Settings applicable to all certificates in inventory by default
     AuthenticationSettingsDto:
       type: object
       properties:
@@ -1833,15 +1868,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
-    BasicAuth:
-      type: http
-      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

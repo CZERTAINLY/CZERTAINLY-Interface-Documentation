@@ -132,7 +132,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RaProfileValidationUpdateDto"
+              $ref: "#/components/schemas/RaProfileCertificateValidationSettingsUpdateDto"
         required: true
       responses:
         "204":
@@ -1019,28 +1019,48 @@ components:
           description: UUID of Certificate
       required:
       - uuid
-    RaProfileValidationUpdateDto:
+    RaProfileCertificateValidationSettingsUpdateDto:
       type: object
       properties:
-        validationEnabled:
+        enabled:
           type: boolean
-          description: Indicator whether validation of certificates associated with
-            RA profile should be enabled
-        validationFrequency:
+          description: "Indicator whether validation of certificates associated with\
+            \ RA profile should be enabled, if null, then values in platform settings\
+            \ will be used"
+        frequency:
           type: integer
           format: int32
+          default: "1"
           description: "Frequency of validation of certificates in days, when not\
             \ set, value in platform settings is used"
           minimum: 1
         expiringThreshold:
           type: integer
           format: int32
+          default: "30"
           description: "How many days before expiration should certificate validation\
             \ status change to Expiring, when not set, value in platform settings\
             \ is used"
           minimum: 1
-      required:
-      - validationEnabled
+    RaProfileCertificateValidationSettingsDto:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: "Indicator whether validation of certificates associated with\
+            \ RA profile should be enabled, if null, then values in platform settings\
+            \ will be used"
+        frequency:
+          type: integer
+          format: int32
+          description: Frequency of validation of certificates in days
+          minimum: 1
+        expiringThreshold:
+          type: integer
+          format: int32
+          description: How many days before expiration should certificate validation
+            status change to Expiring
+          minimum: 1
     RaProfileDto:
       type: object
       properties:
@@ -1084,26 +1104,16 @@ components:
           description: List of protocols enabled
           items:
             type: string
-        validationEnabled:
-          type: boolean
-          description: Indicator whether validation of certificates associated with
-            RA profile should be enabled
-        validationFrequency:
-          type: integer
-          format: int32
-          description: Frequency of validation of certificates in days
-        expiringThreshold:
-          type: integer
-          format: int32
-          description: How many days before expiration should certificate validation
-            status change to Expiring
+        certificateValidationSettings:
+          $ref: "#/components/schemas/RaProfileCertificateValidationSettingsDto"
+          description: Settings for validation of certificates associated with the
+            RA Profile
       required:
       - authorityInstanceName
       - authorityInstanceUuid
       - enabled
       - name
       - uuid
-      - validationEnabled
     ResponseAttributeDto:
       type: object
       description: Response attribute with content for object it belongs to
