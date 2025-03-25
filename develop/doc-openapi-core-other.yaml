@@ -317,7 +317,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OAuth2ProviderSettingsDto"
+                $ref: "#/components/schemas/OAuth2ProviderSettingsResponseDto"
         "400":
           description: Bad Request
           content:
@@ -1029,28 +1029,6 @@ components:
             $ref: "#/components/schemas/OAuth2ProviderSettingsDto"
       required:
       - disableLocalhostUser
-    JwkDto:
-      type: object
-      properties:
-        kid:
-          type: string
-          description: The key ID parameter used to match a specific key in provider
-        publicKey:
-          type: string
-          description: Base64 encoded value of public key
-        keyType:
-          type: string
-          description: "The cryptographic algorithm family used with the key, such\
-            \ as \"RSA\" or \"EC\""
-        algorithm:
-          type: string
-          description: The algorithm intended for use with the key
-        use:
-          type: string
-          description: The intended use of the public key
-      required:
-      - kid
-      - publicKey
     OAuth2ProviderSettingsDto:
       type: object
       properties:
@@ -1118,13 +1096,7 @@ components:
           default: 15m
           description: Duration in seconds after which will inactive user's session
             be terminated.
-        jwkSetKeys:
-          type: array
-          description: List of public keys used by the provider
-          items:
-            $ref: "#/components/schemas/JwkDto"
       required:
-      - jwkSetKeys
       - name
     OAuth2ProviderSettingsUpdateDto:
       type: object
@@ -1664,6 +1636,103 @@ components:
             $ref: "#/components/schemas/OAuth2ProviderSettingsDto"
       required:
       - disableLocalhostUser
+    JwkDto:
+      type: object
+      properties:
+        kid:
+          type: string
+          description: The key ID parameter used to match a specific key in provider
+        publicKey:
+          type: string
+          description: Base64 encoded value of public key
+        keyType:
+          type: string
+          description: "The cryptographic algorithm family used with the key, such\
+            \ as \"RSA\" or \"EC\""
+        algorithm:
+          type: string
+          description: The algorithm intended for use with the key
+        use:
+          type: string
+          description: The intended use of the public key
+      required:
+      - kid
+      - publicKey
+    OAuth2ProviderSettingsResponseDto:
+      type: object
+      properties:
+        issuerUrl:
+          type: string
+          description: "URL of issuer issuing authentication tokens. If provided,\
+            \ authentication via JWT token is enabled for this provider."
+        clientId:
+          type: string
+          description: The client ID used to identify the client application during
+            the authorization process.
+        clientSecret:
+          type: string
+          description: The client secret used by the client application to authenticate
+            with the authorization server.
+        authorizationUrl:
+          type: string
+          description: The URL where the authorization server redirects the user for
+            login and authorization.
+        tokenUrl:
+          type: string
+          description: The URl used to exchange the authorization code or credentials
+            for an access token.
+        jwkSetUrl:
+          type: string
+          description: The URL where the JSON Web Key Set (JWKS) containing the public
+            keys used to verify JWT tokens can be retrieved.
+        jwkSet:
+          type: string
+          description: "Base64 encoded JWK Set, provided in case JWK Set URL is not\
+            \ available"
+        scope:
+          type: array
+          description: ' The list of scopes that define the access levels and permissions
+            requested by the client application.'
+          items:
+            type: string
+        logoutUrl:
+          type: string
+          description: URL to end session on provider side.
+        postLogoutUrl:
+          type: string
+          description: URL that user will be redirected after logout from application.
+        userInfoUrl:
+          type: string
+          description: The URL containing information about user.
+        audiences:
+          type: array
+          description: "A list of expected audiences for validating the issued tokens,\
+            \ used to match the intended recipients of the tokens."
+          items:
+            type: string
+        skew:
+          type: integer
+          format: int32
+          description: "The allowed time skew, in seconds, for token validation. This\
+            \ accounts for clock differences between systems. Default value is 30\
+            \ seconds."
+        sessionMaxInactiveInterval:
+          type: integer
+          format: int32
+          default: 15m
+          description: Duration in seconds after which will inactive user's session
+            be terminated.
+        name:
+          type: string
+          description: Name of OAuth2 Provider
+        jwkSetKeys:
+          type: array
+          description: List of public keys used by the provider
+          items:
+            $ref: "#/components/schemas/JwkDto"
+      required:
+      - jwkSetKeys
+      - name
     ResourceDto:
       type: object
       properties:
