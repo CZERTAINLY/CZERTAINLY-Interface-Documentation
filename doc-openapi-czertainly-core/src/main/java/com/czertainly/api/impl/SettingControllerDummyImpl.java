@@ -4,7 +4,7 @@ import com.czertainly.api.interfaces.core.web.SettingController;
 import com.czertainly.api.model.core.settings.*;
 import com.czertainly.api.model.core.settings.authentication.AuthenticationSettingsDto;
 import com.czertainly.api.model.core.settings.authentication.AuthenticationSettingsUpdateDto;
-import com.czertainly.api.model.core.settings.authentication.OAuth2ProviderSettingsDto;
+import com.czertainly.api.model.core.settings.authentication.OAuth2ProviderSettingsResponseDto;
 import com.czertainly.api.model.core.settings.authentication.OAuth2ProviderSettingsUpdateDto;
 import com.czertainly.api.model.core.settings.logging.LoggingSettingsDto;
 import jakarta.validation.Valid;
@@ -50,7 +50,7 @@ public class SettingControllerDummyImpl implements SettingController {
     }
 
     @Override
-    public OAuth2ProviderSettingsDto getOAuth2ProviderSettings(String providerName) {
+    public OAuth2ProviderSettingsResponseDto getOAuth2ProviderSettings(String providerName) {
         return null;
     }
 
