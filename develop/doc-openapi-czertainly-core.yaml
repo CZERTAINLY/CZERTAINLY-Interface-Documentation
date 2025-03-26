@@ -94,6 +94,8 @@ tags:
   description: Cryptographic Operations Controller API
 - name: Workflow Rules Management
   description: Workflow Rules Management API
+- name: Info
+  description: CZERTAINLY Application Information API
 - name: Enums
   description: Enums API
 - name: Connector Authentication
@@ -16817,6 +16819,77 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+  /v1/info:
+    get:
+      tags:
+      - Info
+      summary: Get information about running CZERTAINLY Application
+      operationId: getInfo
+      responses:
+        "200":
+          description: CZERTAINLY Application info retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreInfoResponseDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+  /v1/health/readiness:
+    get:
+      tags:
+      - Info
+      summary: Health readiness check endpoint
+      operationId: getHealthReadiness
+      responses:
+        "200":
+          description: Health readiness checked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActuatorHealthDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+  /v1/health/liveness:
+    get:
+      tags:
+      - Info
+      summary: Health liveness check endpoint
+      operationId: getHealthLiveness
+      responses:
+        "200":
+          description: Health liveness checked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActuatorHealthDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/enums:
     get:
       tags:
@@ -28264,6 +28337,55 @@ components:
       - pageNumber
       - totalItems
       - totalPages
+    AppInfoDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: CZERTAINLY Application name
+        version:
+          type: string
+          description: CZERTAINLY Core version
+      required:
+      - name
+      - version
+    CoreInfoResponseDto:
+      type: object
+      properties:
+        app:
+          $ref: "#/components/schemas/AppInfoDto"
+          description: CZERTAINLY Application information
+        db:
+          $ref: "#/components/schemas/DatabaseInfoDto"
+          description: Database information
+      required:
+      - app
+      - db
+    DatabaseInfoDto:
+      type: object
+      properties:
+        system:
+          type: string
+          description: Database system product name
+        version:
+          type: string
+          description: Database product version
+      required:
+      - system
+      - version
+    ActuatorHealthDto:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Status of the application health
+          enum:
+          - UNKNOWN
+          - UP
+          - DOWN
+          - OUT_OF_SERVICE
+      required:
+      - status
     EnumItemDto:
       type: object
       properties:
