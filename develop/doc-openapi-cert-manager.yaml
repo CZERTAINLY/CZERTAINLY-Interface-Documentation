@@ -23,10 +23,14 @@ tags:
   description: Certificate Inventory API
 - name: Authentication Management
   description: Authentication Management API
+- name: Info
+  description: CZERTAINLY Application Information API
 - name: RA Profile Management
   description: RA Profile Management API
 - name: Client Operations v2
   description: Client Operations v2 API
+- name: Approval Inventory
+  description: Approval Inventory API
 paths:
   /v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates:
     post:
@@ -239,6 +243,39 @@ paths:
       - BearerJWTAuth: []
       - CertificateAuth: []
       - SessionAuth: []
+  /v1/info:
+    get:
+      tags:
+      - Info
+      summary: Get information about running CZERTAINLY Application
+      operationId: getInfo
+      responses:
+        "200":
+          description: CZERTAINLY Application info retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CoreInfoResponseDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
   /v1/certificates/{uuid}:
     get:
       tags:
@@ -285,6 +322,105 @@ paths:
       - BearerJWTAuth: []
       - CertificateAuth: []
       - SessionAuth: []
+  /v1/certificates/{uuid}/history:
+    get:
+      tags:
+      - Certificate Inventory
+      summary: Get Certificate event history
+      operationId: getCertificateEventHistory
+      parameters:
+      - name: uuid
+        in: path
+        description: Certificate UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Certificate event history retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CertificateEventHistoryDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/certificates/{uuid}/approvals:
+    get:
+      tags:
+      - Certificate Inventory
+      summary: List Certificates Approvals
+      operationId: listCertificateApprovals
+      parameters:
+      - name: uuid
+        in: path
+        description: Certificate UUID
+        required: true
+        schema:
+          type: string
+      - name: paginationRequestDto
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/PaginationRequestDto"
+      responses:
+        "200":
+          description: List of all approvals for the certificate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApprovalResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
   /v1/auth/profile:
     get:
       tags:
@@ -298,6 +434,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserDetailDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/approvals/{uuid}:
+    get:
+      tags:
+      - Approval Inventory
+      summary: Get Approval Detail
+      operationId: getApproval
+      parameters:
+      - name: uuid
+        in: path
+        description: Approval UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Approval detail retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApprovalDetailDto"
+        "404":
+          description: Approval not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -1151,6 +1333,42 @@ components:
       - label
       - name
       - type
+    AppInfoDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: CZERTAINLY Application name
+        version:
+          type: string
+          description: CZERTAINLY Core version
+      required:
+      - name
+      - version
+    CoreInfoResponseDto:
+      type: object
+      properties:
+        app:
+          $ref: "#/components/schemas/AppInfoDto"
+          description: CZERTAINLY Application information
+        db:
+          $ref: "#/components/schemas/DatabaseInfoDto"
+          description: Database information
+      required:
+      - app
+      - db
+    DatabaseInfoDto:
+      type: object
+      properties:
+        system:
+          type: string
+          description: Database system product name
+        version:
+          type: string
+          description: Database product version
+      required:
+      - system
+      - version
     CertificateComplianceResultDto:
       type: object
       properties:
@@ -2044,6 +2262,172 @@ components:
       - enabled
       - name
       - uuid
+    CertificateEventHistoryDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID of the event
+        certificateUuid:
+          type: string
+          description: UUID of the Certificate
+        created:
+          type: string
+          format: date-time
+          description: Event creation time
+        createdBy:
+          type: string
+          description: Created By
+        event:
+          type: string
+          description: Event type
+          enum:
+          - Issue Certificate
+          - Request Certificate
+          - Renew Certificate
+          - Rekey Certificate
+          - Revoke Certificate
+          - Delete Certificate
+          - Approve action requested
+          - Approve action closed
+          - Update State
+          - Update Validation Status
+          - Update RA Profile
+          - Update Entity
+          - Update Group
+          - Update Owner
+          - Upload Certificate
+          - Certificate Discovered
+          - Update Location
+        status:
+          type: string
+          description: Event result
+          enum:
+          - SUCCESS
+          - FAILED
+        message:
+          type: string
+          description: Event message
+        additionalInformation:
+          type: object
+          additionalProperties:
+            type: object
+          description: Additional information for the event
+      required:
+      - certificateUuid
+      - created
+      - createdBy
+      - event
+      - message
+      - status
+      - uuid
+    PaginationRequestDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          default: "10"
+          description: Number of entries per page
+          maximum: 1000
+        pageNumber:
+          type: integer
+          format: int32
+          default: "1"
+          description: Page number for the request
+    ApprovalDto:
+      type: object
+      properties:
+        approvalUuid:
+          type: string
+          description: UUID of the Approval
+        creatorUuid:
+          type: string
+          description: UUID of the user that requested approval
+        creatorUsername:
+          type: string
+          description: Username of the user that requested approval
+        version:
+          type: integer
+          format: int32
+          description: Version of the Approval profile
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date of the Approval
+        expiryAt:
+          type: string
+          format: date-time
+          description: Expiry date of the Approval
+        closedAt:
+          type: string
+          format: date-time
+          description: Date of resolution of the Approval
+        status:
+          type: string
+          description: Status of the Approval
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
+          - EXPIRED
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource of the Approval
+        resourceAction:
+          type: string
+          description: Resource action of the Approval
+        objectUuid:
+          type: string
+          description: UUID of the target object of the Approval
+        approvalProfileName:
+          type: string
+          description: Name of the Approval profile
+        approvalProfileUuid:
+          type: string
+          description: UUID of the Approval profile
+      required:
+      - approvalProfileName
+      - approvalProfileUuid
+      - approvalUuid
+      - createdAt
+      - creatorUuid
+      - expiryAt
+      - objectUuid
+      - resource
+      - resourceAction
+      - status
+      - version
+    ApprovalResponseDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+        approvals:
+          type: array
+          description: List of the Approvals
+          items:
+            $ref: "#/components/schemas/ApprovalDto"
+      required:
+      - approvals
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
     RoleDto:
       type: object
       properties:
@@ -2138,21 +2522,189 @@ components:
       - systemUser
       - username
       - uuid
+    ApprovalDetailDto:
+      type: object
+      properties:
+        approvalUuid:
+          type: string
+          description: UUID of the Approval
+        creatorUuid:
+          type: string
+          description: UUID of the user that requested approval
+        creatorUsername:
+          type: string
+          description: Username of the user that requested approval
+        version:
+          type: integer
+          format: int32
+          description: Version of the Approval profile
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date of the Approval
+        expiryAt:
+          type: string
+          format: date-time
+          description: Expiry date of the Approval
+        closedAt:
+          type: string
+          format: date-time
+          description: Date of resolution of the Approval
+        status:
+          type: string
+          description: Status of the Approval
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
+          - EXPIRED
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource of the Approval
+        resourceAction:
+          type: string
+          description: Resource action of the Approval
+        objectUuid:
+          type: string
+          description: UUID of the target object of the Approval
+        approvalProfileName:
+          type: string
+          description: Name of the Approval profile
+        approvalProfileUuid:
+          type: string
+          description: UUID of the Approval profile
+        expiry:
+          type: integer
+          format: int32
+          description: Expiration in hours
+        description:
+          type: string
+          description: Description of the Approval
+        approvalSteps:
+          type: array
+          description: List of Approval steps related to this Approval
+          items:
+            $ref: "#/components/schemas/ApprovalDetailStepDto"
+      required:
+      - approvalProfileName
+      - approvalProfileUuid
+      - approvalSteps
+      - approvalUuid
+      - createdAt
+      - creatorUuid
+      - expiry
+      - expiryAt
+      - objectUuid
+      - resource
+      - resourceAction
+      - status
+      - version
+    ApprovalDetailStepDto:
+      type: object
+      properties:
+        userUuid:
+          type: string
+          format: uuid
+          description: UUID of the responsible user to approve action in approval
+            step
+        roleUuid:
+          type: string
+          format: uuid
+          description: UUID of the responsible role of the users to approve action
+            in approval step
+        groupUuid:
+          type: string
+          format: uuid
+          description: UUID of the responsible group of the users to approve action
+            in approval step
+        description:
+          type: string
+          description: Description of the approval step
+        order:
+          type: integer
+          format: int32
+          description: Order of the position in the approval steps flow
+        requiredApprovals:
+          type: integer
+          format: int32
+          description: "Count of the required approvals for the approval step, by\
+            \ default there is 1 approval needed."
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of the Approval step
+        username:
+          type: string
+          description: Username of the responsible user to approve action in approval
+            step
+        roleName:
+          type: string
+          description: Name of the responsible role of the users to approve action
+            in approval step
+        groupName:
+          type: string
+          description: Name of the responsible group of the users to approve action
+            in approval step
+        approvalStepRecipients:
+          type: array
+          description: List of the approval recipient related for this step
+          items:
+            $ref: "#/components/schemas/ApprovalStepRecipientDto"
+      required:
+      - approvalStepRecipients
+      - order
+      - uuid
+    ApprovalStepRecipientDto:
+      type: object
+      properties:
+        approvalRecipientUuid:
+          type: string
+          description: UUID of the approval recipient
+        userUuid:
+          type: string
+          description: UUID of the recipient user
+        username:
+          type: string
+          description: Username of the recipient
+        createdAt:
+          type: string
+          format: date-time
+          description: Creating date of the approval recipient
+        closedAt:
+          type: string
+          format: date-time
+          description: Resolution date of the approval recipient
+        status:
+          type: string
+          description: Status of the approval recipient
+          enum:
+          - PENDING
+          - APPROVED
+          - REJECTED
+          - EXPIRED
+        comment:
+          type: string
+          description: Comment of the approval recipient
+      required:
+      - approvalRecipientUuid
+      - createdAt
+      - status
+      - userUuid
   securitySchemes:
     ConnectorAPIKeyAuth:
       type: apiKey
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header
