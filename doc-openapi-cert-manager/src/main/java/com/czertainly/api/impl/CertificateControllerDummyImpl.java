@@ -80,7 +80,6 @@ public class CertificateControllerDummyImpl implements CertificateController {
         return null;
     }
 
-    @Hidden
     @Override
     public List<CertificateEventHistoryDto> getCertificateEventHistory(String uuid) throws NotFoundException {
         return null;
@@ -134,7 +133,6 @@ public class CertificateControllerDummyImpl implements CertificateController {
         return null;
     }
 
-    @Hidden
     @Override
     public ApprovalResponseDto listCertificateApprovals(String uuid, PaginationRequestDto paginationRequestDto) {
         return null;
