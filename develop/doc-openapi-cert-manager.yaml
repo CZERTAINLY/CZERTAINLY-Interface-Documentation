@@ -433,7 +433,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserDetailDto"
+                $ref: "#/components/schemas/UserProfileDetailDto"
         "400":
           description: Bad Request
           content:
@@ -2470,7 +2470,7 @@ components:
       required:
       - fingerprint
       - uuid
-    UserDetailDto:
+    UserProfileDetailDto:
       type: object
       properties:
         uuid:
@@ -2519,13 +2519,27 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
+        permissions:
+          $ref: "#/components/schemas/UserProfilePermissionsDto"
+          description: User permissions
       required:
       - enabled
       - groups
+      - permissions
       - roles
       - systemUser
       - username
       - uuid
+    UserProfilePermissionsDto:
+      type: object
+      properties:
+        allowedListings:
+          type: array
+          description: Allowed resource listings
+          items:
+            $ref: "#/components/schemas/Resource"
+      required:
+      - allowedListings
     ApprovalDetailDto:
       type: object
       properties:
@@ -2700,15 +2714,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

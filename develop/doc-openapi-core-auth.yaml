@@ -524,7 +524,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserDetailDto"
+                $ref: "#/components/schemas/UserProfileDetailDto"
         "400":
           description: Bad Request
           content:
@@ -2678,21 +2678,91 @@ components:
       - authenticationProviders
       examples:
       - Name
+    UserProfileDetailDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID of the User
+          examples:
+          - 5b5f0784-2519-11ed-861d-0242ac120002
+        username:
+          type: string
+          description: Username of the user
+          examples:
+          - user1
+        firstName:
+          type: string
+          description: First name of the user
+        lastName:
+          type: string
+          description: Last name of the user
+        email:
+          type: string
+          description: Email of the user
+        description:
+          type: string
+          description: Description of the user
+        groups:
+          type: array
+          description: Groups of the user
+          items:
+            $ref: "#/components/schemas/NameAndUuidDto"
+        enabled:
+          type: boolean
+          description: "Status of the user. True = Enabled, False = Disabled"
+        systemUser:
+          type: boolean
+          description: "Is System user. True = Yes, False = No"
+        certificate:
+          $ref: "#/components/schemas/UserCertificateDto"
+          description: User Certificate details
+        roles:
+          type: array
+          description: Roles for the user
+          items:
+            $ref: "#/components/schemas/RoleDto"
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttributeDto"
+        permissions:
+          $ref: "#/components/schemas/UserProfilePermissionsDto"
+          description: User permissions
+      required:
+      - enabled
+      - groups
+      - permissions
+      - roles
+      - systemUser
+      - username
+      - uuid
+    UserProfilePermissionsDto:
+      type: object
+      properties:
+        allowedListings:
+          type: array
+          description: Allowed resource listings
+          items:
+            $ref: "#/components/schemas/Resource"
+      required:
+      - allowedListings
   securitySchemes:
     ConnectorAPIKeyAuth:
       type: apiKey
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
-    BasicAuth:
-      type: http
-      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header
