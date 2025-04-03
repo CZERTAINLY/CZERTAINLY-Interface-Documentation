@@ -7,6 +7,7 @@ import com.czertainly.api.model.common.NameAndUuidDto;
 import com.czertainly.api.model.core.auth.AuthResourceDto;
 import com.czertainly.api.model.core.auth.Resource;
 import com.czertainly.api.model.core.auth.UserDetailDto;
+import com.czertainly.api.model.core.auth.UserProfileDetailDto;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,7 +18,7 @@ import java.util.List;
 public class AuthControllerDummyImpl implements AuthController {
 
     @Override
-    public UserDetailDto profile() {
+    public UserProfileDetailDto profile() {
         return null;
     }
 
