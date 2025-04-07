@@ -21617,6 +21617,7 @@ components:
             $ref: "#/components/schemas/ResponseAttributeDto"
       required:
       - attributes
+      - kind
       - name
       - status
       - tokenProfiles
@@ -22296,14 +22297,15 @@ components:
           description: "Indicator whether CA is marked as trusted, set to null if\
             \ certificate is not CA"
       required:
+      - certificateType
       - commonName
+      - complianceStatus
       - keySize
       - privateKeyAvailability
       - publicKeyAlgorithm
       - signatureAlgorithm
       - state
       - subjectDn
-      - trustedCa
       - uuid
       - validationStatus
     CertificateState:
@@ -22791,11 +22793,8 @@ components:
       required:
       - attributes
       - creationTime
-      - description
       - items
       - name
-      - tokenInstanceName
-      - tokenInstanceUuid
       - uuid
     KeyFormat:
       type: string
@@ -22858,12 +22857,12 @@ components:
           description: Reason for Compromise
       required:
       - enabled
+      - format
       - keyAlgorithm
-      - keyReferenceUuid
+      - length
       - name
       - state
       - type
-      - usage
       - uuid
     KeyState:
       type: string
@@ -22988,11 +22987,8 @@ components:
           - "Keystore, etc."
       required:
       - attributes
-      - connectorName
-      - connectorUuid
       - kind
       - name
-      - status
       - uuid
     EditLocationRequestDto:
       type: object
@@ -23185,8 +23181,6 @@ components:
           description: Name of Credential provider Connector
       required:
       - attributes
-      - connectorName
-      - connectorUuid
       - enabled
       - kind
       - name
@@ -23580,8 +23574,6 @@ components:
           - "LegacyEjbca, ADCS, etc."
       required:
       - attributes
-      - connectorName
-      - connectorUuid
       - kind
       - name
       - status
@@ -23674,8 +23666,6 @@ components:
           description: Settings for validation of certificates associated with the
             RA Profile
       required:
-      - authorityInstanceName
-      - authorityInstanceUuid
       - enabled
       - name
       - uuid
@@ -25120,18 +25110,16 @@ components:
           $ref: "#/components/schemas/KeyState"
           description: Key State
       required:
+      - associations
       - creationTime
-      - description
       - enabled
+      - format
       - keyAlgorithm
-      - keyReferenceUuid
       - keyWrapperUuid
+      - length
       - name
       - state
-      - tokenInstanceName
-      - tokenInstanceUuid
       - type
-      - usage
       - uuid
     EntityInstanceRequestDto:
       type: object
@@ -25987,17 +25975,15 @@ components:
           $ref: "#/components/schemas/CertificateProtocolDto"
           description: Information about protocol used to issue the certificate
       required:
-      - certificateContent
+      - certificateType
       - commonName
+      - complianceStatus
       - keySize
-      - keyUsage
       - privateKeyAvailability
       - publicKeyAlgorithm
       - signatureAlgorithm
       - state
       - subjectDn
-      - subjectType
-      - trustedCa
       - uuid
       - validationStatus
     CertificateProtocol:
@@ -26069,6 +26055,8 @@ components:
           type: string
           description: UUID of the Key
       required:
+      - certificateRequestFormat
+      - certificateType
       - commonName
       - content
       - publicKeyAlgorithm
@@ -26141,12 +26129,10 @@ components:
           format: int32
           description: Number of associated objects
       required:
+      - associations
       - creationTime
-      - description
       - items
       - name
-      - tokenInstanceName
-      - tokenInstanceUuid
       - uuid
     CertificateContentDto:
       type: object
@@ -27549,6 +27535,7 @@ components:
           type: string
           description: Connector Kind
       required:
+      - kind
       - name
       - status
       - tokenProfiles
@@ -29230,11 +29217,6 @@ components:
           description: Description of the Approval profile
           examples:
           - Detail description of the approval profile
-        enabled:
-          type: boolean
-          description: Enable of the Approval profile
-          examples:
-          - "true"
         expiry:
           type: integer
           format: int32
@@ -29253,7 +29235,6 @@ components:
           description: Number of associated objects
       required:
       - associations
-      - enabled
       - name
       - numberOfSteps
       - uuid
@@ -29627,7 +29608,6 @@ components:
       - approvalRecipientUuid
       - createdAt
       - status
-      - userUuid
     ApprovalUserDto:
       type: object
       properties:
@@ -29689,11 +29669,6 @@ components:
           description: Description of the Approval profile
           examples:
           - Detail description of the approval profile
-        enabled:
-          type: boolean
-          description: Enable of the Approval profile
-          examples:
-          - "true"
         expiry:
           type: integer
           format: int32
@@ -29718,7 +29693,6 @@ components:
       required:
       - approvalSteps
       - associations
-      - enabled
       - name
       - numberOfSteps
       - uuid
@@ -29901,14 +29875,11 @@ components:
           - 6b55de1c-844f-11ec-a8a3-0242ac120002
       required:
       - accountId
-      - acmeProfileName
-      - acmeProfileUuid
       - contact
       - enabled
       - failedOrders
       - pendingOrders
       - processingOrders
-      - raProfile
       - status
       - successfulOrders
       - termsOfServiceAgreed
@@ -29961,10 +29932,7 @@ components:
           - 6b55de1c-844f-11ec-a8a3-0242ac120002
       required:
       - accountId
-      - acmeProfileName
-      - acmeProfileUuid
       - enabled
-      - raProfile
       - status
       - totalOrders
       - uuid
