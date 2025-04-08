@@ -37,12 +37,12 @@ paths:
         required: true
         schema:
           type: string
-      - name: approvalProfileForVersionDto
+      - name: version
         in: query
-        description: Select specific version of the approval profile
-        required: true
+        required: false
         schema:
-          $ref: "#/components/schemas/ApprovalProfileForVersionDto"
+          type: integer
+          format: int32
       responses:
         "200":
           description: Approval profile retrieved
@@ -197,11 +197,25 @@ paths:
       summary: List Approval Profiles
       operationId: listApprovalProfiles
       parameters:
-      - name: paginationRequestDto
+      - name: itemsPerPage
         in: query
-        required: true
+        description: Number of entries per page
+        required: false
         schema:
-          $ref: "#/components/schemas/PaginationRequestDto"
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
       responses:
         "200":
           description: List of all the approval profiles
@@ -471,11 +485,25 @@ paths:
       summary: List of Approvals
       operationId: listApprovals
       parameters:
-      - name: paginationRequestDto
+      - name: itemsPerPage
         in: query
-        required: true
+        description: Number of entries per page
+        required: false
         schema:
-          $ref: "#/components/schemas/PaginationRequestDto"
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
       responses:
         "200":
           description: List of all approvals
@@ -556,17 +584,30 @@ paths:
       summary: List of User's Approvals
       operationId: listUserApprovals
       parameters:
-      - name: paginationRequestDto
+      - name: itemsPerPage
         in: query
-        required: true
+        description: Number of entries per page
+        required: false
         schema:
-          $ref: "#/components/schemas/PaginationRequestDto"
-      - name: approvalUserDto
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
         in: query
-        description: Select if you want to list all history of approvals by user
-        required: true
+        description: Page number for the request
+        required: false
         schema:
-          $ref: "#/components/schemas/ApprovalUserDto"
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
+      - name: history
+        in: query
+        required: false
+        schema:
+          type: boolean
       responses:
         "200":
           description: List of all approvals
@@ -722,20 +763,6 @@ components:
       properties:
         comment:
           type: string
-    PaginationRequestDto:
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          format: int32
-          default: "10"
-          description: Number of entries per page
-          maximum: 1000
-        pageNumber:
-          type: integer
-          format: int32
-          default: "1"
-          description: Page number for the request
     ApprovalDto:
       type: object
       properties:
@@ -1049,11 +1076,6 @@ components:
       - approvalRecipientUuid
       - createdAt
       - status
-    ApprovalUserDto:
-      type: object
-      properties:
-        history:
-          type: boolean
     ApprovalProfileDto:
       type: object
       properties:
@@ -1126,12 +1148,6 @@ components:
       - pageNumber
       - totalItems
       - totalPages
-    ApprovalProfileForVersionDto:
-      type: object
-      properties:
-        version:
-          type: integer
-          format: int32
     ApprovalProfileDetailDto:
       type: object
       properties:

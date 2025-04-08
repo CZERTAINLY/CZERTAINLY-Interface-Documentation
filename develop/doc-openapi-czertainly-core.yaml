@@ -4970,12 +4970,12 @@ paths:
         required: true
         schema:
           type: string
-      - name: approvalProfileForVersionDto
+      - name: version
         in: query
-        description: Select specific version of the approval profile
-        required: true
+        required: false
         schema:
-          $ref: "#/components/schemas/ApprovalProfileForVersionDto"
+          type: integer
+          format: int32
       responses:
         "200":
           description: Approval profile retrieved
@@ -10597,11 +10597,25 @@ paths:
       summary: List Approval Profiles
       operationId: listApprovalProfiles
       parameters:
-      - name: paginationRequestDto
+      - name: itemsPerPage
         in: query
-        required: true
+        description: Number of entries per page
+        required: false
         schema:
-          $ref: "#/components/schemas/PaginationRequestDto"
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
       responses:
         "200":
           description: List of all the approval profiles
@@ -12068,12 +12082,33 @@ paths:
       summary: List notifications for logged user
       operationId: listNotifications
       parameters:
-      - name: request
+      - name: unread
         in: query
         description: Show only unread notifications
-        required: true
+        required: false
         schema:
-          $ref: "#/components/schemas/NotificationRequestDto"
+          type: boolean
+          default: false
+          description: Show only unread notifications
+      - name: itemsPerPage
+        in: query
+        description: Number of entries per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
       responses:
         "200":
           description: List of notifications
@@ -15917,11 +15952,25 @@ paths:
       summary: List of scheduled jobs
       operationId: listScheduledJobs
       parameters:
-      - name: pagination
+      - name: itemsPerPage
         in: query
-        required: true
+        description: Number of entries per page
+        required: false
         schema:
-          $ref: "#/components/schemas/PaginationRequestDto"
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
       responses:
         "200":
           description: List of scheduled jobs fetched
@@ -15952,11 +16001,25 @@ paths:
       summary: Scheduled job history
       operationId: getScheduledJobHistory
       parameters:
-      - name: pagination
+      - name: itemsPerPage
         in: query
-        required: true
+        description: Number of entries per page
+        required: false
         schema:
-          $ref: "#/components/schemas/PaginationRequestDto"
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
       - name: uuid
         in: path
         description: Scheduled job UUID
@@ -18339,11 +18402,25 @@ paths:
         required: true
         schema:
           type: string
-      - name: paginationRequestDto
+      - name: itemsPerPage
         in: query
-        required: true
+        description: Number of entries per page
+        required: false
         schema:
-          $ref: "#/components/schemas/PaginationRequestDto"
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
       responses:
         "200":
           description: List of all approvals for the certificate
@@ -19432,11 +19509,25 @@ paths:
       summary: List of Approvals
       operationId: listApprovals
       parameters:
-      - name: paginationRequestDto
+      - name: itemsPerPage
         in: query
-        required: true
+        description: Number of entries per page
+        required: false
         schema:
-          $ref: "#/components/schemas/PaginationRequestDto"
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
       responses:
         "200":
           description: List of all approvals
@@ -19509,17 +19600,30 @@ paths:
       summary: List of User's Approvals
       operationId: listUserApprovals
       parameters:
-      - name: paginationRequestDto
+      - name: itemsPerPage
         in: query
-        required: true
+        description: Number of entries per page
+        required: false
         schema:
-          $ref: "#/components/schemas/PaginationRequestDto"
-      - name: approvalUserDto
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
         in: query
-        description: Select if you want to list all history of approvals by user
-        required: true
+        description: Page number for the request
+        required: false
         schema:
-          $ref: "#/components/schemas/ApprovalUserDto"
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
+      - name: history
+        in: query
+        required: false
+        schema:
+          type: boolean
       responses:
         "200":
           description: List of all approvals
@@ -27892,20 +27996,6 @@ components:
       required:
       - jwkSetKeys
       - name
-    PaginationRequestDto:
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          format: int32
-          default: "10"
-          description: Number of entries per page
-          maximum: 1000
-        pageNumber:
-          type: integer
-          format: int32
-          default: "1"
-          description: Page number for the request
     ScheduledJobDto:
       type: object
       properties:
@@ -28247,24 +28337,6 @@ components:
           description: Resource of objects that are subject of event
       required:
       - event
-    NotificationRequestDto:
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          format: int32
-          default: "10"
-          description: Number of entries per page
-          maximum: 1000
-        pageNumber:
-          type: integer
-          format: int32
-          default: "1"
-          description: Page number for the request
-        unread:
-          type: boolean
-          default: "false"
-          description: Show only unread notifications
     NotificationDto:
       type: object
       properties:
@@ -29608,11 +29680,6 @@ components:
       - approvalRecipientUuid
       - createdAt
       - status
-    ApprovalUserDto:
-      type: object
-      properties:
-        history:
-          type: boolean
     ApprovalProfileResponseDto:
       type: object
       properties:
@@ -29641,12 +29708,6 @@ components:
       - pageNumber
       - totalItems
       - totalPages
-    ApprovalProfileForVersionDto:
-      type: object
-      properties:
-        version:
-          type: integer
-          format: int32
     ApprovalProfileDetailDto:
       type: object
       properties:

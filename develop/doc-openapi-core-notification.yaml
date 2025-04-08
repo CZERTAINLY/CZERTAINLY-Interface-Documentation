@@ -336,12 +336,33 @@ paths:
       summary: List notifications for logged user
       operationId: listNotifications
       parameters:
-      - name: request
+      - name: unread
         in: query
         description: Show only unread notifications
-        required: true
+        required: false
         schema:
-          $ref: "#/components/schemas/NotificationRequestDto"
+          type: boolean
+          default: false
+          description: Show only unread notifications
+      - name: itemsPerPage
+        in: query
+        description: Number of entries per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
       responses:
         "200":
           description: List of notifications
@@ -1400,24 +1421,6 @@ components:
           description: Object identifier
       required:
       - uuid
-    NotificationRequestDto:
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          format: int32
-          default: "10"
-          description: Number of entries per page
-          maximum: 1000
-        pageNumber:
-          type: integer
-          format: int32
-          default: "1"
-          description: Page number for the request
-        unread:
-          type: boolean
-          default: "false"
-          description: Show only unread notifications
     NotificationDto:
       type: object
       properties:

@@ -251,11 +251,25 @@ paths:
       summary: List of scheduled jobs
       operationId: listScheduledJobs
       parameters:
-      - name: pagination
+      - name: itemsPerPage
         in: query
-        required: true
+        description: Number of entries per page
+        required: false
         schema:
-          $ref: "#/components/schemas/PaginationRequestDto"
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
       responses:
         "200":
           description: List of scheduled jobs fetched
@@ -290,11 +304,25 @@ paths:
       summary: Scheduled job history
       operationId: getScheduledJobHistory
       parameters:
-      - name: pagination
+      - name: itemsPerPage
         in: query
-        required: true
+        description: Number of entries per page
+        required: false
         schema:
-          $ref: "#/components/schemas/PaginationRequestDto"
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
       - name: uuid
         in: path
         description: Scheduled job UUID
@@ -418,20 +446,6 @@ components:
       - started
       - succeeded
       - failed
-    PaginationRequestDto:
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          format: int32
-          default: "10"
-          description: Number of entries per page
-          maximum: 1000
-        pageNumber:
-          type: integer
-          format: int32
-          default: "1"
-          description: Page number for the request
     ScheduledJobDto:
       type: object
       properties:
@@ -621,15 +635,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

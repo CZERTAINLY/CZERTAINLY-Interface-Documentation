@@ -788,11 +788,25 @@ paths:
         required: true
         schema:
           type: string
-      - name: paginationRequestDto
+      - name: itemsPerPage
         in: query
-        required: true
+        description: Number of entries per page
+        required: false
         schema:
-          $ref: "#/components/schemas/PaginationRequestDto"
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
       responses:
         "200":
           description: List of all approvals for the certificate
@@ -2969,20 +2983,6 @@ components:
       - content
       - encoding
       - format
-    PaginationRequestDto:
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          format: int32
-          default: "10"
-          description: Number of entries per page
-          maximum: 1000
-        pageNumber:
-          type: integer
-          format: int32
-          default: "1"
-          description: Page number for the request
     ApprovalDto:
       type: object
       properties:
