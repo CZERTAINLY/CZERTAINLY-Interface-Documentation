@@ -5,11 +5,16 @@ import com.czertainly.api.interfaces.core.web.RoleManagementController;
 import com.czertainly.api.model.client.auth.RoleRequestDto;
 import com.czertainly.api.model.core.auth.*;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class RoleManagementControllerDummyImpl implements RoleManagementController {
     @Override
     public List<RoleDto> listRoles() {

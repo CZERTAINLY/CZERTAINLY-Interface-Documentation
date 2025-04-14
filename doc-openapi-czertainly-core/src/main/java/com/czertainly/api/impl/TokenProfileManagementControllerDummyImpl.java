@@ -12,12 +12,17 @@ import com.czertainly.api.model.client.cryptography.tokenprofile.TokenProfileKey
 import com.czertainly.api.model.core.cryptography.tokenprofile.TokenProfileDetailDto;
 import com.czertainly.api.model.core.cryptography.tokenprofile.TokenProfileDto;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class TokenProfileManagementControllerDummyImpl implements TokenProfileController {
     @Override
     public List<TokenProfileDto> listTokenProfiles(Optional<Boolean> enabled) {

@@ -56,7 +56,7 @@ public class ScepProfileControllerDummyImpl implements ScepProfileController {
     }
 
     @Override
-    public List<BulkActionMessageDto> forceDeleteScepProfiles(List<String> uuids) throws NotFoundException, ValidationException {
+    public List<BulkActionMessageDto> forceDeleteScepProfiles(List<String> uuids) throws ValidationException {
         return null;
     }
 

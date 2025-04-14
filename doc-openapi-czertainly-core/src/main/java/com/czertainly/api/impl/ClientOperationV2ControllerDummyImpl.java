@@ -5,6 +5,8 @@ import com.czertainly.api.interfaces.core.client.v2.ClientOperationController;
 import com.czertainly.api.model.client.attribute.RequestAttributeDto;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.v2.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -14,6 +16,9 @@ import java.security.cert.CertificateException;
 import java.util.List;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class ClientOperationV2ControllerDummyImpl implements ClientOperationController {
 
     @Override

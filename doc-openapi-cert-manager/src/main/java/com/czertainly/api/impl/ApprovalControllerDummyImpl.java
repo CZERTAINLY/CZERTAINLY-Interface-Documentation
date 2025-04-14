@@ -8,21 +8,19 @@ import com.czertainly.api.model.client.approval.ApprovalResponseDto;
 import com.czertainly.api.model.client.approval.ApprovalUserDto;
 import com.czertainly.api.model.client.approval.UserApprovalDto;
 import com.czertainly.api.model.core.scheduler.PaginationRequestDto;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@SecurityRequirements(value = {
-        @SecurityRequirement(name = "")
-})
 public class ApprovalControllerDummyImpl implements ApprovalController {
 
+    @Hidden
     @Override
     public ApprovalResponseDto listApprovals(PaginationRequestDto paginationRequestDto) throws ValidationException {
         return null;
     }
 
+    @Hidden
     @Override
     public ApprovalResponseDto listUserApprovals(PaginationRequestDto paginationRequestDto, ApprovalUserDto approvalUserDto) throws ValidationException {
         return null;
@@ -33,21 +31,25 @@ public class ApprovalControllerDummyImpl implements ApprovalController {
         return null;
     }
 
+    @Hidden
     @Override
     public void approveApproval(String uuid) throws NotFoundException {
 
     }
 
+    @Hidden
     @Override
     public void rejectApproval(String uuid) throws NotFoundException {
 
     }
 
+    @Hidden
     @Override
     public void approveApprovalRecipient(String uuid, UserApprovalDto userApprovalDto) throws NotFoundException {
 
     }
 
+    @Hidden
     @Override
     public void rejectApprovalRecipient(String uuid, UserApprovalDto userApprovalDto) throws NotFoundException {
 

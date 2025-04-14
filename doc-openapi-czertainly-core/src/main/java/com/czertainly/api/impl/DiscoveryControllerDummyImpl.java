@@ -12,12 +12,17 @@ import com.czertainly.api.model.client.discovery.DiscoveryHistoryDetailDto;
 import com.czertainly.api.model.core.scheduler.ScheduleDiscoveryDto;
 import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.cert.CertificateException;
 import java.util.List;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class DiscoveryControllerDummyImpl implements DiscoveryController {
 
     @Override

@@ -8,11 +8,16 @@ import com.czertainly.api.model.core.notification.NotificationInstanceDto;
 import com.czertainly.api.model.core.notification.NotificationInstanceRequestDto;
 import com.czertainly.api.model.core.notification.NotificationInstanceUpdateRequestDto;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class NotificationInstanceControllerDummyImpl implements NotificationInstanceController {
 
     @Override

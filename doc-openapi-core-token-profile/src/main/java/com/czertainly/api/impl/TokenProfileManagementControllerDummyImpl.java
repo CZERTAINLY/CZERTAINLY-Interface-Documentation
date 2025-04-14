@@ -9,6 +9,7 @@ import com.czertainly.api.model.client.cryptography.tokenprofile.AddTokenProfile
 import com.czertainly.api.model.client.cryptography.tokenprofile.BulkTokenProfileKeyUsageRequestDto;
 import com.czertainly.api.model.client.cryptography.tokenprofile.EditTokenProfileRequestDto;
 import com.czertainly.api.model.client.cryptography.tokenprofile.TokenProfileKeyUsageRequestDto;
+import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.cryptography.tokenprofile.TokenProfileDetailDto;
 import com.czertainly.api.model.core.cryptography.tokenprofile.TokenProfileDto;
 import org.springframework.http.ResponseEntity;
@@ -83,4 +84,9 @@ public class TokenProfileManagementControllerDummyImpl implements TokenProfileCo
     public void updateKeysUsages(BulkTokenProfileKeyUsageRequestDto request) {
 
     }
+
+//    @Override
+//    public List<BaseAttribute> listTestAttributes() {
+//        return List.of();
+//    }
 }

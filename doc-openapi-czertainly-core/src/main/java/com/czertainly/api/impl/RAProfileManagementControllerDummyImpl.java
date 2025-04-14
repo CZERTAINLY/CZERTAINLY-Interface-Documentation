@@ -7,8 +7,11 @@ import com.czertainly.api.model.client.compliance.SimplifiedComplianceProfileDto
 import com.czertainly.api.model.client.raprofile.*;
 import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
 import com.czertainly.api.model.core.certificate.CertificateDetailDto;
+import com.czertainly.api.model.core.raprofile.RaProfileCertificateValidationSettingsUpdateDto;
 import com.czertainly.api.model.core.raprofile.RaProfileDto;
 import org.springframework.http.ResponseEntity;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.NoSuchAlgorithmException;
@@ -17,6 +20,9 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class RAProfileManagementControllerDummyImpl implements RAProfileManagementController {
 
     @Override
@@ -41,6 +47,11 @@ public class RAProfileManagementControllerDummyImpl implements RAProfileManageme
 
     @Override
     public RaProfileDto editRaProfile(String authorityUuid, String raProfileUuid, EditRaProfileRequestDto request) throws ConnectorException, AttributeException {
+        return null;
+    }
+
+    @Override
+    public RaProfileDto updateRaProfileValidationConfiguration(String authorityUuid, String raProfileUuid, RaProfileCertificateValidationSettingsUpdateDto request) {
         return null;
     }
 

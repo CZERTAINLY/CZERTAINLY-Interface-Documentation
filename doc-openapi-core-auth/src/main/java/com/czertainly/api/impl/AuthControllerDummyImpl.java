@@ -7,7 +7,7 @@ import com.czertainly.api.model.common.NameAndUuidDto;
 import com.czertainly.api.model.core.auth.Resource;
 import com.czertainly.api.model.core.auth.AuthResourceDto;
 import com.czertainly.api.model.core.auth.UserDetailDto;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.czertainly.api.model.core.auth.UserProfileDetailDto;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.cert.CertificateException;
@@ -16,17 +16,17 @@ import java.util.List;
 @RestController
 public class AuthControllerDummyImpl implements AuthController {
     @Override
-    public UserDetailDto profile() throws NotFoundException, JsonProcessingException {
+    public UserProfileDetailDto profile() {
         return null;
     }
 
     @Override
-    public UserDetailDto updateUserProfile(UpdateUserRequestDto request) throws NotFoundException, JsonProcessingException, CertificateException {
+    public UserDetailDto updateUserProfile(UpdateUserRequestDto request) throws NotFoundException, CertificateException {
         return null;
     }
 
     @Override
-    public List<AuthResourceDto> getAuthResources() throws NotFoundException {
+    public List<AuthResourceDto> getAuthResources() {
         return null;
     }
 
