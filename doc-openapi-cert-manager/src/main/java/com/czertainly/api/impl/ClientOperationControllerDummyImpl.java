@@ -20,13 +20,11 @@ import java.util.List;
 @RestController
 public class ClientOperationControllerDummyImpl implements ClientOperationController {
 
-    @Hidden
     @Override
     public List<BaseAttribute> listIssueCertificateAttributes(String authorityUuid, String raProfileUuid) throws NotFoundException, ConnectorException {
         return null;
     }
 
-    @Hidden
     @Override
     public void validateIssueCertificateAttributes(String authorityUuid, String raProfileUuid, List<RequestAttributeDto> attributes) throws NotFoundException, ConnectorException, ValidationException {
 
@@ -43,13 +41,11 @@ public class ClientOperationControllerDummyImpl implements ClientOperationContro
         return null;
     }
 
-    @Hidden
     @Override
     public ClientCertificateDataResponseDto renewCertificate(String authorityUuid, String raProfileUuid, String certificateUuid, ClientCertificateRenewRequestDto request) throws NotFoundException, CertificateException, IOException, NoSuchAlgorithmException, InvalidKeyException {
         return null;
     }
 
-    @Hidden
     @Override
     public ClientCertificateDataResponseDto rekeyCertificate(String authorityUuid, String raProfileUuid, String certificateUuid, ClientCertificateRekeyRequestDto request) throws NotFoundException, CertificateException, IOException, NoSuchAlgorithmException, InvalidKeyException {
         return null;
