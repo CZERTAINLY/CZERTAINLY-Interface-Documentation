@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@SuppressWarnings("java:S1186")
 @RestController
 public class NotificationInstanceControllerDummyImpl implements NotificationInstanceController {
 
