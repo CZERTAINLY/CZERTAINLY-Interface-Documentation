@@ -100,7 +100,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                $ref: "#/components/schemas/UuidDto"
         "404":
           description: Approval profile not found
           content:
@@ -690,6 +690,14 @@ components:
             \ default there is 1 approval needed."
       required:
       - order
+    UuidDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+      required:
+      - uuid
     ErrorMessageDto:
       type: object
       properties:
@@ -750,14 +758,6 @@ components:
       - approvalSteps
       - enabled
       - name
-    UuidDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: Object identifier
-      required:
-      - uuid
     UserApprovalDto:
       type: object
       properties:
@@ -867,7 +867,6 @@ components:
       - connectors
       - attributes
       - jobs
-      - notificationInstances
       - users
       - roles
       - acmeAccounts
@@ -888,6 +887,8 @@ components:
       - keys
       - approvalProfiles
       - approvals
+      - notificationProfiles
+      - notificationInstances
       - rules
       - actions
       - triggers
@@ -1253,15 +1254,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
-    BasicAuth:
-      type: http
-      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

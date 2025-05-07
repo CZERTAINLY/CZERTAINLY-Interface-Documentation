@@ -1480,7 +1480,6 @@ components:
       - connectors
       - attributes
       - jobs
-      - notificationInstances
       - users
       - roles
       - acmeAccounts
@@ -1501,6 +1500,8 @@ components:
       - keys
       - approvalProfiles
       - approvals
+      - notificationProfiles
+      - notificationInstances
       - rules
       - actions
       - triggers
@@ -1632,17 +1633,19 @@ components:
             \ is set, trigger does not have any actions."
         event:
           type: string
-          description: Event that should fire trigger
+          description: Event that trigger can be assigned to
           enum:
-          - discoveryFinished
-        eventResource:
-          $ref: "#/components/schemas/Resource"
-          description: Resource associated with trigger event
+          - certificate_status_changed
+          - certificate_action_performed
+          - certificate_discovered
+          - discovery_finished
+          - approval_requested
+          - approval_closed
+          - scheduled_job_finished
       required:
       - ignoreTrigger
       - name
       - resource
-      - type
       - uuid
     TriggerType:
       type: string
@@ -1790,6 +1793,7 @@ components:
       - AttributeValueTarget
       - ProgrammingLanguageEnum
       - SchedulerJobExecutionStatus
+      - RecipientType
       - TriggerType
       - ConditionType
       - ExecutionType
@@ -1852,15 +1856,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

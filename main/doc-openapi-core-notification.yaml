@@ -29,7 +29,176 @@ tags:
     \ that can be used to notify recipient(s) about events that were triggered in\
     \ the platform. Note that this API does not handle internal notifications. For\
     \ internal notifications, please refer to the Internal Notification API"
+- name: Notification profile inventory
+  description: Notification profile inventory API
 paths:
+  /v1/notificationProfiles/{uuid}:
+    get:
+      tags:
+      - Notification profile inventory
+      summary: Get Notification profile details
+      operationId: getNotificationProfile
+      parameters:
+      - name: uuid
+        in: path
+        description: Notification profile UUID
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: Select specific version of the notification profile
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Notification profile retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationProfileDetailDto"
+        "404":
+          description: Notification profile not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+    put:
+      tags:
+      - Notification profile inventory
+      summary: Edit Notification profile
+      operationId: editNotificationProfile
+      parameters:
+      - name: uuid
+        in: path
+        description: Notification profile UUID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationProfileUpdateRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Notification profile updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationProfileDetailDto"
+        "404":
+          description: Notification profile not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+    delete:
+      tags:
+      - Notification profile inventory
+      summary: Delete notification profile
+      operationId: deleteNotificationProfile
+      parameters:
+      - name: uuid
+        in: path
+        description: Notification profile UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Notification profile deleted
+        "404":
+          description: Notification profile not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
   /v1/notificationInstances/{uuid}:
     get:
       tags:
@@ -211,6 +380,114 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/notificationProfiles:
+    get:
+      tags:
+      - Notification profile inventory
+      summary: List Notification profiles
+      operationId: listNotificationProfiles
+      parameters:
+      - name: itemsPerPage
+        in: query
+        description: Number of entries per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
+      responses:
+        "200":
+          description: List of all the notification profiles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationProfileResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+    post:
+      tags:
+      - Notification profile inventory
+      summary: Create Notification profile
+      operationId: createNotificationProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationProfileRequestDto"
+        required: true
+      responses:
+        "200":
+          description: New Notification profile created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationProfileDetailDto"
+        "404":
+          description: Notification profile not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
       security:
       - BearerJWTAuth: []
       - CertificateAuth: []
@@ -621,6 +898,154 @@ paths:
       - SessionAuth: []
 components:
   schemas:
+    NotificationProfileUpdateRequestDto:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Description of the Notification profile
+          examples:
+          - Detail description of the notification profile
+        recipientType:
+          $ref: "#/components/schemas/RecipientType"
+          description: Recipient type of notifications produced by profile
+        recipientUuid:
+          type: string
+          format: uuid
+          description: Recipient UUID of notifications produced by profile
+        notificationInstanceUuid:
+          type: string
+          format: uuid
+          description: Notification instance UUID
+        internalNotification:
+          type: boolean
+          description: Is notification profile sending internal notifications
+        frequency:
+          type: string
+          format: duration
+          description: Frequency of repeated notification
+          example: P1DT12H
+        repetitions:
+          type: integer
+          format: int32
+          description: Maximum number of repetitions of same notification
+      required:
+      - internalNotification
+      - recipientType
+    RecipientType:
+      type: string
+      enum:
+      - user
+      - group
+      - role
+      - owner
+    NameAndUuidDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+      required:
+      - name
+      - uuid
+    NotificationProfileDetailDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Notification profile
+        name:
+          type: string
+          description: Name of the Notification profile
+          examples:
+          - NotificationProfile1
+        description:
+          type: string
+          description: Description of the Notification profile
+          examples:
+          - Detail description of the notification profile
+        version:
+          type: integer
+          format: int32
+          description: Latest version of the Notification profile
+          examples:
+          - "1"
+        recipient:
+          $ref: "#/components/schemas/RecipientDto"
+          description: Recipient info
+        notificationInstance:
+          $ref: "#/components/schemas/NameAndUuidDto"
+          description: Notification instance info
+        internalNotification:
+          type: boolean
+          description: Is notification profile sending internal notifications
+        frequency:
+          type: string
+          format: duration
+          description: Frequency of repeated notification
+          example: P1DT12H
+        repetitions:
+          type: integer
+          format: int32
+          description: Maximum number of repetitions of same notification
+      required:
+      - internalNotification
+      - name
+      - recipient
+      - uuid
+      - version
+    RecipientDto:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/RecipientType"
+          description: Recipient type
+        uuid:
+          type: string
+          description: Recipient object UUID
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Recipient object name
+          examples:
+          - Name
+      required:
+      - type
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          examples:
+          - Error message
+      required:
+      - message
+    AuthenticationServiceExceptionDto:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          format: int32
+          description: Status code of the HTTP Request
+        code:
+          type: string
+          description: Code of the result
+        message:
+          type: string
+          description: Exception message
+      required:
+      - code
+      - message
+      - statusCode
     AttributeCallback:
       type: object
       properties:
@@ -1275,33 +1700,6 @@ components:
           description: Time attribute value in format HH:mm:ss
       required:
       - data
-    ErrorMessageDto:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Error message detail
-          examples:
-          - Error message
-      required:
-      - message
-    AuthenticationServiceExceptionDto:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          format: int32
-          description: Status code of the HTTP Request
-        code:
-          type: string
-          description: Code of the result
-        message:
-          type: string
-          description: Exception message
-      required:
-      - code
-      - message
-      - statusCode
     NotificationInstanceDto:
       type: object
       properties:
@@ -1382,6 +1780,46 @@ components:
       - label
       - name
       - type
+    NotificationProfileRequestDto:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Description of the Notification profile
+          examples:
+          - Detail description of the notification profile
+        recipientType:
+          $ref: "#/components/schemas/RecipientType"
+          description: Recipient type of notifications produced by profile
+        recipientUuid:
+          type: string
+          format: uuid
+          description: Recipient UUID of notifications produced by profile
+        notificationInstanceUuid:
+          type: string
+          format: uuid
+          description: Notification instance UUID
+        internalNotification:
+          type: boolean
+          description: Is notification profile sending internal notifications
+        frequency:
+          type: string
+          format: duration
+          description: Frequency of repeated notification
+          example: P1DT12H
+        repetitions:
+          type: integer
+          format: int32
+          description: Maximum number of repetitions of same notification
+        name:
+          type: string
+          description: Name of the Notification profile
+          examples:
+          - NotificationProfile1
+      required:
+      - internalNotification
+      - name
+      - recipientType
     NotificationInstanceRequestDto:
       type: object
       properties:
@@ -1495,7 +1933,6 @@ components:
       - connectors
       - attributes
       - jobs
-      - notificationInstances
       - users
       - roles
       - acmeAccounts
@@ -1516,6 +1953,8 @@ components:
       - keys
       - approvalProfiles
       - approvals
+      - notificationProfiles
+      - notificationInstances
       - rules
       - actions
       - triggers
@@ -1537,21 +1976,91 @@ components:
       - cmpTransactions
       - endEntityProfiles
       - authenticationProviders
+    NotificationProfileDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Notification profile
+        name:
+          type: string
+          description: Name of the Notification profile
+          examples:
+          - NotificationProfile1
+        description:
+          type: string
+          description: Description of the Notification profile
+          examples:
+          - Detail description of the notification profile
+        version:
+          type: integer
+          format: int32
+          description: Latest version of the Notification profile
+          examples:
+          - "1"
+        recipientType:
+          $ref: "#/components/schemas/RecipientType"
+          description: Recipient type of notifications produced by profile
+        recipientUuid:
+          type: string
+          format: uuid
+          description: Recipient UUID of notifications produced by profile
+        notificationInstanceUuid:
+          type: string
+          format: uuid
+          description: Notification instance UUID
+        internalNotification:
+          type: boolean
+          description: Is notification profile sending internal notifications
+      required:
+      - internalNotification
+      - name
+      - recipientType
+      - uuid
+      - version
+    NotificationProfileResponseDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+        notificationProfiles:
+          type: array
+          items:
+            $ref: "#/components/schemas/NotificationProfileDto"
+      required:
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
   securitySchemes:
     ConnectorAPIKeyAuth:
       type: apiKey
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
-    BasicAuth:
-      type: http
-      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

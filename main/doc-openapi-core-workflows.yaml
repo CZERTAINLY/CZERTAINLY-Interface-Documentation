@@ -728,11 +728,6 @@ paths:
         required: false
         schema:
           $ref: "#/components/schemas/Resource"
-      - name: eventResource
-        in: query
-        required: false
-        schema:
-          $ref: "#/components/schemas/Resource"
       responses:
         "200":
           description: List of triggers
@@ -1241,7 +1236,6 @@ components:
       - connectors
       - attributes
       - jobs
-      - notificationInstances
       - users
       - roles
       - acmeAccounts
@@ -1262,6 +1256,8 @@ components:
       - keys
       - approvalProfiles
       - approvals
+      - notificationProfiles
+      - notificationInstances
       - rules
       - actions
       - triggers
@@ -1308,12 +1304,15 @@ components:
             \ is set, trigger does not have any actions."
         event:
           type: string
-          description: Event of the trigger
+          description: Event that trigger can be assigned to
           enum:
-          - discoveryFinished
-        eventResource:
-          $ref: "#/components/schemas/Resource"
-          description: Type of the the trigger event source object
+          - certificate_status_changed
+          - certificate_action_performed
+          - certificate_discovered
+          - discovery_finished
+          - approval_requested
+          - approval_closed
+          - scheduled_job_finished
         rulesUuids:
           type: array
           description: List of UUIDs of existing rules to add to the trigger
@@ -1327,7 +1326,6 @@ components:
       required:
       - ignoreTrigger
       - resource
-      - type
     ErrorMessageDto:
       type: object
       properties:
@@ -1577,12 +1575,15 @@ components:
             \ is set, trigger does not have any actions."
         event:
           type: string
-          description: Event that should fire trigger
+          description: Event that trigger can be assigned to
           enum:
-          - discoveryFinished
-        eventResource:
-          $ref: "#/components/schemas/Resource"
-          description: Resource associated with trigger event
+          - certificate_status_changed
+          - certificate_action_performed
+          - certificate_discovered
+          - discovery_finished
+          - approval_requested
+          - approval_closed
+          - scheduled_job_finished
         rules:
           type: array
           description: List of Rules in the Rule Trigger
@@ -1599,7 +1600,6 @@ components:
       - name
       - resource
       - rules
-      - type
       - uuid
     UpdateRuleRequestDto:
       type: object
@@ -1710,12 +1710,15 @@ components:
             \ is set, trigger does not have any actions."
         event:
           type: string
-          description: Event that should fire trigger
+          description: Event that trigger can be assigned to
           enum:
-          - discoveryFinished
-        eventResource:
-          $ref: "#/components/schemas/Resource"
-          description: Type of the the trigger event source object
+          - certificate_status_changed
+          - certificate_action_performed
+          - certificate_discovered
+          - discovery_finished
+          - approval_requested
+          - approval_closed
+          - scheduled_job_finished
         rulesUuids:
           type: array
           description: List of UUIDs of existing rules to add to the trigger
@@ -1730,7 +1733,6 @@ components:
       - ignoreTrigger
       - name
       - resource
-      - type
     RuleRequestDto:
       type: object
       properties:
@@ -1853,17 +1855,19 @@ components:
             \ is set, trigger does not have any actions."
         event:
           type: string
-          description: Event that should fire trigger
+          description: Event that trigger can be assigned to
           enum:
-          - discoveryFinished
-        eventResource:
-          $ref: "#/components/schemas/Resource"
-          description: Resource associated with trigger event
+          - certificate_status_changed
+          - certificate_action_performed
+          - certificate_discovered
+          - discovery_finished
+          - approval_requested
+          - approval_closed
+          - scheduled_job_finished
       required:
       - ignoreTrigger
       - name
       - resource
-      - type
       - uuid
     TriggerHistoryDto:
       type: object
