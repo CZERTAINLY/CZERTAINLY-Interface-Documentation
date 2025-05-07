@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@SuppressWarnings("java:S1186")
 @RestController
 public class TriggerControllerDummyImpl implements TriggerController {
 
     @Override
-    public List<TriggerDto> listTriggers(Resource resource, Resource eventResource) {
+    public List<TriggerDto> listTriggers(Resource resource) {
         return List.of();
     }
 
