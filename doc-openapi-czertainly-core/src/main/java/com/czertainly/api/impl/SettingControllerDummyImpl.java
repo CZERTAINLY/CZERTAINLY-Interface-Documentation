@@ -1,5 +1,6 @@
 package com.czertainly.api.impl;
 
+import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.SettingController;
 import com.czertainly.api.model.core.settings.*;
 import com.czertainly.api.model.core.settings.authentication.AuthenticationSettingsDto;
@@ -30,12 +31,17 @@ public class SettingControllerDummyImpl implements SettingController {
     }
 
     @Override
-    public NotificationSettingsDto getNotificationsSettings() {
+    public EventsSettingsDto getEventsSettings() {
         return null;
     }
 
     @Override
-    public void updateNotificationsSettings(NotificationSettingsDto notificationSettingsDto) {
+    public void updateEventsSettings(EventsSettingsDto eventsSettingsDto) throws NotFoundException {
+
+    }
+
+    @Override
+    public void updateEventSettings(EventSettingsDto eventSettingsDto) throws NotFoundException {
 
     }
 
