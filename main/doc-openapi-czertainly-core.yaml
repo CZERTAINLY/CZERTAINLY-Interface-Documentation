@@ -1524,72 +1524,13 @@ paths:
     put:
       tags:
       - Settings
-      summary: Update platform setting
+      summary: Update platform settings
       operationId: updatePlatformSettings
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/PlatformSettingsUpdateDto"
-        required: true
-      responses:
-        "204":
-          description: Setting updated
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
-  /v1/settings/notifications:
-    get:
-      tags:
-      - Settings
-      summary: Get notification settings
-      operationId: getNotificationsSettings
-      responses:
-        "200":
-          description: Notification settings retrieved
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/NotificationSettingsDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
-    put:
-      tags:
-      - Settings
-      summary: Update notifications setting
-      operationId: updateNotificationsSettings
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NotificationSettingsDto"
         required: true
       responses:
         "204":
@@ -1642,7 +1583,7 @@ paths:
     put:
       tags:
       - Settings
-      summary: Update logging setting
+      summary: Update logging settings
       operationId: updateLoggingSettings
       requestBody:
         content:
@@ -1653,6 +1594,95 @@ paths:
       responses:
         "200":
           description: Logging settings updated
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+  /v1/settings/events:
+    get:
+      tags:
+      - Settings
+      summary: Get events settings
+      operationId: getEventsSettings
+      responses:
+        "200":
+          description: Notification settings retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventsSettingsDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+    put:
+      tags:
+      - Settings
+      summary: Update events settings
+      operationId: updateEventsSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventsSettingsDto"
+        required: true
+      responses:
+        "204":
+          description: Setting updated
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+    patch:
+      tags:
+      - Settings
+      summary: Update events settings
+      operationId: updateEventSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventSettingsDto"
+        required: true
+      responses:
+        "204":
+          description: Setting updated
         "400":
           description: Bad Request
           content:
@@ -6257,6 +6287,43 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ExecutionDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+  /v1/workflows/events:
+    post:
+      tags:
+      - Workflow Triggers Management
+      summary: Associate event with triggers
+      operationId: associateTriggers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TriggerEventAssociationRequestDto"
+        required: true
+      responses:
+        "201":
+          description: Trigger associations created
+        "404":
+          description: Rule or Action not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
@@ -22210,17 +22277,6 @@ components:
           description: URL of the Util Service
           examples:
           - http://util-service:8080
-    NotificationSettingsDto:
-      type: object
-      properties:
-        notificationsMapping:
-          type: object
-          additionalProperties:
-            type: string
-          description: Map of notification instances where key is notification type
-            enum
-      required:
-      - notificationsMapping
     AuditLoggingSettingsDto:
       type: object
       properties:
@@ -22332,6 +22388,20 @@ components:
       required:
       - logAllModules
       - logAllResources
+    EventsSettingsDto:
+      type: object
+      properties:
+        eventsMapping:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+              format: uuid
+          description: Map of triggers associated to event where key is resource event
+            enum
+      required:
+      - eventsMapping
     AuthenticationSettingsUpdateDto:
       type: object
       properties:
@@ -24859,6 +24929,38 @@ components:
       - name
       - resource
       - type
+    TriggerEventAssociationRequestDto:
+      type: object
+      properties:
+        event:
+          type: string
+          description: Resource event
+          enum:
+          - certificate_status_changed
+          - certificate_action_performed
+          - certificate_discovered
+          - discovery_finished
+          - approval_requested
+          - approval_closed
+          - scheduled_job_finished
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Event triggers association resource
+        objectUuid:
+          type: string
+          format: uuid
+          description: Event triggers association object UUID
+        triggerUuids:
+          type: array
+          description: List of triggers associated with event
+          items:
+            type: string
+            format: uuid
+      required:
+      - event
+      - objectUuid
+      - resource
+      - triggerUuids
     ConditionRequestDto:
       type: object
       properties:
@@ -27227,6 +27329,29 @@ components:
             format: uuid
       required:
       - reason
+    EventSettingsDto:
+      type: object
+      properties:
+        event:
+          type: string
+          description: Resource event
+          enum:
+          - certificate_status_changed
+          - certificate_action_performed
+          - certificate_discovered
+          - discovery_finished
+          - approval_requested
+          - approval_closed
+          - scheduled_job_finished
+        triggerUuids:
+          type: array
+          description: List of triggers associated with event
+          items:
+            type: string
+            format: uuid
+      required:
+      - event
+      - triggerUuids
     EditKeyItemDto:
       type: object
       properties:

@@ -965,6 +965,47 @@ paths:
       - BearerJWTAuth: []
       - CertificateAuth: []
       - SessionAuth: []
+  /v1/workflows/events:
+    post:
+      tags:
+      - Workflow Triggers Management
+      summary: Associate event with triggers
+      operationId: associateTriggers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TriggerEventAssociationRequestDto"
+        required: true
+      responses:
+        "201":
+          description: Trigger associations created
+        "404":
+          description: Rule or Action not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
   /v1/workflows/conditions:
     get:
       tags:
@@ -1789,6 +1830,38 @@ components:
       - name
       - resource
       - type
+    TriggerEventAssociationRequestDto:
+      type: object
+      properties:
+        event:
+          type: string
+          description: Resource event
+          enum:
+          - certificate_status_changed
+          - certificate_action_performed
+          - certificate_discovered
+          - discovery_finished
+          - approval_requested
+          - approval_closed
+          - scheduled_job_finished
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Event triggers association resource
+        objectUuid:
+          type: string
+          format: uuid
+          description: Event triggers association object UUID
+        triggerUuids:
+          type: array
+          description: List of triggers associated with event
+          items:
+            type: string
+            format: uuid
+      required:
+      - event
+      - objectUuid
+      - resource
+      - triggerUuids
     ConditionRequestDto:
       type: object
       properties:
