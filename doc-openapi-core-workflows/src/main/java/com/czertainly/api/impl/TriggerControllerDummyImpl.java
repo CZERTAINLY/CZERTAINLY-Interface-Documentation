@@ -47,4 +47,9 @@ public class TriggerControllerDummyImpl implements TriggerController {
     public TriggerHistorySummaryDto getTriggerHistorySummary(String associationObjectUuid) throws NotFoundException {
         return null;
     }
+
+    @Override
+    public void associateTriggers(TriggerEventAssociationRequestDto request) throws NotFoundException {
+        
+    }
 }
