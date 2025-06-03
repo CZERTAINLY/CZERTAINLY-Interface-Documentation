@@ -1411,6 +1411,11 @@ components:
           description: List of attributes to sign the CSR
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
+        altSignatureAttributes:
+          type: array
+          description: List of attributes to sign the alternative private key
+          items:
+            $ref: "#/components/schemas/RequestAttributeDto"
         request:
           type: string
           description: Certificate signing request encoded as Base64 string
@@ -1426,6 +1431,14 @@ components:
           type: string
           format: uuid
           description: Key UUID. Required if CSR is not uploaded
+        altTokenProfileUuid:
+          type: string
+          format: uuid
+          description: Token Profile UUID for the alternative key.
+        altKeyUuid:
+          type: string
+          format: uuid
+          description: Alternative Key UUID.
         attributes:
           type: array
           description: List of RA Profile related Attributes to issue Certificate
@@ -1988,10 +2001,24 @@ components:
           type: string
           format: uuid
           description: Token Profile UUID
+        altKeyUuid:
+          type: string
+          format: uuid
+          description: Alternative Key UUID
+        altTokenProfileUuid:
+          type: string
+          format: uuid
+          description: Token Profile UUID for the alternative key
         signatureAttributes:
           type: array
           description: "Signature Attributes. If not provided, existing attributes\
             \ will be used to generate the new CSR"
+          items:
+            $ref: "#/components/schemas/RequestAttributeDto"
+        altSignatureAttributes:
+          type: array
+          description: "Alternative Signature Attributes. If not provided, existing\
+            \ alternative attributes will be used to generate the new CSR"
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
     ClientAddEndEntityRequestDto:

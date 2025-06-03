@@ -202,7 +202,7 @@ paths:
     put:
       tags:
       - Settings
-      summary: Update events settings
+      summary: Update multiple events settings
       operationId: updateEventsSettings
       requestBody:
         content:
@@ -236,7 +236,7 @@ paths:
     patch:
       tags:
       - Settings
-      summary: Update events settings
+      summary: Update single event settings
       operationId: updateEventSettings
       requestBody:
         content:
@@ -1161,6 +1161,7 @@ components:
       - logAllResources
     EventsSettingsDto:
       type: object
+      description: DTO representing settings of multiple events mapped by its enum
       properties:
         eventsMapping:
           type: object
@@ -1170,9 +1171,21 @@ components:
               type: string
               format: uuid
           description: Map of triggers associated to event where key is resource event
-            enum
+            enum and value is list of trigger UUIDs
+          propertyNames:
+            $ref: "#/components/schemas/ResourceEvent"
       required:
       - eventsMapping
+    ResourceEvent:
+      type: string
+      enum:
+      - certificate_status_changed
+      - certificate_action_performed
+      - certificate_discovered
+      - discovery_finished
+      - approval_requested
+      - approval_closed
+      - scheduled_job_finished
     AuthenticationSettingsUpdateDto:
       type: object
       properties:
@@ -1634,18 +1647,11 @@ components:
       - path
     EventSettingsDto:
       type: object
+      description: DTO representing settings of single event
       properties:
         event:
-          type: string
+          $ref: "#/components/schemas/ResourceEvent"
           description: Resource event
-          enum:
-          - certificate_status_changed
-          - certificate_action_performed
-          - certificate_discovered
-          - discovery_finished
-          - approval_requested
-          - approval_closed
-          - scheduled_job_finished
         triggerUuids:
           type: array
           description: List of triggers associated with event
@@ -2081,16 +2087,8 @@ components:
       type: object
       properties:
         event:
-          type: string
+          $ref: "#/components/schemas/ResourceEvent"
           description: Resource event code
-          enum:
-          - certificate_status_changed
-          - certificate_action_performed
-          - certificate_discovered
-          - discovery_finished
-          - approval_requested
-          - approval_closed
-          - scheduled_job_finished
           examples:
           - discoveryFinished
         producedResource:
@@ -2174,15 +2172,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

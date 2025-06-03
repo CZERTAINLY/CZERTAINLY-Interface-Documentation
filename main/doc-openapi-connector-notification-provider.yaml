@@ -1582,16 +1582,8 @@ components:
           deprecated: true
           description: Notification event type that happened to trigger the notification
         event:
-          type: string
+          $ref: "#/components/schemas/ResourceEvent"
           description: Event type that happened to trigger the notification
-          enum:
-          - certificate_status_changed
-          - certificate_action_performed
-          - certificate_discovered
-          - discovery_finished
-          - approval_requested
-          - approval_closed
-          - scheduled_job_finished
         resource:
           $ref: "#/components/schemas/Resource"
           description: Resource which is represented by data
@@ -1673,6 +1665,16 @@ components:
       - cmpTransactions
       - endEntityProfiles
       - authenticationProviders
+    ResourceEvent:
+      type: string
+      enum:
+      - certificate_status_changed
+      - certificate_action_performed
+      - certificate_discovered
+      - discovery_finished
+      - approval_requested
+      - approval_closed
+      - scheduled_job_finished
     EndpointDto:
       type: object
       properties:
@@ -1757,15 +1759,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
-    BasicAuth:
-      type: http
-      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

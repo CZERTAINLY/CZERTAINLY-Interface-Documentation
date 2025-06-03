@@ -1642,7 +1642,7 @@ paths:
     put:
       tags:
       - Settings
-      summary: Update events settings
+      summary: Update multiple events settings
       operationId: updateEventsSettings
       requestBody:
         content:
@@ -1672,7 +1672,7 @@ paths:
     patch:
       tags:
       - Settings
-      summary: Update events settings
+      summary: Update single event settings
       operationId: updateEventSettings
       requestBody:
         content:
@@ -20741,6 +20741,16 @@ components:
       - cmpTransactions
       - endEntityProfiles
       - authenticationProviders
+    ResourceEvent:
+      type: string
+      enum:
+      - certificate_status_changed
+      - certificate_action_performed
+      - certificate_discovered
+      - discovery_finished
+      - approval_requested
+      - approval_closed
+      - scheduled_job_finished
     TriggerType:
       type: string
       enum:
@@ -20765,16 +20775,8 @@ components:
             \ on context could have other implications to object processing. If ignore\
             \ is set, trigger does not have any actions."
         event:
-          type: string
+          $ref: "#/components/schemas/ResourceEvent"
           description: Event that trigger can be assigned to
-          enum:
-          - certificate_status_changed
-          - certificate_action_performed
-          - certificate_discovered
-          - discovery_finished
-          - approval_requested
-          - approval_closed
-          - scheduled_job_finished
         rulesUuids:
           type: array
           description: List of UUIDs of existing rules to add to the trigger
@@ -21046,16 +21048,8 @@ components:
             \ on context could have other implications to object processing. If ignore\
             \ is set, trigger does not have any actions."
         event:
-          type: string
+          $ref: "#/components/schemas/ResourceEvent"
           description: Event that trigger can be assigned to
-          enum:
-          - certificate_status_changed
-          - certificate_action_performed
-          - certificate_discovered
-          - discovery_finished
-          - approval_requested
-          - approval_closed
-          - scheduled_job_finished
         rules:
           type: array
           description: List of Rules in the Rule Trigger
@@ -22425,6 +22419,7 @@ components:
       - logAllResources
     EventsSettingsDto:
       type: object
+      description: DTO representing settings of multiple events mapped by its enum
       properties:
         eventsMapping:
           type: object
@@ -22434,7 +22429,9 @@ components:
               type: string
               format: uuid
           description: Map of triggers associated to event where key is resource event
-            enum
+            enum and value is list of trigger UUIDs
+          propertyNames:
+            $ref: "#/components/schemas/ResourceEvent"
       required:
       - eventsMapping
     AuthenticationSettingsUpdateDto:
@@ -22729,13 +22726,26 @@ components:
         publicKeyAlgorithm:
           type: string
           description: Public key algorithm
+        altPublicKeyAlgorithm:
+          type: string
+          description: Alternative Public key algorithm
         signatureAlgorithm:
           type: string
           description: Certificate signature algorithm
+        altSignatureAlgorithm:
+          type: string
+          description: Certificate alternative signature algorithm
+        hybridCertificate:
+          type: boolean
+          description: Indicator whether the certificate is hybrid
         keySize:
           type: integer
           format: int32
           description: Certificate key size
+        altKeySize:
+          type: integer
+          format: int32
+          description: Certificate key size of the alternative key
         state:
           $ref: "#/components/schemas/CertificateState"
           description: State of the Certificate
@@ -22779,9 +22789,13 @@ components:
           description: "Indicator whether CA is marked as trusted, set to null if\
             \ certificate is not CA"
       required:
+      - altKeySize
+      - altPublicKeyAlgorithm
+      - altSignatureAlgorithm
       - certificateType
       - commonName
       - complianceStatus
+      - hybridCertificate
       - keySize
       - privateKeyAvailability
       - publicKeyAlgorithm
@@ -23073,10 +23087,12 @@ components:
         recipientType:
           $ref: "#/components/schemas/RecipientType"
           description: Recipient type of notifications produced by profile
-        recipientUuid:
-          type: string
-          format: uuid
-          description: Recipient UUID of notifications produced by profile
+        recipientUuids:
+          type: array
+          description: Recipient UUIDs of notifications produced by profile
+          items:
+            type: string
+            format: uuid
         notificationInstanceUuid:
           type: string
           format: uuid
@@ -23100,6 +23116,7 @@ components:
       type: string
       enum:
       - none
+      - default
       - user
       - group
       - role
@@ -23126,9 +23143,14 @@ components:
           description: Latest version of the Notification profile
           examples:
           - "1"
-        recipient:
-          $ref: "#/components/schemas/RecipientDto"
-          description: Recipient info
+        recipientType:
+          $ref: "#/components/schemas/RecipientType"
+          description: Recipient type of notifications produced by profile
+        recipients:
+          type: array
+          description: Recipients info
+          items:
+            $ref: "#/components/schemas/NameAndUuidDto"
         notificationInstance:
           $ref: "#/components/schemas/NameAndUuidDto"
           description: Notification instance info
@@ -23147,27 +23169,9 @@ components:
       required:
       - internalNotification
       - name
-      - recipient
+      - recipientType
       - uuid
       - version
-    RecipientDto:
-      type: object
-      properties:
-        type:
-          $ref: "#/components/schemas/RecipientType"
-          description: Recipient type
-        uuid:
-          type: string
-          description: Recipient object UUID
-          examples:
-          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
-        name:
-          type: string
-          description: Recipient object name
-          examples:
-          - Name
-      required:
-      - type
     AttributeMappingDto:
       type: object
       properties:
@@ -24733,6 +24737,11 @@ components:
           description: List of attributes to sign the CSR
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
+        altSignatureAttributes:
+          type: array
+          description: List of attributes to sign the alternative private key
+          items:
+            $ref: "#/components/schemas/RequestAttributeDto"
         request:
           type: string
           description: Certificate signing request encoded as Base64 string
@@ -24748,6 +24757,14 @@ components:
           type: string
           format: uuid
           description: Key UUID. Required if CSR is not uploaded
+        altTokenProfileUuid:
+          type: string
+          format: uuid
+          description: Token Profile UUID for the alternative key.
+        altKeyUuid:
+          type: string
+          format: uuid
+          description: Alternative Key UUID.
         attributes:
           type: array
           description: List of RA Profile related Attributes to issue Certificate
@@ -24840,10 +24857,24 @@ components:
           type: string
           format: uuid
           description: Token Profile UUID
+        altKeyUuid:
+          type: string
+          format: uuid
+          description: Alternative Key UUID
+        altTokenProfileUuid:
+          type: string
+          format: uuid
+          description: Token Profile UUID for the alternative key
         signatureAttributes:
           type: array
           description: "Signature Attributes. If not provided, existing attributes\
             \ will be used to generate the new CSR"
+          items:
+            $ref: "#/components/schemas/RequestAttributeDto"
+        altSignatureAttributes:
+          type: array
+          description: "Alternative Signature Attributes. If not provided, existing\
+            \ alternative attributes will be used to generate the new CSR"
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
     RequestAttributeCallback:
@@ -24894,16 +24925,8 @@ components:
             \ on context could have other implications to object processing. If ignore\
             \ is set, trigger does not have any actions."
         event:
-          type: string
+          $ref: "#/components/schemas/ResourceEvent"
           description: Event that trigger can be assigned to
-          enum:
-          - certificate_status_changed
-          - certificate_action_performed
-          - certificate_discovered
-          - discovery_finished
-          - approval_requested
-          - approval_closed
-          - scheduled_job_finished
         rulesUuids:
           type: array
           description: List of UUIDs of existing rules to add to the trigger
@@ -24968,16 +24991,8 @@ components:
       type: object
       properties:
         event:
-          type: string
+          $ref: "#/components/schemas/ResourceEvent"
           description: Resource event
-          enum:
-          - certificate_status_changed
-          - certificate_action_performed
-          - certificate_discovered
-          - discovery_finished
-          - approval_requested
-          - approval_closed
-          - scheduled_job_finished
         resource:
           $ref: "#/components/schemas/Resource"
           description: Event triggers association resource
@@ -25533,10 +25548,12 @@ components:
         recipientType:
           $ref: "#/components/schemas/RecipientType"
           description: Recipient type of notifications produced by profile
-        recipientUuid:
-          type: string
-          format: uuid
-          description: Recipient UUID of notifications produced by profile
+        recipientUuids:
+          type: array
+          description: Recipient UUIDs of notifications produced by profile
+          items:
+            type: string
+            format: uuid
         notificationInstanceUuid:
           type: string
           format: uuid
@@ -26422,6 +26439,12 @@ components:
           description: List of attributes to sign the CSR
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
+        altSignatureAttributes:
+          type: array
+          description: "List of attributes to sign the alternative private key, in\
+            \ case of hybrid CSR"
+          items:
+            $ref: "#/components/schemas/RequestAttributeDto"
         request:
           type: string
           description: Certificate signing request encoded as Base64 string
@@ -26437,6 +26460,14 @@ components:
           type: string
           format: uuid
           description: Key UUID. Required if CSR is not uploaded
+        altTokenProfileUuid:
+          type: string
+          format: uuid
+          description: Token Profile UUID for the alternative key
+        altKeyUuid:
+          type: string
+          format: uuid
+          description: Alternative Key UUID.
         issueAttributes:
           type: array
           description: List of RA Profile related Attributes to issue Certificate
@@ -26515,13 +26546,26 @@ components:
         publicKeyAlgorithm:
           type: string
           description: Public key algorithm
+        altPublicKeyAlgorithm:
+          type: string
+          description: Alternative Public key algorithm
         signatureAlgorithm:
           type: string
           description: Certificate signature algorithm
+        altSignatureAlgorithm:
+          type: string
+          description: Certificate alternative signature algorithm
+        hybridCertificate:
+          type: boolean
+          description: Indicator whether the certificate is hybrid
         keySize:
           type: integer
           format: int32
           description: Certificate key size
+        altKeySize:
+          type: integer
+          format: int32
+          description: Certificate key size of the alternative key
         state:
           $ref: "#/components/schemas/CertificateState"
           description: State of the Certificate
@@ -26611,6 +26655,9 @@ components:
         key:
           $ref: "#/components/schemas/KeyDto"
           description: Key Pair of the certificate
+        altKey:
+          $ref: "#/components/schemas/KeyDto"
+          description: Alternative Key Pair of the certificate
         certificateRequest:
           $ref: "#/components/schemas/CertificateRequestDto"
           description: Certificate request data
@@ -26637,9 +26684,13 @@ components:
           $ref: "#/components/schemas/CertificateProtocolDto"
           description: Information about protocol used to issue the certificate
       required:
+      - altKeySize
+      - altPublicKeyAlgorithm
+      - altSignatureAlgorithm
       - certificateType
       - commonName
       - complianceStatus
+      - hybridCertificate
       - keySize
       - privateKeyAvailability
       - publicKeyAlgorithm
@@ -26687,6 +26738,9 @@ components:
         signatureAlgorithm:
           type: string
           description: Certificate signature algorithm
+        altSignatureAlgorithm:
+          type: string
+          description: Certificate alternative signature algorithm
         content:
           type: string
           description: Certificate request content
@@ -26713,10 +26767,19 @@ components:
           description: Signature Attributes
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
+        altSignatureAttributes:
+          type: array
+          description: Alternative Signature Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttributeDto"
         keyUuid:
           type: string
           description: UUID of the Key
+        altKeyUuid:
+          type: string
+          description: UUID of the Alternative Key
       required:
+      - altSignatureAlgorithm
       - certificateRequestFormat
       - certificateType
       - commonName
@@ -27366,18 +27429,11 @@ components:
       - reason
     EventSettingsDto:
       type: object
+      description: DTO representing settings of single event
       properties:
         event:
-          type: string
+          $ref: "#/components/schemas/ResourceEvent"
           description: Resource event
-          enum:
-          - certificate_status_changed
-          - certificate_action_performed
-          - certificate_discovered
-          - discovery_finished
-          - approval_requested
-          - approval_closed
-          - scheduled_job_finished
         triggerUuids:
           type: array
           description: List of triggers associated with event
@@ -27981,16 +28037,8 @@ components:
             \ on context could have other implications to object processing. If ignore\
             \ is set, trigger does not have any actions."
         event:
-          type: string
+          $ref: "#/components/schemas/ResourceEvent"
           description: Event that trigger can be assigned to
-          enum:
-          - certificate_status_changed
-          - certificate_action_performed
-          - certificate_discovered
-          - discovery_finished
-          - approval_requested
-          - approval_closed
-          - scheduled_job_finished
       required:
       - ignoreTrigger
       - name
@@ -28910,16 +28958,8 @@ components:
       type: object
       properties:
         event:
-          type: string
+          $ref: "#/components/schemas/ResourceEvent"
           description: Resource event code
-          enum:
-          - certificate_status_changed
-          - certificate_action_performed
-          - certificate_discovered
-          - discovery_finished
-          - approval_requested
-          - approval_closed
-          - scheduled_job_finished
           examples:
           - discoveryFinished
         producedResource:
@@ -29015,10 +29055,12 @@ components:
         recipientType:
           $ref: "#/components/schemas/RecipientType"
           description: Recipient type of notifications produced by profile
-        recipientUuid:
-          type: string
-          format: uuid
-          description: Recipient UUID of notifications produced by profile
+        recipientUuids:
+          type: array
+          description: Recipient UUIDs of notifications produced by profile
+          items:
+            type: string
+            format: uuid
         notificationInstanceUuid:
           type: string
           format: uuid

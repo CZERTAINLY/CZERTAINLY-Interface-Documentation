@@ -1338,13 +1338,26 @@ components:
         publicKeyAlgorithm:
           type: string
           description: Public key algorithm
+        altPublicKeyAlgorithm:
+          type: string
+          description: Alternative Public key algorithm
         signatureAlgorithm:
           type: string
           description: Certificate signature algorithm
+        altSignatureAlgorithm:
+          type: string
+          description: Certificate alternative signature algorithm
+        hybridCertificate:
+          type: boolean
+          description: Indicator whether the certificate is hybrid
         keySize:
           type: integer
           format: int32
           description: Certificate key size
+        altKeySize:
+          type: integer
+          format: int32
+          description: Certificate key size of the alternative key
         state:
           $ref: "#/components/schemas/CertificateState"
           description: State of the Certificate
@@ -1388,9 +1401,13 @@ components:
           description: "Indicator whether CA is marked as trusted, set to null if\
             \ certificate is not CA"
       required:
+      - altKeySize
+      - altPublicKeyAlgorithm
+      - altSignatureAlgorithm
       - certificateType
       - commonName
       - complianceStatus
+      - hybridCertificate
       - keySize
       - privateKeyAvailability
       - publicKeyAlgorithm
@@ -1735,15 +1752,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
-    BasicAuth:
-      type: http
-      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

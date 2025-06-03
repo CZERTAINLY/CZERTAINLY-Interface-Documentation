@@ -1015,6 +1015,11 @@ components:
           description: List of attributes to sign the CSR
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
+        altSignatureAttributes:
+          type: array
+          description: List of attributes to sign the alternative private key
+          items:
+            $ref: "#/components/schemas/RequestAttributeDto"
         request:
           type: string
           description: Certificate signing request encoded as Base64 string
@@ -1030,6 +1035,14 @@ components:
           type: string
           format: uuid
           description: Key UUID. Required if CSR is not uploaded
+        altTokenProfileUuid:
+          type: string
+          format: uuid
+          description: Token Profile UUID for the alternative key.
+        altKeyUuid:
+          type: string
+          format: uuid
+          description: Alternative Key UUID.
         attributes:
           type: array
           description: List of RA Profile related Attributes to issue Certificate
@@ -1589,10 +1602,24 @@ components:
           type: string
           format: uuid
           description: Token Profile UUID
+        altKeyUuid:
+          type: string
+          format: uuid
+          description: Alternative Key UUID
+        altTokenProfileUuid:
+          type: string
+          format: uuid
+          description: Token Profile UUID for the alternative key
         signatureAttributes:
           type: array
           description: "Signature Attributes. If not provided, existing attributes\
             \ will be used to generate the new CSR"
+          items:
+            $ref: "#/components/schemas/RequestAttributeDto"
+        altSignatureAttributes:
+          type: array
+          description: "Alternative Signature Attributes. If not provided, existing\
+            \ alternative attributes will be used to generate the new CSR"
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
     RaProfileCertificateValidationSettingsUpdateDto:
@@ -2131,13 +2158,26 @@ components:
         publicKeyAlgorithm:
           type: string
           description: Public key algorithm
+        altPublicKeyAlgorithm:
+          type: string
+          description: Alternative Public key algorithm
         signatureAlgorithm:
           type: string
           description: Certificate signature algorithm
+        altSignatureAlgorithm:
+          type: string
+          description: Certificate alternative signature algorithm
+        hybridCertificate:
+          type: boolean
+          description: Indicator whether the certificate is hybrid
         keySize:
           type: integer
           format: int32
           description: Certificate key size
+        altKeySize:
+          type: integer
+          format: int32
+          description: Certificate key size of the alternative key
         state:
           $ref: "#/components/schemas/CertificateState"
           description: State of the Certificate
@@ -2227,6 +2267,9 @@ components:
         key:
           $ref: "#/components/schemas/KeyDto"
           description: Key Pair of the certificate
+        altKey:
+          $ref: "#/components/schemas/KeyDto"
+          description: Alternative Key Pair of the certificate
         certificateRequest:
           $ref: "#/components/schemas/CertificateRequestDto"
           description: Certificate request data
@@ -2253,9 +2296,13 @@ components:
           $ref: "#/components/schemas/CertificateProtocolDto"
           description: Information about protocol used to issue the certificate
       required:
+      - altKeySize
+      - altPublicKeyAlgorithm
+      - altSignatureAlgorithm
       - certificateType
       - commonName
       - complianceStatus
+      - hybridCertificate
       - keySize
       - privateKeyAvailability
       - publicKeyAlgorithm
@@ -2296,13 +2343,26 @@ components:
         publicKeyAlgorithm:
           type: string
           description: Public key algorithm
+        altPublicKeyAlgorithm:
+          type: string
+          description: Alternative Public key algorithm
         signatureAlgorithm:
           type: string
           description: Certificate signature algorithm
+        altSignatureAlgorithm:
+          type: string
+          description: Certificate alternative signature algorithm
+        hybridCertificate:
+          type: boolean
+          description: Indicator whether the certificate is hybrid
         keySize:
           type: integer
           format: int32
           description: Certificate key size
+        altKeySize:
+          type: integer
+          format: int32
+          description: Certificate key size of the alternative key
         state:
           $ref: "#/components/schemas/CertificateState"
           description: State of the Certificate
@@ -2346,9 +2406,13 @@ components:
           description: "Indicator whether CA is marked as trusted, set to null if\
             \ certificate is not CA"
       required:
+      - altKeySize
+      - altPublicKeyAlgorithm
+      - altSignatureAlgorithm
       - certificateType
       - commonName
       - complianceStatus
+      - hybridCertificate
       - keySize
       - privateKeyAvailability
       - publicKeyAlgorithm
@@ -2439,6 +2503,9 @@ components:
         signatureAlgorithm:
           type: string
           description: Certificate signature algorithm
+        altSignatureAlgorithm:
+          type: string
+          description: Certificate alternative signature algorithm
         content:
           type: string
           description: Certificate request content
@@ -2465,10 +2532,19 @@ components:
           description: Signature Attributes
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
+        altSignatureAttributes:
+          type: array
+          description: Alternative Signature Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttributeDto"
         keyUuid:
           type: string
           description: UUID of the Key
+        altKeyUuid:
+          type: string
+          description: UUID of the Alternative Key
       required:
+      - altSignatureAlgorithm
       - certificateRequestFormat
       - certificateType
       - commonName
