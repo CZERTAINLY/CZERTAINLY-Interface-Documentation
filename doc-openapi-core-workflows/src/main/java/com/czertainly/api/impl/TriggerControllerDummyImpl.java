@@ -4,10 +4,13 @@ import com.czertainly.api.exception.AlreadyExistException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.TriggerController;
 import com.czertainly.api.model.core.auth.Resource;
+import com.czertainly.api.model.core.other.ResourceEvent;
 import com.czertainly.api.model.core.workflows.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings("java:S1186")
 @RestController
@@ -49,7 +52,12 @@ public class TriggerControllerDummyImpl implements TriggerController {
     }
 
     @Override
-    public void associateTriggers(TriggerEventAssociationRequestDto request) throws NotFoundException {
+    public void associateEventTriggers(TriggerEventAssociationRequestDto request) throws NotFoundException {
         
+    }
+
+    @Override
+    public Map<ResourceEvent, List<UUID>> getEventTriggersAssociations(Resource resource, UUID associationObjectUuid) {
+        return Map.of();
     }
 }
