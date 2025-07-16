@@ -1,0 +1,664 @@
+openapi: 3.1.0
+info:
+  title: CZERTAINLY Scheduler API
+  description: REST API for managing Scheduler and its jobs in the platform
+  contact:
+    name: CZERTAINLY
+    url: https://www.czertainly.com
+    email: info@czertainly.com
+  license:
+    name: MIT License
+    url: https://github.com/CZERTAINLY/CZERTAINLY/blob/develop/LICENSE.md
+  version: 2.15.1
+  x-logo:
+    url: images/czertainly_color_H.svg
+externalDocs:
+  description: CZERTAINLY Documentation
+  url: https://docs.czertainly.com
+servers:
+- url: https://demo.czertainly.online/api
+  description: CZERTAINLY Demo server
+tags:
+- name: Scheduled Jobs Management
+  description: Scheduled Jobs Management API
+paths:
+  /v1/scheduler/jobs/{uuid}:
+    get:
+      tags:
+      - Scheduled Jobs Management
+      summary: Scheduled job detail
+      operationId: getScheduledJobDetail
+      parameters:
+      - name: uuid
+        in: path
+        description: Scheduled job UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Scheduled job detail retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduledJobDetailDto"
+        "404":
+          description: Scheduled job not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+    put:
+      tags:
+      - Scheduled Jobs Management
+      summary: Edit Scheduled job
+      operationId: updateScheduledJob
+      parameters:
+      - name: uuid
+        in: path
+        description: Scheduled job UUID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateScheduledJob"
+        required: true
+      responses:
+        "200":
+          description: Scheduled job updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduledJobDetailDto"
+        "404":
+          description: Scheduled job not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+    delete:
+      tags:
+      - Scheduled Jobs Management
+      summary: Delete Scheduled job
+      operationId: deleteScheduledJob
+      parameters:
+      - name: uuid
+        in: path
+        description: Scheduled job UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Scheduled job deleted
+        "404":
+          description: Scheduled job not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/scheduler/jobs/{uuid}/enable:
+    patch:
+      tags:
+      - Scheduled Jobs Management
+      summary: Enabling of Scheduled job
+      operationId: enableScheduledJob
+      parameters:
+      - name: uuid
+        in: path
+        description: Scheduled job UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Scheduled job enabled
+        "404":
+          description: Scheduled job not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/scheduler/jobs/{uuid}/disable:
+    patch:
+      tags:
+      - Scheduled Jobs Management
+      summary: Disabling of Scheduled job
+      operationId: disableScheduledJob
+      parameters:
+      - name: uuid
+        in: path
+        description: Scheduled job UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Scheduled job disabled
+        "404":
+          description: Scheduled job not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/scheduler/jobs:
+    get:
+      tags:
+      - Scheduled Jobs Management
+      summary: List of scheduled jobs
+      operationId: listScheduledJobs
+      parameters:
+      - name: itemsPerPage
+        in: query
+        description: Number of entries per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
+      responses:
+        "200":
+          description: List of scheduled jobs fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduledJobsResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/scheduler/jobs/{uuid}/history:
+    get:
+      tags:
+      - Scheduled Jobs Management
+      summary: Scheduled job history
+      operationId: getScheduledJobHistory
+      parameters:
+      - name: itemsPerPage
+        in: query
+        description: Number of entries per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
+      - name: uuid
+        in: path
+        description: Scheduled job UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Scheduled job history retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScheduledJobHistoryResponseDto"
+        "404":
+          description: Scheduled job not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+components:
+  schemas:
+    UpdateScheduledJob:
+      type: object
+      properties:
+        cronExpression:
+          type: string
+          description: Cron expression for job schedule
+    ErrorMessageDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message detail
+          examples:
+          - Error message
+      required:
+      - message
+    AuthenticationServiceExceptionDto:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          format: int32
+          description: Status code of the HTTP Request
+        code:
+          type: string
+          description: Code of the result
+        message:
+          type: string
+          description: Exception message
+      required:
+      - code
+      - message
+      - statusCode
+    ScheduledJobDetailDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of the scheduled job
+        jobName:
+          type: string
+          description: Name of the scheduled job
+        jobType:
+          type: string
+          description: Type of scheduled job (job processor name)
+        cronExpression:
+          type: string
+          description: CRON expression representing configuration of pattern how to
+            run scheduled job
+        enabled:
+          type: boolean
+          description: "Status of the scheduled job. True = Enabled, False = Disabled"
+        oneTime:
+          type: boolean
+          description: Is scheduled job triggered only once
+        system:
+          type: boolean
+          description: Is system scheduled job
+        lastExecutionStatus:
+          $ref: "#/components/schemas/SchedulerJobExecutionStatus"
+          description: Execution status of last job triggered task
+        userUuid:
+          type: string
+          format: uuid
+        objectData:
+          type: object
+      required:
+      - cronExpression
+      - enabled
+      - jobName
+      - jobType
+      - lastExecutionStatus
+      - oneTime
+      - system
+      - uuid
+    SchedulerJobExecutionStatus:
+      type: string
+      enum:
+      - started
+      - succeeded
+      - failed
+    ScheduledJobDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of the scheduled job
+        jobName:
+          type: string
+          description: Name of the scheduled job
+        jobType:
+          type: string
+          description: Type of scheduled job (job processor name)
+        cronExpression:
+          type: string
+          description: CRON expression representing configuration of pattern how to
+            run scheduled job
+        enabled:
+          type: boolean
+          description: "Status of the scheduled job. True = Enabled, False = Disabled"
+        oneTime:
+          type: boolean
+          description: Is scheduled job triggered only once
+        system:
+          type: boolean
+          description: Is system scheduled job
+        lastExecutionStatus:
+          $ref: "#/components/schemas/SchedulerJobExecutionStatus"
+          description: Execution status of last job triggered task
+      required:
+      - cronExpression
+      - enabled
+      - jobName
+      - jobType
+      - lastExecutionStatus
+      - oneTime
+      - system
+      - uuid
+    ScheduledJobsResponseDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+        scheduledJobs:
+          type: array
+          description: Scheduled jobs
+          items:
+            $ref: "#/components/schemas/ScheduledJobDto"
+      required:
+      - itemsPerPage
+      - pageNumber
+      - scheduledJobs
+      - totalItems
+      - totalPages
+    Resource:
+      type: string
+      enum:
+      - NONE
+      - ANY
+      - dashboard
+      - settings
+      - auditLogs
+      - credentials
+      - connectors
+      - attributes
+      - jobs
+      - users
+      - roles
+      - acmeAccounts
+      - acmeProfiles
+      - scepProfiles
+      - cmpProfiles
+      - authorities
+      - raProfiles
+      - certificates
+      - certificateRequests
+      - groups
+      - complianceProfiles
+      - discoveries
+      - entities
+      - locations
+      - tokenProfiles
+      - tokens
+      - keys
+      - approvalProfiles
+      - approvals
+      - notificationProfiles
+      - notificationInstances
+      - rules
+      - actions
+      - triggers
+      - resources
+      - resourceEvents
+      - searchFilters
+      - keyItems
+      - platformEnums
+      - notifications
+      - conditions
+      - executions
+      - complianceRules
+      - complianceGroups
+      - customAttributes
+      - globalMetadata
+      - acmeOrders
+      - acmeAuthorizations
+      - acmeChallenges
+      - cmpTransactions
+      - endEntityProfiles
+      - authenticationProviders
+    ScheduledJobHistoryDto:
+      type: object
+      properties:
+        jobUuid:
+          type: string
+          format: uuid
+          description: Scheduled job UUID
+        startTime:
+          type: string
+          format: date-time
+          description: Start time of triggered task
+        endTime:
+          type: string
+          format: date-time
+          description: End time of triggered task
+        status:
+          $ref: "#/components/schemas/SchedulerJobExecutionStatus"
+          description: Execution status of triggered task
+        resultMessage:
+          type: string
+          description: Message explaining result status
+        resultObjectType:
+          $ref: "#/components/schemas/Resource"
+          description: Result object type
+        resultObjectIdentification:
+          type: array
+          description: Result object identification (UUID)
+          items:
+            type: string
+      required:
+      - startTime
+      - status
+    ScheduledJobHistoryResponseDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+        scheduledJobHistory:
+          type: array
+          description: Scheduled job history
+          items:
+            $ref: "#/components/schemas/ScheduledJobHistoryDto"
+      required:
+      - itemsPerPage
+      - pageNumber
+      - scheduledJobHistory
+      - totalItems
+      - totalPages
+  securitySchemes:
+    ConnectorAPIKeyAuth:
+      type: apiKey
+      description: API Key in header configured for connector
+      name: X-API-KEY
+      in: header
+    SessionAuth:
+      type: apiKey
+      description: Session-based authentication with session ID stored in 'czertainly-session'
+        cookie
+      name: czertainly-session
+      in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
+    CertificateAuth:
+      type: apiKey
+      description: Base64 encoded X.509 certificate passed in header
+      name: X-APP-CERTIFICATE
+      in: header
+    CertificateTLSAuth:
+      type: mutualTLS
+      description: Client certificate authentication
+    NoAuth:
+      type: http
+      description: No authentication
+      scheme: none
+    BearerJWTAuth:
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT
