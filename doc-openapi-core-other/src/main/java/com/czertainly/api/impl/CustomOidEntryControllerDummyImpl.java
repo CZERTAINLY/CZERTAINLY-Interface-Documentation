@@ -8,9 +8,11 @@ import com.czertainly.api.model.core.oid.CustomOidEntryListResponseDto;
 import com.czertainly.api.model.core.oid.CustomOidEntryRequestDto;
 import com.czertainly.api.model.core.oid.CustomOidEntryUpdateRequestDto;
 import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@RestController
 public class CustomOidEntryControllerDummyImpl implements CustomOidEntryController {
     @Override
     public CustomOidEntryDetailResponseDto createCustomOidEntry(CustomOidEntryRequestDto requestDto) {
