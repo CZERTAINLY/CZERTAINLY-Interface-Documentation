@@ -19,6 +19,8 @@ servers:
 - url: https://demo.czertainly.online/api
   description: CZERTAINLY Demo server
 tags:
+- name: Custom OID Management
+  description: Custom OID Management API
 - name: Info
   description: CZERTAINLY Application Information API
 - name: Audit Log
@@ -450,6 +452,240 @@ paths:
       - BearerJWTAuth: []
       - CertificateAuth: []
       - SessionAuth: []
+  /v1/oids/{oid}:
+    get:
+      tags:
+      - Custom OID Management
+      summary: Get custom OID entry by OID
+      operationId: getCustomOidEntry
+      parameters:
+      - name: oid
+        in: path
+        description: OID identifier
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Custom OID entry retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomOidEntryDetailResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+    put:
+      tags:
+      - Custom OID Management
+      summary: Edit an existing custom OID entry
+      operationId: editCustomOidEntry
+      parameters:
+      - name: oid
+        in: path
+        description: OID identifier
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomOidEntryUpdateRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Custom OID entry updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomOidEntryDetailResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+    delete:
+      tags:
+      - Custom OID Management
+      summary: Delete a custom OID entry by OID
+      operationId: deleteCustomOidEntry
+      parameters:
+      - name: oid
+        in: path
+        description: OID identifier
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Custom OID entry deleted
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/oids:
+    post:
+      tags:
+      - Custom OID Management
+      summary: Create a new custom OID entry
+      operationId: createCustomOidEntry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomOidEntryRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Custom OID entry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomOidEntryDetailResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+    delete:
+      tags:
+      - Custom OID Management
+      summary: Bulk delete customOID entries
+      operationId: bulkDeleteCustomOidEntry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+        required: true
+      responses:
+        "204":
+          description: Custom OID entries deleted
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/oids/list:
+    post:
+      tags:
+      - Custom OID Management
+      summary: List custom OID entries with filtering and pagination
+      operationId: listCustomOidEntries
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Custom OID entries retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomOidEntryListResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
   /v1/auditLogs:
     post:
       tags:
@@ -751,6 +987,41 @@ paths:
                   type: array
                   items:
                     $ref: "#/components/schemas/ResourceEventDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/oids/search:
+    get:
+      tags:
+      - Custom OID Management
+      summary: Get searchable filter fields for custom OID entries
+      operationId: getSearchableInformation
+      responses:
+        "200":
+          description: Searchable fields retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchFieldDataByGroupDto"
         "400":
           description: Bad Request
           content:
@@ -1334,6 +1605,103 @@ components:
           default: 15m
           description: Duration in seconds after which will inactive user's session
             be terminated.
+    AdditionalOidPropertiesDto:
+      type: object
+      description: Additional properties of custom OID entry
+    CustomOidEntryUpdateRequestDto:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Display name of the custom OID entry
+        description:
+          type: string
+          description: Description of the custom OID entry
+        category:
+          $ref: "#/components/schemas/OidCategory"
+          description: "Category of the OID entry. When updating OID entry, this property\
+            \ does not change the category and is instead used to determine type of\
+            \ additional properties."
+        additionalProperties:
+          description: Additional properties depending on OID category
+          oneOf:
+          - $ref: "#/components/schemas/RdnAttributeTypeOidPropertiesDto"
+      required:
+      - category
+      - displayName
+    OidCategory:
+      type: string
+      enum:
+      - rdnAttributeType
+      - extendedKeyUsage
+      - generic
+    RdnAttributeTypeOidPropertiesDto:
+      allOf:
+      - $ref: "#/components/schemas/AdditionalOidPropertiesDto"
+      - type: object
+        properties:
+          code:
+            type: string
+            description: "Code to be displayed in RDN string (e.g., CN for Common\
+              \ Name)"
+          altCodes:
+            type: array
+            description: Alternative codes that can appear in RDN representing the
+              same OID
+            items:
+              type: string
+      required:
+      - code
+    CustomOidEntryDetailResponseDto:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: Object Identifier (OID) in dot notation
+        displayName:
+          type: string
+          description: Display name of the custom OID entry
+        description:
+          type: string
+          description: Description of the custom OID entry
+        category:
+          $ref: "#/components/schemas/OidCategory"
+          description: Category of the custom OID entry
+        additionalProperties:
+          description: Additional properties depending on the OID category
+          oneOf:
+          - $ref: "#/components/schemas/RdnAttributeTypeOidPropertiesDto"
+      required:
+      - category
+      - displayName
+      - oid
+    CustomOidEntryRequestDto:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Display name of the custom OID entry
+        description:
+          type: string
+          description: Description of the custom OID entry
+        category:
+          $ref: "#/components/schemas/OidCategory"
+          description: "Category of the OID entry. When updating OID entry, this property\
+            \ does not change the category and is instead used to determine type of\
+            \ additional properties."
+        additionalProperties:
+          description: Additional properties depending on OID category
+          oneOf:
+          - $ref: "#/components/schemas/RdnAttributeTypeOidPropertiesDto"
+        oid:
+          type: string
+          description: "Object Identifier (OID) in dot notation (e.g., 1.2.840.113549.1.1.1)"
+          example: 1.2.840.113549.1.1.1
+          pattern: "^[0-2](\\.(0|[1-9]\\d*)){1,50}$"
+      required:
+      - category
+      - displayName
+      - oid
     FilterConditionOperator:
       type: string
       enum:
@@ -1404,6 +1772,54 @@ components:
           format: int32
           default: "1"
           description: Page number for the request
+    CustomOidEntryListResponseDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+        oidEntries:
+          type: array
+          description: List of custom OID entries
+          items:
+            $ref: "#/components/schemas/CustomOidEntryResponseDto"
+      required:
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
+    CustomOidEntryResponseDto:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: Object Identifier (OID) in dot notation
+        displayName:
+          type: string
+          description: Display name of the custom OID entry
+        description:
+          type: string
+          description: Description of the custom OID entry
+        category:
+          $ref: "#/components/schemas/OidCategory"
+          description: Category of the custom OID entry
+      required:
+      - category
+      - displayName
+      - oid
     ActorRecord:
       type: object
       properties:
@@ -2179,15 +2595,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
-    BasicAuth:
-      type: http
-      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header
