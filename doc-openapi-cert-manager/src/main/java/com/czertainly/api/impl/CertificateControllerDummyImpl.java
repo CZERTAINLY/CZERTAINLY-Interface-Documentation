@@ -23,36 +23,37 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class CertificateControllerDummyImpl implements CertificateController {
 
     @Hidden
     @Override
-    public CertificateResponseDto listCertificates(SearchRequestDto request) throws ValidationException {
+    public CertificateResponseDto listCertificates(CertificateSearchRequestDto request) throws ValidationException {
         return null;
     }
 
     @Override
-    public CertificateDetailDto getCertificate(String uuid) throws NotFoundException, CertificateException, IOException {
-        return null;
-    }
-
-    @Hidden
-    @Override
-    public CertificateDownloadResponseDto downloadCertificate(String uuid, CertificateFormat certificateFormat, CertificateFormatEncoding encoding) throws NotFoundException, CertificateException, IOException {
+    public CertificateDetailDto getCertificate(UUID uuid) throws NotFoundException, CertificateException, IOException {
         return null;
     }
 
     @Hidden
     @Override
-    public void deleteCertificate(String uuid) throws NotFoundException {
+    public CertificateDownloadResponseDto downloadCertificate(UUID uuid, CertificateFormat certificateFormat, CertificateFormatEncoding encoding) throws NotFoundException, CertificateException, IOException {
+        return null;
+    }
+
+    @Hidden
+    @Override
+    public void deleteCertificate(UUID uuid) throws NotFoundException {
 
     }
 
     @Hidden
     @Override
-    public void updateCertificateObjects(String uuid, CertificateUpdateObjectsDto request) throws NotFoundException {
+    public void updateCertificateObjects(UUID uuid, CertificateUpdateObjectsDto request) throws NotFoundException {
 
     }
 
@@ -81,13 +82,13 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
-    public List<CertificateEventHistoryDto> getCertificateEventHistory(String uuid) throws NotFoundException {
+    public List<CertificateEventHistoryDto> getCertificateEventHistory(UUID uuid) throws NotFoundException {
         return null;
     }
 
     @Hidden
     @Override
-    public List<LocationDto> listLocations(String certificateUuid) throws NotFoundException {
+    public List<LocationDto> listLocations(UUID certificateUuid) throws NotFoundException {
         return null;
     }
 
@@ -99,7 +100,7 @@ public class CertificateControllerDummyImpl implements CertificateController {
 
     @Hidden
     @Override
-    public CertificateValidationResultDto getCertificateValidationResult(String uuid) throws NotFoundException, CertificateException {
+    public CertificateValidationResultDto getCertificateValidationResult(UUID uuid) throws NotFoundException, CertificateException {
         return null;
     }
 
@@ -111,7 +112,7 @@ public class CertificateControllerDummyImpl implements CertificateController {
 
     @Hidden
     @Override
-    public List<CertificateContentDto> getCertificateContent(List<String> uuids) {
+    public List<CertificateContentDto> getCertificateContent(List<UUID> uuids) {
         return null;
     }
 
@@ -123,18 +124,38 @@ public class CertificateControllerDummyImpl implements CertificateController {
 
     @Hidden
     @Override
-    public CertificateChainResponseDto getCertificateChain(String uuid, boolean withEndCertificate) throws NotFoundException {
+    public CertificateChainResponseDto getCertificateChain(UUID uuid, boolean withEndCertificate) throws NotFoundException {
         return null;
     }
 
     @Hidden
     @Override
-    public CertificateChainDownloadResponseDto downloadCertificateChain(String uuid, CertificateFormat certificateFormat, boolean withEndCertificate, CertificateFormatEncoding encoding) throws NotFoundException, CertificateException {
+    public CertificateChainDownloadResponseDto downloadCertificateChain(UUID uuid, CertificateFormat certificateFormat, boolean withEndCertificate, CertificateFormatEncoding encoding) throws NotFoundException, CertificateException {
         return null;
     }
 
     @Override
-    public ApprovalResponseDto listCertificateApprovals(String uuid, PaginationRequestDto paginationRequestDto) {
+    public ApprovalResponseDto listCertificateApprovals(UUID uuid, PaginationRequestDto paginationRequestDto) {
         return null;
+    }
+
+    @Override
+    public void archiveCertificate(UUID uuid) throws NotFoundException {
+
+    }
+
+    @Override
+    public void unarchiveCertificate(UUID uuid) throws NotFoundException {
+
+    }
+
+    @Override
+    public void bulkArchiveCertificate(List<UUID> uuids) {
+
+    }
+
+    @Override
+    public void bulkUnarchiveCertificate(List<UUID> uuids) {
+
     }
 }

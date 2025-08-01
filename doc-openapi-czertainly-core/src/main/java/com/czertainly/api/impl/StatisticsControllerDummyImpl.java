@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
         @SecurityRequirement(name = "")
 })
 public class StatisticsControllerDummyImpl implements StatisticsController {
+
     @Override
-    public StatisticsDto getStatistics() {
+    public StatisticsDto getStatistics(boolean includeArchived) {
         return null;
     }
 }
