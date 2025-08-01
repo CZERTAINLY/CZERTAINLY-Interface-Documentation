@@ -22,12 +22,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 public class CertificateControllerDummyImpl implements CertificateController {
 
     @Override
-    public CertificateResponseDto listCertificates(SearchRequestDto request) throws ValidationException {
+    public CertificateResponseDto listCertificates(CertificateSearchRequestDto request) throws ValidationException {
         return null;
     }
 
@@ -119,5 +120,25 @@ public class CertificateControllerDummyImpl implements CertificateController {
     @Override
     public ApprovalResponseDto listCertificateApprovals(String uuid, PaginationRequestDto paginationRequestDto) {
         return null;
+    }
+
+    @Override
+    public void archiveCertificate(UUID uuid) throws NotFoundException {
+
+    }
+
+    @Override
+    public void unarchiveCertificate(UUID uuid) throws NotFoundException {
+
+    }
+
+    @Override
+    public void bulkArchiveCertificate(List<UUID> uuids) {
+
+    }
+
+    @Override
+    public void bulkUnarchiveCertificate(List<UUID> uuids) {
+
     }
 }
