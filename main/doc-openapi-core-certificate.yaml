@@ -32,7 +32,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SearchRequestDto"
+              $ref: "#/components/schemas/CertificateSearchRequestDto"
         required: true
       responses:
         "200":
@@ -385,6 +385,7 @@ paths:
         required: true
         schema:
           type: string
+          format: uuid
       responses:
         "200":
           description: Certificate detail retrieved
@@ -430,6 +431,7 @@ paths:
         required: true
         schema:
           type: string
+          format: uuid
       responses:
         "204":
           description: Certificate deleted
@@ -471,6 +473,7 @@ paths:
         required: true
         schema:
           type: string
+          format: uuid
       requestBody:
         content:
           application/json:
@@ -506,6 +509,180 @@ paths:
       - BearerJWTAuth: []
       - CertificateAuth: []
       - SessionAuth: []
+  /v1/certificates/{uuid}/unarchive:
+    patch:
+      tags:
+      - Certificate Inventory
+      summary: Unarchive a certificate
+      operationId: unarchiveCertificate
+      parameters:
+      - name: uuid
+        in: path
+        description: Certificate UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Certificate unarchived
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/certificates/{uuid}/archive:
+    patch:
+      tags:
+      - Certificate Inventory
+      summary: Archive a certificate
+      operationId: archiveCertificate
+      parameters:
+      - name: uuid
+        in: path
+        description: Certificate UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Certificate archived
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/certificates/unarchive:
+    patch:
+      tags:
+      - Certificate Inventory
+      summary: Unarchive a list of certificates
+      operationId: bulkUnarchiveCertificate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Certificates unarchived
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/certificates/archive:
+    patch:
+      tags:
+      - Certificate Inventory
+      summary: Archive a list of certificates
+      operationId: bulkArchiveCertificate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Certificates archived
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
   /v1/certificates/{uuid}/{certificateFormat}:
     get:
       tags:
@@ -519,6 +696,7 @@ paths:
         required: true
         schema:
           type: string
+          format: uuid
       - name: certificateFormat
         in: path
         description: Certificate format
@@ -576,6 +754,7 @@ paths:
         required: true
         schema:
           type: string
+          format: uuid
       responses:
         "200":
           description: Certificate validation detail retrieved
@@ -622,6 +801,7 @@ paths:
         required: true
         schema:
           type: string
+          format: uuid
       responses:
         "200":
           description: Certificate event history retrieved
@@ -675,6 +855,7 @@ paths:
         required: true
         schema:
           type: string
+          format: uuid
       - name: withEndCertificate
         in: query
         required: false
@@ -726,6 +907,7 @@ paths:
         required: true
         schema:
           type: string
+          format: uuid
       - name: certificateFormat
         in: path
         description: Certificate format
@@ -788,6 +970,7 @@ paths:
         required: true
         schema:
           type: string
+          format: uuid
       - name: itemsPerPage
         in: query
         description: Number of entries per page
@@ -853,6 +1036,7 @@ paths:
         required: true
         schema:
           type: string
+          format: uuid
       responses:
         "200":
           description: Locations retrieved
@@ -972,6 +1156,28 @@ paths:
       - SessionAuth: []
 components:
   schemas:
+    CertificateSearchRequestDto:
+      type: object
+      properties:
+        filters:
+          type: array
+          description: Certificate filter input
+          items:
+            $ref: "#/components/schemas/SearchFilterRequestDto"
+        itemsPerPage:
+          type: integer
+          format: int32
+          default: "10"
+          description: Number of entries per page
+          maximum: 1000
+        pageNumber:
+          type: integer
+          format: int32
+          default: "1"
+          description: Page number for the request
+        includeArchived:
+          type: boolean
+          description: Include archived certificates
     FilterConditionOperator:
       type: string
       enum:
@@ -1023,25 +1229,6 @@ components:
       - condition
       - fieldIdentifier
       - fieldSource
-    SearchRequestDto:
-      type: object
-      properties:
-        filters:
-          type: array
-          description: Certificate filter input
-          items:
-            $ref: "#/components/schemas/SearchFilterRequestDto"
-        itemsPerPage:
-          type: integer
-          format: int32
-          default: "10"
-          description: Number of entries per page
-          maximum: 1000
-        pageNumber:
-          type: integer
-          format: int32
-          default: "1"
-          description: Page number for the request
     ErrorMessageDto:
       type: object
       properties:
@@ -1361,7 +1548,6 @@ components:
       - failed
       - issued
       - revoked
-      - archived
     CertificateType:
       type: string
       enum:
@@ -2998,6 +3184,8 @@ components:
           - Upload Certificate
           - Certificate Discovered
           - Update Location
+          - Archive certificate
+          - Unarchive certificate
         status:
           type: string
           description: Event result

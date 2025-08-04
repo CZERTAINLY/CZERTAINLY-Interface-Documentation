@@ -810,6 +810,14 @@ paths:
       - Statistics/Dashboard
       summary: Get Dashboard/Statistics Details
       operationId: getStatistics
+      parameters:
+      - name: includeArchived
+        in: query
+        description: Include archived certificates in the statistics
+        required: false
+        schema:
+          type: boolean
+          default: false
       responses:
         "200":
           description: Details retrieved
@@ -2027,6 +2035,8 @@ components:
       - updateAttributeContent
       - deleteAttributeContent
       - promoteMetadata
+      - archive
+      - unarchive
       - listCertificateProfiles
       - listCas
     OperationResult:
@@ -2595,15 +2605,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header
