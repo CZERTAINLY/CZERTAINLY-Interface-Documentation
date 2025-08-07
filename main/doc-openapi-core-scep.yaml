@@ -1084,6 +1084,24 @@ components:
       - xquery
       - xml
       - yaml
+    ProtocolCertificateAssociationsDto:
+      type: object
+      properties:
+        ownerUuid:
+          type: string
+          format: uuid
+          description: UUID of the user to be associated with certificate by protocol
+        groupUuids:
+          type: array
+          description: UUIDs of the groups to be associated with certificate by protocol
+          items:
+            type: string
+            format: uuid
+        customAttributes:
+          type: array
+          description: Custom Attributes to be associated with certificate by protocol
+          items:
+            $ref: "#/components/schemas/RequestAttributeDto"
     RangeAttributeConstraint:
       type: object
       description: Range attribute constraint to specify boundaries for integer value
@@ -1218,6 +1236,9 @@ components:
         intuneApplicationKey:
           type: string
           description: Intune Application Key
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
       required:
       - caCertificateUuid
       - issueCertificateAttributes
@@ -1577,6 +1598,9 @@ components:
         intuneApplicationId:
           type: string
           description: Intune application ID
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
       required:
       - enabled
       - includeCaCertificate
@@ -1663,6 +1687,9 @@ components:
         intuneApplicationKey:
           type: string
           description: Intune Application Key
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
         name:
           type: string
           description: Name of the SCEP Profile
@@ -1751,15 +1778,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
-    BasicAuth:
-      type: http
-      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

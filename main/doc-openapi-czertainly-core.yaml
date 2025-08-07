@@ -23106,6 +23106,24 @@ components:
       - started
       - succeeded
       - failed
+    ProtocolCertificateAssociationsDto:
+      type: object
+      properties:
+        ownerUuid:
+          type: string
+          format: uuid
+          description: UUID of the user to be associated with certificate by protocol
+        groupUuids:
+          type: array
+          description: UUIDs of the groups to be associated with certificate by protocol
+          items:
+            type: string
+            format: uuid
+        customAttributes:
+          type: array
+          description: Custom Attributes to be associated with certificate by protocol
+          items:
+            $ref: "#/components/schemas/RequestAttributeDto"
     ScepProfileEditRequestDto:
       type: object
       properties:
@@ -23163,6 +23181,9 @@ components:
         intuneApplicationKey:
           type: string
           description: Intune Application Key
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
       required:
       - caCertificateUuid
       - issueCertificateAttributes
@@ -23400,6 +23421,9 @@ components:
         intuneApplicationId:
           type: string
           description: Intune application ID
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
       required:
       - enabled
       - includeCaCertificate
@@ -24565,6 +24589,9 @@ components:
           type: string
           description: UUID of the Certificate to be used as signing certificate for
             CMP responses. Required when responseProtectionMethod is signature
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
         name:
           type: string
           description: Name of the CMP Profile
@@ -24623,6 +24650,9 @@ components:
           description: CMP URL
           examples:
           - https://your-domain.com/api/v1/protocols/cmp/cmpProfile
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
         issueCertificateAttributes:
           type: array
           description: List of Attributes to issue a Certificate for the associated
@@ -25157,6 +25187,9 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
       required:
       - issueCertificateAttributes
       - revokeCertificateAttributes
@@ -25256,6 +25289,9 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
       required:
       - enabled
       - name
@@ -25775,6 +25811,9 @@ components:
         intuneApplicationKey:
           type: string
           description: Intune Application Key
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
         name:
           type: string
           description: Name of the SCEP Profile
@@ -26939,6 +26978,9 @@ components:
           type: string
           description: UUID of the Certificate to be used as signing certificate for
             CMP responses. Required when responseProtectionMethod is signature
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
         name:
           type: string
           description: Name of the CMP Profile
@@ -28047,6 +28089,9 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
       required:
       - issueCertificateAttributes
       - name
@@ -30323,6 +30368,9 @@ components:
           description: CMP URL
           examples:
           - https://your-domain.com/api/v1/protocols/cmp/cmpProfile
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Properties to set for certificates associated with protocol
       required:
       - enabled
       - name
@@ -31286,6 +31334,9 @@ components:
           description: UUID of the ACME Profile
           examples:
           - 6b55de1c-844f-11ec-a8a3-0242ac120002
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
       required:
       - accountId
       - contact
