@@ -823,7 +823,7 @@ components:
           description: UUID of the Certificate to be used as signing certificate for
             CMP responses. Required when responseProtectionMethod is signature
         certificateAssociations:
-          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsRequestDto"
           description: Associations to set for certificates issued by the protocol
         name:
           type: string
@@ -1182,7 +1182,7 @@ components:
       enum:
       - sharedSecret
       - signature
-    ProtocolCertificateAssociationsDto:
+    ProtocolCertificateAssociationsRequestDto:
       type: object
       properties:
         ownerUuid:
@@ -1535,9 +1535,6 @@ components:
           description: CMP URL
           examples:
           - https://your-domain.com/api/v1/protocols/cmp/cmpProfile
-        certificateAssociations:
-          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
-          description: Associations to set for certificates issued by the protocol
         issueCertificateAttributes:
           type: array
           description: List of Attributes to issue a Certificate for the associated
@@ -1564,6 +1561,9 @@ components:
         signingCertificate:
           $ref: "#/components/schemas/CertificateDto"
           description: Signing certificate for the CMP responses
+        certificateAssociations:
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          description: Associations to set for certificates issued by the protocol
       required:
       - enabled
       - name
@@ -1605,6 +1605,24 @@ components:
       required:
       - name
       - uuid
+    ProtocolCertificateAssociationsDto:
+      type: object
+      properties:
+        ownerUuid:
+          type: string
+          format: uuid
+          description: UUID of the user to be associated with certificate by protocol
+        groupUuids:
+          type: array
+          description: UUIDs of the groups to be associated with certificate by protocol
+          items:
+            type: string
+            format: uuid
+        customAttributes:
+          type: array
+          description: Custom Attributes to be associated with certificate by protocol
+          items:
+            $ref: "#/components/schemas/ResponseAttributeDto"
     ResponseAttributeDto:
       type: object
       description: Response attribute with content for object it belongs to
@@ -1710,7 +1728,7 @@ components:
           description: UUID of the Certificate to be used as signing certificate for
             CMP responses. Required when responseProtectionMethod is signature
         certificateAssociations:
-          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsRequestDto"
           description: Associations to set for certificates issued by the protocol
         name:
           type: string
@@ -1765,9 +1783,6 @@ components:
           description: CMP URL
           examples:
           - https://your-domain.com/api/v1/protocols/cmp/cmpProfile
-        certificateAssociations:
-          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
-          description: Properties to set for certificates associated with protocol
       required:
       - enabled
       - name
@@ -1802,15 +1817,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

@@ -1035,7 +1035,7 @@ components:
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
         certificateAssociations:
-          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsRequestDto"
           description: Associations to set for certificates issued by the protocol
       required:
       - issueCertificateAttributes
@@ -1520,7 +1520,7 @@ components:
       - xquery
       - xml
       - yaml
-    ProtocolCertificateAssociationsDto:
+    ProtocolCertificateAssociationsRequestDto:
       type: object
       properties:
         ownerUuid:
@@ -1803,6 +1803,24 @@ components:
       - enabled
       - name
       - uuid
+    ProtocolCertificateAssociationsDto:
+      type: object
+      properties:
+        ownerUuid:
+          type: string
+          format: uuid
+          description: UUID of the user to be associated with certificate by protocol
+        groupUuids:
+          type: array
+          description: UUIDs of the groups to be associated with certificate by protocol
+          items:
+            type: string
+            format: uuid
+        customAttributes:
+          type: array
+          description: Custom Attributes to be associated with certificate by protocol
+          items:
+            $ref: "#/components/schemas/ResponseAttributeDto"
     ResponseAttributeDto:
       type: object
       description: Response attribute with content for object it belongs to
@@ -1945,7 +1963,7 @@ components:
           items:
             $ref: "#/components/schemas/RequestAttributeDto"
         certificateAssociations:
-          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
+          $ref: "#/components/schemas/ProtocolCertificateAssociationsRequestDto"
           description: Associations to set for certificates issued by the protocol
       required:
       - issueCertificateAttributes
@@ -2086,9 +2104,6 @@ components:
           description: UUID of the ACME Profile
           examples:
           - 6b55de1c-844f-11ec-a8a3-0242ac120002
-        certificateAssociations:
-          $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
-          description: Associations to set for certificates issued by the protocol
       required:
       - accountId
       - contact
@@ -2181,15 +2196,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header
