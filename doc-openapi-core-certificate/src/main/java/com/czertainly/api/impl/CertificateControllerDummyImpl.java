@@ -141,4 +141,19 @@ public class CertificateControllerDummyImpl implements CertificateController {
     public void bulkUnarchiveCertificate(List<UUID> uuids) {
 
     }
+
+    @Override
+    public CertificateRelationsDto getCertificateRelations(UUID uuid) throws NotFoundException {
+        return null;
+    }
+
+    @Override
+    public void associateSourceCertificate(UUID uuid, UUID sourceCertificateUuid) throws NotFoundException {
+
+    }
+
+    @Override
+    public void removeSourceCertificateAssociation(UUID uuid, UUID sourceCertificateUuid) throws NotFoundException {
+
+    }
 }
