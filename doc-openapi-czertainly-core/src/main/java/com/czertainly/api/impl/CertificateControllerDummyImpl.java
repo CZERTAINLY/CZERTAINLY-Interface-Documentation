@@ -153,12 +153,12 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
-    public void associateSourceCertificate(UUID uuid, UUID sourceCertificateUuid) throws NotFoundException {
+    public void associateCertificates(UUID uuid, UUID certificateUuid) throws NotFoundException {
 
     }
 
     @Override
-    public void removeSourceCertificateAssociation(UUID uuid, UUID sourceCertificateUuid) throws NotFoundException {
+    public void removeCertificateAssociation(UUID uuid, UUID certificateUuid) throws NotFoundException {
 
     }
 }
