@@ -552,6 +552,105 @@ paths:
       - BearerJWTAuth: []
       - CertificateAuth: []
       - SessionAuth: []
+  /v1/certificates/{uuid}/relations/{certificateUuid}:
+    delete:
+      tags:
+      - Certificate Inventory
+      summary: Remove a source certificate association from the given certificate
+      operationId: removeCertificateAssociation
+      parameters:
+      - name: uuid
+        in: path
+        description: Certificate UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: certificateUuid
+        in: path
+        description: UUID of certificate to disassociate the certificate with
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Certificate association removed successfully
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+    patch:
+      tags:
+      - Certificate Inventory
+      summary: Associate a source certificate to the given certificate
+      operationId: associateCertificates
+      parameters:
+      - name: uuid
+        in: path
+        description: Certificate UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: certificateUuid
+        in: path
+        description: UUID of certificate to associate the certificate with
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Certificates associated successfully
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
   /v1/certificates/{uuid}/archive:
     patch:
       tags:
@@ -782,6 +881,52 @@ paths:
           description: Not Found
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/certificates/{uuid}/relations:
+    get:
+      tags:
+      - Certificate Inventory
+      summary: Get relations for a certificate
+      operationId: getCertificateRelations
+      parameters:
+      - name: uuid
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Certificate relations retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CertificateRelationsDto"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
       security:
@@ -2443,6 +2588,7 @@ components:
         sourceCertificateUuid:
           type: string
           format: uuid
+          deprecated: true
           description: Source certificate UUID
         issueAttributes:
           type: array
@@ -2456,6 +2602,7 @@ components:
             $ref: "#/components/schemas/ResponseAttributeDto"
         relatedCertificates:
           type: array
+          deprecated: true
           description: List of related certificates
           items:
             $ref: "#/components/schemas/CertificateDto"
@@ -3167,6 +3314,97 @@ components:
           description: Date of the most recent validation of the certificate
       required:
       - resultStatus
+    CertificateRelationType:
+      type: string
+      enum:
+      - renewal
+      - rekey
+      - replacement
+      - pending
+    CertificateRelationsDto:
+      type: object
+      properties:
+        certificateUuid:
+          type: string
+          format: uuid
+          description: UUID of the certificate that is the subject of the request.
+            Listed certificates include its source and descending certificates.
+        successorCertificates:
+          type: array
+          description: "List of certificates that renew, rekey or replace the subject\
+            \ certificate"
+          items:
+            $ref: "#/components/schemas/CertificateSimpleDto"
+        predecessorCertificates:
+          type: array
+          description: "List of certificates which the subject certificate renews,\
+            \ rekeys or replaces."
+          items:
+            $ref: "#/components/schemas/CertificateSimpleDto"
+      required:
+      - certificateUuid
+    CertificateSimpleDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of the certificate
+        certificateType:
+          $ref: "#/components/schemas/CertificateType"
+          description: Type of the certificate
+        state:
+          $ref: "#/components/schemas/CertificateState"
+          description: State of the certificate
+        relationType:
+          $ref: "#/components/schemas/CertificateRelationType"
+          description: Relation type
+        commonName:
+          type: string
+          description: Common name
+        subjectDn:
+          type: string
+          description: Subject distinguished name
+        issuerCommonName:
+          type: string
+          description: Issuer common name
+        issuerDn:
+          type: string
+          description: Issuer distinguished name
+        serialNumber:
+          type: string
+          description: Certificate serial number
+        fingerprint:
+          type: string
+          description: Certificate fingerprint
+        publicKeyAlgorithm:
+          type: string
+          description: Public key algorithm
+        altPublicKeyAlgorithm:
+          type: string
+          description: Alternative public key algorithm
+        signatureAlgorithm:
+          type: string
+          description: Signature algorithm
+        altSignatureAlgorithm:
+          type: string
+          description: Alternative signature algorithm
+        notBefore:
+          type: string
+          format: date-time
+          description: Not before date
+        notAfter:
+          type: string
+          format: date-time
+          description: Not after date
+      required:
+      - certificateType
+      - commonName
+      - publicKeyAlgorithm
+      - relationType
+      - state
+      - subjectDn
+      - uuid
     CertificateEventHistoryDto:
       type: object
       properties:
