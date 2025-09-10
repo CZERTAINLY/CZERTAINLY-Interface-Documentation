@@ -2642,6 +2642,83 @@ components:
           description: Time attribute value in format HH:mm:ss
       required:
       - data
+    ComplianceCheckResultDto:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Overall compliance result status
+        timestamp:
+          type: string
+          format: date-time
+          description: Date of the most recent compliance check
+        failedRules:
+          type: array
+          description: Compliance rules that didn't pass compliance check
+          items:
+            $ref: "#/components/schemas/ComplianceCheckRuleDto"
+      required:
+      - failedRules
+      - status
+    ComplianceCheckRuleDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Compliance rule UUID
+        name:
+          type: string
+          description: Compliance rule name
+        description:
+          type: string
+          description: Description of the compliance rule
+          examples:
+          - Sample rule description
+        status:
+          $ref: "#/components/schemas/ComplianceRuleStatus"
+          description: Result status of rule compliance check
+          examples:
+          - ok
+        connectorUuid:
+          type: string
+          format: uuid
+          description: UUID of the Compliance Provider
+        connectorName:
+          type: string
+          description: Name of the Compliance Provider
+        kind:
+          type: string
+          description: Kind of the Compliance Provider
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource of the rule
+          examples:
+          - certificates
+        attributes:
+          type: array
+          description: Attributes of the rule
+          items:
+            $ref: "#/components/schemas/ResponseAttributeDto"
+      required:
+      - name
+      - resource
+      - status
+      - uuid
+    ComplianceRuleStatus:
+      type: string
+      enum:
+      - ok
+      - nok
+      - na
+    ComplianceStatus:
+      type: string
+      enum:
+      - not_checked
+      - ok
+      - nok
+      - na
+      - not_available
     GroupDto:
       type: object
       properties:
@@ -2772,8 +2849,12 @@ components:
           description: List of associated items
           items:
             $ref: "#/components/schemas/KeyAssociationDto"
+        complianceStatus:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Key compliance status
       required:
       - attributes
+      - complianceStatus
       - creationTime
       - items
       - name
@@ -2837,7 +2918,14 @@ components:
         reason:
           $ref: "#/components/schemas/KeyCompromiseReason"
           description: Reason for Compromise
+        complianceStatus:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Key compliance status
+        complianceResult:
+          $ref: "#/components/schemas/ComplianceCheckResultDto"
+          description: Key compliance check result
       required:
+      - complianceStatus
       - enabled
       - format
       - keyAlgorithm
@@ -3287,8 +3375,12 @@ components:
         state:
           $ref: "#/components/schemas/KeyState"
           description: Key State
+        complianceStatus:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Key compliance status
       required:
       - associations
+      - complianceStatus
       - creationTime
       - enabled
       - format
@@ -3877,8 +3969,12 @@ components:
           type: integer
           format: int32
           description: Number of associated objects
+        complianceStatus:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Key compliance status
       required:
       - associations
+      - complianceStatus
       - creationTime
       - items
       - name

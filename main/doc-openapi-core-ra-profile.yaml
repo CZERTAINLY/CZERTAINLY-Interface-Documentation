@@ -280,6 +280,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+      deprecated: true
       security:
       - BearerJWTAuth: []
       - CertificateAuth: []
@@ -1794,6 +1795,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+      deprecated: true
       security:
       - BearerJWTAuth: []
       - CertificateAuth: []
@@ -3213,9 +3215,14 @@ components:
           uniqueItems: true
         nonCompliantRules:
           type: array
-          description: Certificate compliance check result
+          deprecated: true
+          description: "Certificate compliance check result. Deprecated, use `complianceResult`\
+            \ property instead."
           items:
             $ref: "#/components/schemas/CertificateComplianceResultDto"
+        complianceResult:
+          $ref: "#/components/schemas/ComplianceCheckResultDto"
+          description: Certificate compliance check result
         customAttributes:
           type: array
           description: List of Custom Attributes
@@ -3510,10 +3517,17 @@ components:
         altKeyUuid:
           type: string
           description: UUID of the Alternative Key
+        complianceStatus:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Certificate request compliance status
+        complianceResult:
+          $ref: "#/components/schemas/ComplianceCheckResultDto"
+          description: Certificate request compliance check result
       required:
       - certificateRequestFormat
       - certificateType
       - commonName
+      - complianceStatus
       - content
       - publicKeyAlgorithm
       - signatureAlgorithm
@@ -3557,6 +3571,69 @@ components:
       - revoked
       - expiring
       - expired
+    ComplianceCheckResultDto:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Overall compliance result status
+        timestamp:
+          type: string
+          format: date-time
+          description: Date of the most recent compliance check
+        failedRules:
+          type: array
+          description: Compliance rules that didn't pass compliance check
+          items:
+            $ref: "#/components/schemas/ComplianceCheckRuleDto"
+      required:
+      - failedRules
+      - status
+    ComplianceCheckRuleDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Compliance rule UUID
+        name:
+          type: string
+          description: Compliance rule name
+        description:
+          type: string
+          description: Description of the compliance rule
+          examples:
+          - Sample rule description
+        status:
+          $ref: "#/components/schemas/ComplianceRuleStatus"
+          description: Result status of rule compliance check
+          examples:
+          - ok
+        connectorUuid:
+          type: string
+          format: uuid
+          description: UUID of the Compliance Provider
+        connectorName:
+          type: string
+          description: Name of the Compliance Provider
+        kind:
+          type: string
+          description: Kind of the Compliance Provider
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource of the rule
+          examples:
+          - certificates
+        attributes:
+          type: array
+          description: Attributes of the rule
+          items:
+            $ref: "#/components/schemas/ResponseAttributeDto"
+      required:
+      - name
+      - resource
+      - status
+      - uuid
     ComplianceRuleStatus:
       type: string
       enum:
@@ -3570,6 +3647,7 @@ components:
       - ok
       - nok
       - na
+      - not_available
     GroupDto:
       type: object
       properties:
@@ -3662,8 +3740,12 @@ components:
           type: integer
           format: int32
           description: Number of associated objects
+        complianceStatus:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Key compliance status
       required:
       - associations
+      - complianceStatus
       - creationTime
       - items
       - name
@@ -3754,8 +3836,12 @@ components:
         state:
           $ref: "#/components/schemas/KeyState"
           description: Key State
+        complianceStatus:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Key compliance status
       required:
       - associations
+      - complianceStatus
       - creationTime
       - enabled
       - format
