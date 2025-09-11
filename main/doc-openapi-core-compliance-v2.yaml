@@ -44,7 +44,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ComplianceProfileDto"
+                $ref: "#/components/schemas/ComplianceProfileDtoV2"
         "400":
           description: Bad Request
           content:
@@ -108,7 +108,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ComplianceProfileDto"
+                $ref: "#/components/schemas/ComplianceProfileDtoV2"
         "422":
           description: Unprocessable Entity
           content:
@@ -347,7 +347,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ComplianceProfileRequestDto"
+              $ref: "#/components/schemas/ComplianceProfileRequestDtoV2"
         required: true
       responses:
         "201":
@@ -355,7 +355,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ComplianceProfileDto"
+                $ref: "#/components/schemas/ComplianceProfileDtoV2"
         "422":
           description: Unprocessable Entity
           content:
@@ -552,7 +552,7 @@ paths:
       summary: Add/remove compliance rule to/from Compliance Profile
       description: "If provider UUID is sent (also kind is required) then provider\
         \ rules is handled, otherwise handling internal rule"
-      operationId: patchComplianceProfileRuleV2
+      operationId: patchComplianceProfileRulesV2
       parameters:
       - name: uuid
         in: path
@@ -624,7 +624,7 @@ paths:
       tags:
       - Compliance Profile Management v2
       summary: Add/remove group to/from Compliance Profile
-      operationId: patchComplianceProfileGroupV2
+      operationId: patchComplianceProfileGroupsV2
       parameters:
       - name: uuid
         in: path
@@ -2053,7 +2053,7 @@ components:
       - availabilityStatus
       - name
       - uuid
-    ComplianceProfileDto:
+    ComplianceProfileDtoV2:
       type: object
       properties:
         uuid:
@@ -2268,7 +2268,7 @@ components:
       - label
       - name
       - type
-    ComplianceProfileRequestDto:
+    ComplianceProfileRequestDtoV2:
       type: object
       properties:
         description:
@@ -2844,15 +2844,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header
