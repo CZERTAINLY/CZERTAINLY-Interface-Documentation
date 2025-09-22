@@ -5,10 +5,7 @@ import com.czertainly.api.exception.AttributeException;
 import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.v2.ComplianceProfileController;
-import com.czertainly.api.model.client.compliance.v2.ComplianceProfileGroupsPatchRequestDto;
-import com.czertainly.api.model.client.compliance.v2.ComplianceProfileRequestDto;
-import com.czertainly.api.model.client.compliance.v2.ComplianceProfileRulesPatchRequestDto;
-import com.czertainly.api.model.client.compliance.v2.ComplianceProfileUpdateRequestDto;
+import com.czertainly.api.model.client.compliance.v2.*;
 import com.czertainly.api.model.common.BulkActionMessageDto;
 import com.czertainly.api.model.core.auth.Resource;
 import com.czertainly.api.model.core.compliance.v2.ComplianceGroupListDto;
@@ -72,6 +69,21 @@ public class ComplianceProfileControllerDummyImpl implements ComplianceProfileCo
     @Override
     public List<ComplianceRuleListDto> getComplianceGroupRules(UUID groupUuid, UUID connectorUuid, String kind) throws ConnectorException, NotFoundException {
         return List.of();
+    }
+
+    @Override
+    public ComplianceRuleListDto createComplianceInternalRule(ComplianceInternalRuleRequestDto request) throws AlreadyExistException {
+        return null;
+    }
+
+    @Override
+    public ComplianceRuleListDto updateComplianceInternalRule(UUID internalRuleUuid, ComplianceInternalRuleRequestDto request) throws NotFoundException {
+        return null;
+    }
+
+    @Override
+    public void deleteComplianceInternalRule(UUID internalRuleUuid) throws NotFoundException {
+
     }
 
     @Override
