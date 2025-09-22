@@ -177,6 +177,82 @@ paths:
         "400":
           description: Bad Request
           content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v2/complianceProfiles/rules/{internalRuleUuid}:
+    put:
+      tags:
+      - Compliance Profile Management v2
+      summary: Update Compliance internal rule
+      operationId: updateComplianceInternalRuleV2
+      parameters:
+      - name: internalRuleUuid
+        in: path
+        description: Compliance internal rule UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComplianceInternalRuleRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Compliance internal rule updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceRuleListDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
@@ -206,6 +282,60 @@ paths:
           description: Connector Communication Error
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+    delete:
+      tags:
+      - Compliance Profile Management v2
+      summary: Delete Compliance internal rule
+      operationId: deleteComplianceInternalRuleV2
+      parameters:
+      - name: internalRuleUuid
+        in: path
+        description: Compliance internal rule UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Compliance internal rule deleted
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
       security:
@@ -250,7 +380,7 @@ paths:
         "400":
           description: Bad Request
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
@@ -258,7 +388,7 @@ paths:
         "403":
           description: Forbidden
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
@@ -266,19 +396,19 @@ paths:
         "404":
           description: Not Found
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "503":
           description: Connector Communication Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
       security:
@@ -480,33 +610,61 @@ paths:
       - BearerJWTAuth: []
       - CertificateAuth: []
       - SessionAuth: []
-  /v2/compliance/{resource}:
-    post:
+  /v2/complianceProfiles/rules:
+    get:
       tags:
-      - Compliance Management v2
-      summary: Initiate compliance Check for requested resource objects
-      operationId: checkResourceObjectsComplianceV2
+      - Compliance Profile Management v2
+      summary: Get Compliance rules
+      description: "Lists compliance rules. If provider UUID is sent (also kind is\
+        \ required) then provider rules are listed, otherwise lists internal rules"
+      operationId: getComplianceRulesV2
       parameters:
+      - name: connectorUuid
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: kind
+        in: query
+        required: false
+        schema:
+          type: string
       - name: resource
-        in: path
-        description: Resource
-        required: true
+        in: query
+        required: false
         schema:
           $ref: "#/components/schemas/Resource"
-        example: raProfiles
-      requestBody:
-        description: Resource object UUIDs
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: string
-                format: uuid
-        required: true
+      - name: type
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: format
+        in: query
+        required: false
+        schema:
+          type: string
       responses:
-        "204":
-          description: Compliance check initiated
+        "200":
+          description: Compliance rules retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComplianceRuleListDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "400":
           description: Bad Request
           content:
@@ -539,6 +697,138 @@ paths:
           description: Connector Communication Error
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+    post:
+      tags:
+      - Compliance Profile Management v2
+      summary: Create Compliance internal rule
+      operationId: createComplianceInternalRuleV2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComplianceInternalRuleRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Compliance internal rule created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceRuleListDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v2/compliance/{resource}:
+    post:
+      tags:
+      - Compliance Management v2
+      summary: Initiate compliance Check for requested resource objects
+      operationId: checkResourceObjectsComplianceV2
+      parameters:
+      - name: resource
+        in: path
+        description: Resource
+        required: true
+        schema:
+          $ref: "#/components/schemas/Resource"
+        example: raProfiles
+      requestBody:
+        description: Resource object UUIDs
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Compliance check initiated
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
       security:
@@ -573,7 +863,7 @@ paths:
         "422":
           description: Unprocessable Entity
           content:
-            application/json:
+            '*/*':
               schema:
                 type: array
                 items:
@@ -584,7 +874,7 @@ paths:
         "400":
           description: Bad Request
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
@@ -592,7 +882,7 @@ paths:
         "403":
           description: Forbidden
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
@@ -600,19 +890,19 @@ paths:
         "404":
           description: Not Found
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "503":
           description: Connector Communication Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
       security:
@@ -645,7 +935,7 @@ paths:
         "422":
           description: Unprocessable Entity
           content:
-            application/json:
+            '*/*':
               schema:
                 type: array
                 items:
@@ -656,7 +946,7 @@ paths:
         "400":
           description: Bad Request
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
@@ -664,7 +954,7 @@ paths:
         "403":
           description: Forbidden
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
@@ -672,19 +962,19 @@ paths:
         "404":
           description: Not Found
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "503":
           description: Connector Communication Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
       security:
@@ -725,7 +1015,7 @@ paths:
         "422":
           description: Unprocessable Entity
           content:
-            application/json:
+            '*/*':
               schema:
                 type: array
                 items:
@@ -736,7 +1026,7 @@ paths:
         "400":
           description: Bad Request
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
@@ -744,7 +1034,7 @@ paths:
         "403":
           description: Forbidden
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
@@ -752,19 +1042,19 @@ paths:
         "404":
           description: Not Found
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "503":
           description: Connector Communication Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
       security:
@@ -804,7 +1094,7 @@ paths:
         "422":
           description: Unprocessable Entity
           content:
-            application/json:
+            '*/*':
               schema:
                 type: array
                 items:
@@ -815,7 +1105,7 @@ paths:
         "400":
           description: Bad Request
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
@@ -823,7 +1113,7 @@ paths:
         "403":
           description: Forbidden
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
@@ -831,19 +1121,19 @@ paths:
         "404":
           description: Not Found
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "503":
           description: Connector Communication Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
       security:
@@ -873,99 +1163,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ResourceObjectDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-      security:
-      - BearerJWTAuth: []
-      - CertificateAuth: []
-      - SessionAuth: []
-  /v2/complianceProfiles/rules:
-    get:
-      tags:
-      - Compliance Profile Management v2
-      summary: Get Compliance rules
-      description: "Lists compliance rules. If provider UUID is sent (also kind is\
-        \ required) then provider rules are listed, otherwise lists internal rules"
-      operationId: getComplianceRulesV2
-      parameters:
-      - name: connectorUuid
-        in: query
-        required: false
-        schema:
-          type: string
-          format: uuid
-      - name: kind
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: resource
-        in: query
-        required: true
-        schema:
-          $ref: "#/components/schemas/Resource"
-      - name: type
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: format
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Compliance rules retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ComplianceRuleListDto"
-        "422":
-          description: Unprocessable Entity
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
         "400":
           description: Bad Request
           content:
@@ -2141,11 +2338,69 @@ components:
           description: Attributes of the rule
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
+        conditionItems:
+          type: array
+          description: List of the compliance internal rule condition items
+          items:
+            $ref: "#/components/schemas/ConditionItemDto"
       required:
       - availabilityStatus
       - name
       - resource
       - uuid
+    ConditionItemDto:
+      type: object
+      properties:
+        fieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: Source of the field in the condition item
+        fieldIdentifier:
+          type: string
+          description: Field identifier of the condition item
+        operator:
+          $ref: "#/components/schemas/FilterConditionOperator"
+          description: Operator of the condition item
+        value:
+          type: object
+          description: Value of the condition item
+      required:
+      - fieldIdentifier
+      - fieldSource
+      - operator
+    FilterConditionOperator:
+      type: string
+      enum:
+      - EQUALS
+      - NOT_EQUALS
+      - GREATER
+      - GREATER_OR_EQUAL
+      - LESSER
+      - LESSER_OR_EQUAL
+      - CONTAINS
+      - NOT_CONTAINS
+      - STARTS_WITH
+      - ENDS_WITH
+      - EMPTY
+      - NOT_EMPTY
+      - IN_NEXT
+      - IN_PAST
+      - MATCHES
+      - NOT_MATCHES
+      - COUNT_EQUAL
+      - COUNT_NOT_EQUAL
+      - COUNT_GREATER_THAN
+      - COUNT_LESS_THAN
+      - SUCCESS
+      - FAILED
+      - UNKNOWN
+      - NOT_CHECKED
+    FilterFieldSource:
+      type: string
+      enum:
+      - meta
+      - custom
+      - data
+      - property
     ProviderComplianceRulesDto:
       type: object
       properties:
@@ -2268,164 +2523,46 @@ components:
       - label
       - name
       - type
-    ComplianceProfileRequestDtoV2:
+    ComplianceInternalRuleRequestDto:
       type: object
       properties:
-        description:
-          type: string
-          description: Description of the Compliance Profile
-          examples:
-          - Profile 1
-        internalRules:
-          type: array
-          description: UUIDs of internal rules to be associated with the Compliance
-            Profile. Profiles can be created without rules and can be added later.
-          items:
-            type: string
-            format: uuid
-          uniqueItems: true
-        providerRules:
-          type: array
-          description: Provider rules to be associated with the Compliance Profile.
-            Profiles can be created without rules and can be added later.
-          items:
-            $ref: "#/components/schemas/ProviderComplianceRulesRequestDto"
-        customAttributes:
-          type: array
-          description: List of Custom Attributes
-          items:
-            $ref: "#/components/schemas/RequestAttributeDto"
         name:
           type: string
-          description: Name of the Compliance Profile
-          examples:
-          - Profile 1
-      required:
-      - name
-    ComplianceProfileRulesPatchRequestDto:
-      type: object
-      properties:
-        removal:
-          type: boolean
-          description: Indicates if removing or adding rule with UUID specified in
-            request
-          examples:
-          - 1212a-34dddf34-4334f-34ddfvfdg1y3
-        ruleUuid:
-          type: string
-          format: uuid
-          description: UUID of the rule
-          examples:
-          - 1212a-34dddf34-4334f-34ddfvfdg1y3
-        connectorUuid:
-          type: string
-          format: uuid
-          description: UUID of the Compliance Provider
-          examples:
-          - 1212a-34dddf34-4334f-34ddfvfdg1y3
-        kind:
-          type: string
-          description: Kind of the Compliance Provider
-          examples:
-          - default
-        attributes:
-          type: array
-          description: Attributes for the rule
-          items:
-            $ref: "#/components/schemas/RequestAttributeDto"
-      required:
-      - removal
-      - ruleUuid
-    ComplianceProfileGroupsPatchRequestDto:
-      type: object
-      properties:
-        removal:
-          type: boolean
-          description: Indicates if removing or adding group with UUID specified in
-            request
-          examples:
-          - 1212a-34dddf34-4334f-34ddfvfdg1y3
-        groupUuid:
-          type: string
-          format: uuid
-          description: UUID of the group
-          examples:
-          - 1212a-34dddf34-4334f-34ddfvfdg1y3
-        connectorUuid:
-          type: string
-          format: uuid
-          description: UUID of the Compliance Provider
-          examples:
-          - 1212a-34dddf34-4334f-34ddfvfdg1y3
-        kind:
-          type: string
-          description: Kind of the Compliance Provider
-          examples:
-          - default
-      required:
-      - connectorUuid
-      - groupUuid
-      - kind
-      - removal
-    ComplianceProfileListDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-          description: Compliance profile UUID
-        name:
-          type: string
-          description: Compliance profile name
+          description: Name of the compliance internal rule
         description:
           type: string
-          description: Compliance Profile description
-        providerRulesCount:
-          type: integer
-          format: int32
-          description: Provider (external) rules count
-        providerGroupsCount:
-          type: integer
-          format: int32
-          description: Provider (external) groups count
-        internalRulesCount:
-          type: integer
-          format: int32
-          description: Workflow (internal) rules count
-        associations:
-          type: integer
-          format: int32
-          description: Number of associated objects
-      required:
-      - associations
-      - internalRulesCount
-      - name
-      - providerGroupsCount
-      - providerRulesCount
-      - uuid
-    ResourceObjectDto:
-      type: object
-      properties:
+          description: Description of the compliance internal rule
         resource:
           $ref: "#/components/schemas/Resource"
-          description: Resource of object
-          examples:
-          - certificates
-        objectUuid:
-          type: string
-          format: uuid
-          description: Object UUID
-          examples:
-          - 2dcc528b-9e16-46c6-877e-74eae258173f
-        name:
-          type: string
-          description: Object Name
-          examples:
-          - Name
+          description: Resource associated with the compliance internal rule
+        conditionItems:
+          type: array
+          description: List of the condition items to add to compliance internal rule
+          items:
+            $ref: "#/components/schemas/ConditionItemRequestDto"
       required:
+      - conditionItems
       - name
-      - objectUuid
       - resource
+    ConditionItemRequestDto:
+      type: object
+      properties:
+        fieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: Source of the field in the condition item
+        fieldIdentifier:
+          type: string
+          description: Field identifier of the condition item
+        operator:
+          $ref: "#/components/schemas/FilterConditionOperator"
+          description: Operator of the condition item
+        value:
+          type: object
+          description: Value of the condition item
+      required:
+      - fieldIdentifier
+      - fieldSource
+      - operator
     BaseAttributeDto:
       type: object
       description: Base Attribute definition
@@ -2495,6 +2632,11 @@ components:
           description: Attributes of the rule
           items:
             $ref: "#/components/schemas/BaseAttributeDto"
+        conditionItems:
+          type: array
+          description: List of the compliance internal rule condition items
+          items:
+            $ref: "#/components/schemas/ConditionItemDto"
       required:
       - name
       - resource
@@ -2783,6 +2925,164 @@ components:
       required:
       - label
       - visible
+    ComplianceProfileRequestDtoV2:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Description of the Compliance Profile
+          examples:
+          - Profile 1
+        internalRules:
+          type: array
+          description: UUIDs of internal rules to be associated with the Compliance
+            Profile. Profiles can be created without rules and can be added later.
+          items:
+            type: string
+            format: uuid
+          uniqueItems: true
+        providerRules:
+          type: array
+          description: Provider rules to be associated with the Compliance Profile.
+            Profiles can be created without rules and can be added later.
+          items:
+            $ref: "#/components/schemas/ProviderComplianceRulesRequestDto"
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/RequestAttributeDto"
+        name:
+          type: string
+          description: Name of the Compliance Profile
+          examples:
+          - Profile 1
+      required:
+      - name
+    ComplianceProfileRulesPatchRequestDto:
+      type: object
+      properties:
+        removal:
+          type: boolean
+          description: Indicates if removing or adding rule with UUID specified in
+            request
+          examples:
+          - 1212a-34dddf34-4334f-34ddfvfdg1y3
+        ruleUuid:
+          type: string
+          format: uuid
+          description: UUID of the rule
+          examples:
+          - 1212a-34dddf34-4334f-34ddfvfdg1y3
+        connectorUuid:
+          type: string
+          format: uuid
+          description: UUID of the Compliance Provider
+          examples:
+          - 1212a-34dddf34-4334f-34ddfvfdg1y3
+        kind:
+          type: string
+          description: Kind of the Compliance Provider
+          examples:
+          - default
+        attributes:
+          type: array
+          description: Attributes for the rule
+          items:
+            $ref: "#/components/schemas/RequestAttributeDto"
+      required:
+      - removal
+      - ruleUuid
+    ComplianceProfileGroupsPatchRequestDto:
+      type: object
+      properties:
+        removal:
+          type: boolean
+          description: Indicates if removing or adding group with UUID specified in
+            request
+          examples:
+          - 1212a-34dddf34-4334f-34ddfvfdg1y3
+        groupUuid:
+          type: string
+          format: uuid
+          description: UUID of the group
+          examples:
+          - 1212a-34dddf34-4334f-34ddfvfdg1y3
+        connectorUuid:
+          type: string
+          format: uuid
+          description: UUID of the Compliance Provider
+          examples:
+          - 1212a-34dddf34-4334f-34ddfvfdg1y3
+        kind:
+          type: string
+          description: Kind of the Compliance Provider
+          examples:
+          - default
+      required:
+      - connectorUuid
+      - groupUuid
+      - kind
+      - removal
+    ComplianceProfileListDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Compliance profile UUID
+        name:
+          type: string
+          description: Compliance profile name
+        description:
+          type: string
+          description: Compliance Profile description
+        providerRulesCount:
+          type: integer
+          format: int32
+          description: Provider (external) rules count
+        providerGroupsCount:
+          type: integer
+          format: int32
+          description: Provider (external) groups count
+        internalRulesCount:
+          type: integer
+          format: int32
+          description: Workflow (internal) rules count
+        associations:
+          type: integer
+          format: int32
+          description: Number of associated objects
+      required:
+      - associations
+      - internalRulesCount
+      - name
+      - providerGroupsCount
+      - providerRulesCount
+      - uuid
+    ResourceObjectDto:
+      type: object
+      properties:
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource of object
+          examples:
+          - certificates
+        objectUuid:
+          type: string
+          format: uuid
+          description: Object UUID
+          examples:
+          - 2dcc528b-9e16-46c6-877e-74eae258173f
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+      required:
+      - name
+      - objectUuid
+      - resource
     ComplianceGroupListDto:
       type: object
       properties:
@@ -2844,15 +3144,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

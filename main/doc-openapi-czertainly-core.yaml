@@ -264,6 +264,78 @@ paths:
         "400":
           description: Bad Request
           content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/complianceProfiles/rules/{internalRuleUuid}:
+    put:
+      tags:
+      - Compliance Profile Management v2
+      summary: Update Compliance internal rule
+      operationId: updateComplianceInternalRuleV2
+      parameters:
+      - name: internalRuleUuid
+        in: path
+        description: Compliance internal rule UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComplianceInternalRuleRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Compliance internal rule updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceRuleListDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
@@ -293,6 +365,56 @@ paths:
           description: Connector Communication Error
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    delete:
+      tags:
+      - Compliance Profile Management v2
+      summary: Delete Compliance internal rule
+      operationId: deleteComplianceInternalRuleV2
+      parameters:
+      - name: internalRuleUuid
+        in: path
+        description: Compliance internal rule UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Compliance internal rule deleted
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
   /v1/workflows/triggers/{triggerUuid}:
@@ -6328,7 +6450,7 @@ paths:
         "400":
           description: Bad Request
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
@@ -6336,7 +6458,7 @@ paths:
         "403":
           description: Forbidden
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
@@ -6344,19 +6466,19 @@ paths:
         "404":
           description: Not Found
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "503":
           description: Connector Communication Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
   /v2/complianceProfiles:
@@ -6542,33 +6664,61 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
-  /v2/compliance/{resource}:
-    post:
+  /v2/complianceProfiles/rules:
+    get:
       tags:
-      - Compliance Management v2
-      summary: Initiate compliance Check for requested resource objects
-      operationId: checkResourceObjectsComplianceV2
+      - Compliance Profile Management v2
+      summary: Get Compliance rules
+      description: "Lists compliance rules. If provider UUID is sent (also kind is\
+        \ required) then provider rules are listed, otherwise lists internal rules"
+      operationId: getComplianceRulesV2
       parameters:
+      - name: connectorUuid
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: kind
+        in: query
+        required: false
+        schema:
+          type: string
       - name: resource
-        in: path
-        description: Resource
-        required: true
+        in: query
+        required: false
         schema:
           $ref: "#/components/schemas/Resource"
-        example: raProfiles
-      requestBody:
-        description: Resource object UUIDs
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: string
-                format: uuid
-        required: true
+      - name: type
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: format
+        in: query
+        required: false
+        schema:
+          type: string
       responses:
-        "204":
-          description: Compliance check initiated
+        "200":
+          description: Compliance rules retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ComplianceRuleListDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "400":
           description: Bad Request
           content:
@@ -6601,6 +6751,130 @@ paths:
           description: Connector Communication Error
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    post:
+      tags:
+      - Compliance Profile Management v2
+      summary: Create Compliance internal rule
+      operationId: createComplianceInternalRuleV2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ComplianceInternalRuleRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Compliance internal rule created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceRuleListDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/compliance/{resource}:
+    post:
+      tags:
+      - Compliance Management v2
+      summary: Initiate compliance Check for requested resource objects
+      operationId: checkResourceObjectsComplianceV2
+      parameters:
+      - name: resource
+        in: path
+        description: Resource
+        required: true
+        schema:
+          $ref: "#/components/schemas/Resource"
+        example: raProfiles
+      requestBody:
+        description: Resource object UUIDs
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Compliance check initiated
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
   /v1/{resource}/{parentObjectUuid}/callback:
@@ -11912,7 +12186,7 @@ paths:
         "422":
           description: Unprocessable Entity
           content:
-            application/json:
+            '*/*':
               schema:
                 type: array
                 items:
@@ -11923,7 +12197,7 @@ paths:
         "400":
           description: Bad Request
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
@@ -11931,7 +12205,7 @@ paths:
         "403":
           description: Forbidden
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
@@ -11939,19 +12213,19 @@ paths:
         "404":
           description: Not Found
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "503":
           description: Connector Communication Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
   /v2/complianceProfiles/{uuid}/groups:
@@ -11980,7 +12254,7 @@ paths:
         "422":
           description: Unprocessable Entity
           content:
-            application/json:
+            '*/*':
               schema:
                 type: array
                 items:
@@ -11991,7 +12265,7 @@ paths:
         "400":
           description: Bad Request
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
@@ -11999,7 +12273,7 @@ paths:
         "403":
           description: Forbidden
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
@@ -12007,19 +12281,19 @@ paths:
         "404":
           description: Not Found
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "503":
           description: Connector Communication Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
   /v2/complianceProfiles/{uuid}/associations/{resource}/{associationObjectUuid}:
@@ -12056,7 +12330,7 @@ paths:
         "422":
           description: Unprocessable Entity
           content:
-            application/json:
+            '*/*':
               schema:
                 type: array
                 items:
@@ -12067,7 +12341,7 @@ paths:
         "400":
           description: Bad Request
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
@@ -12075,7 +12349,7 @@ paths:
         "403":
           description: Forbidden
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
@@ -12083,19 +12357,19 @@ paths:
         "404":
           description: Not Found
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "503":
           description: Connector Communication Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
     patch:
@@ -12131,7 +12405,7 @@ paths:
         "422":
           description: Unprocessable Entity
           content:
-            application/json:
+            '*/*':
               schema:
                 type: array
                 items:
@@ -12142,7 +12416,7 @@ paths:
         "400":
           description: Bad Request
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "401":
@@ -12150,7 +12424,7 @@ paths:
         "403":
           description: Forbidden
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
@@ -12158,19 +12432,19 @@ paths:
         "404":
           description: Not Found
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "502":
           description: Connector Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "503":
           description: Connector Communication Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
   /v1/users/{userUuid}/roles:
@@ -16913,95 +17187,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ResourceObjectDto"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
-        "404":
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "502":
-          description: Connector Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-        "503":
-          description: Connector Communication Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
-  /v2/complianceProfiles/rules:
-    get:
-      tags:
-      - Compliance Profile Management v2
-      summary: Get Compliance rules
-      description: "Lists compliance rules. If provider UUID is sent (also kind is\
-        \ required) then provider rules are listed, otherwise lists internal rules"
-      operationId: getComplianceRulesV2
-      parameters:
-      - name: connectorUuid
-        in: query
-        required: false
-        schema:
-          type: string
-          format: uuid
-      - name: kind
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: resource
-        in: query
-        required: true
-        schema:
-          $ref: "#/components/schemas/Resource"
-      - name: type
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: format
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Compliance rules retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ComplianceRuleListDto"
-        "422":
-          description: Unprocessable Entity
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
         "400":
           description: Bad Request
           content:
@@ -23337,11 +23522,69 @@ components:
           description: Attributes of the rule
           items:
             $ref: "#/components/schemas/ResponseAttributeDto"
+        conditionItems:
+          type: array
+          description: List of the compliance internal rule condition items
+          items:
+            $ref: "#/components/schemas/ConditionItemDto"
       required:
       - availabilityStatus
       - name
       - resource
       - uuid
+    ConditionItemDto:
+      type: object
+      properties:
+        fieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: Source of the field in the condition item
+        fieldIdentifier:
+          type: string
+          description: Field identifier of the condition item
+        operator:
+          $ref: "#/components/schemas/FilterConditionOperator"
+          description: Operator of the condition item
+        value:
+          type: object
+          description: Value of the condition item
+      required:
+      - fieldIdentifier
+      - fieldSource
+      - operator
+    FilterConditionOperator:
+      type: string
+      enum:
+      - EQUALS
+      - NOT_EQUALS
+      - GREATER
+      - GREATER_OR_EQUAL
+      - LESSER
+      - LESSER_OR_EQUAL
+      - CONTAINS
+      - NOT_CONTAINS
+      - STARTS_WITH
+      - ENDS_WITH
+      - EMPTY
+      - NOT_EMPTY
+      - IN_NEXT
+      - IN_PAST
+      - MATCHES
+      - NOT_MATCHES
+      - COUNT_EQUAL
+      - COUNT_NOT_EQUAL
+      - COUNT_GREATER_THAN
+      - COUNT_LESS_THAN
+      - SUCCESS
+      - FAILED
+      - UNKNOWN
+      - NOT_CHECKED
+    FilterFieldSource:
+      type: string
+      enum:
+      - meta
+      - custom
+      - data
+      - property
     ProviderComplianceRulesDto:
       type: object
       properties:
@@ -23464,6 +23707,408 @@ components:
       - label
       - name
       - type
+    ComplianceInternalRuleRequestDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the compliance internal rule
+        description:
+          type: string
+          description: Description of the compliance internal rule
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource associated with the compliance internal rule
+        conditionItems:
+          type: array
+          description: List of the condition items to add to compliance internal rule
+          items:
+            $ref: "#/components/schemas/ConditionItemRequestDto"
+      required:
+      - conditionItems
+      - name
+      - resource
+    ConditionItemRequestDto:
+      type: object
+      properties:
+        fieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: Source of the field in the condition item
+        fieldIdentifier:
+          type: string
+          description: Field identifier of the condition item
+        operator:
+          $ref: "#/components/schemas/FilterConditionOperator"
+          description: Operator of the condition item
+        value:
+          type: object
+          description: Value of the condition item
+      required:
+      - fieldIdentifier
+      - fieldSource
+      - operator
+    BaseAttributeDto:
+      type: object
+      description: Base Attribute definition
+      discriminator:
+        propertyName: type
+        mapping:
+          data: "#/components/schemas/DataAttribute"
+          info: "#/components/schemas/InfoAttribute"
+          group: "#/components/schemas/GroupAttribute"
+          meta: "#/components/schemas/MetadataAttribute"
+          custom: "#/components/schemas/CustomAttribute"
+      oneOf:
+      - $ref: "#/components/schemas/DataAttribute"
+      - $ref: "#/components/schemas/InfoAttribute"
+      - $ref: "#/components/schemas/GroupAttribute"
+      - $ref: "#/components/schemas/MetadataAttribute"
+      - $ref: "#/components/schemas/CustomAttribute"
+      required:
+      - name
+      - type
+      - uuid
+    ComplianceRuleListDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Compliance rule UUID
+        name:
+          type: string
+          description: Compliance rule name
+        description:
+          type: string
+          description: Description of the compliance rule
+          examples:
+          - Sample rule description
+        connectorUuid:
+          type: string
+          format: uuid
+          description: UUID of the Compliance Provider
+        kind:
+          type: string
+          description: Kind of the Compliance Provider
+        groupUuid:
+          type: string
+          format: uuid
+          description: UUID of the group to which the rule belongs to
+          examples:
+          - 166b5cf52-63f2-11ec-90d6-0242ac120003
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource of the rule
+          examples:
+          - certificates
+        type:
+          type: string
+          description: Type of the resource object
+          examples:
+          - X.509
+        format:
+          type: string
+          description: Format of the resource object
+          examples:
+          - pkcs7
+        attributes:
+          type: array
+          description: Attributes of the rule
+          items:
+            $ref: "#/components/schemas/BaseAttributeDto"
+        conditionItems:
+          type: array
+          description: List of the compliance internal rule condition items
+          items:
+            $ref: "#/components/schemas/ConditionItemDto"
+      required:
+      - name
+      - resource
+      - uuid
+    CustomAttribute:
+      type: object
+      description: Custom attribute allows to store and transfer dynamic data. Its
+        content can be edited and send in requests to store.
+      properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          examples:
+          - "2"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          examples:
+          - 166b5cf52-63f2-11ec-90d6-0242ac120003
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDto"
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/CustomAttributeProperties"
+          description: Properties of the Attributes
+      required:
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
+    CustomAttributeProperties:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Friendly name of the the Attribute
+          examples:
+          - Attribute Name
+        visible:
+          type: boolean
+          default: "true"
+          description: "Boolean determining if the Attribute is visible and can be\
+            \ displayed, otherwise it should be hidden to the user."
+        group:
+          type: string
+          description: "Group of the Attribute, used for the logical grouping of the\
+            \ Attribute"
+          examples:
+          - requiredAttributes
+        required:
+          type: boolean
+          default: "false"
+          description: "Boolean determining if the Attribute is required. If true,\
+            \ the Attribute must be provided."
+        readOnly:
+          type: boolean
+          default: "false"
+          description: "Boolean determining if the Attribute is read only. If true,\
+            \ the Attribute content cannot be changed."
+        list:
+          type: boolean
+          default: "false"
+          description: Boolean determining if the Attribute contains list of values
+            in the content
+        multiSelect:
+          type: boolean
+          default: "false"
+          description: Boolean determining if the Attribute can have multiple values
+      required:
+      - label
+      - list
+      - multiSelect
+      - readOnly
+      - required
+      - visible
+    GroupAttribute:
+      type: object
+      description: Group attribute and its content represents dynamic list of additional
+        attributes retrieved by callback. Its content can not be edited and is not
+        send in requests to store.
+      properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          examples:
+          - "2"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          examples:
+          - 166b5cf52-63f2-11ec-90d6-0242ac120003
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/BaseAttributeDto"
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
+        attributeCallback:
+          $ref: "#/components/schemas/AttributeCallback"
+          description: Optional definition of callback for getting the content of
+            the Attribute based on the action
+      required:
+      - name
+      - type
+      - uuid
+    InfoAttribute:
+      type: object
+      description: Info attribute contains content that is for information purpose
+        or represents additional information for object (metadata). Its content can
+        not be edited and is not send in requests to store.
+      properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          examples:
+          - "2"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          examples:
+          - 166b5cf52-63f2-11ec-90d6-0242ac120003
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDto"
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/InfoAttributeProperties"
+          description: Properties of the Attributes
+      required:
+      - content
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
+    InfoAttributeProperties:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Friendly name of the the Attribute
+          examples:
+          - Attribute Name
+        visible:
+          type: boolean
+          default: "true"
+          description: "Boolean determining if the Attribute is visible and can be\
+            \ displayed, otherwise it should be hidden to the user."
+        group:
+          type: string
+          description: "Group of the Attribute, used for the logical grouping of the\
+            \ Attribute"
+          examples:
+          - requiredAttributes
+      required:
+      - label
+      - visible
+    MetadataAttribute:
+      type: object
+      description: Info attribute contains content that is for metadata. Its content
+        can not be edited and is not send in requests to store.
+      properties:
+        version:
+          type: integer
+          format: int32
+          default: "2"
+          description: Version of the Attribute
+          examples:
+          - "2"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          examples:
+          - 166b5cf52-63f2-11ec-90d6-0242ac120003
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDto"
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          default: data
+          description: Type of the Attribute
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/MetadataAttributeProperties"
+          description: Properties of the Attributes
+      required:
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
+    MetadataAttributeProperties:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Friendly name of the the Attribute
+          examples:
+          - Attribute Name
+        visible:
+          type: boolean
+          default: "true"
+          description: "Boolean determining if the Attribute is visible and can be\
+            \ displayed, otherwise it should be hidden to the user."
+        group:
+          type: string
+          description: "Group of the Attribute, used for the logical grouping of the\
+            \ Attribute"
+          examples:
+          - requiredAttributes
+        global:
+          type: boolean
+          default: "false"
+          description: Boolean determining if the Metadata is a global metadata.
+        overwrite:
+          type: boolean
+          default: "false"
+          description: Boolean determining if the new metadata content should overwrite
+            (replace) existing content instead of appending.
+      required:
+      - label
+      - visible
     ResourceEvent:
       type: string
       enum:
@@ -23576,25 +24221,6 @@ components:
       - resource
       - type
       - uuid
-    ConditionItemDto:
-      type: object
-      properties:
-        fieldSource:
-          $ref: "#/components/schemas/FilterFieldSource"
-          description: Source of the field in the condition item
-        fieldIdentifier:
-          type: string
-          description: Field identifier of the condition item
-        operator:
-          $ref: "#/components/schemas/FilterConditionOperator"
-          description: Operator of the condition item
-        value:
-          type: object
-          description: Value of the condition item
-      required:
-      - fieldIdentifier
-      - fieldSource
-      - operator
     ConditionType:
       type: string
       enum:
@@ -23659,40 +24285,6 @@ components:
       enum:
       - setField
       - sendNotification
-    FilterConditionOperator:
-      type: string
-      enum:
-      - EQUALS
-      - NOT_EQUALS
-      - GREATER
-      - GREATER_OR_EQUAL
-      - LESSER
-      - LESSER_OR_EQUAL
-      - CONTAINS
-      - NOT_CONTAINS
-      - STARTS_WITH
-      - ENDS_WITH
-      - EMPTY
-      - NOT_EMPTY
-      - IN_NEXT
-      - IN_PAST
-      - MATCHES
-      - NOT_MATCHES
-      - COUNT_EQUAL
-      - COUNT_NOT_EQUAL
-      - COUNT_GREATER_THAN
-      - COUNT_LESS_THAN
-      - SUCCESS
-      - FAILED
-      - UNKNOWN
-      - NOT_CHECKED
-    FilterFieldSource:
-      type: string
-      enum:
-      - meta
-      - custom
-      - data
-      - property
     RuleDetailDto:
       type: object
       properties:
@@ -23811,25 +24403,6 @@ components:
             $ref: "#/components/schemas/ExecutionItemRequestDto"
       required:
       - items
-    ConditionItemRequestDto:
-      type: object
-      properties:
-        fieldSource:
-          $ref: "#/components/schemas/FilterFieldSource"
-          description: Source of the field in the condition item
-        fieldIdentifier:
-          type: string
-          description: Field identifier of the condition item
-        operator:
-          $ref: "#/components/schemas/FilterConditionOperator"
-          description: Operator of the condition item
-        value:
-          type: object
-          description: Value of the condition item
-      required:
-      - fieldIdentifier
-      - fieldSource
-      - operator
     UpdateConditionRequestDto:
       type: object
       properties:
@@ -24910,7 +25483,6 @@ components:
       - ok
       - nok
       - na
-      - not_available
     GroupDto:
       type: object
       properties:
@@ -25516,6 +26088,7 @@ components:
       - ok
       - nok
       - na
+      - not_available
     KeyAlgorithm:
       type: string
       enum:
@@ -30196,311 +30769,6 @@ components:
       properties:
         comment:
           type: string
-    BaseAttributeDto:
-      type: object
-      description: Base Attribute definition
-      discriminator:
-        propertyName: type
-        mapping:
-          data: "#/components/schemas/DataAttribute"
-          info: "#/components/schemas/InfoAttribute"
-          group: "#/components/schemas/GroupAttribute"
-          meta: "#/components/schemas/MetadataAttribute"
-          custom: "#/components/schemas/CustomAttribute"
-      oneOf:
-      - $ref: "#/components/schemas/DataAttribute"
-      - $ref: "#/components/schemas/InfoAttribute"
-      - $ref: "#/components/schemas/GroupAttribute"
-      - $ref: "#/components/schemas/MetadataAttribute"
-      - $ref: "#/components/schemas/CustomAttribute"
-      required:
-      - name
-      - type
-      - uuid
-    CustomAttribute:
-      type: object
-      description: Custom attribute allows to store and transfer dynamic data. Its
-        content can be edited and send in requests to store.
-      properties:
-        version:
-          type: integer
-          format: int32
-          default: "2"
-          description: Version of the Attribute
-          examples:
-          - "2"
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          examples:
-          - 166b5cf52-63f2-11ec-90d6-0242ac120003
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDto"
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          default: data
-          description: Type of the Attribute
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/CustomAttributeProperties"
-          description: Properties of the Attributes
-      required:
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
-    CustomAttributeProperties:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Friendly name of the the Attribute
-          examples:
-          - Attribute Name
-        visible:
-          type: boolean
-          default: "true"
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
-        group:
-          type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          examples:
-          - requiredAttributes
-        required:
-          type: boolean
-          default: "false"
-          description: "Boolean determining if the Attribute is required. If true,\
-            \ the Attribute must be provided."
-        readOnly:
-          type: boolean
-          default: "false"
-          description: "Boolean determining if the Attribute is read only. If true,\
-            \ the Attribute content cannot be changed."
-        list:
-          type: boolean
-          default: "false"
-          description: Boolean determining if the Attribute contains list of values
-            in the content
-        multiSelect:
-          type: boolean
-          default: "false"
-          description: Boolean determining if the Attribute can have multiple values
-      required:
-      - label
-      - list
-      - multiSelect
-      - readOnly
-      - required
-      - visible
-    GroupAttribute:
-      type: object
-      description: Group attribute and its content represents dynamic list of additional
-        attributes retrieved by callback. Its content can not be edited and is not
-        send in requests to store.
-      properties:
-        version:
-          type: integer
-          format: int32
-          default: "2"
-          description: Version of the Attribute
-          examples:
-          - "2"
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          examples:
-          - 166b5cf52-63f2-11ec-90d6-0242ac120003
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/BaseAttributeDto"
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          default: data
-          description: Type of the Attribute
-        attributeCallback:
-          $ref: "#/components/schemas/AttributeCallback"
-          description: Optional definition of callback for getting the content of
-            the Attribute based on the action
-      required:
-      - name
-      - type
-      - uuid
-    InfoAttribute:
-      type: object
-      description: Info attribute contains content that is for information purpose
-        or represents additional information for object (metadata). Its content can
-        not be edited and is not send in requests to store.
-      properties:
-        version:
-          type: integer
-          format: int32
-          default: "2"
-          description: Version of the Attribute
-          examples:
-          - "2"
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          examples:
-          - 166b5cf52-63f2-11ec-90d6-0242ac120003
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDto"
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          default: data
-          description: Type of the Attribute
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/InfoAttributeProperties"
-          description: Properties of the Attributes
-      required:
-      - content
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
-    InfoAttributeProperties:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Friendly name of the the Attribute
-          examples:
-          - Attribute Name
-        visible:
-          type: boolean
-          default: "true"
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
-        group:
-          type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          examples:
-          - requiredAttributes
-      required:
-      - label
-      - visible
-    MetadataAttribute:
-      type: object
-      description: Info attribute contains content that is for metadata. Its content
-        can not be edited and is not send in requests to store.
-      properties:
-        version:
-          type: integer
-          format: int32
-          default: "2"
-          description: Version of the Attribute
-          examples:
-          - "2"
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          examples:
-          - 166b5cf52-63f2-11ec-90d6-0242ac120003
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDto"
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          default: data
-          description: Type of the Attribute
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/MetadataAttributeProperties"
-          description: Properties of the Attributes
-      required:
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
-    MetadataAttributeProperties:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Friendly name of the the Attribute
-          examples:
-          - Attribute Name
-        visible:
-          type: boolean
-          default: "true"
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
-        group:
-          type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          examples:
-          - requiredAttributes
-        global:
-          type: boolean
-          default: "false"
-          description: Boolean determining if the Metadata is a global metadata.
-        overwrite:
-          type: boolean
-          default: "false"
-          description: Boolean determining if the new metadata content should overwrite
-            (replace) existing content instead of appending.
-      required:
-      - label
-      - visible
     ComplianceProfileListDto:
       type: object
       properties:
@@ -30560,58 +30828,6 @@ components:
       - name
       - objectUuid
       - resource
-    ComplianceRuleListDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-          description: Compliance rule UUID
-        name:
-          type: string
-          description: Compliance rule name
-        description:
-          type: string
-          description: Description of the compliance rule
-          examples:
-          - Sample rule description
-        connectorUuid:
-          type: string
-          format: uuid
-          description: UUID of the Compliance Provider
-        kind:
-          type: string
-          description: Kind of the Compliance Provider
-        groupUuid:
-          type: string
-          format: uuid
-          description: UUID of the group to which the rule belongs to
-          examples:
-          - 166b5cf52-63f2-11ec-90d6-0242ac120003
-        resource:
-          $ref: "#/components/schemas/Resource"
-          description: Resource of the rule
-          examples:
-          - certificates
-        type:
-          type: string
-          description: Type of the resource object
-          examples:
-          - X.509
-        format:
-          type: string
-          description: Format of the resource object
-          examples:
-          - pkcs7
-        attributes:
-          type: array
-          description: Attributes of the rule
-          items:
-            $ref: "#/components/schemas/BaseAttributeDto"
-      required:
-      - name
-      - resource
-      - uuid
     ComplianceGroupListDto:
       type: object
       properties:
