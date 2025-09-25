@@ -1316,6 +1316,9 @@ components:
           - ALL
           - CONSOLE
           - DATABASE
+        verbose:
+          type: boolean
+          description: Additional data should be logged
       required:
       - logAllModules
       - logAllResources
@@ -2051,20 +2054,23 @@ components:
       enum:
       - success
       - failure
+    ResourceObjectIdentity:
+      type: object
+      properties:
+        name:
+          type: string
+        uuid:
+          type: string
+          format: uuid
     ResourceRecord:
       type: object
       properties:
         type:
           $ref: "#/components/schemas/Resource"
-        uuids:
+        objects:
           type: array
           items:
-            type: string
-            format: uuid
-        names:
-          type: array
-          items:
-            type: string
+            $ref: "#/components/schemas/ResourceObjectIdentity"
       required:
       - type
     SourceRecord:
