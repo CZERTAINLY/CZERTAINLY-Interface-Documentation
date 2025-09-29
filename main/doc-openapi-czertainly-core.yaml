@@ -6877,6 +6877,125 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/compliance/{resource}/{objectUuid}:
+    get:
+      tags:
+      - Compliance Management v2
+      summary: Get the latest compliance check result for the specified resource object
+      operationId: getComplianceCheckResultV2
+      parameters:
+      - name: resource
+        in: path
+        description: Resource
+        required: true
+        schema:
+          $ref: "#/components/schemas/Resource"
+        example: raProfiles
+      - name: objectUuid
+        in: path
+        description: Object UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Compliance check initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComplianceCheckResultDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    post:
+      tags:
+      - Compliance Management v2
+      summary: Initiate compliance Check for requested resource object
+      operationId: checkResourceObjectComplianceV2
+      parameters:
+      - name: resource
+        in: path
+        description: Resource
+        required: true
+        schema:
+          $ref: "#/components/schemas/Resource"
+        example: raProfiles
+      - name: objectUuid
+        in: path
+        description: Object UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Compliance check initiated
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/{resource}/{parentObjectUuid}/callback:
     post:
       tags:
@@ -25486,6 +25605,7 @@ components:
       - ok
       - nok
       - na
+      - failed
     GroupDto:
       type: object
       properties:
@@ -26022,76 +26142,6 @@ components:
       required:
       - description
       - name
-    ComplianceCheckResultDto:
-      type: object
-      properties:
-        status:
-          $ref: "#/components/schemas/ComplianceStatus"
-          description: Overall compliance result status
-        timestamp:
-          type: string
-          format: date-time
-          description: Date of the most recent compliance check
-        failedRules:
-          type: array
-          description: Compliance rules that didn't pass compliance check
-          items:
-            $ref: "#/components/schemas/ComplianceCheckRuleDto"
-      required:
-      - failedRules
-      - status
-    ComplianceCheckRuleDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-          description: Compliance rule UUID
-        name:
-          type: string
-          description: Compliance rule name
-        description:
-          type: string
-          description: Description of the compliance rule
-          examples:
-          - Sample rule description
-        status:
-          $ref: "#/components/schemas/ComplianceRuleStatus"
-          description: Result status of rule compliance check
-          examples:
-          - ok
-        connectorUuid:
-          type: string
-          format: uuid
-          description: UUID of the Compliance Provider
-        connectorName:
-          type: string
-          description: Name of the Compliance Provider
-        kind:
-          type: string
-          description: Kind of the Compliance Provider
-        resource:
-          $ref: "#/components/schemas/Resource"
-          description: Resource of the rule
-          examples:
-          - certificates
-        attributes:
-          type: array
-          description: Attributes of the rule
-          items:
-            $ref: "#/components/schemas/ResponseAttributeDto"
-      required:
-      - name
-      - resource
-      - status
-      - uuid
-    ComplianceRuleStatus:
-      type: string
-      enum:
-      - ok
-      - nok
-      - na
-      - not_available
     KeyAlgorithm:
       type: string
       enum:
@@ -26267,9 +26317,6 @@ components:
         complianceStatus:
           $ref: "#/components/schemas/ComplianceStatus"
           description: Key compliance status
-        complianceResult:
-          $ref: "#/components/schemas/ComplianceCheckResultDto"
-          description: Key compliance check result
       required:
       - complianceStatus
       - enabled
@@ -29628,9 +29675,6 @@ components:
             \ property instead."
           items:
             $ref: "#/components/schemas/CertificateComplianceResultDto"
-        complianceResult:
-          $ref: "#/components/schemas/ComplianceCheckResultDto"
-          description: Certificate compliance check result
         customAttributes:
           type: array
           description: List of Custom Attributes
@@ -29775,9 +29819,6 @@ components:
         complianceStatus:
           $ref: "#/components/schemas/ComplianceStatus"
           description: Certificate request compliance status
-        complianceResult:
-          $ref: "#/components/schemas/ComplianceCheckResultDto"
-          description: Certificate request compliance check result
       required:
       - certificateRequestFormat
       - certificateType
@@ -29794,6 +29835,13 @@ components:
       - selfSignedEndEntity
       - intermediateCa
       - rootCa
+    ComplianceRuleStatus:
+      type: string
+      enum:
+      - ok
+      - nok
+      - na
+      - not_available
     KeyDto:
       type: object
       properties:
@@ -30085,6 +30133,8 @@ components:
       - disassociate
       - history
       - summary
+      - listRules
+      - getComplianceResult
       - checkCompliance
       - checkValidation
       - issue
@@ -30870,6 +30920,72 @@ components:
       - connectorUuid
       - kind
       - name
+      - uuid
+    ComplianceCheckResultDto:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Overall compliance result status
+        timestamp:
+          type: string
+          format: date-time
+          description: Date of the most recent compliance check
+        message:
+          type: string
+          description: Overall compliance check result message
+        failedRules:
+          type: array
+          description: Compliance rules that didn't pass compliance check
+          items:
+            $ref: "#/components/schemas/ComplianceCheckRuleDto"
+      required:
+      - failedRules
+      - status
+    ComplianceCheckRuleDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Compliance rule UUID
+        name:
+          type: string
+          description: Compliance rule name
+        description:
+          type: string
+          description: Description of the compliance rule
+          examples:
+          - Sample rule description
+        status:
+          $ref: "#/components/schemas/ComplianceRuleStatus"
+          description: Result status of rule compliance check
+          examples:
+          - ok
+        connectorUuid:
+          type: string
+          format: uuid
+          description: UUID of the Compliance Provider
+        connectorName:
+          type: string
+          description: Name of the Compliance Provider
+        kind:
+          type: string
+          description: Kind of the Compliance Provider
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource of the rule
+          examples:
+          - certificates
+        attributes:
+          type: array
+          description: Attributes of the rule
+          items:
+            $ref: "#/components/schemas/ResponseAttributeDto"
+      required:
+      - name
+      - resource
+      - status
       - uuid
     TriggerDto:
       type: object

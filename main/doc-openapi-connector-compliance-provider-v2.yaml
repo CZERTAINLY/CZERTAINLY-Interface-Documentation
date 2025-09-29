@@ -16,7 +16,7 @@ externalDocs:
   description: CZERTAINLY Documentation
   url: https://docs.czertainly.com
 servers:
-- url: https://demo.czertainly.online/api
+- url: https://demo.czertainly.online
   description: CZERTAINLY Demo server
 tags:
 - name: Connector Info
@@ -181,7 +181,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ComplianceRequestDto"
+              $ref: "#/components/schemas/ComplianceRequestDtoV2"
         required: true
       responses:
         "200":
@@ -189,7 +189,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ComplianceResponseDto"
+                $ref: "#/components/schemas/ComplianceResponseDtoV2"
         "422":
           description: Unprocessable entity
           content:
@@ -660,7 +660,7 @@ components:
         ruleUuids:
           type: array
           description: UUIDs of the rules to retrieve
-          examples:
+          example:
           - 166b5cf52-63f2-11ec-90d6-0242ac120003
           items:
             type: string
@@ -669,7 +669,7 @@ components:
         groupUuids:
           type: array
           description: UUIDs of the groups to retrieve
-          examples:
+          example:
           - 166b5cf52-63f2-11ec-90d6-0242ac120003
           items:
             type: string
@@ -1760,8 +1760,9 @@ components:
           description: Time attribute value in format HH:mm:ss
       required:
       - data
-    ComplianceRequestDto:
+    ComplianceRequestDtoV2:
       type: object
+      description: Request for Compliance Check V2
       properties:
         resource:
           $ref: "#/components/schemas/Resource"
@@ -1787,8 +1788,15 @@ components:
           description: List of UUIDs of Compliance rules
           items:
             $ref: "#/components/schemas/ComplianceRuleRequestDto"
+        groups:
+          type: array
+          description: List of UUIDs of Compliance groups
+          items:
+            type: string
+            format: uuid
       required:
       - data
+      - groups
       - rules
     ComplianceRuleRequestDto:
       type: object
@@ -1835,39 +1843,38 @@ components:
       - contentType
       - name
       - uuid
-    ComplianceResponseDto:
+    ComplianceResponseDtoV2:
       type: object
+      description: Response of Compliance Check V2
       properties:
         status:
           $ref: "#/components/schemas/ComplianceStatus"
           description: Status of the compliance check
-          examples:
-          - ok
+          example: ok
         rules:
           type: array
           description: List of rules applied and their status
           items:
-            $ref: "#/components/schemas/ComplianceResponseRulesDto"
+            $ref: "#/components/schemas/ComplianceResponseRuleDtoV2"
       required:
-      - status
-    ComplianceResponseRulesDto:
+      - rules
+    ComplianceResponseRuleDtoV2:
       type: object
+      description: Response of Compliance Rule Check V2
       properties:
         uuid:
           type: string
+          format: uuid
           description: UUID of the rule
-          examples:
-          - 166b5cf52-63f2-11ec-90d6-0242ac120003
+          example: 166b5cf52-63f2-11ec-90d6-0242ac120003
         name:
           type: string
           description: Name of the rule
-          examples:
-          - Rule1
+          example: Rule1
         status:
           $ref: "#/components/schemas/ComplianceRuleStatus"
           description: Rule status
-          examples:
-          - ok
+          example: ok
       required:
       - name
       - status
@@ -1886,6 +1893,7 @@ components:
       - ok
       - nok
       - na
+      - failed
     FunctionGroupCode:
       type: string
       enum:
@@ -2009,15 +2017,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header
