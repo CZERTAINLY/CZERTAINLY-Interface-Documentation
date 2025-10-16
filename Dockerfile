@@ -1,5 +1,5 @@
 # build environment
-FROM maven:3.9.9-eclipse-temurin-21 as build
+FROM maven:3.9.11-eclipse-temurin-21 as build
 COPY ./ /home/app
 COPY settings.xml /root/.m2/settings.xml
 RUN mvn -f /home/app/pom.xml clean verify
