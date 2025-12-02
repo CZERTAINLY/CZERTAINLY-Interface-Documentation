@@ -24,9 +24,11 @@ public class ClientOperationControllerDummyImpl implements ClientOperationContro
     }
 
     @Override
-    public void validateIssueCertificateAttributes(String authorityUuid, String raProfileUuid, List<RequestAttributeDto> attributes) throws NotFoundException, ConnectorException, ValidationException {
+    public void validateIssueCertificateAttributes(String authorityUuid, String raProfileUuid, List<RequestAttribute> attributes) throws NotFoundException, ConnectorException, ValidationException {
 
     }
+
+
 
     @Override
     public ClientCertificateDataResponseDto issueRequestedCertificate(String authorityUuid, String raProfileUuid, String certificateUuid) throws NotFoundException, ConnectorException, AlreadyExistException, CertificateException, NoSuchAlgorithmException {

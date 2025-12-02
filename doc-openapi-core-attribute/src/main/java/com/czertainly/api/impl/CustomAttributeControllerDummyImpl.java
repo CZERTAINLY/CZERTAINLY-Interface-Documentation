@@ -3,7 +3,7 @@ package com.czertainly.api.impl;
 import com.czertainly.api.exception.AlreadyExistException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.CustomAttributeController;
-import com.czertainly.api.model.client.attribute.ResponseAttributeDto;
+import com.czertainly.api.model.client.attribute.ResponseAttribute;
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeCreateRequestDto;
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeDefinitionDetailDto;
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeDefinitionDto;
@@ -85,12 +85,12 @@ public class CustomAttributeControllerDummyImpl implements CustomAttributeContro
     }
 
     @Override
-    public List<ResponseAttributeDto> updateAttributeContentForResource(Resource resourceName, String objectUuid, String attributeUuid, List<BaseAttributeContent> request) throws NotFoundException {
+    public List<ResponseAttribute> updateAttributeContentForResource(Resource resourceName, String objectUuid, String attributeUuid, List<BaseAttributeContent> request) throws NotFoundException {
         return null;
     }
 
     @Override
-    public List<ResponseAttributeDto> deleteAttributeContentForResource(Resource resourceName, String objectUuid, String attributeUuid) throws NotFoundException {
+    public List<ResponseAttribute> deleteAttributeContentForResource(Resource resourceName, String objectUuid, String attributeUuid) throws NotFoundException {
         return null;
     }
 }
