@@ -11,7 +11,7 @@ import com.czertainly.api.model.client.location.AddLocationRequestDto;
 import com.czertainly.api.model.client.location.EditLocationRequestDto;
 import com.czertainly.api.model.client.location.IssueToLocationRequestDto;
 import com.czertainly.api.model.client.location.PushToLocationRequestDto;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.core.location.LocationDto;
 import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
 import org.springframework.http.ResponseEntity;
@@ -70,13 +70,14 @@ public class LocationManagementControllerDummyImpl implements LocationManagement
 
     @Override
     public List<BaseAttribute> listPushAttributes(String entityUuid, String locationUuid) throws NotFoundException, LocationException {
-        return null;
+        return List.of();
     }
 
     @Override
     public List<BaseAttribute> listCsrAttributes(String entityUuid, String locationUuid) throws NotFoundException, LocationException {
-        return null;
+        return List.of();
     }
+
 
     @Override
     public LocationDto pushCertificate(String entityUuid, String locationUuid, String certificateUuid, PushToLocationRequestDto request) throws NotFoundException, LocationException {

@@ -5,12 +5,13 @@ import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.AuthorityInstanceController;
+import com.czertainly.api.model.client.attribute.RequestAttribute;
 import com.czertainly.api.model.client.attribute.RequestAttributeDto;
 import com.czertainly.api.model.client.authority.AuthorityInstanceRequestDto;
 import com.czertainly.api.model.client.authority.AuthorityInstanceUpdateRequestDto;
 import com.czertainly.api.model.common.BulkActionMessageDto;
 import com.czertainly.api.model.common.NameAndIdDto;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.core.authority.AuthorityInstanceDto;
 import org.springframework.http.ResponseEntity;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -71,7 +72,7 @@ public class AuthorityInstanceControllerDummyImpl implements AuthorityInstanceCo
     }
 
     @Override
-    public void validateRAProfileAttributes(String uuid, List<RequestAttributeDto> attributes) throws ConnectorException {
+    public void validateRAProfileAttributes(String uuid, List<RequestAttribute> attributes) throws ConnectorException {
 
     }
 

@@ -5,7 +5,7 @@ import com.czertainly.api.interfaces.core.web.CryptographicKeyController;
 import com.czertainly.api.model.client.certificate.SearchRequestDto;
 import com.czertainly.api.model.client.cryptography.CryptographicKeyResponseDto;
 import com.czertainly.api.model.client.cryptography.key.*;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.core.cryptography.key.*;
 import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -198,8 +198,8 @@ public class CryptographicKeyControllerDummyImpl implements CryptographicKeyCont
     }
 
     @Override
-    public List<BaseAttribute> listCreateKeyAttributes(String tokenInstanceUuid, String tokenProfileUuid, KeyRequestType type) throws ConnectorException {
-        return null;
+    public List<BaseAttribute> listCreateKeyAttributes(String tokenInstanceUuid, String tokenProfileUuid, KeyRequestType type) throws ConnectorException, NotFoundException {
+        return List.of();
     }
 
     @Override

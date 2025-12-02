@@ -2,7 +2,7 @@ package com.czertainly.api.impl;
 
 import com.czertainly.api.interfaces.core.web.ConnectorAuthController;
 import com.czertainly.api.model.client.attribute.RequestAttributeDto;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.common.attribute.v3.DataAttributeV3;
 import com.czertainly.api.model.core.connector.AuthType;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,9 +17,10 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
     }
 
     @Override
-    public List<BaseAttribute> getBasicAuthAttributes() {
-        return null;
+    public List<DataAttributeV3> getBasicAuthAttributes() {
+        return List.of();
     }
+
 
     @Override
     public void validateBasicAuthAttributes(List<RequestAttributeDto> attributes) {
@@ -27,8 +28,8 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
     }
 
     @Override
-    public List<BaseAttribute> getCertificateAttributes() {
-        return null;
+    public List<DataAttributeV3> getCertificateAttributes() {
+        return List.of();
     }
 
     @Override
@@ -37,8 +38,8 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
     }
 
     @Override
-    public List<BaseAttribute> getApiKeyAuthAttributes() {
-        return null;
+    public List<DataAttributeV3> getApiKeyAuthAttributes() {
+        return List.of();
     }
 
     @Override
@@ -47,12 +48,15 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
     }
 
     @Override
-    public List<BaseAttribute> getJWTAuthAttributes() {
-        return null;
+    public List<DataAttributeV3> getJWTAuthAttributes() {
+        return List.of();
     }
 
     @Override
     public void validateJWTAuthAttributes(List<RequestAttributeDto> attributes) {
 
     }
+
+
 }
+

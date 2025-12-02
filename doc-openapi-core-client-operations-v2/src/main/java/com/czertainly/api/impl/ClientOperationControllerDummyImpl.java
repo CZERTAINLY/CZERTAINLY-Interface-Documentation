@@ -2,8 +2,9 @@ package com.czertainly.api.impl;
 
 import com.czertainly.api.exception.*;
 import com.czertainly.api.interfaces.core.client.v2.ClientOperationController;
+import com.czertainly.api.model.client.attribute.RequestAttribute;
 import com.czertainly.api.model.client.attribute.RequestAttributeDto;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.core.v2.*;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,9 +16,11 @@ import java.util.List;
 
 @RestController
 public class ClientOperationControllerDummyImpl implements ClientOperationController {
+
+
     @Override
     public List<BaseAttribute> listIssueCertificateAttributes(String authorityUuid, String raProfileUuid) throws NotFoundException, ConnectorException {
-        return null;
+        return List.of();
     }
 
     @Override
@@ -46,12 +49,13 @@ public class ClientOperationControllerDummyImpl implements ClientOperationContro
     }
 
     @Override
-    public List<BaseAttribute> listRevokeCertificateAttributes(String authorityUuid, String raProfileUuid) throws NotFoundException, ConnectorException {
-        return null;
+    public List<BaseAttribute> listRevokeCertificateAttributes(String authorityUuid, String raProfileUuid) throws ConnectorException, NotFoundException {
+        return List.of();
     }
 
+
     @Override
-    public void validateRevokeCertificateAttributes(String authorityUuid, String raProfileUuid, List<RequestAttributeDto> attributes) throws NotFoundException, ConnectorException, ValidationException {
+    public void validateRevokeCertificateAttributes(String authorityUuid, String raProfileUuid, List<RequestAttribute> attributes) throws NotFoundException, ConnectorException, ValidationException {
 
     }
 
