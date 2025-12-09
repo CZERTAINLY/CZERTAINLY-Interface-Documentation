@@ -3,10 +3,10 @@ package com.czertainly.api.impl;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.connector.cryptography.CryptographicOperationsController;
-import com.czertainly.api.model.client.attribute.RequestAttributeDto;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.client.attribute.RequestAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.connector.cryptography.operations.*;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,7 +24,6 @@ public class CryptographicOperationControllerDummyImpl implements CryptographicO
         return null;
     }
 
-    @Override
     public SignDataResponseDto signData(String uuid, String keyUuid, SignDataRequestDto request) throws NotFoundException {
         return null;
     }
@@ -34,13 +33,13 @@ public class CryptographicOperationControllerDummyImpl implements CryptographicO
         return null;
     }
 
-    @Override
+
     public List<BaseAttribute> listRandomAttributes(String uuid) throws NotFoundException {
-        return null;
+        return List.of();
     }
 
     @Override
-    public void validateRandomAttributes(String uuid, List<RequestAttributeDto> attributes) throws NotFoundException, ValidationException {
+    public void validateRandomAttributes(String uuid, List<RequestAttribute> attributes) throws NotFoundException, ValidationException {
 
     }
 
@@ -48,4 +47,5 @@ public class CryptographicOperationControllerDummyImpl implements CryptographicO
     public RandomDataResponseDto randomData(String uuid, RandomDataRequestDto request) throws NotFoundException {
         return null;
     }
+
 }
