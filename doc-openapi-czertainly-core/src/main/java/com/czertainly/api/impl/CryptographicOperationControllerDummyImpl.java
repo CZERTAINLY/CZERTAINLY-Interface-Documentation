@@ -5,7 +5,6 @@ import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.CryptographicOperationsController;
 import com.czertainly.api.model.client.cryptography.operations.*;
 import com.czertainly.api.model.common.attribute.common.BaseAttribute;
-import com.czertainly.api.model.common.attribute.v3.BaseAttributeV3;
 import com.czertainly.api.model.common.enums.cryptography.KeyAlgorithm;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -22,7 +21,7 @@ import java.util.List;
 public class CryptographicOperationControllerDummyImpl implements CryptographicOperationsController {
 
     @Override
-    public List<BaseAttributeV3<?>> listCipherAttributes(@Parameter(description = "Token Instance UUID") @PathVariable String tokenInstanceUuid, @Parameter(description = "Token Profile UUID") @PathVariable String tokenProfileUuid, @Parameter(description = "Key UUID") @PathVariable String uuid, @Parameter(description = "Key Item UUID") @PathVariable String keyItemUuid, @Parameter(description = "Cryptographic algorithm") @PathVariable KeyAlgorithm algorithm) throws ConnectorException, NotFoundException {
+    public List<BaseAttribute> listCipherAttributes(@Parameter(description = "Token Instance UUID") @PathVariable String tokenInstanceUuid, @Parameter(description = "Token Profile UUID") @PathVariable String tokenProfileUuid, @Parameter(description = "Key UUID") @PathVariable String uuid, @Parameter(description = "Key Item UUID") @PathVariable String keyItemUuid, @Parameter(description = "Cryptographic algorithm") @PathVariable KeyAlgorithm algorithm) throws ConnectorException, NotFoundException {
         return List.of();
     }
 
@@ -37,7 +36,7 @@ public class CryptographicOperationControllerDummyImpl implements CryptographicO
     }
 
     @Override
-    public List<BaseAttributeV3<?>> listSignatureAttributes(@Parameter(description = "Token Instance UUID") @PathVariable String tokenInstanceUuid, @Parameter(description = "Token Profile UUID") @PathVariable String tokenProfileUuid, @Parameter(description = "Key instance UUID") @PathVariable String uuid, @Parameter(description = "Key Item UUID") @PathVariable String keyItemUuid, @Parameter(description = "Cryptographic algorithm") @PathVariable KeyAlgorithm algorithm) throws ConnectorException, NotFoundException {
+    public List<BaseAttribute> listSignatureAttributes(@Parameter(description = "Token Instance UUID") @PathVariable String tokenInstanceUuid, @Parameter(description = "Token Profile UUID") @PathVariable String tokenProfileUuid, @Parameter(description = "Key instance UUID") @PathVariable String uuid, @Parameter(description = "Key Item UUID") @PathVariable String keyItemUuid, @Parameter(description = "Cryptographic algorithm") @PathVariable KeyAlgorithm algorithm) throws ConnectorException, NotFoundException {
         return List.of();
     }
 

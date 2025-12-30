@@ -9,9 +9,9 @@ import com.czertainly.api.model.client.attribute.custom.CustomAttributeCreateReq
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeDefinitionDetailDto;
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeDefinitionDto;
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeUpdateRequestDto;
-import com.czertainly.api.model.common.attribute.v2.content.AttributeContentType;
-import com.czertainly.api.model.common.attribute.v3.CustomAttributeV3;
-import com.czertainly.api.model.common.attribute.v3.content.BaseAttributeContentV3;
+import com.czertainly.api.model.common.attribute.common.AttributeContent;
+import com.czertainly.api.model.common.attribute.common.CustomAttribute;
+import com.czertainly.api.model.common.attribute.common.content.AttributeContentType;
 import com.czertainly.api.model.core.auth.Resource;
 import org.springframework.http.ResponseEntity;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -81,7 +81,7 @@ public class CustomAttributeControllerDummyImpl implements CustomAttributeContro
     }
 
     @Override
-    public List<CustomAttributeV3> getResourceCustomAttributes(Resource resource) {
+    public List<CustomAttribute<?>> getResourceCustomAttributes(Resource resource) {
         return List.of();
     }
 
@@ -92,7 +92,7 @@ public class CustomAttributeControllerDummyImpl implements CustomAttributeContro
     }
 
     @Override
-    public List<ResponseAttribute> updateAttributeContentForResource(Resource resourceName, String objectUuid, String attributeUuid, List<BaseAttributeContentV3<?>> request) throws NotFoundException, AttributeException {
+    public List<ResponseAttribute> updateAttributeContentForResource(Resource resourceName, String objectUuid, String attributeUuid, List<AttributeContent> request) throws NotFoundException, AttributeException {
         return List.of();
     }
 

@@ -1,6 +1,7 @@
 package com.czertainly.api.impl;
 
 import com.czertainly.api.exception.AlreadyExistException;
+import com.czertainly.api.exception.AttributeException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.CustomAttributeController;
 import com.czertainly.api.model.client.attribute.ResponseAttribute;
@@ -8,9 +9,9 @@ import com.czertainly.api.model.client.attribute.custom.CustomAttributeCreateReq
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeDefinitionDetailDto;
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeDefinitionDto;
 import com.czertainly.api.model.client.attribute.custom.CustomAttributeUpdateRequestDto;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
-import com.czertainly.api.model.common.attribute.v2.content.AttributeContentType;
-import com.czertainly.api.model.common.attribute.v2.content.BaseAttributeContent;
+import com.czertainly.api.model.common.attribute.common.AttributeContent;
+import com.czertainly.api.model.common.attribute.common.CustomAttribute;
+import com.czertainly.api.model.common.attribute.common.content.AttributeContentType;
 import com.czertainly.api.model.core.auth.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -75,7 +76,7 @@ public class CustomAttributeControllerDummyImpl implements CustomAttributeContro
     }
 
     @Override
-    public List<BaseAttribute> getResourceCustomAttributes(Resource resource) {
+    public List<CustomAttribute<?>> getResourceCustomAttributes(Resource resource) {
         return null;
     }
 
@@ -85,9 +86,10 @@ public class CustomAttributeControllerDummyImpl implements CustomAttributeContro
     }
 
     @Override
-    public List<ResponseAttribute> updateAttributeContentForResource(Resource resourceName, String objectUuid, String attributeUuid, List<BaseAttributeContent> request) throws NotFoundException {
+    public List<ResponseAttribute> updateAttributeContentForResource(Resource resourceName, String objectUuid, String attributeUuid, List<AttributeContent> request) throws NotFoundException, AttributeException {
         return null;
     }
+
 
     @Override
     public List<ResponseAttribute> deleteAttributeContentForResource(Resource resourceName, String objectUuid, String attributeUuid) throws NotFoundException {

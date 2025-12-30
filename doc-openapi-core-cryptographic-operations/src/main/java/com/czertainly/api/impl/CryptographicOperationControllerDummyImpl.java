@@ -3,7 +3,7 @@ package com.czertainly.api.impl;
 import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.interfaces.core.web.CryptographicOperationsController;
 import com.czertainly.api.model.client.cryptography.operations.*;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.common.enums.cryptography.KeyAlgorithm;
 import org.springframework.web.bind.annotation.RestController;
 

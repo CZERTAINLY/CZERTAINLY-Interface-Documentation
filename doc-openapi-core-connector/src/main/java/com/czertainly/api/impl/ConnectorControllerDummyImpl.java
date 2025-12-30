@@ -5,7 +5,7 @@ import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.ConnectorController;
-import com.czertainly.api.model.client.attribute.RequestAttributeDto;
+import com.czertainly.api.model.client.attribute.RequestAttribute;
 import com.czertainly.api.model.client.connector.ConnectDto;
 import com.czertainly.api.model.client.connector.ConnectRequestDto;
 import com.czertainly.api.model.client.connector.ConnectorRequestDto;
@@ -93,7 +93,7 @@ public class ConnectorControllerDummyImpl implements ConnectorController {
     }
 
     @Override
-    public void validateAttributes(String uuid, String functionGroup, String kind, List<RequestAttributeDto<?>> attributes) throws NotFoundException, ConnectorException {
+    public void validateAttributes(String uuid, String functionGroup, String kind, List<RequestAttribute> attributes) throws NotFoundException, ConnectorException {
 
     }
 

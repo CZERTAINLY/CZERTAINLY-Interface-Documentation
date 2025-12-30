@@ -5,7 +5,7 @@ import com.czertainly.api.interfaces.core.web.RAProfileManagementController;
 import com.czertainly.api.model.client.approvalprofile.ApprovalProfileDto;
 import com.czertainly.api.model.client.compliance.SimplifiedComplianceProfileDto;
 import com.czertainly.api.model.client.raprofile.*;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.core.certificate.CertificateDetailDto;
 import com.czertainly.api.model.core.raprofile.RaProfileCertificateValidationSettingsUpdateDto;
 import com.czertainly.api.model.core.raprofile.RaProfileDto;

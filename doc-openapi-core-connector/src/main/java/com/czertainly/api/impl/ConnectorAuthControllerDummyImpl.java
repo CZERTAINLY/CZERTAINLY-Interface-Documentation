@@ -1,8 +1,8 @@
 package com.czertainly.api.impl;
 
 import com.czertainly.api.interfaces.core.web.ConnectorAuthController;
-import com.czertainly.api.model.client.attribute.RequestAttributeDto;
-import com.czertainly.api.model.common.attribute.v3.DataAttributeV3;
+import com.czertainly.api.model.client.attribute.RequestAttribute;
+import com.czertainly.api.model.common.attribute.common.DataAttribute;
 import com.czertainly.api.model.core.connector.AuthType;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,43 +17,43 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
     }
 
     @Override
-    public List<DataAttributeV3> getBasicAuthAttributes() {
+    public List<DataAttribute<?>> getBasicAuthAttributes() {
         return List.of();
     }
 
 
     @Override
-    public void validateBasicAuthAttributes(List<RequestAttributeDto> attributes) {
+    public void validateBasicAuthAttributes(List<RequestAttribute> attributes) {
 
     }
 
     @Override
-    public List<DataAttributeV3> getCertificateAttributes() {
+    public List<DataAttribute<?>> getCertificateAttributes() {
         return List.of();
     }
 
     @Override
-    public void validateCertificateAttributes(List<RequestAttributeDto> attributes) {
+    public void validateCertificateAttributes(List<RequestAttribute> attributes) {
 
     }
 
     @Override
-    public List<DataAttributeV3> getApiKeyAuthAttributes() {
+    public List<DataAttribute<?>> getApiKeyAuthAttributes() {
         return List.of();
     }
 
     @Override
-    public void validateApiKeyAuthAttributes(List<RequestAttributeDto> attributes) {
+    public void validateApiKeyAuthAttributes(List<RequestAttribute> attributes) {
 
     }
 
     @Override
-    public List<DataAttributeV3> getJWTAuthAttributes() {
+    public List<DataAttribute<?>> getJWTAuthAttributes() {
         return List.of();
     }
 
     @Override
-    public void validateJWTAuthAttributes(List<RequestAttributeDto> attributes) {
+    public void validateJWTAuthAttributes(List<RequestAttribute> attributes) {
 
     }
 

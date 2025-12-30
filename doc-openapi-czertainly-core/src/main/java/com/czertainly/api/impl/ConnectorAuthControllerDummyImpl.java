@@ -2,8 +2,7 @@ package com.czertainly.api.impl;
 
 import com.czertainly.api.interfaces.core.web.ConnectorAuthController;
 import com.czertainly.api.model.client.attribute.RequestAttribute;
-import com.czertainly.api.model.client.attribute.RequestAttributeDto;
-import com.czertainly.api.model.common.attribute.v3.DataAttributeV3;
+import com.czertainly.api.model.common.attribute.common.DataAttribute;
 import com.czertainly.api.model.core.connector.AuthType;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
@@ -24,7 +23,7 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
     }
 
     @Override
-    public List<DataAttributeV3> getBasicAuthAttributes() {
+    public List<DataAttribute<?>> getBasicAuthAttributes() {
         return List.of();
     }
 
@@ -35,7 +34,7 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
 
 
     @Override
-    public List<DataAttributeV3> getCertificateAttributes() {
+    public List<DataAttribute<?>> getCertificateAttributes() {
         return List.of();
     }
 
@@ -46,7 +45,7 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
 
 
     @Override
-    public List<DataAttributeV3> getApiKeyAuthAttributes() {
+    public List<DataAttribute<?>> getApiKeyAuthAttributes() {
         return List.of();
     }
 
@@ -57,7 +56,7 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
 
 
     @Override
-    public List<DataAttributeV3> getJWTAuthAttributes() {
+    public List<DataAttribute<?>> getJWTAuthAttributes() {
         return List.of();
     }
 

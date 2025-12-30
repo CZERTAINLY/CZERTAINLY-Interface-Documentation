@@ -7,7 +7,7 @@ import com.czertainly.api.interfaces.core.web.CertificateController;
 import com.czertainly.api.model.client.approval.ApprovalResponseDto;
 import com.czertainly.api.model.client.certificate.*;
 import com.czertainly.api.model.common.UuidDto;
-import com.czertainly.api.model.common.attribute.v3.BaseAttributeV3;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.core.certificate.*;
 import com.czertainly.api.model.core.location.LocationDto;
 import com.czertainly.api.model.core.scheduler.PaginationRequestDto;
@@ -98,7 +98,7 @@ public class CertificateControllerDummyImpl implements CertificateController {
     }
 
     @Override
-    public List<BaseAttributeV3<?>> getCsrGenerationAttributes() {
+    public List<BaseAttribute> getCsrGenerationAttributes() {
         return List.of();
     }
 

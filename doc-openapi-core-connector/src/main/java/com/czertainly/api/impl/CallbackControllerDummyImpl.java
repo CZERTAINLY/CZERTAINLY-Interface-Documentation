@@ -4,7 +4,7 @@ import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.CallbackController;
-import com.czertainly.api.model.common.attribute.v2.callback.RequestAttributeCallback;
+import com.czertainly.api.model.common.attribute.common.callback.RequestAttributeCallback;
 import com.czertainly.api.model.core.auth.Resource;
 import org.springframework.web.bind.annotation.RestController;
 
