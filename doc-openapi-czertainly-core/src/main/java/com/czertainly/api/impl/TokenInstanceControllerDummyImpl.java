@@ -5,9 +5,10 @@ import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.TokenInstanceController;
+import com.czertainly.api.model.client.attribute.RequestAttribute;
 import com.czertainly.api.model.client.attribute.RequestAttributeDto;
 import com.czertainly.api.model.client.cryptography.token.TokenInstanceRequestDto;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.core.cryptography.token.TokenInstanceDetailDto;
 import com.czertainly.api.model.core.cryptography.token.TokenInstanceDto;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -48,7 +49,7 @@ public class TokenInstanceControllerDummyImpl implements TokenInstanceController
     }
 
     @Override
-    public void activateTokenInstance(String uuid, List<RequestAttributeDto> attributes) throws ConnectorException {
+    public void activateTokenInstance(String uuid, List<RequestAttribute> attributes) throws ConnectorException {
 
     }
 
@@ -68,12 +69,13 @@ public class TokenInstanceControllerDummyImpl implements TokenInstanceController
     }
 
     @Override
-    public List<BaseAttribute> listTokenProfileAttributes(String uuid) throws ConnectorException {
-        return null;
+    public List<BaseAttribute> listTokenProfileAttributes(String uuid) throws ConnectorException, NotFoundException {
+        return List.of();
     }
 
     @Override
-    public List<BaseAttribute> listTokenInstanceActivationAttributes(String uuid) throws ConnectorException {
-        return null;
+    public List<BaseAttribute> listTokenInstanceActivationAttributes(String uuid) throws ConnectorException, NotFoundException {
+        return List.of();
     }
+
 }

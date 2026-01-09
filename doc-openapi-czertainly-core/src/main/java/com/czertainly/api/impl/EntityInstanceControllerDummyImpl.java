@@ -2,13 +2,15 @@ package com.czertainly.api.impl;
 
 import com.czertainly.api.exception.AlreadyExistException;
 import com.czertainly.api.exception.ConnectorException;
+import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.EntityInstanceController;
+import com.czertainly.api.model.client.attribute.RequestAttribute;
 import com.czertainly.api.model.client.attribute.RequestAttributeDto;
 import com.czertainly.api.model.client.certificate.EntityInstanceResponseDto;
 import com.czertainly.api.model.client.certificate.SearchRequestDto;
 import com.czertainly.api.model.client.entity.EntityInstanceRequestDto;
 import com.czertainly.api.model.client.entity.EntityInstanceUpdateRequestDto;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.core.entity.EntityInstanceDto;
 import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
 import org.springframework.http.ResponseEntity;
@@ -55,12 +57,14 @@ public class EntityInstanceControllerDummyImpl implements EntityInstanceControll
     }
 
     @Override
-    public List<BaseAttribute> listLocationAttributes(String entityUuid) throws ConnectorException {
-        return null;
+    public List<BaseAttribute> listLocationAttributes(String entityUuid) throws ConnectorException, NotFoundException {
+        return List.of();
     }
 
     @Override
-    public void validateLocationAttributes(String entityUuid, List<RequestAttributeDto> attributes) throws ConnectorException {
+    public void validateLocationAttributes(String entityUuid, List<RequestAttribute> attributes) throws ConnectorException, NotFoundException {
 
     }
+
+
 }

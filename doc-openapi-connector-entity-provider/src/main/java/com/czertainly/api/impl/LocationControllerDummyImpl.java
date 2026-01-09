@@ -4,8 +4,8 @@ import com.czertainly.api.exception.LocationException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.connector.entity.LocationController;
-import com.czertainly.api.model.client.attribute.RequestAttributeDto;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.client.attribute.RequestAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.connector.entity.*;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +29,7 @@ public class LocationControllerDummyImpl implements LocationController {
     }
 
     @Override
-    public void validatePushCertificateAttributes(String entityUuid, List<RequestAttributeDto> pushAttributes) throws NotFoundException, ValidationException {
+    public void validatePushCertificateAttributes(String entityUuid, List<RequestAttribute> pushAttributes) throws NotFoundException, ValidationException {
 
     }
 
@@ -49,7 +49,7 @@ public class LocationControllerDummyImpl implements LocationController {
     }
 
     @Override
-    public void validateGenerateCsrAttributes(String entityUuid, List<RequestAttributeDto> csrAttributes) throws NotFoundException, ValidationException {
+    public void validateGenerateCsrAttributes(String entityUuid, List<RequestAttribute> csrAttributes) throws NotFoundException, ValidationException {
 
     }
 }

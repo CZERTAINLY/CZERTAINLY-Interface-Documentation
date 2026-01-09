@@ -1,12 +1,15 @@
 package com.czertainly.api.impl;
 
 import com.czertainly.api.exception.ConnectorException;
+import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.core.web.CryptographicOperationsController;
 import com.czertainly.api.model.client.cryptography.operations.*;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.common.enums.cryptography.KeyAlgorithm;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -17,10 +20,9 @@ import java.util.List;
 })
 public class CryptographicOperationControllerDummyImpl implements CryptographicOperationsController {
 
-
     @Override
-    public List<BaseAttribute> listCipherAttributes(String tokenInstanceUuid, String tokenProfileUuid, String uuid, String keyItemUuid, KeyAlgorithm algorithm) throws ConnectorException {
-        return null;
+    public List<BaseAttribute> listCipherAttributes(@Parameter(description = "Token Instance UUID") @PathVariable String tokenInstanceUuid, @Parameter(description = "Token Profile UUID") @PathVariable String tokenProfileUuid, @Parameter(description = "Key UUID") @PathVariable String uuid, @Parameter(description = "Key Item UUID") @PathVariable String keyItemUuid, @Parameter(description = "Cryptographic algorithm") @PathVariable KeyAlgorithm algorithm) throws ConnectorException, NotFoundException {
+        return List.of();
     }
 
     @Override
@@ -34,9 +36,10 @@ public class CryptographicOperationControllerDummyImpl implements CryptographicO
     }
 
     @Override
-    public List<BaseAttribute> listSignatureAttributes(String tokenInstanceUuid, String tokenProfileUuid, String uuid, String keyItemUuid, KeyAlgorithm algorithm) throws ConnectorException {
-        return null;
+    public List<BaseAttribute> listSignatureAttributes(@Parameter(description = "Token Instance UUID") @PathVariable String tokenInstanceUuid, @Parameter(description = "Token Profile UUID") @PathVariable String tokenProfileUuid, @Parameter(description = "Key instance UUID") @PathVariable String uuid, @Parameter(description = "Key Item UUID") @PathVariable String keyItemUuid, @Parameter(description = "Cryptographic algorithm") @PathVariable KeyAlgorithm algorithm) throws ConnectorException, NotFoundException {
+        return List.of();
     }
+
 
     @Override
     public SignDataResponseDto signData(String tokenInstanceUuid, String tokenProfileUuid, String uuid, String keyItemUuid, SignDataRequestDto request) throws ConnectorException {
@@ -49,9 +52,10 @@ public class CryptographicOperationControllerDummyImpl implements CryptographicO
     }
 
     @Override
-    public List<BaseAttribute> listRandomAttributes(String tokenInstanceUuid) throws ConnectorException {
-        return null;
+    public List<BaseAttribute> listRandomAttributes(@Parameter(description = "Token Instance UUID") @PathVariable String tokenInstanceUuid) throws ConnectorException, NotFoundException {
+        return List.of();
     }
+
 
     @Override
     public RandomDataResponseDto randomData(String tokenInstanceUuid, RandomDataRequestDto request) throws ConnectorException {

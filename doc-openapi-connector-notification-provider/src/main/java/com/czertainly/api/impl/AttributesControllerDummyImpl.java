@@ -2,8 +2,8 @@ package com.czertainly.api.impl;
 
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.connector.AttributesController;
-import com.czertainly.api.model.client.attribute.RequestAttributeDto;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.client.attribute.RequestAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public class AttributesControllerDummyImpl implements AttributesController {
     }
 
     @Override
-    public void validateAttributes(String kind, List<RequestAttributeDto> attributes) throws ValidationException {
+    public void validateAttributes(String kind, List<RequestAttribute> attributes) throws ValidationException {
 
     }
 }

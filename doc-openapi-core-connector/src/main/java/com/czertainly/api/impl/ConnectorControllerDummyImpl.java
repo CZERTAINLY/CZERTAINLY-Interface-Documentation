@@ -5,14 +5,14 @@ import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.ConnectorController;
-import com.czertainly.api.model.client.attribute.RequestAttributeDto;
+import com.czertainly.api.model.client.attribute.RequestAttribute;
 import com.czertainly.api.model.client.connector.ConnectDto;
 import com.czertainly.api.model.client.connector.ConnectRequestDto;
 import com.czertainly.api.model.client.connector.ConnectorRequestDto;
 import com.czertainly.api.model.client.connector.ConnectorUpdateRequestDto;
 import com.czertainly.api.model.common.BulkActionMessageDto;
 import com.czertainly.api.model.common.HealthDto;
-import com.czertainly.api.model.common.attribute.v2.BaseAttribute;
+import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.core.connector.ConnectorDto;
 import com.czertainly.api.model.core.connector.ConnectorStatus;
 import com.czertainly.api.model.core.connector.FunctionGroupCode;
@@ -83,19 +83,20 @@ public class ConnectorControllerDummyImpl implements ConnectorController {
     }
 
     @Override
-    public List<BaseAttribute> getAttributes(String uuid, FunctionGroupCode functionGroup, String kind) throws ConnectorException {
-        return null;
+    public List<BaseAttribute> getAttributes(String uuid, FunctionGroupCode functionGroup, String kind) throws NotFoundException, ConnectorException {
+        return List.of();
     }
 
     @Override
-    public Map<FunctionGroupCode, Map<String, List<BaseAttribute>>> getAttributesAll(String uuid) throws ConnectorException {
-        return null;
+    public Map<FunctionGroupCode, Map<String, List<BaseAttribute>>> getAttributesAll(String uuid) throws NotFoundException, ConnectorException {
+        return Map.of();
     }
 
     @Override
-    public void validateAttributes(String uuid, String functionGroup, String kind, List<RequestAttributeDto> attributes) throws ConnectorException {
+    public void validateAttributes(String uuid, String functionGroup, String kind, List<RequestAttribute> attributes) throws NotFoundException, ConnectorException {
 
     }
+
 
     @Override
     public List<BulkActionMessageDto> bulkDeleteConnector(List<String> uuids) throws ValidationException, ConnectorException {
