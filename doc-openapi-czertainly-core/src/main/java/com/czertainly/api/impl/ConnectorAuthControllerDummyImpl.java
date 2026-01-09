@@ -23,7 +23,7 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
     }
 
     @Override
-    public List<DataAttribute<?>> getBasicAuthAttributes() {
+    public List<DataAttribute> getBasicAuthAttributes() {
         return List.of();
     }
 
@@ -34,7 +34,7 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
 
 
     @Override
-    public List<DataAttribute<?>> getCertificateAttributes() {
+    public List<DataAttribute> getCertificateAttributes() {
         return List.of();
     }
 
@@ -45,7 +45,7 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
 
 
     @Override
-    public List<DataAttribute<?>> getApiKeyAuthAttributes() {
+    public List<DataAttribute> getApiKeyAuthAttributes() {
         return List.of();
     }
 
@@ -56,7 +56,7 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
 
 
     @Override
-    public List<DataAttribute<?>> getJWTAuthAttributes() {
+    public List<DataAttribute> getJWTAuthAttributes() {
         return List.of();
     }
 

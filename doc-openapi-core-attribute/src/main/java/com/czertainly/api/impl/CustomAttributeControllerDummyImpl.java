@@ -76,7 +76,7 @@ public class CustomAttributeControllerDummyImpl implements CustomAttributeContro
     }
 
     @Override
-    public List<CustomAttribute<?>> getResourceCustomAttributes(Resource resource) {
+    public List<CustomAttribute> getResourceCustomAttributes(Resource resource) {
         return null;
     }
 
