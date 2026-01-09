@@ -92,7 +92,7 @@ public class CustomAttributeControllerDummyImpl implements CustomAttributeContro
 
 
     @Override
-    public List<ResponseAttribute> deleteAttributeContentForResource(Resource resourceName, String objectUuid, String attributeUuid) throws NotFoundException {
+    public List<ResponseAttribute> deleteAttributeContentForResource(Resource resourceName, String objectUuid, String attributeUuid) throws NotFoundException, AttributeException {
         return null;
     }
 }

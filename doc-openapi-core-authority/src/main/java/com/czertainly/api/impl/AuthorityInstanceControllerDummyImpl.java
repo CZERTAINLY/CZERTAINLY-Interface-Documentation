@@ -61,7 +61,7 @@ public class AuthorityInstanceControllerDummyImpl implements AuthorityInstanceCo
     }
 
     @Override
-    public List<BaseAttribute> listRAProfileAttributes(String uuid) throws ConnectorException {
+    public List<BaseAttribute> listRAProfileAttributes(String uuid) throws ConnectorException, NotFoundException {
         return null;
     }
 

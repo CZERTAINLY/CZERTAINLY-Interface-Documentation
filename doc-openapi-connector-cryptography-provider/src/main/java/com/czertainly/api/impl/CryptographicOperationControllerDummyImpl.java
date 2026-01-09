@@ -24,6 +24,7 @@ public class CryptographicOperationControllerDummyImpl implements CryptographicO
         return null;
     }
 
+    @Override
     public SignDataResponseDto signData(String uuid, String keyUuid, SignDataRequestDto request) throws NotFoundException {
         return null;
     }
@@ -33,7 +34,7 @@ public class CryptographicOperationControllerDummyImpl implements CryptographicO
         return null;
     }
 
-
+    @Override
     public List<BaseAttribute> listRandomAttributes(String uuid) throws NotFoundException {
         return List.of();
     }
