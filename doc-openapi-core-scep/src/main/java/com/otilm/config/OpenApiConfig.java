@@ -27,7 +27,7 @@ public class OpenApiConfig {
     @Bean
     public GroupedOpenApi raProfileApis() {
         return GroupedOpenApi.builder()
-        		.group("core-acme")
+        		.group("core-scep")
                 .packagesToScan("com.otilm.api.impl")
                 //.pathsToMatch("/v1/**")
                 .build()
