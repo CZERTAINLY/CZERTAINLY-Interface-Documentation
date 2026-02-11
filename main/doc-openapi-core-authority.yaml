@@ -421,7 +421,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/RequestAttributeDto"
+                $ref: "#/components/schemas/RequestAttribute"
         required: true
       responses:
         "200":
@@ -888,15 +888,15 @@ components:
           type: array
           description: List of Authority instance Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         customAttributes:
           type: array
           description: List of Custom Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - attributes
-    BaseAttributeConstraintDto:
+    BaseAttributeConstraint:
       type: object
       description: Base Attribute Constraint definition
       discriminator:
@@ -1169,7 +1169,7 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
@@ -1494,7 +1494,7 @@ components:
           description: Regular Expression Attribute Constraint Data
       required:
       - type
-    RequestAttributeDto:
+    RequestAttribute:
       type: object
       description: Request attribute to send attribute content for object
       discriminator:
@@ -1720,12 +1720,12 @@ components:
           type: array
           description: List of Authority instance Attributes
           items:
-            $ref: "#/components/schemas/ResponseAttributeDto"
+            $ref: "#/components/schemas/ResponseAttribute"
         customAttributes:
           type: array
           description: List of Custom Attributes
           items:
-            $ref: "#/components/schemas/ResponseAttributeDto"
+            $ref: "#/components/schemas/ResponseAttribute"
         status:
           type: string
           description: Status of Authority instance
@@ -1746,7 +1746,7 @@ components:
       - name
       - status
       - uuid
-    ResponseAttributeDto:
+    ResponseAttribute:
       type: object
       description: Response attribute to send attribute content for object
       discriminator:
@@ -1854,12 +1854,12 @@ components:
           type: array
           description: List of Authority instance Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         customAttributes:
           type: array
           description: List of Custom Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         connectorUuid:
           type: string
           description: UUID of Authority provider
@@ -2080,10 +2080,14 @@ components:
         properties:
           $ref: "#/components/schemas/CustomAttributeProperties"
           description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -2127,17 +2131,19 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
             the Attribute based on the action
         schemaVersion:
           $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -2449,10 +2455,14 @@ components:
         properties:
           $ref: "#/components/schemas/MetadataAttributeProperties"
           description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version

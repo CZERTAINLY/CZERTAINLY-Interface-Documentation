@@ -724,7 +724,7 @@ components:
       enum:
       - v2
       - v3
-    BaseAttributeConstraintDto:
+    BaseAttributeConstraint:
       type: object
       description: Base Attribute Constraint definition
       discriminator:
@@ -844,18 +844,18 @@ components:
           description: List of Attributes to issue Certificate for the associated
             RA Profile. Required when raProfileUuid is provided
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         revokeCertificateAttributes:
           type: array
           description: List of Attributes to revoke Certificate for the associated
             RA Profile. Required when raProfileUuid is provided
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         customAttributes:
           type: array
           description: List of Custom Attributes for CMP Profile
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         requestProtectionMethod:
           $ref: "#/components/schemas/ProtectionMethod"
           description: Protection Method for the CMP Request
@@ -1062,7 +1062,7 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
@@ -1361,7 +1361,7 @@ components:
           type: array
           description: Custom Attributes to be associated with certificate by protocol
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
     RangeAttributeConstraint:
       type: object
       description: Range attribute constraint to specify boundaries for integer value
@@ -1410,7 +1410,7 @@ components:
           description: Regular Expression Attribute Constraint Data
       required:
       - type
-    RequestAttributeDto:
+    RequestAttribute:
       type: object
       description: Request attribute to send attribute content for object
       discriminator:
@@ -1797,18 +1797,18 @@ components:
           description: List of Attributes to issue a Certificate for the associated
             RA Profile
           items:
-            $ref: "#/components/schemas/ResponseAttributeDto"
+            $ref: "#/components/schemas/ResponseAttribute"
         revokeCertificateAttributes:
           type: array
           description: List of Attributes to revoke a Certificate for the associated
             RA Profile
           items:
-            $ref: "#/components/schemas/ResponseAttributeDto"
+            $ref: "#/components/schemas/ResponseAttribute"
         customAttributes:
           type: array
           description: List of Custom Attributes for CMP Profile
           items:
-            $ref: "#/components/schemas/ResponseAttributeDto"
+            $ref: "#/components/schemas/ResponseAttribute"
         requestProtectionMethod:
           $ref: "#/components/schemas/ProtectionMethod"
           description: Protection Method for the CMP Request
@@ -1859,7 +1859,7 @@ components:
           type: array
           description: List of Custom Attributes
           items:
-            $ref: "#/components/schemas/ResponseAttributeDto"
+            $ref: "#/components/schemas/ResponseAttribute"
       required:
       - name
       - uuid
@@ -1880,8 +1880,8 @@ components:
           type: array
           description: Custom Attributes to be associated with certificate by protocol
           items:
-            $ref: "#/components/schemas/ResponseAttributeDto"
-    ResponseAttributeDto:
+            $ref: "#/components/schemas/ResponseAttribute"
+    ResponseAttribute:
       type: object
       description: Response attribute to send attribute content for object
       discriminator:
@@ -2020,18 +2020,18 @@ components:
           description: List of Attributes to issue Certificate for the associated
             RA Profile. Required when raProfileUuid is provided
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         revokeCertificateAttributes:
           type: array
           description: List of Attributes to revoke Certificate for the associated
             RA Profile. Required when raProfileUuid is provided
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         customAttributes:
           type: array
           description: List of Custom Attributes for CMP Profile
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         requestProtectionMethod:
           $ref: "#/components/schemas/ProtectionMethod"
           description: Protection Method for the CMP Request
@@ -2137,15 +2137,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

@@ -118,7 +118,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/RequestAttributeDto"
+                $ref: "#/components/schemas/RequestAttribute"
         required: true
       responses:
         "200":
@@ -308,7 +308,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/RequestAttributeDto"
+                $ref: "#/components/schemas/RequestAttribute"
         required: true
       responses:
         "200":
@@ -441,7 +441,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/RequestAttributeDto"
+                $ref: "#/components/schemas/RequestAttribute"
         required: true
       responses:
         "200":
@@ -733,7 +733,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/RequestAttributeDto"
+                $ref: "#/components/schemas/RequestAttribute"
         required: true
       responses:
         "200":
@@ -1310,7 +1310,7 @@ components:
       enum:
       - v2
       - v3
-    BaseAttributeConstraintDto:
+    BaseAttributeConstraint:
       type: object
       description: Base Attribute Constraint definition
       discriminator:
@@ -1422,12 +1422,12 @@ components:
           type: array
           description: List of RA Profiles attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         attributes:
           type: array
           description: List of Attributes to revoke Certificate
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         certificate:
           type: string
           description: Base64 Certificate content. (Certificate to be revoked)
@@ -1619,7 +1619,7 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
@@ -1944,7 +1944,7 @@ components:
           description: Regular Expression Attribute Constraint Data
       required:
       - type
-    RequestAttributeDto:
+    RequestAttribute:
       type: object
       description: Request attribute to send attribute content for object
       discriminator:
@@ -2167,7 +2167,7 @@ components:
           type: array
           description: List of RA Profiles attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         certificate:
           type: string
           description: Base64 Certificate content. (Certificate to be renewed)
@@ -2175,7 +2175,7 @@ components:
           type: array
           description: Metadata for the Certificate
           items:
-            $ref: "#/components/schemas/MetadataAttributeDto"
+            $ref: "#/components/schemas/MetadataAttribute"
       required:
       - certificate
       - meta
@@ -2186,7 +2186,7 @@ components:
       enum:
       - pkcs10
       - crmf
-    MetadataAttributeDto:
+    MetadataAttribute:
       description: Metadata Attribute definition
       oneOf:
       - $ref: "#/components/schemas/MetadataAttributeV2"
@@ -2301,10 +2301,14 @@ components:
         properties:
           $ref: "#/components/schemas/MetadataAttributeProperties"
           description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -2321,7 +2325,7 @@ components:
           type: array
           description: Metadata for the Certificate
           items:
-            $ref: "#/components/schemas/MetadataAttributeDto"
+            $ref: "#/components/schemas/MetadataAttribute"
         certificateType:
           $ref: "#/components/schemas/CertificateType"
           default: X509
@@ -2347,12 +2351,12 @@ components:
           type: array
           description: List of RA Profiles attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         attributes:
           type: array
           description: List of Attributes to issue Certificate
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - attributes
       - raProfileAttributes
@@ -2367,7 +2371,7 @@ components:
           type: array
           description: List of RA Profiles attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - certificate
       - raProfileAttributes
@@ -2378,7 +2382,7 @@ components:
           type: array
           description: Metadata for identified certificate
           items:
-            $ref: "#/components/schemas/MetadataAttributeDto"
+            $ref: "#/components/schemas/MetadataAttribute"
       required:
       - meta
     FunctionGroupCode:
@@ -2406,7 +2410,7 @@ components:
           type: array
           description: List of Authority instance Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - attributes
       - kind
@@ -2448,14 +2452,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
           example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
       required:
       - name
       - type
@@ -2619,10 +2623,14 @@ components:
         properties:
           $ref: "#/components/schemas/CustomAttributeProperties"
           description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -2666,17 +2674,19 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
             the Attribute based on the action
         schemaVersion:
           $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -2890,7 +2900,7 @@ components:
           type: array
           description: List of RA Profiles attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - raProfileAttributes
     CertificateRevocationListResponseDto:
@@ -2909,7 +2919,7 @@ components:
           type: array
           description: List of RA Profiles attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - raProfileAttributes
     CaCertificatesResponseDto:

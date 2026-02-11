@@ -857,7 +857,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/DataAttributeDto"
+                  $ref: "#/components/schemas/DataAttribute"
         "404":
           description: Connector not found
           content:
@@ -1147,7 +1147,7 @@ components:
       enum:
       - v2
       - v3
-    BaseAttributeConstraintDto:
+    BaseAttributeConstraint:
       type: object
       description: Base Attribute Constraint definition
       discriminator:
@@ -1420,7 +1420,7 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
@@ -1637,7 +1637,7 @@ components:
           type: array
           description: List of Notification instance Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         attributeMappings:
           type: array
           description: List of attribute mappings between mapping attributes and (recipient)
@@ -1764,7 +1764,7 @@ components:
           description: Regular Expression Attribute Constraint Data
       required:
       - type
-    RequestAttributeDto:
+    RequestAttribute:
       type: object
       description: Request attribute to send attribute content for object
       discriminator:
@@ -1975,7 +1975,7 @@ components:
           type: array
           description: List of Notification instance Attributes
           items:
-            $ref: "#/components/schemas/ResponseAttributeDto"
+            $ref: "#/components/schemas/ResponseAttribute"
         attributeMappings:
           type: array
           description: List of attribute mappings between mapping attributes and (recipient)
@@ -1989,7 +1989,7 @@ components:
       - kind
       - name
       - uuid
-    ResponseAttributeDto:
+    ResponseAttribute:
       type: object
       description: Response attribute to send attribute content for object
       discriminator:
@@ -2140,7 +2140,7 @@ components:
           type: array
           description: List of Notification instance Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         attributeMappings:
           type: array
           description: List of attribute mappings between mapping attributes and (recipient)
@@ -2248,6 +2248,7 @@ components:
       - roles
       - acmeAccounts
       - acmeProfiles
+      - cboms
       - scepProfiles
       - cmpProfiles
       - authorities
@@ -2359,7 +2360,7 @@ components:
       - pageNumber
       - totalItems
       - totalPages
-    DataAttributeDto:
+    DataAttribute:
       description: Data Attribute
       oneOf:
       - $ref: "#/components/schemas/DataAttributeV2"
@@ -2404,17 +2405,19 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
             the Attribute based on the action
         schemaVersion:
           $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version

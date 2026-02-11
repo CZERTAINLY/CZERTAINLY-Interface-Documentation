@@ -694,7 +694,7 @@ components:
       enum:
       - v2
       - v3
-    BaseAttributeConstraintDto:
+    BaseAttributeConstraint:
       type: object
       description: Base Attribute Constraint definition
       discriminator:
@@ -967,7 +967,7 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
@@ -1292,7 +1292,7 @@ components:
           description: Regular Expression Attribute Constraint Data
       required:
       - type
-    RequestAttributeDto:
+    RequestAttribute:
       type: object
       description: Request attribute to send attribute content for object
       discriminator:
@@ -1495,7 +1495,7 @@ components:
           type: array
           description: List of signature Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         data:
           type: array
           description: Data to be signed
@@ -1570,7 +1570,7 @@ components:
           type: array
           description: List of signature Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         data:
           type: array
           description: Data to be signed
@@ -1613,7 +1613,7 @@ components:
           type: array
           description: List of cipher Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         cipherData:
           type: array
           description: Encrypted/decrypted data
@@ -1684,7 +1684,7 @@ components:
           type: array
           description: Random generator Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - length
     RandomDataResponseDto:
@@ -1893,10 +1893,14 @@ components:
         properties:
           $ref: "#/components/schemas/CustomAttributeProperties"
           description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -1940,17 +1944,19 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
             the Attribute based on the action
         schemaVersion:
           $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -2262,10 +2268,14 @@ components:
         properties:
           $ref: "#/components/schemas/MetadataAttributeProperties"
           description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -2275,15 +2285,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
-    BasicAuth:
-      type: http
-      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
+    BasicAuth:
+      type: http
+      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

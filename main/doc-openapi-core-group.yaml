@@ -19,13 +19,13 @@ servers:
 - url: https://demo.czertainly.online/api
   description: CZERTAINLY Demo server
 tags:
-- name: Certificate & Key Group
-  description: Group API
+- name: Group management
+  description: Group management API
 paths:
   /v1/groups/{uuid}:
     get:
       tags:
-      - Certificate & Key Group
+      - Group management
       summary: Group details
       operationId: getGroup
       parameters:
@@ -69,7 +69,7 @@ paths:
       - SessionAuth: []
     put:
       tags:
-      - Certificate & Key Group
+      - Group management
       summary: Edit Group
       operationId: editGroup
       parameters:
@@ -120,7 +120,7 @@ paths:
       - SessionAuth: []
     delete:
       tags:
-      - Certificate & Key Group
+      - Group management
       summary: Delete Group
       operationId: deleteGroup
       parameters:
@@ -162,7 +162,7 @@ paths:
   /v1/groups:
     get:
       tags:
-      - Certificate & Key Group
+      - Group management
       summary: List Groups
       operationId: listGroups
       responses:
@@ -196,7 +196,7 @@ paths:
       - SessionAuth: []
     post:
       tags:
-      - Certificate & Key Group
+      - Group management
       summary: Create Group
       operationId: createGroup
       requestBody:
@@ -240,7 +240,7 @@ paths:
       - SessionAuth: []
     delete:
       tags:
-      - Certificate & Key Group
+      - Group management
       summary: Delete multiple Groups
       operationId: bulkDeleteGroup
       requestBody:
@@ -371,7 +371,7 @@ components:
       enum:
       - v2
       - v3
-    BaseAttributeConstraintDto:
+    BaseAttributeConstraint:
       type: object
       description: Base Attribute Constraint definition
       discriminator:
@@ -644,7 +644,7 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
@@ -837,7 +837,7 @@ components:
           type: array
           description: List of Custom Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - name
     IntegerAttributeContentV2:
@@ -988,7 +988,7 @@ components:
           description: Regular Expression Attribute Constraint Data
       required:
       - type
-    RequestAttributeDto:
+    RequestAttribute:
       type: object
       description: Request attribute to send attribute content for object
       discriminator:
@@ -1220,11 +1220,11 @@ components:
           type: array
           description: List of Custom Attributes
           items:
-            $ref: "#/components/schemas/ResponseAttributeDto"
+            $ref: "#/components/schemas/ResponseAttribute"
       required:
       - name
       - uuid
-    ResponseAttributeDto:
+    ResponseAttribute:
       type: object
       description: Response attribute to send attribute content for object
       discriminator:
@@ -1336,15 +1336,15 @@ components:
       description: API Key in header configured for connector
       name: X-API-KEY
       in: header
+    BasicAuth:
+      type: http
+      scheme: Basic
     SessionAuth:
       type: apiKey
       description: Session-based authentication with session ID stored in 'czertainly-session'
         cookie
       name: czertainly-session
       in: cookie
-    BasicAuth:
-      type: http
-      scheme: Basic
     CertificateAuth:
       type: apiKey
       description: Base64 encoded X.509 certificate passed in header

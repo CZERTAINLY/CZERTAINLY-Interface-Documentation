@@ -203,7 +203,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/RequestAttributeDto"
+                $ref: "#/components/schemas/RequestAttribute"
         required: true
       responses:
         "200":
@@ -501,7 +501,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/DataAttributeDto"
+                  $ref: "#/components/schemas/DataAttribute"
         "400":
           description: Bad Request
           content:
@@ -662,7 +662,7 @@ components:
       enum:
       - v2
       - v3
-    BaseAttributeConstraintDto:
+    BaseAttributeConstraint:
       type: object
       description: Base Attribute Constraint definition
       discriminator:
@@ -935,7 +935,7 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
@@ -1155,7 +1155,7 @@ components:
           type: array
           description: List of Notification instance Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - attributes
       - kind
@@ -1278,7 +1278,7 @@ components:
           description: Regular Expression Attribute Constraint Data
       required:
       - type
-    RequestAttributeDto:
+    RequestAttribute:
       type: object
       description: Request attribute to send attribute content for object
       discriminator:
@@ -1502,14 +1502,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
           example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
       required:
       - name
       - type
@@ -1673,10 +1673,14 @@ components:
         properties:
           $ref: "#/components/schemas/CustomAttributeProperties"
           description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -1720,17 +1724,19 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
             the Attribute based on the action
         schemaVersion:
           $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -2042,10 +2048,14 @@ components:
         properties:
           $ref: "#/components/schemas/MetadataAttributeProperties"
           description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -2121,7 +2131,7 @@ components:
           type: array
           description: Mapped attributes values for recipient
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - name
     Resource:
@@ -2140,6 +2150,7 @@ components:
       - roles
       - acmeAccounts
       - acmeProfiles
+      - cboms
       - scepProfiles
       - cmpProfiles
       - authorities
@@ -2249,7 +2260,7 @@ components:
       - endPoints
       - functionGroupCode
       - kinds
-    DataAttributeDto:
+    DataAttribute:
       description: Data Attribute
       oneOf:
       - $ref: "#/components/schemas/DataAttributeV2"

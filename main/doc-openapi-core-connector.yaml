@@ -854,7 +854,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/RequestAttributeDto"
+                $ref: "#/components/schemas/RequestAttribute"
         required: true
       responses:
         "200":
@@ -997,7 +997,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/RequestAttributeDto"
+                $ref: "#/components/schemas/RequestAttribute"
         required: true
       responses:
         "200":
@@ -1040,7 +1040,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/RequestAttributeDto"
+                $ref: "#/components/schemas/RequestAttribute"
         required: true
       responses:
         "200":
@@ -1083,7 +1083,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/RequestAttributeDto"
+                $ref: "#/components/schemas/RequestAttribute"
         required: true
       responses:
         "200":
@@ -1126,7 +1126,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/RequestAttributeDto"
+                $ref: "#/components/schemas/RequestAttribute"
         required: true
       responses:
         "200":
@@ -1440,7 +1440,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/DataAttributeDto"
+                  $ref: "#/components/schemas/DataAttribute"
         "400":
           description: Bad Request
           content:
@@ -1481,7 +1481,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/DataAttributeDto"
+                  $ref: "#/components/schemas/DataAttribute"
         "400":
           description: Bad Request
           content:
@@ -1522,7 +1522,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/DataAttributeDto"
+                  $ref: "#/components/schemas/DataAttribute"
         "400":
           description: Bad Request
           content:
@@ -1563,7 +1563,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/DataAttributeDto"
+                  $ref: "#/components/schemas/DataAttribute"
         "400":
           description: Bad Request
           content:
@@ -1767,7 +1767,7 @@ components:
       - certificate
       - apiKey
       - jwt
-    BaseAttributeConstraintDto:
+    BaseAttributeConstraint:
       type: object
       description: Base Attribute Constraint definition
       discriminator:
@@ -1932,12 +1932,12 @@ components:
           description: List of authentication Attributes. Required if the authentication
             type is not NONE
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         customAttributes:
           type: array
           description: List of Custom Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
     CredentialAttributeContentData:
       type: object
       properties:
@@ -2064,7 +2064,7 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
@@ -2389,7 +2389,7 @@ components:
           description: Regular Expression Attribute Constraint Data
       required:
       - type
-    RequestAttributeDto:
+    RequestAttribute:
       type: object
       description: Request attribute to send attribute content for object
       discriminator:
@@ -2630,7 +2630,7 @@ components:
           type: array
           description: List of Attributes for the authentication type
           items:
-            $ref: "#/components/schemas/ResponseAttributeDto"
+            $ref: "#/components/schemas/ResponseAttribute"
         status:
           $ref: "#/components/schemas/ConnectorStatus"
           description: Status of the Connector
@@ -2640,7 +2640,7 @@ components:
           type: array
           description: List of Custom Attributes
           items:
-            $ref: "#/components/schemas/ResponseAttributeDto"
+            $ref: "#/components/schemas/ResponseAttribute"
       required:
       - authType
       - functionGroups
@@ -2734,7 +2734,7 @@ components:
       - kinds
       - name
       - uuid
-    ResponseAttributeDto:
+    ResponseAttribute:
       type: object
       description: Response attribute to send attribute content for object
       discriminator:
@@ -2862,7 +2862,7 @@ components:
           description: List of authentication Attributes. Required if the authentication
             type is not NONE
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - authType
       - url
@@ -2882,6 +2882,7 @@ components:
       - roles
       - acmeAccounts
       - acmeProfiles
+      - cboms
       - scepProfiles
       - cmpProfiles
       - authorities
@@ -2968,12 +2969,12 @@ components:
           description: List of authentication Attributes. Required if the authentication
             type is not NONE
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
         customAttributes:
           type: array
           description: List of Custom Attributes
           items:
-            $ref: "#/components/schemas/RequestAttributeDto"
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - authType
       - name
@@ -3194,10 +3195,14 @@ components:
         properties:
           $ref: "#/components/schemas/CustomAttributeProperties"
           description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -3241,17 +3246,19 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
             the Attribute based on the action
         schemaVersion:
           $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
@@ -3563,14 +3570,18 @@ components:
         properties:
           $ref: "#/components/schemas/MetadataAttributeProperties"
           description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
-    DataAttributeDto:
+    DataAttribute:
       description: Data Attribute
       oneOf:
       - $ref: "#/components/schemas/DataAttributeV2"

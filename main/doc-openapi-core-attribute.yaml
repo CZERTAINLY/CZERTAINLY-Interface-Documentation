@@ -788,7 +788,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ResponseAttributeDto"
+                  $ref: "#/components/schemas/ResponseAttribute"
         "404":
           description: Custom attribute not found
           content:
@@ -855,7 +855,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/ResponseAttributeDto"
+                  $ref: "#/components/schemas/ResponseAttribute"
         "404":
           description: Custom attribute not found
           content:
@@ -1020,7 +1020,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/CustomAttributeDto"
+                  $ref: "#/components/schemas/CustomAttribute"
         "400":
           description: Bad Request
           content:
@@ -1240,7 +1240,7 @@ components:
       - pathVariable
       - requestParameter
       - body
-    BaseAttributeConstraintDto:
+    BaseAttributeConstraint:
       type: object
       description: Base Attribute Constraint definition
       discriminator:
@@ -1567,7 +1567,7 @@ components:
           type: array
           description: Optional constraints used for validating the Attribute content
           items:
-            $ref: "#/components/schemas/BaseAttributeConstraintDto"
+            $ref: "#/components/schemas/BaseAttributeConstraint"
         attributeCallback:
           $ref: "#/components/schemas/AttributeCallback"
           description: Optional definition of callback for getting the content of
@@ -1908,6 +1908,7 @@ components:
       - roles
       - acmeAccounts
       - acmeProfiles
+      - cboms
       - scepProfiles
       - cmpProfiles
       - authorities
@@ -2251,7 +2252,7 @@ components:
       enum:
       - v2
       - v3
-    ResponseAttributeDto:
+    ResponseAttribute:
       type: object
       description: Response attribute to send attribute content for object
       discriminator:
@@ -2427,7 +2428,7 @@ components:
       - name
       - resources
       - uuid
-    CustomAttributeDto:
+    CustomAttribute:
       description: Custom Attribute
       oneOf:
       - $ref: "#/components/schemas/CustomAttributeV2"
@@ -2556,10 +2557,14 @@ components:
         properties:
           $ref: "#/components/schemas/CustomAttributeProperties"
           description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
       - contentType
       - name
       - properties
+      - schemaVersion
       - type
       - uuid
       - version
