@@ -1,23 +1,23 @@
 openapi: 3.1.0
 info:
-  title: CZERTAINLY Certificate API
+  title: Certificate API
   description: REST API for managing Certificates in the platform
   contact:
-    name: CZERTAINLY
-    url: https://www.czertainly.com
-    email: info@czertainly.com
+    name: ILM
+    url: https://www.otilm.com
+    email: info@otilm.com
   license:
     name: MIT License
     url: https://github.com/CZERTAINLY/CZERTAINLY/blob/develop/LICENSE.md
-  version: 2.16.2-SNAPSHOT
+  version: 2.16.3-SNAPSHOT
   x-logo:
-    url: images/czertainly_color_H.svg
+    url: images/ilm-logo.svg
 externalDocs:
-  description: CZERTAINLY Documentation
-  url: https://docs.czertainly.com
+  description: ILM Documentation
+  url: https://docs.otilm.com
 servers:
-- url: https://demo.czertainly.online/api
-  description: CZERTAINLY Demo server
+- url: http://localhost:45389
+  description: Generated server url
 tags:
 - name: Certificate Inventory
   description: Certificate Inventory API
@@ -1417,7 +1417,6 @@ components:
             $ref: "#/components/schemas/AttributeCallbackMapping"
           uniqueItems: true
       required:
-      - callbackContext
       - callbackMethod
       - mappings
     AttributeCallbackMapping:
@@ -1473,6 +1472,15 @@ components:
       - credential
       - codeblock
       - object
+      - resource
+    AttributeResource:
+      type: string
+      enum:
+      - certificates
+      - credentials
+      - authorities
+      - entities
+      - locations
     AttributeType:
       type: string
       enum:
@@ -1487,6 +1495,7 @@ components:
       - pathVariable
       - requestParameter
       - body
+      - filter
     AttributeVersion:
       type: string
       enum:
@@ -1554,6 +1563,7 @@ components:
           string: "#/components/schemas/StringAttributeContentV3"
           text: "#/components/schemas/TextAttributeContentV3"
           time: "#/components/schemas/TimeAttributeContentV3"
+          resource: "#/components/schemas/ResourceObjectContent"
       oneOf:
       - $ref: "#/components/schemas/BooleanAttributeContentV3"
       - $ref: "#/components/schemas/CodeBlockAttributeContentV3"
@@ -1566,6 +1576,7 @@ components:
       - $ref: "#/components/schemas/StringAttributeContentV3"
       - $ref: "#/components/schemas/TextAttributeContentV3"
       - $ref: "#/components/schemas/TimeAttributeContentV3"
+      - $ref: "#/components/schemas/ResourceObjectContent"
     BooleanAttributeContentV2:
       type: object
       description: Boolean attribute content to store true/false values
@@ -1893,7 +1904,21 @@ components:
           type: boolean
           default: false
           description: Boolean determining if the Attribute can have multiple values
+        protectionLevel:
+          $ref: "#/components/schemas/ProtectionLevel"
+          default: none
+          description: Protection level of the attribute content
+        resource:
+          $ref: "#/components/schemas/AttributeResource"
+          description: "Resource of the attribute, relevant if the attribute has Resource\
+            \ content type"
+        extensibleList:
+          type: boolean
+          default: false
+          description: Boolean determining if a list Attribute can have values other
+            than predefined options
       required:
+      - extensibleList
       - label
       - list
       - multiSelect
@@ -2244,6 +2269,11 @@ components:
       - xquery
       - xml
       - yaml
+    ProtectionLevel:
+      type: string
+      enum:
+      - none
+      - encrypted
     RangeAttributeConstraint:
       type: object
       description: Range attribute constraint to specify boundaries for integer value
@@ -2292,11 +2322,52 @@ components:
           description: Regular Expression Attribute Constraint Data
       required:
       - type
+    ResourceObjectContent:
+      type: object
+      description: Resource object attribute content carrying resource object data
+      properties:
+        reference:
+          type: string
+          description: Content Reference
+        data:
+          $ref: "#/components/schemas/ResourceObjectContentData"
+          description: Resource Object content data
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Content Type of the attribute
+      required:
+      - contentType
+      - data
+    ResourceObjectContentData:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        resource:
+          $ref: "#/components/schemas/AttributeResource"
+          description: Resource contained in data
+        content:
+          type: string
+          description: Base64 encoded content of the resource object
+        attributes:
+          description: Attributes of the resource object
+      required:
+      - name
+      - resource
+      - uuid
     ResponseAttribute:
       type: object
       description: Response attribute to send attribute content for object
       discriminator:
-        propertyName: schemaVersion
+        propertyName: version
         mapping:
           v2: "#/components/schemas/ResponseAttributeV2"
           v3: "#/components/schemas/ResponseAttributeV3"
@@ -2307,9 +2378,9 @@ components:
       - contentType
       - label
       - name
-      - schemaVersion
       - type
       - uuid
+      - version
     ResponseAttributeV2:
       type: object
       properties:
@@ -2340,16 +2411,16 @@ components:
           description: Content Type of the Attribute
           examples:
           - Attribute
-        schemaVersion:
+        version:
           $ref: "#/components/schemas/AttributeVersion"
           description: Version of the Attribute
       required:
       - contentType
       - label
       - name
-      - schemaVersion
       - type
       - uuid
+      - version
     ResponseAttributeV3:
       type: object
       properties:
@@ -2380,16 +2451,16 @@ components:
           description: Content Type of the Attribute
           examples:
           - Attribute
-        schemaVersion:
+        version:
           $ref: "#/components/schemas/AttributeVersion"
           description: Version of the Attribute
       required:
       - contentType
       - label
       - name
-      - schemaVersion
       - type
       - uuid
+      - version
     SecretAttributeContentData:
       type: object
       properties:
@@ -2397,7 +2468,7 @@ components:
           type: string
           description: Secret attribute data
         protectionLevel:
-          type: string
+          $ref: "#/components/schemas/ProtectionLevel"
           description: Level of protection of the data
     SecretAttributeContentV2:
       type: object
@@ -3470,8 +3541,8 @@ components:
       discriminator:
         propertyName: version
         mapping:
-          "2": "#/components/schemas/ResponseMetadataV2"
-          "3": "#/components/schemas/ResponseMetadataV3"
+          v2: "#/components/schemas/ResponseMetadataV2"
+          v3: "#/components/schemas/ResponseMetadataV3"
       oneOf:
       - $ref: "#/components/schemas/ResponseMetadataV3"
       - $ref: "#/components/schemas/ResponseMetadataV2"
@@ -3519,7 +3590,7 @@ components:
           items:
             $ref: "#/components/schemas/BaseAttributeContentDtoV2"
         version:
-          type: string
+          $ref: "#/components/schemas/AttributeVersion"
           description: Version of the Attribute
           examples:
           - Attribute
@@ -3567,7 +3638,7 @@ components:
           items:
             $ref: "#/components/schemas/BaseAttributeContentDtoV3"
         version:
-          type: string
+          $ref: "#/components/schemas/AttributeVersion"
           description: Version of the Attribute
           examples:
           - Attribute
@@ -4060,6 +4131,7 @@ components:
       - AttributeValueTarget
       - ProgrammingLanguageEnum
       - AttributeVersion
+      - ProtectionLevel
       - SchedulerJobExecutionStatus
       - RecipientType
       - TriggerType
@@ -4218,7 +4290,17 @@ components:
           type: boolean
           default: false
           description: Boolean determining if the Attribute can have multiple values
+        extensibleList:
+          type: boolean
+          default: false
+          description: Boolean determining if a list Attribute can have values other
+            than predefined options
+        protectionLevel:
+          $ref: "#/components/schemas/ProtectionLevel"
+          default: none
+          description: Protection level of the attribute content
       required:
+      - extensibleList
       - label
       - list
       - multiSelect
@@ -4597,6 +4679,10 @@ components:
           default: false
           description: Boolean determining if the new metadata content should overwrite
             (replace) existing content instead of appending.
+        protectionLevel:
+          $ref: "#/components/schemas/ProtectionLevel"
+          default: none
+          description: Protection level of the attribute content
       required:
       - label
       - visible
@@ -4690,34 +4776,3 @@ components:
       - type
       - uuid
       - version
-  securitySchemes:
-    ConnectorAPIKeyAuth:
-      type: apiKey
-      description: API Key in header configured for connector
-      name: X-API-KEY
-      in: header
-    BasicAuth:
-      type: http
-      scheme: Basic
-    SessionAuth:
-      type: apiKey
-      description: Session-based authentication with session ID stored in 'czertainly-session'
-        cookie
-      name: czertainly-session
-      in: cookie
-    CertificateAuth:
-      type: apiKey
-      description: Base64 encoded X.509 certificate passed in header
-      name: X-APP-CERTIFICATE
-      in: header
-    CertificateTLSAuth:
-      type: mutualTLS
-      description: Client certificate authentication
-    NoAuth:
-      type: http
-      description: No authentication
-      scheme: none
-    BearerJWTAuth:
-      type: http
-      scheme: Bearer
-      bearerFormat: JWT
