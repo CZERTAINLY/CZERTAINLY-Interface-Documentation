@@ -16,8 +16,8 @@ externalDocs:
   description: ILM Documentation
   url: https://docs.otilm.com
 servers:
-- url: http://localhost:40079
-  description: Generated server url
+- url: https://demo.czertainly.online/api
+  description: CZERTAINLY Demo server
 tags:
 - name: Certificate Inventory
   description: Certificate Inventory API
@@ -2476,14 +2476,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
           example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
       required:
       - name
       - type
@@ -3059,12 +3059,34 @@ components:
       required:
       - name
       - version
+    BuildInfoDto:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: App build timestamp
+          example: 2024-06-01T12:00:00Z
+        branch:
+          type: string
+          description: Git branch name
+          example: main
+        commitId:
+          type: string
+          description: Abbreviated ID of the commit
+          example: a1b2c3d
+      required:
+      - timestamp
     CoreInfoResponseDto:
       type: object
       properties:
         app:
           $ref: "#/components/schemas/AppInfoDto"
-          description: CZERTAINLY Application information
+          description: ILM Application information
+        build:
+          $ref: "#/components/schemas/BuildInfoDto"
+          description: ILM Application build information. May be omitted depending
+            on deployment configuration
         db:
           $ref: "#/components/schemas/DatabaseInfoDto"
           description: Database information
@@ -4656,3 +4678,19 @@ components:
       - approvalRecipientUuid
       - createdAt
       - status
+  securitySchemes:
+    SessionAuth:
+      type: apiKey
+      description: Session-based authentication with session ID stored in 'czertainly-session'
+        cookie
+      name: czertainly-session
+      in: cookie
+    CertificateAuth:
+      type: apiKey
+      description: Base64 encoded X.509 certificate passed in header
+      name: ssl-client-cert
+      in: header
+    BearerJWTAuth:
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT

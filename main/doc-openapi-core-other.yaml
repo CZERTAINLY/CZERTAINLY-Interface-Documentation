@@ -16,8 +16,8 @@ externalDocs:
   description: ILM Documentation
   url: https://docs.otilm.com
 servers:
-- url: http://localhost:38601
-  description: Generated server url
+- url: https://demo.czertainly.online/api
+  description: CZERTAINLY Demo server
 tags:
 - name: Custom OID Management
   description: Custom OID Management API
@@ -2579,12 +2579,34 @@ components:
       required:
       - name
       - version
+    BuildInfoDto:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: App build timestamp
+          example: 2024-06-01T12:00:00Z
+        branch:
+          type: string
+          description: Git branch name
+          example: main
+        commitId:
+          type: string
+          description: Abbreviated ID of the commit
+          example: a1b2c3d
+      required:
+      - timestamp
     CoreInfoResponseDto:
       type: object
       properties:
         app:
           $ref: "#/components/schemas/AppInfoDto"
-          description: CZERTAINLY Application information
+          description: ILM Application information
+        build:
+          $ref: "#/components/schemas/BuildInfoDto"
+          description: ILM Application build information. May be omitted depending
+            on deployment configuration
         db:
           $ref: "#/components/schemas/DatabaseInfoDto"
           description: Database information
@@ -2637,3 +2659,19 @@ components:
       required:
       - code
       - label
+  securitySchemes:
+    SessionAuth:
+      type: apiKey
+      description: Session-based authentication with session ID stored in 'czertainly-session'
+        cookie
+      name: czertainly-session
+      in: cookie
+    CertificateAuth:
+      type: apiKey
+      description: Base64 encoded X.509 certificate passed in header
+      name: ssl-client-cert
+      in: header
+    BearerJWTAuth:
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT

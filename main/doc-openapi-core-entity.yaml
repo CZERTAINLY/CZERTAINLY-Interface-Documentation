@@ -16,8 +16,8 @@ externalDocs:
   description: ILM Documentation
   url: https://docs.otilm.com
 servers:
-- url: http://localhost:42747
-  description: Generated server url
+- url: https://demo.czertainly.online/api
+  description: CZERTAINLY Demo server
 tags:
 - name: Entity Management
   description: Entity Management API
@@ -1784,14 +1784,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
           example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
       required:
       - name
       - type
@@ -2472,3 +2472,19 @@ components:
       - fieldIdentifier
       - fieldLabel
       - type
+  securitySchemes:
+    SessionAuth:
+      type: apiKey
+      description: Session-based authentication with session ID stored in 'czertainly-session'
+        cookie
+      name: czertainly-session
+      in: cookie
+    CertificateAuth:
+      type: apiKey
+      description: Base64 encoded X.509 certificate passed in header
+      name: ssl-client-cert
+      in: header
+    BearerJWTAuth:
+      type: http
+      scheme: Bearer
+      bearerFormat: JWT
