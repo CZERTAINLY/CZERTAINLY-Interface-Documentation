@@ -1,14 +1,16 @@
 # build environment
-FROM maven:3.9.11-eclipse-temurin-21 as build
+FROM maven:3.9.11-eclipse-temurin-21 AS build
 COPY ./ /home/app
 COPY settings.xml /root/.m2/settings.xml
 RUN mvn -f /home/app/pom.xml clean verify
 
 # build documentation
-FROM node:alpine as docs
-RUN npm install -g redoc-cli
+FROM node:alpine AS docs
+RUN npm install -g @redocly/cli
 COPY --from=build /home/app/openapi /home/app
-RUN for file in /home/app/*.yaml; do redoc-cli build "$file" -o "${file/yaml/html}" --options.theme.logo.gutter=20px; done
+COPY redocly-theme.yaml /home/app/config/redocly-theme.yaml
+COPY images /home/app/images
+RUN for file in /home/app/*.yaml; do redocly build-docs "$file" -o "${file/yaml/html}" --config=/home/app/config/redocly-theme.yaml; done
 
 # production environment
 FROM nginx:stable-alpine
