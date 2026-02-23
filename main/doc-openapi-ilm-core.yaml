@@ -76,6 +76,8 @@ tags:
     \ in the platform. Note that this API does not manage nor trigger external notifications.\
     \ For external notifications, please refer to the External Notification Management\
     \ API."
+- name: Connector Management v2
+  description: Connector Management v2 API
 - name: Token Profile Management
   description: Token Profile Management API
 - name: ACME Account Management
@@ -119,6 +121,182 @@ tags:
 - name: Approval Inventory
   description: Approval Inventory API
 paths:
+  /v2/connectors/{uuid}:
+    get:
+      tags:
+      - Connector Management v2
+      summary: Get details of a Connector
+      operationId: getConnector
+      parameters:
+      - name: uuid
+        in: path
+        description: Connector UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Connector details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectorDetailDtoV2"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    put:
+      tags:
+      - Connector Management v2
+      summary: Edit a Connector
+      operationId: editConnector
+      parameters:
+      - name: uuid
+        in: path
+        description: Connector UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnectorUpdateRequestDtoV2"
+        required: true
+      responses:
+        "200":
+          description: Connector updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectorDetailDtoV2"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    delete:
+      tags:
+      - Connector Management v2
+      summary: Delete a Connector
+      operationId: deleteConnector
+      parameters:
+      - name: uuid
+        in: path
+        description: Connector UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Connector deleted
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v2/complianceProfiles/{uuid}:
     get:
       tags:
@@ -4282,7 +4460,7 @@ paths:
       tags:
       - Connector Management
       summary: Get details of a Connector
-      operationId: getConnector
+      operationId: getConnector_1
       parameters:
       - name: uuid
         in: path
@@ -4335,7 +4513,7 @@ paths:
       tags:
       - Connector Management
       summary: Edit a Connector
-      operationId: editConnector
+      operationId: editConnector_1
       parameters:
       - name: uuid
         in: path
@@ -4405,7 +4583,7 @@ paths:
       tags:
       - Connector Management
       summary: Delete a Connector
-      operationId: deleteConnector
+      operationId: deleteConnector_1
       parameters:
       - name: uuid
         in: path
@@ -6412,6 +6590,550 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/connectors:
+    post:
+      tags:
+      - Connector Management v2
+      summary: Create a new Connector
+      operationId: createConnector
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnectorRequestDtoV2"
+        required: true
+      responses:
+        "200":
+          description: New Connector created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectorDetailDtoV2"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/connectors/{uuid}/reconnect:
+    post:
+      tags:
+      - Connector Management v2
+      summary: Reconnect Connector
+      operationId: reconnect_1
+      parameters:
+      - name: uuid
+        in: path
+        description: Connector UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Reconnect to a Connector
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectInfoDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/connectors/reconnect:
+    post:
+      tags:
+      - Connector Management v2
+      summary: Reconnect multiple Connectors
+      operationId: bulkReconnect_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "204":
+          description: Reconnect multiple Connectors initiated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkActionMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/connectors/list:
+    post:
+      tags:
+      - Connector Management v2
+      summary: List Connectors
+      operationId: listConnectors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequestDto"
+        required: true
+      responses:
+        "200":
+          description: List all Connectors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginationResponseDtoConnectorDtoV2"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/connectors/forceDelete:
+    post:
+      tags:
+      - Connector Management v2
+      summary: Force Delete multiple Connectors
+      operationId: bulkForceDeleteConnector
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "200":
+          description: Connectors deleted
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkActionMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/connectors/delete:
+    post:
+      tags:
+      - Connector Management v2
+      summary: Delete multiple Connectors
+      operationId: bulkDeleteConnector
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "200":
+          description: Connectors deleted
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkActionMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/connectors/connect:
+    post:
+      tags:
+      - Connector Management v2
+      summary: Connect to a Connector
+      operationId: connect_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnectRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Connector connected
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConnectInfoDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/connectors/approve:
+    post:
+      tags:
+      - Connector Management v2
+      summary: Approve multiple Connector
+      operationId: bulkApprove_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+        required: true
+      responses:
+        "200":
+          description: Approve multiple Connectors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkActionMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: No Content
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkActionMessageDto"
+  /v2/connector/register:
+    post:
+      tags:
+      - Connector Registration
+      summary: Register a Connector v2
+      operationId: registerV2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnectorRequestDtoV2"
+        required: true
+      responses:
+        "200":
+          description: Connector registration initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectorDetailDtoV2"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v2/compliance:
     post:
       tags:
@@ -9867,7 +10589,7 @@ paths:
       tags:
       - Connector Management
       summary: List Connectors by Function Group and Kind
-      operationId: listConnectors
+      operationId: listConnectors_1
       parameters:
       - name: functionGroup
         in: query
@@ -9931,7 +10653,7 @@ paths:
       tags:
       - Connector Management
       summary: Create a new Connector
-      operationId: createConnector
+      operationId: createConnector_1
       requestBody:
         content:
           application/json:
@@ -9994,7 +10716,7 @@ paths:
       tags:
       - Connector Management
       summary: Delete multiple Connectors
-      operationId: bulkDeleteConnector
+      operationId: bulkDeleteConnector_1
       requestBody:
         description: Connector UUIDs
         content:
@@ -12277,6 +12999,59 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/connectors/{uuid}/approve:
+    patch:
+      tags:
+      - Connector Management v2
+      summary: Approve a Connector
+      operationId: approve_1
+      parameters:
+      - name: uuid
+        in: path
+        description: Connector UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Connector Approved
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "204":
+          description: No Content
   /v2/complianceProfiles/{uuid}/rules:
     patch:
       tags:
@@ -17283,6 +18058,165 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/connectors/{uuid}/info:
+    get:
+      tags:
+      - Connector Management v2
+      summary: Get Info about Connector
+      operationId: getInfo
+      parameters:
+      - name: uuid
+        in: path
+        description: Connector UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Connector info retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectorInfo"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/connectors/{uuid}/health:
+    get:
+      tags:
+      - Connector Management v2
+      summary: Check Health of a Connector
+      operationId: checkHealth
+      parameters:
+      - name: uuid
+        in: path
+        description: Connector UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Health check completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthInfo"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/connectors/search:
+    get:
+      tags:
+      - Connector Management v2
+      summary: Get Connectors searchable fields information
+      operationId: getConnectorSearchableFieldInformation
+      responses:
+        "200":
+          description: Connector searchable field information retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchFieldDataByGroupDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v2/complianceProfiles/{uuid}/associations:
     get:
       tags:
@@ -19251,7 +20185,7 @@ paths:
       tags:
       - Info
       summary: Get information about running CZERTAINLY Application
-      operationId: getInfo
+      operationId: getInfo_1
       responses:
         "200":
           description: CZERTAINLY Application info retrieved
@@ -19797,7 +20731,7 @@ paths:
       tags:
       - Connector Management
       summary: Check Health of a Connector
-      operationId: checkHealth
+      operationId: checkHealth_1
       parameters:
       - name: uuid
         in: path
@@ -22910,6 +23844,14 @@ components:
       enum:
       - v2
       - v3
+    AuthType:
+      type: string
+      enum:
+      - none
+      - basic
+      - certificate
+      - apiKey
+      - jwt
     BaseAttributeConstraint:
       type: object
       description: Base Attribute Constraint definition
@@ -23059,48 +24001,34 @@ components:
       required:
       - contentType
       - data
-    ComplianceProfileUpdateRequestDto:
+    ConnectorUpdateRequestDtoV2:
       type: object
       properties:
-        description:
+        url:
           type: string
-          description: Description of the Compliance Profile
+          description: URL of the Connector to connect
           examples:
-          - Profile 1
-        internalRules:
+          - http://network-discovery-provider:8080
+        authType:
+          $ref: "#/components/schemas/AuthType"
+          description: Type of authentication for the Connector
+          examples:
+          - none
+        authAttributes:
           type: array
-          description: UUIDs of internal rules to be associated with the Compliance
-            Profile. Profiles can be created without rules and can be added later.
+          description: List of authentication Attributes. Required if the authentication
+            type is not NONE
           items:
-            type: string
-            format: uuid
-          uniqueItems: true
-        providerRules:
-          type: array
-          description: Provider rules to be associated with the Compliance Profile.
-            Profiles can be created without rules and can be added later.
-          items:
-            $ref: "#/components/schemas/ProviderComplianceRulesRequestDto"
+            $ref: "#/components/schemas/RequestAttribute"
         customAttributes:
           type: array
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/RequestAttribute"
-    ComplianceRuleRequestDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-          description: UUID of the rule
-          example: 20354d7a-e4fe-47af-8ff6-187bca92f3f9
-        attributes:
-          type: array
-          description: Attributes for the rule
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
       required:
-      - uuid
+      - authType
+      - customAttributes
+      - url
     CredentialAttributeContentData:
       type: object
       properties:
@@ -23523,32 +24451,6 @@ components:
       enum:
       - none
       - encrypted
-    ProviderComplianceRulesRequestDto:
-      type: object
-      properties:
-        connectorUuid:
-          type: string
-          format: uuid
-          description: UUID of the Compliance Provider
-        kind:
-          type: string
-          description: Kind of the Compliance Provider
-        rules:
-          type: array
-          description: Provider rules associated
-          items:
-            $ref: "#/components/schemas/ComplianceRuleRequestDto"
-          uniqueItems: true
-        groups:
-          type: array
-          description: Provider groups UUIDS to associate profile with
-          items:
-            type: string
-            format: uuid
-          uniqueItems: true
-      required:
-      - connectorUuid
-      - kind
     RangeAttributeConstraint:
       type: object
       description: Range attribute constraint to specify boundaries for integer value
@@ -23944,6 +24846,263 @@ components:
       - code
       - message
       - statusCode
+    ConnectorDetailDtoV2:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        version:
+          $ref: "#/components/schemas/ConnectorVersion"
+          description: Version of the Connector based on the implemented interfaces.
+          example: v2
+        url:
+          type: string
+          description: URL of the Connector
+          examples:
+          - http://network-discovery-provider:8080
+        status:
+          $ref: "#/components/schemas/ConnectorStatus"
+          description: Status of the Connector
+          examples:
+          - CONNECTED
+        functionGroups:
+          type: array
+          description: List of Function Groups implemented by the Connector
+          items:
+            $ref: "#/components/schemas/FunctionGroupDto"
+        interfaces:
+          type: array
+          description: List of connector interfaces implemented by the Connector
+          items:
+            $ref: "#/components/schemas/ConnectorInterfaceInfo"
+        authType:
+          $ref: "#/components/schemas/AuthType"
+          description: Type of authentication for the Connector
+          examples:
+          - none
+        authAttributes:
+          type: array
+          description: List of Attributes for the authentication type
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+      required:
+      - authType
+      - functionGroups
+      - interfaces
+      - name
+      - status
+      - url
+      - uuid
+      - version
+    ConnectorInterface:
+      type: string
+      enum:
+      - info
+      - health
+      - metrics
+      - authority
+      - discovery
+      - entity
+      - compliance
+      - cryptography
+      - notification
+      - secret
+    ConnectorInterfaceInfo:
+      type: object
+      properties:
+        code:
+          $ref: "#/components/schemas/ConnectorInterface"
+          description: Code of the implemented connector interface
+        version:
+          type: string
+          description: Version of the implemented connector interface
+        features:
+          type: array
+          description: Features supported by the connector interface
+          items:
+            $ref: "#/components/schemas/FeatureFlag"
+      required:
+      - code
+      - version
+    ConnectorStatus:
+      type: string
+      enum:
+      - waitingForApproval
+      - connected
+      - failed
+      - offline
+    ConnectorVersion:
+      type: string
+      enum:
+      - v1
+      - v2
+    EndpointDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        context:
+          type: string
+          description: Context of the Endpoint
+          examples:
+          - /v1
+        method:
+          type: string
+          description: Method to be used for the Endpoint
+          examples:
+          - POST
+        required:
+          type: boolean
+          description: True if the Endpoint is required for implementation
+          example: true
+      required:
+      - context
+      - method
+      - name
+      - required
+      - uuid
+    FeatureFlag:
+      type: string
+      enum:
+      - stateless
+      - openMetrics
+      - secretVersioning
+      - secretRotation
+    FunctionGroupCode:
+      type: string
+      enum:
+      - credentialProvider
+      - legacyAuthorityProvider
+      - authorityProvider
+      - discoveryProvider
+      - entityProvider
+      - complianceProvider
+      - complianceProviderV2
+      - cryptographyProvider
+      - notificationProvider
+    FunctionGroupDto:
+      type: object
+      properties:
+        functionGroupCode:
+          $ref: "#/components/schemas/FunctionGroupCode"
+          description: Enumerated code of functional group
+        kinds:
+          type: array
+          description: List of supported functional group kinds
+          example:
+          - SoftKeyStore
+          - Basic
+          - ApiKey
+          items:
+            type: string
+        endPoints:
+          type: array
+          description: List of end points related to functional group
+          items:
+            $ref: "#/components/schemas/EndpointDto"
+        uuid:
+          type: string
+          description: UUID of the Function Group
+          examples:
+          - 204a57f6-2ed3-45b6-bf09-af8b8c900e33
+        name:
+          type: string
+          description: Function Group Name
+      required:
+      - endPoints
+      - functionGroupCode
+      - kinds
+      - name
+      - uuid
+    ComplianceProfileUpdateRequestDto:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Description of the Compliance Profile
+          examples:
+          - Profile 1
+        internalRules:
+          type: array
+          description: UUIDs of internal rules to be associated with the Compliance
+            Profile. Profiles can be created without rules and can be added later.
+          items:
+            type: string
+            format: uuid
+          uniqueItems: true
+        providerRules:
+          type: array
+          description: Provider rules to be associated with the Compliance Profile.
+            Profiles can be created without rules and can be added later.
+          items:
+            $ref: "#/components/schemas/ProviderComplianceRulesRequestDto"
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+    ComplianceRuleRequestDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of the rule
+          example: 20354d7a-e4fe-47af-8ff6-187bca92f3f9
+        attributes:
+          type: array
+          description: Attributes for the rule
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - uuid
+    ProviderComplianceRulesRequestDto:
+      type: object
+      properties:
+        connectorUuid:
+          type: string
+          format: uuid
+          description: UUID of the Compliance Provider
+        kind:
+          type: string
+          description: Kind of the Compliance Provider
+        rules:
+          type: array
+          description: Provider rules associated
+          items:
+            $ref: "#/components/schemas/ComplianceRuleRequestDto"
+          uniqueItems: true
+        groups:
+          type: array
+          description: Provider groups UUIDS to associate profile with
+          items:
+            type: string
+            format: uuid
+          uniqueItems: true
+      required:
+      - connectorUuid
+      - kind
     ComplianceGroupDto:
       type: object
       properties:
@@ -27384,14 +28543,6 @@ components:
       - kind
       - name
       - uuid
-    AuthType:
-      type: string
-      enum:
-      - none
-      - basic
-      - certificate
-      - apiKey
-      - jwt
     ConnectorUpdateRequestDto:
       type: object
       properties:
@@ -27465,92 +28616,6 @@ components:
       - name
       - status
       - url
-      - uuid
-    ConnectorStatus:
-      type: string
-      enum:
-      - waitingForApproval
-      - connected
-      - failed
-      - offline
-    EndpointDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: Object identifier
-          examples:
-          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
-        name:
-          type: string
-          description: Object Name
-          examples:
-          - Name
-        context:
-          type: string
-          description: Context of the Endpoint
-          examples:
-          - /v1
-        method:
-          type: string
-          description: Method to be used for the Endpoint
-          examples:
-          - POST
-        required:
-          type: boolean
-          description: True if the Endpoint is required for implementation
-          example: true
-      required:
-      - context
-      - method
-      - name
-      - required
-      - uuid
-    FunctionGroupCode:
-      type: string
-      enum:
-      - credentialProvider
-      - legacyAuthorityProvider
-      - authorityProvider
-      - discoveryProvider
-      - entityProvider
-      - complianceProvider
-      - complianceProviderV2
-      - cryptographyProvider
-      - notificationProvider
-    FunctionGroupDto:
-      type: object
-      properties:
-        functionGroupCode:
-          $ref: "#/components/schemas/FunctionGroupCode"
-          description: Enumerated code of functional group
-        kinds:
-          type: array
-          description: List of supported functional group kinds
-          example:
-          - SoftKeyStore
-          - Basic
-          - ApiKey
-          items:
-            type: string
-        endPoints:
-          type: array
-          description: List of end points related to functional group
-          items:
-            $ref: "#/components/schemas/EndpointDto"
-        uuid:
-          type: string
-          description: UUID of the Function Group
-          examples:
-          - 204a57f6-2ed3-45b6-bf09-af8b8c900e33
-        name:
-          type: string
-          description: Function Group Name
-      required:
-      - endPoints
-      - functionGroupCode
-      - kinds
-      - name
       - uuid
     ConnectDto:
       type: object
@@ -27959,11 +29024,11 @@ components:
       - $ref: "#/components/schemas/BaseAttributeContentDtoV2"
       - $ref: "#/components/schemas/BaseAttributeContentDtoV3"
       properties:
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
         reference:
           type: string
         data: {}
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
     CustomAttributeUpdateRequestDto:
       type: object
       properties:
@@ -28506,6 +29571,261 @@ components:
             \ alternative attributes will be used to generate the new CSR"
           items:
             $ref: "#/components/schemas/RequestAttribute"
+    ConnectorRequestDtoV2:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the Connector
+          examples:
+          - Connector1
+          minLength: 1
+        version:
+          $ref: "#/components/schemas/ConnectorVersion"
+          description: Version of the Connector.
+          example: v2
+        url:
+          type: string
+          description: URL of the Connector to connect
+          examples:
+          - http://network-discovery-provider:8080
+        authType:
+          $ref: "#/components/schemas/AuthType"
+          description: Type of authentication for the Connector
+          examples:
+          - none
+        authAttributes:
+          type: array
+          description: List of authentication Attributes. Required if the authentication
+            type is not NONE
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - authType
+      - customAttributes
+      - name
+      - url
+      - version
+    ConnectInfoDto:
+      type: object
+      description: Connect Info dependent on connector version
+      discriminator:
+        propertyName: version
+        mapping:
+          v1: "#/components/schemas/ConnectInfoV1"
+          v2: "#/components/schemas/ConnectInfoV2"
+      oneOf:
+      - $ref: "#/components/schemas/ConnectInfoV1"
+      - $ref: "#/components/schemas/ConnectInfoV2"
+      properties:
+        version:
+          type: string
+          description: Version of the Connector.
+          example: v2
+      required:
+      - version
+    ConnectInfoV1:
+      type: object
+      properties:
+        version:
+          $ref: "#/components/schemas/ConnectorVersion"
+          description: Version of the Connector.
+          example: v2
+        connectorUuid:
+          type: string
+          format: uuid
+          description: Connector UUID. Present when connector with that version is
+            already added.
+        errorMessage:
+          type: string
+          description: Error message in case of connection failure.
+        functionGroups:
+          type: array
+          description: Function Group information of a connector
+          items:
+            $ref: "#/components/schemas/FunctionGroupDto"
+      required:
+      - functionGroups
+      - version
+    ConnectInfoV2:
+      type: object
+      properties:
+        version:
+          $ref: "#/components/schemas/ConnectorVersion"
+          description: Version of the Connector.
+          example: v2
+        connectorUuid:
+          type: string
+          format: uuid
+          description: Connector UUID. Present when connector with that version is
+            already added.
+        errorMessage:
+          type: string
+          description: Error message in case of connection failure.
+        connector:
+          $ref: "#/components/schemas/ConnectorInfo"
+          description: Connector Information
+        interfaces:
+          type: array
+          description: Interfaces supported and implemented by the connector
+          items:
+            $ref: "#/components/schemas/ConnectorInterfaceInfo"
+      required:
+      - interfaces
+      - version
+    ConnectorInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the connector
+        name:
+          type: string
+          description: Name of the connector
+        version:
+          type: string
+          description: Version of the connector
+        description:
+          type: string
+          description: Description of the connector
+        metadata:
+          type: object
+          additionalProperties: {}
+          description: Metadata of the connector
+      required:
+      - id
+      - name
+      - version
+    BulkActionMessageDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        message:
+          type: string
+          description: Message describing the associations of the Objects which is
+            preventing the bulk operation
+          examples:
+          - Object is associated with other items
+      required:
+      - message
+      - name
+      - uuid
+    SearchFilterRequestDto:
+      type: object
+      properties:
+        fieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: Field group of search filter
+        fieldIdentifier:
+          type: string
+          description: "Field identifier of search filter. List of available fields\
+            \ with their identifiers can be retrieved from corresponding endpoint\
+            \ `GET /v1/{resource}/search`, e.g.: [**GET /v1/certificates/search**](../core-certificate/#tag/Certificate-Inventory/operation/getSearchableFieldInformation)"
+        condition:
+          $ref: "#/components/schemas/FilterConditionOperator"
+          description: Condition for the search filter
+        value:
+          description: Value to match
+      required:
+      - condition
+      - fieldIdentifier
+      - fieldSource
+    SearchRequestDto:
+      type: object
+      properties:
+        filters:
+          type: array
+          description: Certificate filter input
+          items:
+            $ref: "#/components/schemas/SearchFilterRequestDto"
+        itemsPerPage:
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+        pageNumber:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
+    ConnectorDtoV2:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        version:
+          $ref: "#/components/schemas/ConnectorVersion"
+          description: Version of the Connector based on the implemented interfaces.
+          example: v2
+        url:
+          type: string
+          description: URL of the Connector
+          examples:
+          - http://network-discovery-provider:8080
+        status:
+          $ref: "#/components/schemas/ConnectorStatus"
+          description: Status of the Connector
+          examples:
+          - CONNECTED
+      required:
+      - name
+      - status
+      - url
+      - uuid
+      - version
+    PaginationResponseDtoConnectorDtoV2:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items returned
+          items:
+            $ref: "#/components/schemas/ConnectorDtoV2"
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+      required:
+      - items
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
     ComplianceProfileRequestDtoV2:
       type: object
       properties:
@@ -29248,45 +30568,6 @@ components:
       - category
       - displayName
       - oid
-    SearchFilterRequestDto:
-      type: object
-      properties:
-        fieldSource:
-          $ref: "#/components/schemas/FilterFieldSource"
-          description: Field group of search filter
-        fieldIdentifier:
-          type: string
-          description: "Field identifier of search filter. List of available fields\
-            \ with their identifiers can be retrieved from corresponding endpoint\
-            \ `GET /v1/{resource}/search`, e.g.: [**GET /v1/certificates/search**](../core-certificate/#tag/Certificate-Inventory/operation/getSearchableFieldInformation)"
-        condition:
-          $ref: "#/components/schemas/FilterConditionOperator"
-          description: Condition for the search filter
-        value:
-          description: Value to match
-      required:
-      - condition
-      - fieldIdentifier
-      - fieldSource
-    SearchRequestDto:
-      type: object
-      properties:
-        filters:
-          type: array
-          description: Certificate filter input
-          items:
-            $ref: "#/components/schemas/SearchFilterRequestDto"
-        itemsPerPage:
-          type: integer
-          format: int32
-          default: 10
-          description: Number of entries per page
-          maximum: 1000
-        pageNumber:
-          type: integer
-          format: int32
-          default: 1
-          description: Page number for the request
     CustomOidEntryListResponseDto:
       type: object
       properties:
@@ -29849,7 +31130,7 @@ components:
           type: string
           description: URL of the Connector to connect
           examples:
-          - http://network-discovery-provicer:8080
+          - http://network-discovery-provider:8080
         authType:
           $ref: "#/components/schemas/AuthType"
           description: Type of authentication for the Connector
@@ -30943,6 +32224,7 @@ components:
       - connect
       - reconnect
       - checkHealth
+      - getConnectorInfo
       - statistics
       - approve
       - approveOverride
@@ -31588,6 +32870,159 @@ components:
       properties:
         comment:
           type: string
+    HealthInfo:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/HealthStatus"
+          description: Current connector operational status
+        components:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/HealthInfoComponent"
+          description: Health status of connector components
+      required:
+      - status
+    HealthInfoComponent:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/HealthStatus"
+          description: Current status of component
+        details:
+          type: object
+          additionalProperties: {}
+          description: Additional details about the component status
+      required:
+      - status
+    HealthStatus:
+      type: string
+      enum:
+      - UP
+      - DEGRADED
+      - DOWN
+      - OUT_OF_SERVICE
+      - UNKNOWN
+    FilterFieldType:
+      type: string
+      enum:
+      - string
+      - number
+      - list
+      - date
+      - datetime
+      - boolean
+    PlatformEnum:
+      type: string
+      enum:
+      - Resource
+      - ResourceAction
+      - FilterConditionOperator
+      - FilterFieldType
+      - FilterFieldSource
+      - SettingsSection
+      - AuthType
+      - HealthStatus
+      - ConnectorStatus
+      - FunctionGroupCode
+      - ConnectorVersion
+      - ConnectorInterface
+      - FeatureFlag
+      - CertificateType
+      - CertificateState
+      - CertificateValidationStatus
+      - CertificateFormat
+      - CertificateFormatEncoding
+      - CertificateValidationCheck
+      - CertificateRevocationReason
+      - CertificateRequestFormat
+      - DiscoveryStatus
+      - CertificateProtocol
+      - CertificateSubjectType
+      - CertificateKeyUsage
+      - CertificateRelationType
+      - OidCategory
+      - KeyAlgorithm
+      - KeyFormat
+      - KeyState
+      - KeyType
+      - KeyUsage
+      - KeyRequestType
+      - KeyCompromiseReason
+      - TokenInstanceStatus
+      - DigestAlgorithm
+      - RsaSignatureScheme
+      - RsaEncryptionScheme
+      - ComplianceStatus
+      - ComplianceRuleStatus
+      - AccountStatus
+      - ProtectionMethod
+      - CmpProfileVariant
+      - AttributeType
+      - AttributeContentType
+      - AttributeConstraintType
+      - AttributeValueTarget
+      - ProgrammingLanguageEnum
+      - AttributeVersion
+      - ProtectionLevel
+      - SchedulerJobExecutionStatus
+      - RecipientType
+      - TriggerType
+      - ConditionType
+      - ExecutionType
+      - ResourceEvent
+      - Module
+      - ActorType
+      - AuthMethod
+      - Operation
+      - OperationResult
+      - ApprovalStatusEnum
+    SearchFieldDataByGroupDto:
+      type: object
+      properties:
+        filterFieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: Search group
+        searchFieldData:
+          type: array
+          description: List of search fields for specified search group
+          items:
+            $ref: "#/components/schemas/SearchFieldDataDto"
+      required:
+      - filterFieldSource
+    SearchFieldDataDto:
+      type: object
+      properties:
+        fieldIdentifier:
+          type: string
+          description: Identifier of field to search
+        fieldLabel:
+          type: string
+          description: Label for the field
+        type:
+          $ref: "#/components/schemas/FilterFieldType"
+          description: Type of the field
+        conditions:
+          type: array
+          description: List of available conditions for the field
+          items:
+            $ref: "#/components/schemas/FilterConditionOperator"
+        platformEnum:
+          $ref: "#/components/schemas/PlatformEnum"
+          description: Platform enum of the field values
+        attributeContentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Attribute filter field content type
+        value:
+          description: Available values for the field
+        multiValue:
+          type: boolean
+          description: "Multivalue flag. true = yes, false = no"
+      required:
+      - conditions
+      - fieldIdentifier
+      - fieldLabel
+      - type
     ComplianceProfileListDto:
       type: object
       properties:
@@ -32586,123 +34021,6 @@ components:
       - hasOwner
       - hasRuleEvaluator
       - resource
-    FilterFieldType:
-      type: string
-      enum:
-      - string
-      - number
-      - list
-      - date
-      - datetime
-      - boolean
-    PlatformEnum:
-      type: string
-      enum:
-      - Resource
-      - ResourceAction
-      - FilterConditionOperator
-      - FilterFieldType
-      - FilterFieldSource
-      - SettingsSection
-      - AuthType
-      - HealthStatus
-      - ConnectorStatus
-      - FunctionGroupCode
-      - CertificateType
-      - CertificateState
-      - CertificateValidationStatus
-      - CertificateFormat
-      - CertificateFormatEncoding
-      - CertificateValidationCheck
-      - CertificateRevocationReason
-      - CertificateRequestFormat
-      - DiscoveryStatus
-      - CertificateProtocol
-      - CertificateSubjectType
-      - CertificateKeyUsage
-      - CertificateRelationType
-      - OidCategory
-      - KeyAlgorithm
-      - KeyFormat
-      - KeyState
-      - KeyType
-      - KeyUsage
-      - KeyRequestType
-      - KeyCompromiseReason
-      - TokenInstanceStatus
-      - DigestAlgorithm
-      - RsaSignatureScheme
-      - RsaEncryptionScheme
-      - ComplianceStatus
-      - ComplianceRuleStatus
-      - AccountStatus
-      - ProtectionMethod
-      - CmpProfileVariant
-      - AttributeType
-      - AttributeContentType
-      - AttributeConstraintType
-      - AttributeValueTarget
-      - ProgrammingLanguageEnum
-      - AttributeVersion
-      - ProtectionLevel
-      - SchedulerJobExecutionStatus
-      - RecipientType
-      - TriggerType
-      - ConditionType
-      - ExecutionType
-      - ResourceEvent
-      - Module
-      - ActorType
-      - AuthMethod
-      - Operation
-      - OperationResult
-      - ApprovalStatusEnum
-    SearchFieldDataByGroupDto:
-      type: object
-      properties:
-        filterFieldSource:
-          $ref: "#/components/schemas/FilterFieldSource"
-          description: Search group
-        searchFieldData:
-          type: array
-          description: List of search fields for specified search group
-          items:
-            $ref: "#/components/schemas/SearchFieldDataDto"
-      required:
-      - filterFieldSource
-    SearchFieldDataDto:
-      type: object
-      properties:
-        fieldIdentifier:
-          type: string
-          description: Identifier of field to search
-        fieldLabel:
-          type: string
-          description: Label for the field
-        type:
-          $ref: "#/components/schemas/FilterFieldType"
-          description: Type of the field
-        conditions:
-          type: array
-          description: List of available conditions for the field
-          items:
-            $ref: "#/components/schemas/FilterConditionOperator"
-        platformEnum:
-          $ref: "#/components/schemas/PlatformEnum"
-          description: Platform enum of the field values
-        attributeContentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Attribute filter field content type
-        value:
-          description: Available values for the field
-        multiValue:
-          type: boolean
-          description: "Multivalue flag. true = yes, false = no"
-      required:
-      - conditions
-      - fieldIdentifier
-      - fieldLabel
-      - type
     ResourceEventDto:
       type: object
       properties:
@@ -33132,12 +34450,6 @@ components:
           description: Nested status of services
       required:
       - status
-    HealthStatus:
-      type: string
-      enum:
-      - ok
-      - nok
-      - unknown
     ComplianceProfilesListDto:
       type: object
       properties:
@@ -34563,29 +35875,6 @@ components:
       - enabled
       - status
       - totalOrders
-      - uuid
-    BulkActionMessageDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: Object identifier
-          examples:
-          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
-        name:
-          type: string
-          description: Object Name
-          examples:
-          - Name
-        message:
-          type: string
-          description: Message describing the associations of the Objects which is
-            preventing the bulk operation
-          examples:
-          - Object is associated with other items
-      required:
-      - message
-      - name
       - uuid
     ComplianceRuleDeletionRequestDto:
       type: object
