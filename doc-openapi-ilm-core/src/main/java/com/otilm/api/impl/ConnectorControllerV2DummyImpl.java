@@ -10,6 +10,8 @@ import com.czertainly.api.model.common.BulkActionMessageDto;
 import com.czertainly.api.model.common.PaginationResponseDto;
 import com.czertainly.api.model.core.connector.v2.*;
 import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.ConnectException;
@@ -17,6 +19,9 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@SecurityRequirements(value = {
+        @SecurityRequirement(name = "")
+})
 public class ConnectorControllerV2DummyImpl implements ConnectorController {
 
     @Override
