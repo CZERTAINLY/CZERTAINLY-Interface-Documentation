@@ -80,6 +80,8 @@ tags:
   description: Connector Management v2 API
 - name: Token Profile Management
   description: Token Profile Management API
+- name: CBOM management
+  description: CBOM management API
 - name: ACME Account Management
   description: ACME Account Management API
 - name: Audit Log
@@ -12034,6 +12036,76 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
       deprecated: true
+  /v1/cboms:
+    post:
+      tags:
+      - CBOM management
+      summary: List CBOMs
+      operationId: listCboms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequestDto"
+        required: true
+      responses:
+        "200":
+          description: List of available CBOMs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginationResponseDtoCbomDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+  /v1/cboms/upload:
+    post:
+      tags:
+      - CBOM management
+      summary: Upload CBOM
+      operationId: uploadCbom
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CbomUploadRequestDto"
+        required: true
+      responses:
+        "201":
+          description: CBOM uploaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CbomDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/authorities:
     get:
       tags:
@@ -21915,6 +21987,125 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/cboms/{uuid}:
+    get:
+      tags:
+      - CBOM management
+      summary: CBOM detail
+      operationId: getCbomDetail
+      parameters:
+      - name: uuid
+        in: path
+        description: CBOM entry UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: CBOM details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CbomDetailDto"
+        "404":
+          description: CBOM not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+  /v1/cboms/{uuid}/versions:
+    get:
+      tags:
+      - CBOM management
+      summary: List CBOM versions
+      operationId: listCbomVersions
+      parameters:
+      - name: uuid
+        in: path
+        description: CBOM entry UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: List of CBOM versions retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CbomDto"
+        "404":
+          description: CBOM not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+  /v1/cboms/search:
+    get:
+      tags:
+      - CBOM management
+      summary: Get Cbom searchable fields information
+      operationId: getSearchableFieldInformation_5
+      responses:
+        "200":
+          description: Cbom searchable field information retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchFieldDataByGroupDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/authorities/{uuid}/endentityprofiles:
     get:
       tags:
@@ -22755,7 +22946,7 @@ paths:
       tags:
       - Audit Log
       summary: Get Audit logs searchable fields information
-      operationId: getSearchableFieldInformation_5
+      operationId: getSearchableFieldInformation_6
       responses:
         "200":
           description: Audit logs searchable field information retrieved
@@ -25422,14 +25613,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
@@ -31981,6 +32172,110 @@ components:
           description: List of UUIDs of the Certificates
           items:
             type: string
+    CbomDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of a CBOM record
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp of CBOM database record
+        serialNumber:
+          type: string
+          description: CBOM serial number (URN)
+        version:
+          type: string
+          description: CBOM version
+        specVersion:
+          type: string
+          description: CBOM spec version
+        timestamp:
+          type: string
+          format: date-time
+          description: A timestamp from CBOM metadata
+        source:
+          type: string
+          description: "CBOM source (e.g.: CBOM-Lens)"
+        algorithms:
+          type: integer
+          format: int32
+          description: Number of algorithms
+        certificates:
+          type: integer
+          format: int32
+          description: Number of certificates
+        protocols:
+          type: integer
+          format: int32
+          description: Number of protocols
+        cryptoMaterial:
+          type: integer
+          format: int32
+          description: Number of crypto material items
+        totalAssets:
+          type: integer
+          format: int32
+          description: Total number of assets
+      required:
+      - algorithms
+      - certificates
+      - createdAt
+      - cryptoMaterial
+      - protocols
+      - serialNumber
+      - source
+      - specVersion
+      - timestamp
+      - totalAssets
+      - uuid
+      - version
+    PaginationResponseDtoCbomDto:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items returned
+          items:
+            $ref: "#/components/schemas/CbomDto"
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+      required:
+      - items
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
+    CbomUploadRequestDto:
+      type: object
+      properties:
+        content:
+          type: object
+          additionalProperties: {}
+          description: Raw JSON content of CBOM document
+        customAttributes:
+          type: array
+          description: Custom attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - content
     AuthorityInstanceRequestDto:
       type: object
       properties:
@@ -35120,6 +35415,71 @@ components:
       - pageNumber
       - totalItems
       - totalPages
+    CbomDetailDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of a CBOM record
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp of CBOM database record
+        serialNumber:
+          type: string
+          description: CBOM serial number (URN)
+        version:
+          type: string
+          description: CBOM version
+        specVersion:
+          type: string
+          description: CBOM spec version
+        timestamp:
+          type: string
+          format: date-time
+          description: A timestamp from CBOM metadata
+        source:
+          type: string
+          description: "CBOM source (e.g.: CBOM-Lens)"
+        algorithms:
+          type: integer
+          format: int32
+          description: Number of algorithms
+        certificates:
+          type: integer
+          format: int32
+          description: Number of certificates
+        protocols:
+          type: integer
+          format: int32
+          description: Number of protocols
+        cryptoMaterial:
+          type: integer
+          format: int32
+          description: Number of crypto material items
+        totalAssets:
+          type: integer
+          format: int32
+          description: Total number of assets
+        content:
+          type: object
+          additionalProperties: {}
+          description: Raw JSON content of CBOM document
+      required:
+      - algorithms
+      - certificates
+      - content
+      - createdAt
+      - cryptoMaterial
+      - protocols
+      - serialNumber
+      - source
+      - specVersion
+      - timestamp
+      - totalAssets
+      - uuid
+      - version
     NameAndIdDto:
       type: object
       properties:
