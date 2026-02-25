@@ -5,19 +5,15 @@ import com.czertainly.api.exception.CbomRepositoryException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.CbomController;
-import com.czertainly.api.interfaces.core.web.EnumController;
 import com.czertainly.api.model.client.certificate.SearchRequestDto;
 import com.czertainly.api.model.common.PaginationResponseDto;
-import com.czertainly.api.model.common.enums.PlatformEnum;
 import com.czertainly.api.model.core.cbom.CbomDetailDto;
 import com.czertainly.api.model.core.cbom.CbomDto;
 import com.czertainly.api.model.core.cbom.CbomUploadRequestDto;
-import com.czertainly.api.model.core.enums.EnumItemDto;
 import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
