@@ -19,7 +19,7 @@ public class SecretControllerDummyImpl implements SecretController {
     }
 
     @Override
-    public SecretContent getSecretContent(SecretRequestDto request, Integer version) throws NotFoundException {
+    public SecretContentResponseDto getSecretContent(SecretRequestDto request, String version) throws NotFoundException {
         return null;
     }
 
