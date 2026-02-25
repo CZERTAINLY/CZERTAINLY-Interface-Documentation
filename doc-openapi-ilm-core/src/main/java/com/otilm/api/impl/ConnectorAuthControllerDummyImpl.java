@@ -32,7 +32,6 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
 
     }
 
-
     @Override
     public List<DataAttribute> getCertificateAttributes() {
         return List.of();
@@ -42,7 +41,6 @@ public class ConnectorAuthControllerDummyImpl implements ConnectorAuthController
     public void validateCertificateAttributes(List<RequestAttribute> attributes) {
 
     }
-
 
     @Override
     public List<DataAttribute> getApiKeyAuthAttributes() {
