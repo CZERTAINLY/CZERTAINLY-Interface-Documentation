@@ -29,9 +29,9 @@ public class OpenApiConfig {
     private String version;
 	
     @Bean
-    public GroupedOpenApi raProfileApis() {
+    public GroupedOpenApi vaultProfileApis() {
         return GroupedOpenApi.builder()
-        		.group("core-token-profile")
+        		.group("core-vault-profile")
                 .packagesToScan("com.otilm.api.impl")
                 //.pathsToMatch("/v1/**")
                 .build()

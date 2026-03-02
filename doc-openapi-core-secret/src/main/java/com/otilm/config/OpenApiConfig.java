@@ -29,7 +29,7 @@ public class OpenApiConfig {
     private String version;
 
     @Bean
-    public GroupedOpenApi authorityApis() {
+    public GroupedOpenApi secretApis() {
         return GroupedOpenApi.builder()
                 .group("core-secret")
                 .packagesToScan("com.otilm.api.impl")
