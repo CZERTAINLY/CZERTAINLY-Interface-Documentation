@@ -25,9 +25,9 @@ public class OpenApiConfig {
     private String version;
 
     @Bean
-    public GroupedOpenApi certificateApis() {
+    public GroupedOpenApi oauth2LoginApis() {
         return GroupedOpenApi.builder()
-                .group("core-login")
+                .group("core-oauth2-login")
                 .packagesToScan("com.otilm.api.impl")
                 //.pathsToMatch("/v1/**")
                 .build()
@@ -35,15 +35,15 @@ public class OpenApiConfig {
     }
 
     @Bean
-    public OpenAPI groupOpenAPI() {
+    public OpenAPI oauth2LoginOpenAPI() {
         Map<String, Object> logoExtension = new HashMap<>();
         Map<String, Object> logoExtensionFields = new HashMap<>();
         logoExtensionFields.put("url", "images/ilm-logo.svg");
         logoExtension.put("x-logo", logoExtensionFields);
 
         return new OpenAPI()
-                .info(new Info().title("Group API")
-                        .description("REST API for managing Login in the platform")
+                .info(new Info().title("OAuth2 Login Management v2 API")
+                        .description("REST API for managing OAuth2 Login v2 in the platform")
                         .version(version)
                         .license(new License()
                                 .name("MIT License")
