@@ -3802,7 +3802,7 @@ components:
           type: array
           description: List of connector interfaces implemented by the Connector
           items:
-            $ref: "#/components/schemas/ConnectorInterfaceInfo"
+            $ref: "#/components/schemas/ConnectorInterfaceDto"
         authType:
           $ref: "#/components/schemas/AuthType"
           description: Type of authentication for the Connector
@@ -3840,9 +3840,13 @@ components:
       - cryptography
       - notification
       - secret
-    ConnectorInterfaceInfo:
+    ConnectorInterfaceDto:
       type: object
       properties:
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of the connector interface
         code:
           $ref: "#/components/schemas/ConnectorInterface"
           description: Code of the implemented connector interface
@@ -3856,6 +3860,7 @@ components:
             $ref: "#/components/schemas/FeatureFlag"
       required:
       - code
+      - uuid
       - version
     ConnectorStatus:
       type: string
@@ -4193,6 +4198,23 @@ components:
       - id
       - name
       - version
+    ConnectorInterfaceInfo:
+      type: object
+      properties:
+        code:
+          $ref: "#/components/schemas/ConnectorInterface"
+          description: Code of the implemented connector interface
+        version:
+          type: string
+          description: Version of the implemented connector interface
+        features:
+          type: array
+          description: Features supported by the connector interface
+          items:
+            $ref: "#/components/schemas/FeatureFlag"
+      required:
+      - code
+      - version
     BulkActionMessageDto:
       type: object
       properties:
@@ -4312,7 +4334,19 @@ components:
           description: Status of the Connector
           examples:
           - CONNECTED
+        functionGroups:
+          type: array
+          description: List of Function Groups implemented by the Connector
+          items:
+            $ref: "#/components/schemas/FunctionGroupDto"
+        interfaces:
+          type: array
+          description: List of connector interfaces implemented by the Connector
+          items:
+            $ref: "#/components/schemas/ConnectorInterfaceDto"
       required:
+      - functionGroups
+      - interfaces
       - name
       - status
       - url
