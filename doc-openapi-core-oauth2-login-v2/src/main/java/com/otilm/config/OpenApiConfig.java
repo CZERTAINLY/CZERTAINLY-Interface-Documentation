@@ -27,7 +27,7 @@ public class OpenApiConfig {
     @Bean
     public GroupedOpenApi oauth2LoginApis() {
         return GroupedOpenApi.builder()
-                .group("core-oauth2-login")
+                .group("core-oauth2-login-v2")
                 .packagesToScan("com.otilm.api.impl")
                 //.pathsToMatch("/v1/**")
                 .build()
@@ -59,5 +59,4 @@ public class OpenApiConfig {
                 .servers(null)
                 ;
     }
-
 }
