@@ -6,6 +6,7 @@ import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
 import com.czertainly.api.interfaces.core.web.CbomController;
 import com.czertainly.api.model.client.certificate.SearchRequestDto;
+import com.czertainly.api.model.common.BulkActionMessageDto;
 import com.czertainly.api.model.common.PaginationResponseDto;
 import com.czertainly.api.model.core.cbom.CbomDetailDto;
 import com.czertainly.api.model.core.cbom.CbomDto;
@@ -42,6 +43,16 @@ public class CbomControllerDummyImpl implements CbomController {
     @Override
     public CbomDto uploadCbom(CbomUploadRequestDto request) throws ValidationException, AlreadyExistException, CbomRepositoryException {
         return null;
+    }
+
+    @Override
+    public void deleteCbom(UUID uuid) throws NotFoundException {
+
+    }
+
+    @Override
+    public List<BulkActionMessageDto> bulkDeleteCbom(List<UUID> uuids) {
+        return List.of();
     }
 
     @Override
