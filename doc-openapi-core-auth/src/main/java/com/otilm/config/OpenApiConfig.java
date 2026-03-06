@@ -43,7 +43,7 @@ public class OpenApiConfig {
 
         return new OpenAPI()
                 .info(new Info().title("Auth API")
-                        .description("REST API for managing user, roles, and permissions in the platform")
+                        .description("REST API for managing users, roles, permissions and OAuth2 provider logins in the platform.")
                         .version(version)
                         .license(new License()
                                 .name("MIT License")

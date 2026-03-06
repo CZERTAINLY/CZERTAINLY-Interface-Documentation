@@ -1,5 +1,6 @@
 package com.otilm.api.impl;
 
+import com.czertainly.api.exception.AttributeException;
 import com.czertainly.api.exception.ConnectorException;
 import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.exception.ValidationException;
@@ -10,6 +11,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 @RestController
 @SecurityRequirements(value = {
         @SecurityRequirement(name = "")
@@ -17,6 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class CallbackControllerDummyImpl implements CallbackController {
     @Override
     public Object callback(String uuid, String functionGroup, String kind, RequestAttributeCallback callback) throws ConnectorException, ValidationException {
+        return null;
+    }
+
+    @Override
+    public Object callback(UUID uuid, RequestAttributeCallback callback) throws ConnectorException, NotFoundException, AttributeException {
         return null;
     }
 
