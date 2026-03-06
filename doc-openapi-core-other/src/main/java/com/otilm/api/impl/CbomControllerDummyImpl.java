@@ -40,6 +40,10 @@ public class CbomControllerDummyImpl implements CbomController {
     }
 
     @Override
+    public void sync() throws CbomRepositoryException {
+    }
+
+    @Override
     public List<SearchFieldDataByGroupDto> getSearchableFieldInformation() {
         return List.of();
     }
