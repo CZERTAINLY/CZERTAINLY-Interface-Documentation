@@ -1,7 +1,8 @@
 openapi: 3.1.0
 info:
   title: Auth API
-  description: "REST API for managing user, roles, and permissions in the platform"
+  description: "REST API for managing users, roles, permissions and OAuth2 provider\
+    \ logins in the platform."
   contact:
     name: ILM
     url: https://www.otilm.com
@@ -23,6 +24,8 @@ tags:
   description: User Management API
 - name: Authentication Management
   description: Authentication Management API
+- name: OAuth2 Login Management v2
+  description: OAuth2 Login Management v2 API
 - name: Role Management
   description: Role Management API
 paths:
@@ -1294,6 +1297,81 @@ paths:
       - BearerJWTAuth: []
       - CertificateAuth: []
       - SessionAuth: []
+  /v2/oauth2/providers:
+    get:
+      tags:
+      - OAuth2 Login Management v2
+      summary: Get available OAuth2 authentication providers
+      operationId: getOAuth2Providers
+      parameters:
+      - name: error
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved available login providers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LoginProviderDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+      security: []
+  /v2/oauth2/providers/{provider}/login:
+    get:
+      tags:
+      - OAuth2 Login Management v2
+      summary: Login with OAuth2 provider
+      description: Initiates OAuth2 login flow with the specified provider. Returns
+        a redirect response to the provider's authentication page.
+      operationId: loginWithProvider
+      parameters:
+      - name: provider
+        in: path
+        description: Name of the OAuth2 authentication provider
+        required: true
+        schema:
+          type: string
+      - name: redirect
+        in: query
+        description: Redirect URL to return to after successful authentication
+        required: false
+        schema:
+          type: string
+      responses:
+        "302":
+          description: Redirect to provider's authentication page
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+      security: []
   /v1/users/{userUuid}/permissions:
     get:
       tags:
@@ -1477,6 +1555,22 @@ paths:
       - SessionAuth: []
 components:
   schemas:
+    ApiKeySecretContent:
+      type: object
+      description: Secret representing an API Key
+      properties:
+        type:
+          $ref: "#/components/schemas/SecretType"
+          description: Secret type
+          examples:
+          - apiKey
+        content:
+          type: string
+          description: API Key content encoded as Base64 string
+      required:
+      - content
+      - type
+      title: ApiKeySecretContent
     AttributeCallback:
       type: object
       properties:
@@ -1654,6 +1748,27 @@ components:
       - $ref: "#/components/schemas/TextAttributeContentV3"
       - $ref: "#/components/schemas/TimeAttributeContentV3"
       - $ref: "#/components/schemas/ResourceObjectContent"
+    BasicAuthSecretContent:
+      type: object
+      description: Secret representing Basic Authentication credentials
+      properties:
+        type:
+          $ref: "#/components/schemas/SecretType"
+          description: Secret type
+          examples:
+          - apiKey
+        username:
+          type: string
+          description: Username for Basic Authentication
+          example: admin
+        password:
+          type: string
+          description: Password for Basic Authentication
+      required:
+      - password
+      - type
+      - username
+      title: BasicAuthSecretContent
     BooleanAttributeContentV2:
       type: object
       description: Boolean attribute content to store true/false values
@@ -1682,6 +1797,11 @@ components:
       required:
       - contentType
       - data
+    CertificateType:
+      type: string
+      enum:
+      - X.509
+      - SSH
     CodeBlockAttributeContentData:
       type: object
       properties:
@@ -2044,6 +2164,22 @@ components:
       required:
       - contentType
       - data
+    GenericSecretContent:
+      type: object
+      description: Secret representing generic content encoded as Base64 string
+      properties:
+        type:
+          $ref: "#/components/schemas/SecretType"
+          description: Secret type
+          examples:
+          - apiKey
+        content:
+          type: string
+          description: Generic secret content encoded as Base64 string
+      required:
+      - content
+      - type
+      title: GenericSecretContent
     IntegerAttributeContentV2:
       type: object
       description: Integer attribute content for integer numbers
@@ -2074,6 +2210,69 @@ components:
       required:
       - contentType
       - data
+    JwtTokenSecretContent:
+      type: object
+      description: Secret representing JWT Token
+      properties:
+        type:
+          $ref: "#/components/schemas/SecretType"
+          description: Secret type
+          examples:
+          - apiKey
+        content:
+          type: string
+          description: JWT Token content encoded as Base64 string
+      required:
+      - content
+      - type
+      title: JwtTokenSecretContent
+    KeyStoreSecretContent:
+      type: object
+      description: Secret representing Key Store
+      properties:
+        type:
+          $ref: "#/components/schemas/SecretType"
+          description: Secret type
+          examples:
+          - apiKey
+        keyStoreType:
+          $ref: "#/components/schemas/KeyStoreType"
+          description: Key Store type
+        content:
+          type: string
+          description: BASE64 encoded content of key store
+        password:
+          type: string
+          description: Password for key store
+      required:
+      - content
+      - keyStoreType
+      - password
+      - type
+      title: KeyStoreSecretContent
+    KeyStoreType:
+      type: string
+      enum:
+      - JKS
+      - PKCS12
+    KeyValueSecretContent:
+      type: object
+      description: Secret representing key-value pairs
+      properties:
+        type:
+          $ref: "#/components/schemas/SecretType"
+          description: Secret type
+          examples:
+          - apiKey
+        content:
+          type: object
+          additionalProperties: {}
+          description: "Key-Value pairs stored as the secret content, represented\
+            \ by JSON object"
+      required:
+      - content
+      - type
+      title: KeyValueSecretContent
     ObjectAttributeContentV2:
       type: object
       description: Object attribute content for data with custom structure
@@ -2100,6 +2299,22 @@ components:
       required:
       - contentType
       - data
+    PrivateKeySecretContent:
+      type: object
+      description: Secret representing private key
+      properties:
+        type:
+          $ref: "#/components/schemas/SecretType"
+          description: Secret type
+          examples:
+          - apiKey
+        content:
+          type: string
+          description: BASE64 encoded content of key in PEM format
+      required:
+      - content
+      - type
+      title: PrivateKeySecretContent
     ProgrammingLanguageEnum:
       type: string
       enum:
@@ -2273,6 +2488,36 @@ components:
       - name
       - uuid
       - version
+    ResourceCertificateContentData:
+      type: object
+      description: Content data for resource object attribute containing certificate
+        content
+      properties:
+        uuid:
+          type: string
+          description: Resource identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Resource name
+          examples:
+          - Main authority
+        resource:
+          $ref: "#/components/schemas/AttributeResource"
+          description: Resource contained in data
+          example: authorities
+        certificateType:
+          $ref: "#/components/schemas/CertificateType"
+          description: Certificate type
+        content:
+          type: string
+          description: Base64 encoded content of the certificate
+      required:
+      - name
+      - resource
+      - uuid
+      title: ResourceCertificateContentData
     ResourceObjectContent:
       type: object
       description: Resource object attribute content carrying resource object data
@@ -2291,23 +2536,67 @@ components:
       - data
     ResourceObjectContentData:
       type: object
+      discriminator:
+        propertyName: resource
+        mapping:
+          authorities: "#/components/schemas/ResourceSimpleContentData"
+          entities: "#/components/schemas/ResourceSimpleContentData"
+          locations: "#/components/schemas/ResourceSimpleContentData"
+          credentials: "#/components/schemas/ResourceSimpleContentData"
+          certificates: "#/components/schemas/ResourceCertificateContentData"
+          secrets: "#/components/schemas/ResourceSecretContentData"
+      oneOf:
+      - $ref: "#/components/schemas/ResourceSimpleContentData"
+      - $ref: "#/components/schemas/ResourceCertificateContentData"
+      - $ref: "#/components/schemas/ResourceSecretContentData"
+      required:
+      - name
+      - resource
+      - uuid
+    ResourceSecretContentData:
+      type: object
+      description: Content data for resource object attribute containing secret content
       properties:
         uuid:
           type: string
-          description: Object identifier
+          description: Resource identifier
           examples:
           - 7b55ge1c-844f-11dc-a8a3-0242ac120002
         name:
           type: string
-          description: Object Name
+          description: Resource name
           examples:
-          - Name
+          - Main authority
         resource:
           $ref: "#/components/schemas/AttributeResource"
           description: Resource contained in data
+          example: authorities
         content:
+          $ref: "#/components/schemas/SecretContent"
+          description: Secret content of the resource object
+      required:
+      - name
+      - resource
+      - uuid
+      title: ResourceSecretContentData
+    ResourceSimpleContentData:
+      type: object
+      description: Content data for resource object defined by its attributes
+      properties:
+        resource:
+          $ref: "#/components/schemas/AttributeResource"
+          description: Resource contained in data
+          example: authorities
+        uuid:
           type: string
-          description: Base64 encoded content of the resource object
+          description: Resource identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Resource name
+          examples:
+          - Main authority
         attributes:
           type: array
           description: Attributes of the resource object
@@ -2317,6 +2606,7 @@ components:
       - name
       - resource
       - uuid
+      title: ResourceSimpleContentData
     ResponseAttribute:
       type: object
       description: Response attribute to send attribute content for object
@@ -2433,6 +2723,58 @@ components:
           description: Secret attribute content data
       required:
       - data
+    SecretContent:
+      type: object
+      description: Secret content dependent on secret type
+      discriminator:
+        propertyName: type
+        mapping:
+          basicAuth: "#/components/schemas/BasicAuthSecretContent"
+          apiKey: "#/components/schemas/ApiKeySecretContent"
+          jwtToken: "#/components/schemas/JwtTokenSecretContent"
+          privateKey: "#/components/schemas/PrivateKeySecretContent"
+          secretKey: "#/components/schemas/SecretKeySecretContent"
+          keyStore: "#/components/schemas/KeyStoreSecretContent"
+          keyValue: "#/components/schemas/KeyValueSecretContent"
+          generic: "#/components/schemas/GenericSecretContent"
+      oneOf:
+      - $ref: "#/components/schemas/BasicAuthSecretContent"
+      - $ref: "#/components/schemas/ApiKeySecretContent"
+      - $ref: "#/components/schemas/JwtTokenSecretContent"
+      - $ref: "#/components/schemas/PrivateKeySecretContent"
+      - $ref: "#/components/schemas/SecretKeySecretContent"
+      - $ref: "#/components/schemas/KeyStoreSecretContent"
+      - $ref: "#/components/schemas/KeyValueSecretContent"
+      - $ref: "#/components/schemas/GenericSecretContent"
+      required:
+      - type
+    SecretKeySecretContent:
+      type: object
+      description: Secret representing secret key
+      properties:
+        type:
+          $ref: "#/components/schemas/SecretType"
+          description: Secret type
+          examples:
+          - apiKey
+        content:
+          type: string
+          description: BASE64 encoded binary (raw) content of key
+      required:
+      - content
+      - type
+      title: SecretKeySecretContent
+    SecretType:
+      type: string
+      enum:
+      - basicAuth
+      - apiKey
+      - jwtToken
+      - privateKey
+      - secretKey
+      - keyStore
+      - keyValue
+      - generic
     StringAttributeContentV2:
       type: object
       description: String attribute content
@@ -2956,6 +3298,19 @@ components:
       required:
       - allowAllResources
       - resources
+    LoginProviderDto:
+      type: object
+      description: Login provider information
+      properties:
+        name:
+          type: string
+          description: Provider name
+        loginUrl:
+          type: string
+          description: Provider login URL
+      required:
+      - loginUrl
+      - name
     AuthActionDto:
       type: object
       properties:
