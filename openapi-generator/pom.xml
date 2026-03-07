@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.czertainly</groupId>
+        <artifactId>doc-interface</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>openapi-generator</artifactId>
+    <version>${revision}</version>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <generated.sources.dir>${project.build.directory}/generated-sources/controllers</generated.sources.dir>
+    </properties>
+
+    <dependencies>
+        <!-- Code generator module -->
+        <dependency>
+            <groupId>com.czertainly</groupId>
+            <artifactId>codegen</artifactId>
+            <version>${revision}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Step 1: Run code generator from codegen module -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-dummy-controllers</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.czertainly.openapi.codegen.DummyControllerGenerator</mainClass>
+                            <arguments>
+                                <argument>${project.parent.basedir}/groups.yaml</argument>
+                                <argument>${generated.sources.dir}</argument>
+                            </arguments>
+                            <includeProjectDependencies>true</includeProjectDependencies>
+                            <includePluginDependencies>false</includePluginDependencies>
+                        </configuration>
+                    </execution>
+
+                    <!-- Step 5: Collect the OpenAPI documentation -->
+                    <execution>
+                        <id>generate-all-openapi-docs</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>${project.basedir}/generate-openapi-docs.sh</executable>
+                            <arguments>
+                                <argument>${project.parent.basedir}/groups.yaml</argument>
+                                <argument>${tomcat.http.port}</argument>
+                                <argument>${project.parent.basedir}/openapi</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Step 2: Add generated sources directory -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-generated-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${generated.sources.dir}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>reserve-tomcat-port</id>
+                        <goals>
+                            <goal>reserve-network-port</goal>
+                        </goals>
+                        <phase>process-resources</phase>
+                        <configuration>
+                            <portNames>
+                                <portName>tomcat.http.port</portName>
+                                <portName>tomcat.jmx.port</portName>
+                            </portNames>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Step 3: Normal compilation -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                </configuration>
+            </plugin>
+
+            <!-- Step 4: Start a Spring Boot app for integration tests -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>pre-integration-test</id>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>
+                                <argument>--server.port=${tomcat.http.port}</argument>
+                            </arguments>
+                            <jmxPort>${tomcat.jmx.port}</jmxPort>
+                            <wait>1000</wait>
+                            <maxAttempts>180</maxAttempts>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>post-integration-test</id>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                        <configuration>
+                            <jmxPort>${tomcat.jmx.port}</jmxPort>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.czertainly.openapi.Application</mainClass>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <test.server.port>${tomcat.http.port}</test.server.port>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
