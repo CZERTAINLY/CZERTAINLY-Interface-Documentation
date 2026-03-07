@@ -87,13 +87,13 @@ public class DummyControllerGenerator {
         // Load the interface class using reflection
         Class<?> interfaceClass = loadInterfaceClass(interfaceFqn);
 
-        // Generate implementation code
+        // Generate implementation code with unique naming
+        String implClassName = ClassNameResolver.generateImplementationClassName(interfaceClass);
         TypeResolver typeResolver = new TypeResolver(interfaceClass);
-        CodeGenerator codeGenerator = new CodeGenerator(typeResolver, PACKAGE_NAME);
+        CodeGenerator codeGenerator = new CodeGenerator(typeResolver, PACKAGE_NAME, implClassName);
         String sourceCode = codeGenerator.generateImplementation(interfaceClass);
 
         // Write to file
-        String implClassName = interfaceClass.getSimpleName() + "DummyImpl";
         fileWriter.writeImplementation(implClassName, sourceCode);
 
         // Log success

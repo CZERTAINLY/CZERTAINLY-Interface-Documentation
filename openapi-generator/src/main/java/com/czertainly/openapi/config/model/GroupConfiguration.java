@@ -1,5 +1,7 @@
 package com.czertainly.openapi.config.model;
 
+import com.czertainly.openapi.config.util.ClassNameResolver;
+
 import java.util.List;
 
 /**
@@ -53,16 +55,12 @@ public class GroupConfiguration {
     }
 
     /**
-     * Extracts controller implementation class names from the interface FQNs
+     * Extracts controller implementation class names from the interface FQNs.
+     * Uses ClassNameResolver to generate unique, collision-free class names.
      */
     public List<String> getControllerClassNames() {
         return interfaces.stream()
-                .map(this::extractControllerClassName)
+                .map(ClassNameResolver::generateImplementationClassName)
                 .toList();
-    }
-
-    private String extractControllerClassName(String interfaceFqn) {
-        String interfaceName = interfaceFqn.substring(interfaceFqn.lastIndexOf('.') + 1);
-        return interfaceName + "DummyImpl";
     }
 }

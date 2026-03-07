@@ -12,10 +12,12 @@ public class CodeGenerator {
 
     private final TypeResolver typeResolver;
     private final String packageName;
+    private final String implClassName;
 
-    public CodeGenerator(TypeResolver typeResolver, String packageName) {
+    public CodeGenerator(TypeResolver typeResolver, String packageName, String implClassName) {
         this.typeResolver = typeResolver;
         this.packageName = packageName;
+        this.implClassName = implClassName;
     }
 
     /**
@@ -25,7 +27,6 @@ public class CodeGenerator {
         StringBuilder code = new StringBuilder();
 
         String className = interfaceClass.getSimpleName();
-        String implClassName = className + "DummyImpl";
 
         appendPackageDeclaration(code);
         appendImports(code, interfaceClass);
