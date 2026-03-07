@@ -2,6 +2,7 @@ package com.czertainly.openapi.codegen;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 
 /**
  * Generates Java source code for dummy controller implementations.
@@ -80,7 +81,7 @@ public class CodeGenerator {
         code.append("    public ");
 
         // Return type
-        code.append(typeResolver.getTypeName(method.getReturnType()));
+        code.append(typeResolver.getTypeName(method.getGenericReturnType()));
         code.append(" ");
 
         // Method name and parameters
@@ -90,7 +91,7 @@ public class CodeGenerator {
         code.append(")");
 
         // Exceptions
-        appendExceptions(code, method.getExceptionTypes());
+        appendExceptions(code, method.getGenericExceptionTypes());
 
         // Method body
         code.append(" {\n");
@@ -103,13 +104,13 @@ public class CodeGenerator {
             if (i > 0) {
                 code.append(", ");
             }
-            code.append(typeResolver.getTypeName(parameters[i].getType()));
+            code.append(typeResolver.getTypeName(parameters[i].getParameterizedType()));
             code.append(" ");
             code.append(parameters[i].getName());
         }
     }
 
-    private void appendExceptions(StringBuilder code, Class<?>[] exceptions) {
+    private void appendExceptions(StringBuilder code, Type[] exceptions) {
         if (exceptions.length > 0) {
             code.append(" throws ");
             for (int i = 0; i < exceptions.length; i++) {

@@ -1,7 +1,6 @@
 package com.czertainly.openapi.codegen;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.util.*;
 
 /**
@@ -40,18 +39,67 @@ public class TypeResolver {
      * Returns simple name for non-conflicting types, fully qualified name for conflicting types.
      */
     public String getTypeName(Class<?> type) {
-        if (type.isArray()) {
-            return getTypeName(type.getComponentType()) + "[]";
+        return getTypeName((Type) type);
+    }
+
+    /**
+     * Gets the appropriate type name to use in generated code for generic types.
+     */
+    public String getTypeName(Type type) {
+        if (type instanceof Class<?>) {
+            Class<?> clazz = (Class<?>) type;
+            if (clazz.isArray()) {
+                return getTypeName(clazz.getComponentType()) + "[]";
+            }
+
+            String simpleName = clazz.getSimpleName();
+            if (conflictingNames.contains(simpleName)) {
+                return clazz.getName().replace('$', '.');
+            }
+            return simpleName;
         }
 
-        String simpleName = type.getSimpleName();
-        
-        // Use fully qualified name if there's a conflict
-        if (conflictingNames.contains(simpleName)) {
-            return type.getName().replace('$', '.');
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Type rawType = parameterizedType.getRawType();
+            Type[] typeArguments = parameterizedType.getActualTypeArguments();
+
+            StringBuilder builder = new StringBuilder();
+            builder.append(getTypeName(rawType));
+            builder.append("<");
+            for (int i = 0; i < typeArguments.length; i++) {
+                if (i > 0) {
+                    builder.append(", ");
+                }
+                builder.append(getTypeName(typeArguments[i]));
+            }
+            builder.append("> ");
+            return builder.toString().trim();
         }
 
-        return simpleName;
+        if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            Type[] lowerBounds = wildcardType.getLowerBounds();
+            if (lowerBounds.length > 0) {
+                return "? super " + joinBounds(lowerBounds);
+            }
+            Type[] upperBounds = wildcardType.getUpperBounds();
+            if (upperBounds.length == 0 || isObjectOnly(upperBounds)) {
+                return "?";
+            }
+            return "? extends " + joinBounds(upperBounds);
+        }
+
+        if (type instanceof TypeVariable<?>) {
+            return ((TypeVariable<?>) type).getName();
+        }
+
+        if (type instanceof GenericArrayType) {
+            GenericArrayType arrayType = (GenericArrayType) type;
+            return getTypeName(arrayType.getGenericComponentType()) + "[]";
+        }
+
+        return type.getTypeName();
     }
 
     /**
@@ -66,18 +114,61 @@ public class TypeResolver {
                 continue;
             }
 
-            addClassToMap(map, method.getReturnType());
-            
-            for (Parameter param : method.getParameters()) {
-                addClassToMap(map, param.getType());
+            addTypeToMap(map, method.getGenericReturnType());
+
+            for (Type paramType : method.getGenericParameterTypes()) {
+                addTypeToMap(map, paramType);
             }
 
-            for (Class<?> exception : method.getExceptionTypes()) {
-                addClassToMap(map, exception);
+            for (Type exception : method.getGenericExceptionTypes()) {
+                addTypeToMap(map, exception);
             }
         }
 
         return map;
+    }
+
+    /**
+     * Adds a type and any nested generic component types to the simple name map.
+     */
+    private void addTypeToMap(Map<String, Set<Class<?>>> map, Type type) {
+        if (type instanceof Class<?>) {
+            addClassToMap(map, (Class<?>) type);
+            return;
+        }
+
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            addTypeToMap(map, parameterizedType.getRawType());
+            for (Type argument : parameterizedType.getActualTypeArguments()) {
+                addTypeToMap(map, argument);
+            }
+            return;
+        }
+
+        if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            for (Type bound : wildcardType.getUpperBounds()) {
+                addTypeToMap(map, bound);
+            }
+            for (Type bound : wildcardType.getLowerBounds()) {
+                addTypeToMap(map, bound);
+            }
+            return;
+        }
+
+        if (type instanceof TypeVariable<?>) {
+            TypeVariable<?> typeVariable = (TypeVariable<?>) type;
+            for (Type bound : typeVariable.getBounds()) {
+                addTypeToMap(map, bound);
+            }
+            return;
+        }
+
+        if (type instanceof GenericArrayType) {
+            GenericArrayType arrayType = (GenericArrayType) type;
+            addTypeToMap(map, arrayType.getGenericComponentType());
+        }
     }
 
     /**
@@ -87,7 +178,7 @@ public class TypeResolver {
         if (type.isPrimitive()) {
             return;
         }
-        
+
         if (type.isArray()) {
             addClassToMap(map, type.getComponentType());
             return;
@@ -126,13 +217,13 @@ public class TypeResolver {
                 continue;
             }
 
-            addImportForType(result, method.getReturnType());
-            
-            for (Parameter param : method.getParameters()) {
-                addImportForType(result, param.getType());
+            addImportForType(result, method.getGenericReturnType());
+
+            for (Type paramType : method.getGenericParameterTypes()) {
+                addImportForType(result, paramType);
             }
 
-            for (Class<?> exception : method.getExceptionTypes()) {
+            for (Type exception : method.getGenericExceptionTypes()) {
                 addImportForType(result, exception);
             }
         }
@@ -143,11 +234,51 @@ public class TypeResolver {
     /**
      * Adds import for a type if it's not a primitive or java.lang type.
      */
+    private void addImportForType(Set<String> imports, Type type) {
+        if (type instanceof Class<?>) {
+            addImportForType(imports, (Class<?>) type);
+            return;
+        }
+
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            addImportForType(imports, parameterizedType.getRawType());
+            for (Type argument : parameterizedType.getActualTypeArguments()) {
+                addImportForType(imports, argument);
+            }
+            return;
+        }
+
+        if (type instanceof WildcardType) {
+            WildcardType wildcardType = (WildcardType) type;
+            for (Type bound : wildcardType.getUpperBounds()) {
+                addImportForType(imports, bound);
+            }
+            for (Type bound : wildcardType.getLowerBounds()) {
+                addImportForType(imports, bound);
+            }
+            return;
+        }
+
+        if (type instanceof TypeVariable<?>) {
+            TypeVariable<?> typeVariable = (TypeVariable<?>) type;
+            for (Type bound : typeVariable.getBounds()) {
+                addImportForType(imports, bound);
+            }
+            return;
+        }
+
+        if (type instanceof GenericArrayType) {
+            GenericArrayType arrayType = (GenericArrayType) type;
+            addImportForType(imports, arrayType.getGenericComponentType());
+        }
+    }
+
     private void addImportForType(Set<String> imports, Class<?> type) {
         if (type.isPrimitive()) {
             return;
         }
-        
+
         if (type.isArray()) {
             addImportForType(imports, type.getComponentType());
             return;
@@ -182,5 +313,24 @@ public class TypeResolver {
      */
     private String getSimpleName(String fullyQualifiedName) {
         return fullyQualifiedName.substring(fullyQualifiedName.lastIndexOf('.') + 1);
+    }
+
+    private boolean isObjectOnly(Type[] bounds) {
+        if (bounds.length != 1) {
+            return false;
+        }
+        Type bound = bounds[0];
+        return bound instanceof Class<?> && Object.class.equals(bound);
+    }
+
+    private String joinBounds(Type[] bounds) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < bounds.length; i++) {
+            if (i > 0) {
+                builder.append(" & ");
+            }
+            builder.append(getTypeName(bounds[i]));
+        }
+        return builder.toString();
     }
 }
