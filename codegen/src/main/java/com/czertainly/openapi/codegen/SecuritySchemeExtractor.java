@@ -19,23 +19,18 @@ import java.util.Map;
  */
 public class SecuritySchemeExtractor {
 
-    private static final String AUTH_PROTECTED_CONTROLLER = "com.czertainly.api.interfaces.AuthProtectedController";
-    private static final String AUTH_PROTECTED_CONNECTOR_CONTROLLER_V1 = "com.czertainly.api.interfaces.AuthProtectedConnectorController";
-    private static final String AUTH_PROTECTED_CONNECTOR_CONTROLLER_V2 = "com.czertainly.api.interfaces.connector.common.v2.AuthProtectedConnectorController";
-    private static final String NO_AUTH_CONTROLLER_V1 = "com.czertainly.api.interfaces.NoAuthController";
-    private static final String NO_AUTH_CONNECTOR_CONTROLLER_V2 = "com.czertainly.api.interfaces.connector.common.v2.NoAuthConnectorController";
-    private static final String LEGACY_INFO_CONTROLLER = "com.czertainly.api.interfaces.core.web.InfoController";
-    private static final List<String> ALL_BASE_CLASSES = List.of(
-            AUTH_PROTECTED_CONTROLLER,
-            AUTH_PROTECTED_CONNECTOR_CONTROLLER_V1,
-            AUTH_PROTECTED_CONNECTOR_CONTROLLER_V2,
-            NO_AUTH_CONTROLLER_V1,
-            NO_AUTH_CONNECTOR_CONTROLLER_V2
-    );
-
+    private final List<String> baseSecurityInterfaces;
+    private final List<String> legacyControllers;
     private final Map<String, SecuritySchemeInfo> baseClassSchemes = new HashMap<>();
 
-    public SecuritySchemeExtractor() {
+    /**
+     * Creates a SecuritySchemeExtractor with configuration loaded from groups.yaml.
+     *
+     * @param securityConfig the security configuration containing base interfaces and legacy controllers
+     */
+    public SecuritySchemeExtractor(ConfigurationLoader.SecurityConfiguration securityConfig) {
+        this.baseSecurityInterfaces = new ArrayList<>(securityConfig.baseSecurityInterfaces());
+        this.legacyControllers = new ArrayList<>(securityConfig.legacyControllers());
         initializeBaseClassSchemes();
     }
 
@@ -45,12 +40,12 @@ public class SecuritySchemeExtractor {
      */
     private void initializeBaseClassSchemes() {
         try {
-            analyzeBaseClass(AUTH_PROTECTED_CONTROLLER);
-            analyzeBaseClass(AUTH_PROTECTED_CONNECTOR_CONTROLLER_V1);
-            analyzeBaseClass(AUTH_PROTECTED_CONNECTOR_CONTROLLER_V2);
-            analyzeBaseClass(NO_AUTH_CONTROLLER_V1);
-            analyzeBaseClass(NO_AUTH_CONNECTOR_CONTROLLER_V2);
-            analyzeLegacyController(LEGACY_INFO_CONTROLLER);
+            for (String baseInterface : baseSecurityInterfaces) {
+                analyzeBaseClass(baseInterface);
+            }
+            for (String legacyController : legacyControllers) {
+                analyzeLegacyController(legacyController);
+            }
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Failed to load base security controller classes: " + e.getMessage(), e);
         }
@@ -118,15 +113,16 @@ public class SecuritySchemeExtractor {
     /**
      * Determines which base class an interface extends.
      * Validates that it extends exactly one of the base classes,
-     * except for the legacy InfoController, which is explicitly allowed.
+     * except for legacy controllers, which are explicitly allowed.
      *
      * @param interfaceClass The interface to check
      * @return The FQN of the base security controller class
      * @throws IllegalArgumentException if the interface doesn't inherit from any base class
      */
     public String determineBaseSecurityClass(Class<?> interfaceClass) {
-        if (LEGACY_INFO_CONTROLLER.equals(interfaceClass.getName())) {
-            return LEGACY_INFO_CONTROLLER;
+        // Check if it's a legacy controller
+        if (legacyControllers.contains(interfaceClass.getName())) {
+            return interfaceClass.getName();
         }
 
         String matchedBase = null;
@@ -163,8 +159,8 @@ public class SecuritySchemeExtractor {
 
         if (matchedBase == null) {
             throw new IllegalArgumentException(
-                    "Controller interface " + interfaceClass.getName() + " does not extend any of the base security interfaces: " + ALL_BASE_CLASSES +
-                            ". Legacy exception allowed only for: " + LEGACY_INFO_CONTROLLER
+                    "Controller interface " + interfaceClass.getName() + " does not extend any of the base security interfaces: " + baseSecurityInterfaces +
+                            ". Legacy exception allowed only for: " + legacyControllers
             );
         }
 
@@ -175,7 +171,7 @@ public class SecuritySchemeExtractor {
      * Checks if a class is one of the base security classes.
      */
     private boolean isBaseSecurityClass(String classFqn) {
-        return ALL_BASE_CLASSES.contains(classFqn);
+        return baseSecurityInterfaces.contains(classFqn);
     }
 
     /**

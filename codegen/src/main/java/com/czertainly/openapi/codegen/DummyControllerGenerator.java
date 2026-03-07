@@ -1,6 +1,7 @@
 package com.czertainly.openapi.codegen;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -18,11 +19,10 @@ public class DummyControllerGenerator {
     private static final String PACKAGE_NAME = "com.czertainly.openapi.generated";
 
     private final ConfigurationLoader configLoader;
-    private final SecuritySchemeExtractor securitySchemeExtractor;
+    private SecuritySchemeExtractor securitySchemeExtractor;
 
     public DummyControllerGenerator() {
         this.configLoader = new ConfigurationLoader();
-        this.securitySchemeExtractor = new SecuritySchemeExtractor();
     }
 
     public static void main(String[] args) throws IOException {
@@ -44,7 +44,11 @@ public class DummyControllerGenerator {
      * Main generation method that orchestrates the entire process.
      */
     public void generate(String groupsYamlPath, String outputDir) throws IOException {
-        // Load configuration
+        // Load security configuration
+        ConfigurationLoader.SecurityConfiguration securityConfig = configLoader.loadSecurityConfiguration(groupsYamlPath);
+        this.securitySchemeExtractor = new SecuritySchemeExtractor(securityConfig);
+
+        // Load interface configuration
         Set<String> allInterfaces = configLoader.loadInterfaces(groupsYamlPath);
         int groupCount = configLoader.getGroupCount(groupsYamlPath);
 
@@ -87,14 +91,10 @@ public class DummyControllerGenerator {
      * Validates that the interface extends one of the three base security controllers.
      */
     private void generateDummyController(String interfaceFqn, FileWriter fileWriter) throws Exception {
-        // Load the interface class using reflection
         Class<?> interfaceClass = loadInterfaceClass(interfaceFqn);
 
-        // Determine and validate the base security class
         String baseSecurityClass = securitySchemeExtractor.determineBaseSecurityClass(interfaceClass);
-
-        // Get the security schemes for this base class
-        var securitySchemes = securitySchemeExtractor.getSecuritySchemesForBaseClass(baseSecurityClass);
+        List<String> securitySchemes = securitySchemeExtractor.getSecuritySchemesForBaseClass(baseSecurityClass);
 
         // Generate implementation code with unique naming
         String implClassName = ClassNameResolver.generateImplementationClassName(interfaceClass);
@@ -103,10 +103,8 @@ public class DummyControllerGenerator {
                 baseSecurityClass, securitySchemes);
         String sourceCode = codeGenerator.generateImplementation(interfaceClass);
 
-        // Write to file
         fileWriter.writeImplementation(implClassName, sourceCode);
 
-        // Log success
         int methodCount = countNonObjectMethods(interfaceClass);
         String baseClassName = baseSecurityClass.substring(baseSecurityClass.lastIndexOf('.') + 1);
         System.out.println("✓ Generated " + implClassName + " (" + methodCount + " methods, " + baseClassName + ")");
@@ -156,9 +154,6 @@ public class DummyControllerGenerator {
         System.out.println("=".repeat(70));
     }
 
-    /**
-     * Simple record to hold generation results.
-     */
     private record GenerationResult(int successCount, int failCount) {
     }
 }
