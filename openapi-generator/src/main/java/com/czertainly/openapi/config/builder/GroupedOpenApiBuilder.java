@@ -1,10 +1,11 @@
 package com.czertainly.openapi.config.builder;
 
-import com.czertainly.openapi.config.loader.GroupsConfigurationLoader;
 import com.czertainly.openapi.config.model.CommonConfiguration;
 import com.czertainly.openapi.config.model.GroupConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 @Component
 public class GroupedOpenApiBuilder {
-
+    private static final Logger log = LoggerFactory.getLogger(GroupedOpenApiBuilder.class);
     private static final String BASE_PACKAGE = "com.czertainly.openapi.generated";
 
     private final OpenApiInfoBuilder infoBuilder;
@@ -54,7 +55,7 @@ public class GroupedOpenApiBuilder {
      */
     private void validateGroupConfiguration(GroupConfiguration groupConfig) {
         if (groupConfig.getInterfaces() == null || groupConfig.getInterfaces().isEmpty()) {
-            System.out.println("Warning: Group " + groupConfig.getGroupName() + " has no interfaces, skipping");
+            log.warn("Group {} has no interfaces, skipping", groupConfig.getGroupName());
             throw new IllegalArgumentException("Group has no interfaces");
         }
     }
@@ -93,8 +94,7 @@ public class GroupedOpenApiBuilder {
      * Logs that a group has been registered
      */
     private void logGroupRegistration(GroupConfiguration groupConfig, List<String> controllerClassNames) {
-        System.out.printf(
-                "Registered OpenAPI group: %s (%d interfaces: %s) - %s%n",
+        log.info("Registered OpenAPI group: {} ({} interfaces: {}) - {}",
                 groupConfig.getGroupName(),
                 groupConfig.getInterfaces().size(),
                 controllerClassNames,

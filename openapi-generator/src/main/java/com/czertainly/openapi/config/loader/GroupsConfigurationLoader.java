@@ -2,9 +2,10 @@ package com.czertainly.openapi.config.loader;
 
 import com.czertainly.openapi.config.model.CommonConfiguration;
 import com.czertainly.openapi.config.model.GroupConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -17,7 +18,7 @@ import java.util.Map;
  */
 @Component
 public class GroupsConfigurationLoader {
-
+    private static final Logger log = LoggerFactory.getLogger(GroupsConfigurationLoader.class);
     private static final String GROUPS_YAML_PATH = "../groups.yaml";
     private static final String GROUPS_YAML_CLASSPATH = "groups.yaml";
 
@@ -44,7 +45,7 @@ public class GroupsConfigurationLoader {
             input.close();
 
             parseConfiguration(rawConfig);
-            System.out.println("Loaded OpenAPI configuration from groups.yaml");
+            log.info("Loaded OpenAPI configuration from groups.yaml");
         } catch (Exception e) {
             throw new IllegalStateException("Failed to load groups.yaml configuration", e);
         }
@@ -174,7 +175,7 @@ public class GroupsConfigurationLoader {
     }
 
     /**
-     * Gets all group configurations
+     * Gets the groups configuration
      */
     public List<GroupConfiguration> getGroups() {
         return groups;
