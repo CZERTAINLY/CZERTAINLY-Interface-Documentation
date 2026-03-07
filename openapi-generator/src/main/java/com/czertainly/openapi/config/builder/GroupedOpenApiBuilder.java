@@ -2,6 +2,8 @@ package com.czertainly.openapi.config.builder;
 
 import com.czertainly.openapi.config.model.CommonConfiguration;
 import com.czertainly.openapi.config.model.GroupConfiguration;
+import com.czertainly.openapi.config.security.OpenApiSecuritySanitizer;
+import com.czertainly.openapi.config.security.SecuritySchemeMetadataReader;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import org.slf4j.Logger;
@@ -11,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Builds GroupedOpenApi beans from configuration
@@ -22,11 +26,18 @@ public class GroupedOpenApiBuilder {
     private static final String BASE_PACKAGE = "com.czertainly.openapi.generated";
 
     private final OpenApiInfoBuilder infoBuilder;
+    private final SecuritySchemeMetadataReader securitySchemeMetadataReader;
+    private final OpenApiSecuritySanitizer openApiSecuritySanitizer;
     private final String apiVersion;
 
     @Autowired
-    public GroupedOpenApiBuilder(OpenApiInfoBuilder infoBuilder, @Value("${api.version}") String apiVersion) {
+    public GroupedOpenApiBuilder(OpenApiInfoBuilder infoBuilder,
+                                 SecuritySchemeMetadataReader securitySchemeMetadataReader,
+                                 OpenApiSecuritySanitizer openApiSecuritySanitizer,
+                                 @Value("${api.version}") String apiVersion) {
         this.infoBuilder = infoBuilder;
+        this.securitySchemeMetadataReader = securitySchemeMetadataReader;
+        this.openApiSecuritySanitizer = openApiSecuritySanitizer;
         this.apiVersion = apiVersion;
     }
 
@@ -61,7 +72,8 @@ public class GroupedOpenApiBuilder {
     }
 
     /**
-     * Customizes the OpenAPI object for a specific group
+     * Customizes the OpenAPI object for a specific group.
+     * Applies group-specific info and sanitizes security schemas based on group's interfaces.
      */
     private void customizeOpenApi(OpenAPI openApi, GroupConfiguration groupConfig, CommonConfiguration commonConfig) {
         Info info = infoBuilder.buildInfo(
@@ -73,6 +85,48 @@ public class GroupedOpenApiBuilder {
         openApi.info(info);
 
         infoBuilder.addCommonElements(openApi, commonConfig);
+
+        // Determine which security schemes are allowed for this group's interfaces
+        Set<String> allowedSchemes = determineAllowedSecuritySchemes(groupConfig);
+
+        // Sanitize: remove unwanted security schemes
+        openApiSecuritySanitizer.sanitizeSecuritySchemes(openApi, allowedSchemes);
+    }
+
+    /**
+     * Determines which security schemes are allowed for a group based on its interfaces.
+     * Collects all unique security schemes from all base classes used by the group's interfaces.
+     */
+    private Set<String> determineAllowedSecuritySchemes(GroupConfiguration groupConfig) {
+        Set<String> allowedSchemes = new HashSet<>();
+
+        // For each interface, find its base class and add allowed schemes
+        for (String interfaceFqn : groupConfig.getInterfaces()) {
+            // The base class info was extracted during codegen and stored in annotations
+            String generatedClassName = com.czertainly.openapi.config.util.ClassNameResolver.generateImplementationClassName(interfaceFqn);
+            try {
+                Class<?> generatedClass = Class.forName(BASE_PACKAGE + "." + generatedClassName);
+                com.czertainly.openapi.codegen.SecuritySchemeCategory annotation =
+                        generatedClass.getAnnotation(com.czertainly.openapi.codegen.SecuritySchemeCategory.class);
+
+                if (annotation != null) {
+                    String baseClass = annotation.baseClass();
+                    Set<String> schemesForBase = securitySchemeMetadataReader.getSchemesForBaseClass(baseClass);
+                    allowedSchemes.addAll(schemesForBase);
+
+                    log.debug("Interface {} → base class {}, schemes: {}",
+                            interfaceFqn,
+                            baseClass.substring(baseClass.lastIndexOf('.') + 1),
+                            schemesForBase
+                    );
+                }
+            } catch (ClassNotFoundException e) {
+                log.warn("Could not load generated class for interface {}: {}", interfaceFqn, e.getMessage());
+            }
+        }
+
+        log.debug("Group {} allowed security schemes: {}", groupConfig.getGroupName(), allowedSchemes);
+        return allowedSchemes;
     }
 
     /**

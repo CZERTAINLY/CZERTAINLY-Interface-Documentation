@@ -9,8 +9,8 @@ import java.util.Set;
  * classes that implement the interfaces defined in groups.yaml.
  * <p>
  * Uses reflection to inspect interfaces and generate proper method implementations.
- * Handles import conflicts by detecting classes with the same simple name from different
- * packages and using fully qualified names for those classes.
+ * Validates that each interface extends one of the three base security controllers.
+ * Annotates generated classes with @SecuritySchemeCategory metadata.
  * <p>
  */
 public class DummyControllerGenerator {
@@ -18,9 +18,11 @@ public class DummyControllerGenerator {
     private static final String PACKAGE_NAME = "com.czertainly.openapi.generated";
 
     private final ConfigurationLoader configLoader;
+    private final SecuritySchemeExtractor securitySchemeExtractor;
 
     public DummyControllerGenerator() {
         this.configLoader = new ConfigurationLoader();
+        this.securitySchemeExtractor = new SecuritySchemeExtractor();
     }
 
     public static void main(String[] args) throws IOException {
@@ -82,15 +84,23 @@ public class DummyControllerGenerator {
 
     /**
      * Generates a single dummy controller implementation for the given interface.
+     * Validates that the interface extends one of the three base security controllers.
      */
     private void generateDummyController(String interfaceFqn, FileWriter fileWriter) throws Exception {
         // Load the interface class using reflection
         Class<?> interfaceClass = loadInterfaceClass(interfaceFqn);
 
+        // Determine and validate the base security class
+        String baseSecurityClass = securitySchemeExtractor.determineBaseSecurityClass(interfaceClass);
+
+        // Get the security schemes for this base class
+        var securitySchemes = securitySchemeExtractor.getSecuritySchemesForBaseClass(baseSecurityClass);
+
         // Generate implementation code with unique naming
         String implClassName = ClassNameResolver.generateImplementationClassName(interfaceClass);
         TypeResolver typeResolver = new TypeResolver(interfaceClass);
-        CodeGenerator codeGenerator = new CodeGenerator(typeResolver, PACKAGE_NAME, implClassName);
+        CodeGenerator codeGenerator = new CodeGenerator(typeResolver, PACKAGE_NAME, implClassName,
+                baseSecurityClass, securitySchemes);
         String sourceCode = codeGenerator.generateImplementation(interfaceClass);
 
         // Write to file
@@ -98,7 +108,8 @@ public class DummyControllerGenerator {
 
         // Log success
         int methodCount = countNonObjectMethods(interfaceClass);
-        System.out.println("✓ Generated " + implClassName + " (" + methodCount + " methods)");
+        String baseClassName = baseSecurityClass.substring(baseSecurityClass.lastIndexOf('.') + 1);
+        System.out.println("✓ Generated " + implClassName + " (" + methodCount + " methods, " + baseClassName + ")");
     }
 
     /**
