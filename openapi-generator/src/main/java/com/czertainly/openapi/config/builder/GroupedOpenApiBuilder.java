@@ -86,6 +86,19 @@ public class GroupedOpenApiBuilder {
 
         infoBuilder.addCommonElements(openApi, commonConfig, groupConfig.getServerUrl());
 
+        // Apply group-specific extensions to the Info object
+        if (groupConfig.getExtensions() != null && !groupConfig.getExtensions().isEmpty()) {
+            if (info.getExtensions() == null) {
+                info.setExtensions(new java.util.HashMap<>());
+            }
+            // Merge group-specific extensions (they override common extensions if there's a conflict)
+            info.getExtensions().putAll(groupConfig.getExtensions());
+            log.debug("Applied {} extension(s) to group {}: {}",
+                    groupConfig.getExtensions().size(),
+                    groupConfig.getGroupName(),
+                    groupConfig.getExtensions().keySet());
+        }
+
         // Determine which security schemes are allowed for this group's interfaces
         Set<String> allowedSchemes = determineAllowedSecuritySchemes(groupConfig);
 

@@ -3,6 +3,7 @@ package com.czertainly.openapi.config.model;
 import com.czertainly.openapi.config.util.ClassNameResolver;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Model class representing a single group configuration from groups.yaml
@@ -14,6 +15,7 @@ public class GroupConfiguration {
     private String description;
     private List<String> interfaces;
     private String serverUrl;
+    private Map<String, Object> extensions;
 
     public String getId() {
         return id;
@@ -61,6 +63,14 @@ public class GroupConfiguration {
 
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
+    }
+
+    public Map<String, Object> getExtensions() {
+        return extensions;
+    }
+
+    public void setExtensions(Map<String, Object> extensions) {
+        this.extensions = extensions;
     }
 
     /**

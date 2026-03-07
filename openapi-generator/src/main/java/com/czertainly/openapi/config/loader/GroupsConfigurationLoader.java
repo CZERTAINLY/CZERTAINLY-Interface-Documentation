@@ -19,7 +19,7 @@ import java.util.Map;
 @Component
 public class GroupsConfigurationLoader {
     private static final Logger log = LoggerFactory.getLogger(GroupsConfigurationLoader.class);
-    private static final String GROUPS_YAML_PATH = "../groups.yaml";
+    private static final List<String> GROUPS_YAML_PATHS = List.of("groups.yaml", "../groups.yaml");
     private static final String GROUPS_YAML_CLASSPATH = "groups.yaml";
 
     private List<GroupConfiguration> groups;
@@ -56,9 +56,12 @@ public class GroupsConfigurationLoader {
      */
     private InputStream getConfigurationInputStream() throws Exception {
         // Try to load from the file system first (for Maven build)
-        if (Files.exists(Paths.get(GROUPS_YAML_PATH))) {
-            return Files.newInputStream(Paths.get(GROUPS_YAML_PATH));
+        for (String path : GROUPS_YAML_PATHS) {
+            if (Files.exists(Paths.get(path))) {
+                return Files.newInputStream(Paths.get(path));
+            }
         }
+
         // Fallback to classpath
         return getClass().getClassLoader().getResourceAsStream(GROUPS_YAML_CLASSPATH);
     }
@@ -133,6 +136,12 @@ public class GroupsConfigurationLoader {
             config.setServers(servers);
         }
 
+        // Parse extensions
+        Map<String, Object> extensionsMap = (Map<String, Object>) rawCommonConfig.get("extensions");
+        if (extensionsMap != null) {
+            config.setExtensions(extensionsMap);
+        }
+
         return config;
     }
 
@@ -175,6 +184,11 @@ public class GroupsConfigurationLoader {
         String serverUrl = (String) groupMap.get("serverUrl");
         if (serverUrl != null) {
             group.setServerUrl(serverUrl);
+        }
+
+        Map<String, Object> extensions = (Map<String, Object>) groupMap.get("extensions");
+        if (extensions != null) {
+            group.setExtensions(extensions);
         }
 
         return group;

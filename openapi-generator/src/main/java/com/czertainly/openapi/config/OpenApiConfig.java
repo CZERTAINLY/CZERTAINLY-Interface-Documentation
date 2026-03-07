@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * Dynamic OpenAPI configuration that reads group definitions from groups.yaml
  * and creates GroupedOpenApi beans for each group.
- * 
+ * <p>
  * This class delegates configuration loading and building to specialized components
  * for better separation of concerns and maintainability.
  */

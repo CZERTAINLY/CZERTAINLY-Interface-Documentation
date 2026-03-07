@@ -9,6 +9,7 @@ public class CommonConfiguration {
     private ContactConfiguration contact;
     private ExternalDocsConfiguration externalDocs;
     private java.util.List<ServerConfiguration> servers;
+    private java.util.Map<String, Object> extensions;
 
     public LogoConfiguration getLogo() {
         return logo;
@@ -48,6 +49,14 @@ public class CommonConfiguration {
 
     public void setServers(java.util.List<ServerConfiguration> servers) {
         this.servers = servers;
+    }
+
+    public java.util.Map<String, Object> getExtensions() {
+        return extensions;
+    }
+
+    public void setExtensions(java.util.Map<String, Object> extensions) {
+        this.extensions = extensions;
     }
 
     public static class LogoConfiguration {

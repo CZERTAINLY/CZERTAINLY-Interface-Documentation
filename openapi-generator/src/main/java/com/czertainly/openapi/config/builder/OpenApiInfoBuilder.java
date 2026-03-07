@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Builds OpenAPI objects with common configuration elements
@@ -35,7 +34,7 @@ public class OpenApiInfoBuilder {
                 .description(description)
                 .version(version);
 
-        addLogo(info, commonConfig);
+        addExtensions(info, commonConfig);
         addLicense(info, commonConfig);
         addContact(info, commonConfig);
 
@@ -43,21 +42,16 @@ public class OpenApiInfoBuilder {
     }
 
     /**
-     * Adds logo extension to Info object
+     * Adds all extensions from common configuration to Info object
      */
-    private void addLogo(Info info, CommonConfiguration commonConfig) {
-        CommonConfiguration.LogoConfiguration logo = commonConfig.getLogo();
-        if (logo != null && logo.getUrl() != null) {
-            Map<String, Object> logoExtension = new HashMap<>();
-            Map<String, Object> logoExtensionFields = new HashMap<>();
-            logoExtensionFields.put("url", logo.getUrl());
-            logoExtension.put("x-logo", logoExtensionFields);
-            info.extensions(logoExtension);
+    private void addExtensions(Info info, CommonConfiguration commonConfig) {
+        if (commonConfig.getExtensions() != null && !commonConfig.getExtensions().isEmpty()) {
+            info.extensions(new HashMap<>(commonConfig.getExtensions()));
         }
     }
 
     /**
-     * Adds license to Info object
+     * Adds license to an Info object
      */
     private void addLicense(Info info, CommonConfiguration commonConfig) {
         CommonConfiguration.LicenseConfiguration license = commonConfig.getLicense();
@@ -69,7 +63,7 @@ public class OpenApiInfoBuilder {
     }
 
     /**
-     * Adds contact to Info object
+     * Adds contact to an Info object
      */
     private void addContact(Info info, CommonConfiguration commonConfig) {
         CommonConfiguration.ContactConfiguration contact = commonConfig.getContact();
