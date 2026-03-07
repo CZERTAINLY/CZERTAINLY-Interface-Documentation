@@ -13,6 +13,7 @@ public class GroupConfiguration {
     private String title;
     private String description;
     private List<String> interfaces;
+    private String serverUrl;
 
     public String getId() {
         return id;
@@ -52,6 +53,14 @@ public class GroupConfiguration {
 
     public void setInterfaces(List<String> interfaces) {
         this.interfaces = interfaces;
+    }
+
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
+    public void setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
     }
 
     /**

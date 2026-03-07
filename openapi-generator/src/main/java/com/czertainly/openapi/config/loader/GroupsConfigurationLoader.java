@@ -171,6 +171,12 @@ public class GroupsConfigurationLoader {
         group.setTitle((String) groupMap.get("title"));
         group.setDescription((String) groupMap.get("description"));
         group.setInterfaces((List<String>) groupMap.get("interfaces"));
+
+        String serverUrl = (String) groupMap.get("serverUrl");
+        if (serverUrl != null) {
+            group.setServerUrl(serverUrl);
+        }
+
         return group;
     }
 

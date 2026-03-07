@@ -84,7 +84,7 @@ public class GroupedOpenApiBuilder {
         );
         openApi.info(info);
 
-        infoBuilder.addCommonElements(openApi, commonConfig);
+        infoBuilder.addCommonElements(openApi, commonConfig, groupConfig.getServerUrl());
 
         // Determine which security schemes are allowed for this group's interfaces
         Set<String> allowedSchemes = determineAllowedSecuritySchemes(groupConfig);

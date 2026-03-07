@@ -82,21 +82,23 @@ public class OpenApiInfoBuilder {
     }
 
     /**
-     * Adds common elements to OpenAPI object
+     * Adds common elements to the OpenAPI object with an optional group-specific server URL override
      */
-    public void addCommonElements(OpenAPI openAPI, CommonConfiguration commonConfig) {
-        addServers(openAPI, commonConfig);
+    public void addCommonElements(OpenAPI openAPI, CommonConfiguration commonConfig, String serverUrlOverride) {
+        addServers(openAPI, commonConfig, serverUrlOverride);
         addExternalDocs(openAPI, commonConfig);
     }
 
     /**
-     * Adds servers to OpenAPI object
+     * Adds servers to OpenAPI object with optional group-specific server URL override
+     * If serverUrlOverride is provided, it replaces the URL in common servers while keeping descriptions
      */
-    private void addServers(OpenAPI openAPI, CommonConfiguration commonConfig) {
+    private void addServers(OpenAPI openAPI, CommonConfiguration commonConfig, String serverUrlOverride) {
         List<CommonConfiguration.ServerConfiguration> servers = commonConfig.getServers();
+
         if (servers != null && !servers.isEmpty()) {
             List<Server> serverList = servers.stream()
-                    .map(this::buildServer)
+                    .map(serverConfig -> buildServerWithUrlOverride(serverConfig, serverUrlOverride))
                     .toList();
             openAPI.servers(serverList);
         } else {
@@ -105,11 +107,12 @@ public class OpenApiInfoBuilder {
     }
 
     /**
-     * Builds a Server object from configuration
+     * Builds a Server object from configuration with optional URL override
      */
-    private Server buildServer(CommonConfiguration.ServerConfiguration serverConfig) {
+    private Server buildServerWithUrlOverride(CommonConfiguration.ServerConfiguration serverConfig, String urlOverride) {
+        String url = urlOverride != null ? urlOverride : serverConfig.getUrl();
         return new Server()
-                .url(serverConfig.getUrl())
+                .url(url)
                 .description(serverConfig.getDescription());
     }
 
