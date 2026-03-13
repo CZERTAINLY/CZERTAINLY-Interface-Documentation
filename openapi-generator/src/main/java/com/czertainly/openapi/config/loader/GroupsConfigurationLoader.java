@@ -4,12 +4,14 @@ import com.czertainly.openapi.config.model.CommonConfiguration;
 import com.czertainly.openapi.config.model.GroupConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,13 +21,18 @@ import java.util.Map;
 @Component
 public class GroupsConfigurationLoader {
     private static final Logger log = LoggerFactory.getLogger(GroupsConfigurationLoader.class);
-    private static final List<String> GROUPS_YAML_PATHS = List.of("groups.yaml", "../groups.yaml");
-    private static final String GROUPS_YAML_CLASSPATH = "groups.yaml";
+    private static final List<String> GROUPS_YAML_FILESYSTEM_PATHS = List.of("groups.yaml", "../groups.yaml");
+    private static final String GROUPS_YAML_PATH_PROPERTY = "openapi.groups.config.path";
+
+    private final ExtensionReferenceResolver extensionReferenceResolver;
+    private final Environment environment;
 
     private List<GroupConfiguration> groups;
     private CommonConfiguration commonConfig;
 
-    public GroupsConfigurationLoader() {
+    public GroupsConfigurationLoader(ExtensionReferenceResolver extensionReferenceResolver, Environment environment) {
+        this.extensionReferenceResolver = extensionReferenceResolver;
+        this.environment = environment;
         loadConfiguration();
     }
 
@@ -35,16 +42,14 @@ public class GroupsConfigurationLoader {
     private void loadConfiguration() {
         try {
             Yaml yaml = new Yaml();
-            InputStream input = getConfigurationInputStream();
+            try (InputStream input = getConfigurationInputStream()) {
+                if (input == null) {
+                    throw new IllegalStateException("Cannot find groups.yaml configuration file");
+                }
 
-            if (input == null) {
-                throw new IllegalStateException("Cannot find groups.yaml configuration file");
+                Map<String, Object> rawConfig = yaml.load(input);
+                parseConfiguration(rawConfig);
             }
-
-            Map<String, Object> rawConfig = yaml.load(input);
-            input.close();
-
-            parseConfiguration(rawConfig);
             log.info("Loaded OpenAPI configuration from groups.yaml");
         } catch (Exception e) {
             throw new IllegalStateException("Failed to load groups.yaml configuration", e);
@@ -55,15 +60,26 @@ public class GroupsConfigurationLoader {
      * Gets the input stream for the configuration file
      */
     private InputStream getConfigurationInputStream() throws Exception {
+        String configuredPath = environment.getProperty(GROUPS_YAML_PATH_PROPERTY);
+        if (configuredPath != null) {
+            if (Files.exists(Paths.get(configuredPath))) {
+                return Files.newInputStream(Paths.get(configuredPath));
+            }
+            throw new IllegalStateException(String.format(
+                    "Configured groups.yaml path '%s' does not exist. Check property '%s'.",
+                    configuredPath,
+                    GROUPS_YAML_PATH_PROPERTY
+            ));
+        }
+
         // Try to load from the file system first (for Maven build)
-        for (String path : GROUPS_YAML_PATHS) {
+        for (String path : GROUPS_YAML_FILESYSTEM_PATHS) {
             if (Files.exists(Paths.get(path))) {
                 return Files.newInputStream(Paths.get(path));
             }
         }
 
-        // Fallback to classpath
-        return getClass().getClassLoader().getResourceAsStream(GROUPS_YAML_CLASSPATH);
+        throw new IllegalStateException("Cannot find groups.yaml configuration file");
     }
 
     /**
@@ -139,7 +155,7 @@ public class GroupsConfigurationLoader {
         // Parse extensions
         Map<String, Object> extensionsMap = (Map<String, Object>) rawCommonConfig.get("extensions");
         if (extensionsMap != null) {
-            config.setExtensions(extensionsMap);
+            config.setExtensions(resolveTopLevelExtensions(extensionsMap, "common configuration"));
         }
 
         return config;
@@ -188,10 +204,21 @@ public class GroupsConfigurationLoader {
 
         Map<String, Object> extensions = (Map<String, Object>) groupMap.get("extensions");
         if (extensions != null) {
-            group.setExtensions(extensions);
+            group.setExtensions(resolveTopLevelExtensions(extensions, "group '" + group.getId() + "'"));
         }
 
         return group;
+    }
+
+    private Map<String, Object> resolveTopLevelExtensions(Map<String, Object> extensions, String contextLabel) {
+        Map<String, Object> resolved = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : extensions.entrySet()) {
+            resolved.put(
+                    entry.getKey(),
+                    extensionReferenceResolver.resolveTopLevelValue(entry.getValue(), entry.getKey(), contextLabel)
+            );
+        }
+        return resolved;
     }
 
     /**
