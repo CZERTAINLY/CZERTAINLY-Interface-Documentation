@@ -74,7 +74,6 @@ public class CodeGenerator {
         code.append(" */\n");
         appendSecuritySchemeCategoryAnnotation(code);
         code.append("@RestController\n");
-        code.append("@SuppressWarnings({\"unchecked\", \"rawtypes\"})\n");
         code.append("public class ").append(implClassName);
         code.append(" implements ").append(className).append(" {\n\n");
     }

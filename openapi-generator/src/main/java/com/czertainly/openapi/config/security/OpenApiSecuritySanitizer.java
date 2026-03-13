@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -28,40 +30,51 @@ public class OpenApiSecuritySanitizer {
      * Keeps only those in the allowedSchemes set.
      */
     public void sanitizeSecuritySchemes(OpenAPI openApi, Set<String> allowedSchemes) {
-        if (openApi == null || openApi.getComponents() == null || openApi.getComponents().getSecuritySchemes() == null) {
-            log.debug("No security schemes found in OpenAPI spec");
+        if (openApi == null || openApi.getComponents() == null) {
+            log.debug("No components found in OpenAPI spec");
             return;
         }
 
+        Set<String> validSchemes = allowedSchemes == null ? Collections.emptySet() : allowedSchemes;
+
         Map<String, ?> securitySchemes = openApi.getComponents().getSecuritySchemes();
-        Set<String> schemesToRemove = new HashSet<>();
+        if (securitySchemes != null) {
+            Set<String> schemesToRemove = new HashSet<>();
 
-        // Identify schemes to remove
-        for (String schemeName : securitySchemes.keySet()) {
-            if (!allowedSchemes.contains(schemeName)) {
-                schemesToRemove.add(schemeName);
+            // Identify schemes to remove
+            for (String schemeName : securitySchemes.keySet()) {
+                if (!validSchemes.contains(schemeName)) {
+                    schemesToRemove.add(schemeName);
+                }
             }
-        }
 
-        // Remove unwanted schemes from components
-        for (String schemeName : schemesToRemove) {
-            openApi.getComponents().getSecuritySchemes().remove(schemeName);
-            log.debug("Removed unwanted security scheme: {}", schemeName);
+            // Remove unwanted schemes from components
+            for (String schemeName : schemesToRemove) {
+                openApi.getComponents().getSecuritySchemes().remove(schemeName);
+                log.debug("Removed unwanted security scheme: {}", schemeName);
+            }
+
+            // Avoid emitting an empty map as `securitySchemes: {}` in YAML output.
+            if (openApi.getComponents().getSecuritySchemes().isEmpty()) {
+                openApi.getComponents().setSecuritySchemes(null);
+            }
         }
 
         // Remove references to deleted schemes from all operations
         if (openApi.getPaths() != null) {
             for (PathItem pathItem : openApi.getPaths().values()) {
-                removeInvalidSecurityRequirements(pathItem, allowedSchemes);
+                removeInvalidSecurityRequirements(pathItem, validSchemes);
             }
         }
 
         // Remove references from global security
         if (openApi.getSecurity() != null) {
-            openApi.getSecurity().removeIf(secReq -> !isValidSecurityRequirement(secReq, allowedSchemes));
+            var filteredGlobalSecurity = new ArrayList<>(openApi.getSecurity());
+            filteredGlobalSecurity.removeIf(secReq -> !isValidSecurityRequirement(secReq, validSchemes));
+            openApi.setSecurity(filteredGlobalSecurity);
         }
 
-        log.debug("Sanitized security schemes. Kept: {}", allowedSchemes);
+        log.debug("Sanitized security schemes. Kept: {}", validSchemes);
     }
 
     /**
@@ -70,7 +83,9 @@ public class OpenApiSecuritySanitizer {
     private void removeInvalidSecurityRequirements(PathItem pathItem, Set<String> validSchemeNames) {
         for (Operation operation : pathItem.readOperationsMap().values()) {
             if (operation.getSecurity() != null) {
-                operation.getSecurity().removeIf(secReq -> !isValidSecurityRequirement(secReq, validSchemeNames));
+                var filteredOperationSecurity = new ArrayList<>(operation.getSecurity());
+                filteredOperationSecurity.removeIf(secReq -> !isValidSecurityRequirement(secReq, validSchemeNames));
+                operation.setSecurity(filteredOperationSecurity);
             }
         }
     }
