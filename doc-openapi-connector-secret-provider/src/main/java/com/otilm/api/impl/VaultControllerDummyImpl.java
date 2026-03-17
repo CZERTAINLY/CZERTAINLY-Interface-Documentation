@@ -20,4 +20,9 @@ public class VaultControllerDummyImpl implements VaultController {
     public List<BaseAttribute> listVaultAttributes() throws NotFoundException {
         return List.of();
     }
+
+    @Override
+    public List<BaseAttribute> listVaultProfileAttributes(List<RequestAttribute> attributes) throws NotFoundException {
+        return List.of();
+    }
 }

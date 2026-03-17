@@ -40,7 +40,7 @@ public class SecretManagementControllerDummyImpl implements SecretManagementCont
     }
 
     @Override
-    public SecretContent getSecretContent(UUID uuid) throws NotFoundException, ConnectorException, NoSuchAlgorithmException {
+    public SecretContent getSecretContent(UUID uuid) throws NotFoundException, ConnectorException {
         return null;
     }
 

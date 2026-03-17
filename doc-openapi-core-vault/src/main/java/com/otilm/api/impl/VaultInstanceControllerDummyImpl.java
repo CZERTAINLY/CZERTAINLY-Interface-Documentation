@@ -26,6 +26,11 @@ public class VaultInstanceControllerDummyImpl implements VaultInstanceController
     }
 
     @Override
+    public List<BaseAttribute> listVaultProfileAttributes(UUID uuid) throws ConnectorException, NotFoundException, AttributeException {
+        return List.of();
+    }
+
+    @Override
     public VaultInstanceDetailDto getVaultInstanceDetails(UUID uuid) throws ConnectorException, NotFoundException, AttributeException {
         return null;
     }
