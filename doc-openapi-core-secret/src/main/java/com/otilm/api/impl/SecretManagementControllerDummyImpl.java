@@ -13,7 +13,6 @@ import com.czertainly.api.model.core.search.SearchFieldDataByGroupDto;
 import com.czertainly.api.model.core.secret.*;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +39,7 @@ public class SecretManagementControllerDummyImpl implements SecretManagementCont
     }
 
     @Override
-    public SecretContent getSecretContent(UUID uuid) throws NotFoundException, ConnectorException, NoSuchAlgorithmException {
+    public SecretContent getSecretContent(UUID uuid) throws NotFoundException, ConnectorException {
         return null;
     }
 

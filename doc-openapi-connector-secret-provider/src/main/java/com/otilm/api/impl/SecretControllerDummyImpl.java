@@ -5,7 +5,6 @@ import com.czertainly.api.exception.NotFoundException;
 import com.czertainly.api.interfaces.connector.secrets.SecretController;
 import com.czertainly.api.model.common.attribute.common.BaseAttribute;
 import com.czertainly.api.model.connector.secrets.*;
-import com.czertainly.api.model.connector.secrets.content.SecretContent;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
