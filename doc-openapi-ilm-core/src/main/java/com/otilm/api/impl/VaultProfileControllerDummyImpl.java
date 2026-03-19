@@ -62,7 +62,7 @@ public class VaultProfileControllerDummyImpl implements VaultProfileController {
     }
 
     @Override
-    public List<BaseAttribute> getAttributesForCreatingSecret(UUID vaultUuid, UUID vaultProfileUuid, SecretType secretType) throws ConnectorException, NotFoundException {
+    public List<BaseAttribute> listSecretAttributes(UUID vaultUuid, UUID vaultProfileUuid, SecretType secretType) throws ConnectorException, NotFoundException {
         return List.of();
     }
 
