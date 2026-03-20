@@ -1,5 +1,24 @@
 # Configuration for OpenAPI documentation groups.
+#
+# This file drives the code generator that produces per-group OpenAPI YAML files (written to the openapi/ directory)
+# from the compiled Java interfaces. It has three top-level keys:
+#
+#   security – Identifies which Java interfaces carry authentication annotations so the generator can propagate
+#              the correct security schemes.
+#   groups – Ordered list of API groups; each group becomes one OpenAPI file.
+#   common – Shared metadata (version, license, contact, servers…) that is merged into every generated OpenAPI document.
 
+# ---------------------------------------------------------------------------
+# security
+#
+# baseSecurityInterfaces
+#   Fully qualified names of the marker interfaces that controllers extend to declare their authentication requirements.
+#   The generator uses these to decide which security scheme (bearer token, no-auth…) to attach to each
+#   generated operation.
+#
+# legacyControllers
+#   Controllers that use the legacy auth model and therefore need special-case handling during generation.
+# ---------------------------------------------------------------------------
 security:
   baseSecurityInterfaces:
     - com.czertainly.api.interfaces.AuthProtectedController
@@ -10,6 +29,26 @@ security:
   legacyControllers:
     - com.czertainly.api.interfaces.core.web.InfoController
 
+# ---------------------------------------------------------------------------
+# groups
+#
+# Each entry defines one API group rendered into its own OpenAPI file.
+# Supported fields per group entry:
+#
+#   id             (required) Unique identifier; also used as the output file name: openapi/<id>.yaml.
+#   groupName      (required) Short slug used in URL paths and Redocly portal navigation.
+#   title          (required) Human-readable display name shown in the portal.
+#   description    Short prose describing the purpose of this API group.
+#   indexCategory  Portal navigation category.  Recognised values:
+#                    connector  – connector-side APIs
+#                    core       – platform core APIs
+#                    protocol   – protocol gateway APIs
+#                  Groups without this field are not included in the index page.
+#   serverUrl      Overrides the default server URL defined in common.servers for this specific group.
+#   interfaces     (required) Ordered list of fully-qualified Java controller interface names whose operations
+#                  are merged into this group.
+#   extensions     Arbitrary OpenAPI extension properties (x-*) to add at the info object level of the generated document.
+# ---------------------------------------------------------------------------
 groups:
   - id: doc-openapi-cert-manager
     groupName: cert-manager
@@ -516,6 +555,19 @@ groups:
       - com.czertainly.api.interfaces.core.scep.ScepController
       - com.czertainly.api.interfaces.core.scep.ScepRaProfileController
 
+# ---------------------------------------------------------------------------
+# common
+#
+# Metadata merged into the OpenAPI `info` and top-level objects of every generated document.
+# Individual groups can override specific values (e.g. serverUrl) where needed.
+#
+#   version       API version injected at build time via Maven filtering (resolves the ${api.version} placeholder).
+#   license       SPDX license identifier and URL shown in the portal.
+#   contact       Primary support / maintainer contact information.
+#   externalDocs  Link to the human-readable documentation site.
+#   servers       Default server list; groups may add or replace entries via the group-level `serverUrl` field.
+#   extensions    Arbitrary OpenAPI extension properties added to the info object of every generated document (e.g. x-logo).
+# ---------------------------------------------------------------------------
 common:
   version: ${api.version}
   license:
