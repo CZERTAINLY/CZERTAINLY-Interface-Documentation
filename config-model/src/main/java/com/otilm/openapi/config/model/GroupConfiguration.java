@@ -14,6 +14,7 @@ public class GroupConfiguration {
     private List<String> interfaces;
     private String serverUrl;
     private Map<String, Object> extensions;
+    private String indexCategory;
 
     public String getId() {
         return id;
@@ -69,5 +70,17 @@ public class GroupConfiguration {
 
     public void setExtensions(Map<String, Object> extensions) {
         this.extensions = extensions;
+    }
+
+    /**
+     * Optional category for the API index page (e.g. "core", "connector", "protocol").
+     * Groups without this field are not listed in the generated index.
+     */
+    public String getIndexCategory() {
+        return indexCategory;
+    }
+
+    public void setIndexCategory(String indexCategory) {
+        this.indexCategory = indexCategory;
     }
 }

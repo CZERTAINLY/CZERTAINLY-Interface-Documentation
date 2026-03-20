@@ -71,7 +71,26 @@
                         </configuration>
                     </execution>
 
-                    <!-- Step 5: Collect the OpenAPI documentation -->
+                    <!-- Step 5a: Regenerate index.html API lists from groups.yaml -->
+                    <execution>
+                        <id>generate-index-html</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.otilm.openapi.collector.IndexHtmlGenerator</mainClass>
+                            <arguments>
+                                <argument>${project.parent.basedir}/groups.yaml</argument>
+                                <argument>${project.parent.basedir}/index.html.template</argument>
+                                <argument>${project.parent.basedir}/index.html</argument>
+                            </arguments>
+                            <includeProjectDependencies>true</includeProjectDependencies>
+                            <includePluginDependencies>false</includePluginDependencies>
+                        </configuration>
+                    </execution>
+
+                    <!-- Step 5b: Collect the OpenAPI documentation -->
                     <execution>
                         <id>generate-all-openapi-docs</id>
                         <phase>integration-test</phase>

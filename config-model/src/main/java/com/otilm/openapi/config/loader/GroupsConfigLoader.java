@@ -28,6 +28,24 @@ public class GroupsConfigLoader {
     public static final String DEFAULT_GROUPS_YAML = "groups.yaml";
 
     private final ExtensionReferenceResolver extensionReferenceResolver = new ExtensionReferenceResolver();
+    private final boolean resolveExtensions;
+
+    public GroupsConfigLoader() {
+        this(true);
+    }
+
+    private GroupsConfigLoader(boolean resolveExtensions) {
+        this.resolveExtensions = resolveExtensions;
+    }
+
+    /**
+     * Returns a loader that skips extension resolution.
+     * Use this when the API interface classes referenced by extensions are not
+     * available on the classpath (e.g. in the index.html generator).
+     */
+    public static GroupsConfigLoader withoutExtensionResolution() {
+        return new GroupsConfigLoader(false);
+    }
 
     /**
      * Loads the configuration from the first available location.
@@ -94,7 +112,9 @@ public class GroupsConfigLoader {
         Yaml yaml = new Yaml();
         Map<String, Object> rawConfig = yaml.load(inputStream);
         GroupsConfig config = parse(rawConfig);
-        resolveExtensions(config);
+        if (resolveExtensions) {
+            resolveExtensions(config);
+        }
         return config;
     }
 
@@ -239,6 +259,7 @@ public class GroupsConfigLoader {
         group.setInterfaces((List<String>) groupMap.get("interfaces"));
         group.setServerUrl((String) groupMap.get("serverUrl"));
         group.setExtensions((Map<String, Object>) groupMap.get("extensions"));
+        group.setIndexCategory((String) groupMap.get("indexCategory"));
         return group;
     }
 
