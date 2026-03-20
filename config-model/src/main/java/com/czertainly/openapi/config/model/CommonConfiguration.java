@@ -1,15 +1,18 @@
 package com.czertainly.openapi.config.model;
 
+import java.util.List;
+import java.util.Map;
+
 /**
- * Model class representing common configuration elements
+ * Model class representing common configuration elements from groups.yaml
  */
 public class CommonConfiguration {
     private LogoConfiguration logo;
     private LicenseConfiguration license;
     private ContactConfiguration contact;
     private ExternalDocsConfiguration externalDocs;
-    private java.util.List<ServerConfiguration> servers;
-    private java.util.Map<String, Object> extensions;
+    private List<ServerConfiguration> servers;
+    private Map<String, Object> extensions;
 
     public LogoConfiguration getLogo() {
         return logo;
@@ -43,19 +46,19 @@ public class CommonConfiguration {
         this.externalDocs = externalDocs;
     }
 
-    public java.util.List<ServerConfiguration> getServers() {
+    public List<ServerConfiguration> getServers() {
         return servers;
     }
 
-    public void setServers(java.util.List<ServerConfiguration> servers) {
+    public void setServers(List<ServerConfiguration> servers) {
         this.servers = servers;
     }
 
-    public java.util.Map<String, Object> getExtensions() {
+    public Map<String, Object> getExtensions() {
         return extensions;
     }
 
-    public void setExtensions(java.util.Map<String, Object> extensions) {
+    public void setExtensions(Map<String, Object> extensions) {
         this.extensions = extensions;
     }
 

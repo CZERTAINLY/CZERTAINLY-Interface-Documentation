@@ -1,7 +1,5 @@
 package com.czertainly.openapi.config.loader;
 
-import org.springframework.stereotype.Component;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -12,7 +10,6 @@ import java.util.Map;
 /**
  * Resolves top-level extension values that are wrapped in backticks as static field references.
  */
-@Component
 public class ExtensionReferenceResolver {
 
     /**

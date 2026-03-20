@@ -1,8 +1,13 @@
 package com.czertainly.openapi.codegen;
 
+import com.czertainly.openapi.config.loader.GroupsConfigLoader;
+import com.czertainly.openapi.config.model.GroupsConfig;
+import com.czertainly.openapi.config.model.SecurityConfiguration;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Generates dummy controller implementations from the groups.yaml configuration.
@@ -18,11 +23,11 @@ public class DummyControllerGenerator {
 
     private static final String PACKAGE_NAME = "com.czertainly.openapi.generated";
 
-    private final ConfigurationLoader configLoader;
+    private final GroupsConfigLoader configLoader;
     private SecuritySchemeExtractor securitySchemeExtractor;
 
     public DummyControllerGenerator() {
-        this.configLoader = new ConfigurationLoader();
+        this.configLoader = new GroupsConfigLoader();
     }
 
     public static void main(String[] args) throws IOException {
@@ -44,13 +49,21 @@ public class DummyControllerGenerator {
      * Main generation method that orchestrates the entire process.
      */
     public void generate(String groupsYamlPath, String outputDir) throws IOException {
-        // Load security configuration
-        ConfigurationLoader.SecurityConfiguration securityConfig = configLoader.loadSecurityConfiguration(groupsYamlPath);
+        // Load configuration
+        GroupsConfig groupsConfig = configLoader.loadFromFilesystem(groupsYamlPath);
+        if (groupsConfig == null) {
+            throw new IOException("Failed to load configuration from " + groupsYamlPath);
+        }
+
+        // security configuration
+        SecurityConfiguration securityConfig = groupsConfig.getSecurity();
         this.securitySchemeExtractor = new SecuritySchemeExtractor(securityConfig);
 
-        // Load interface configuration
-        Set<String> allInterfaces = configLoader.loadInterfaces(groupsYamlPath);
-        int groupCount = configLoader.getGroupCount(groupsYamlPath);
+        // interface configuration
+        Set<String> allInterfaces = groupsConfig.getGroups().stream()
+                .flatMap(g -> g.getInterfaces().stream())
+                .collect(Collectors.toSet());
+        int groupCount = groupsConfig.getGroups().size();
 
         System.out.println("Found " + groupCount + " groups with " + allInterfaces.size() + " unique interfaces");
         System.out.println();

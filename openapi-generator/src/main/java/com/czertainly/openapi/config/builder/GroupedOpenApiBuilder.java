@@ -2,6 +2,7 @@ package com.czertainly.openapi.config.builder;
 
 import com.czertainly.openapi.config.model.CommonConfiguration;
 import com.czertainly.openapi.config.model.GroupConfiguration;
+import com.czertainly.openapi.config.util.ClassNameResolver;
 import com.czertainly.openapi.config.security.OpenApiSecuritySanitizer;
 import com.czertainly.openapi.config.security.SecuritySchemeMetadataReader;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -47,7 +48,9 @@ public class GroupedOpenApiBuilder {
     public GroupedOpenApi buildGroupedOpenApi(GroupConfiguration groupConfig, CommonConfiguration commonConfig) {
         validateGroupConfiguration(groupConfig);
 
-        List<String> controllerClassNames = groupConfig.getControllerClassNames();
+        List<String> controllerClassNames = groupConfig.getInterfaces().stream()
+                .map(ClassNameResolver::generateImplementationClassName)
+                .toList();
 
         GroupedOpenApi.Builder builder = GroupedOpenApi.builder()
                 .group(groupConfig.getGroupName())

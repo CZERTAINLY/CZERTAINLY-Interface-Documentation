@@ -1,7 +1,5 @@
 package com.czertainly.openapi.config.model;
 
-import com.czertainly.openapi.config.util.ClassNameResolver;
-
 import java.util.List;
 import java.util.Map;
 
@@ -71,15 +69,5 @@ public class GroupConfiguration {
 
     public void setExtensions(Map<String, Object> extensions) {
         this.extensions = extensions;
-    }
-
-    /**
-     * Extracts controller implementation class names from the interface FQNs.
-     * Uses ClassNameResolver to generate unique, collision-free class names.
-     */
-    public List<String> getControllerClassNames() {
-        return interfaces.stream()
-                .map(ClassNameResolver::generateImplementationClassName)
-                .toList();
     }
 }

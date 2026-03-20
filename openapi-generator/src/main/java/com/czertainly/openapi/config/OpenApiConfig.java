@@ -1,13 +1,14 @@
 package com.czertainly.openapi.config;
 
 import com.czertainly.openapi.config.builder.GroupedOpenApiBuilder;
-import com.czertainly.openapi.config.loader.GroupsConfigurationLoader;
-import com.czertainly.openapi.config.model.CommonConfiguration;
+import com.czertainly.openapi.config.loader.GroupsConfigLoader;
+import com.czertainly.openapi.config.model.GroupsConfig;
 import com.czertainly.openapi.config.model.GroupConfiguration;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +22,11 @@ import java.util.List;
  */
 @Configuration
 public class OpenApiConfig {
-
-    private final GroupsConfigurationLoader configurationLoader;
     private final GroupedOpenApiBuilder groupedOpenApiBuilder;
+    private final GroupsConfigLoader groupsConfigLoader = new GroupsConfigLoader();
 
     @Autowired
-    public OpenApiConfig(GroupsConfigurationLoader configurationLoader, GroupedOpenApiBuilder groupedOpenApiBuilder) {
-        this.configurationLoader = configurationLoader;
+    public OpenApiConfig(GroupedOpenApiBuilder groupedOpenApiBuilder) {
         this.groupedOpenApiBuilder = groupedOpenApiBuilder;
     }
 
@@ -38,12 +37,12 @@ public class OpenApiConfig {
      */
     @Bean
     public List<GroupedOpenApi> groupedOpenApis() {
+        GroupsConfig config = groupsConfigLoader.load();
         List<GroupedOpenApi> groups = new ArrayList<>();
-        CommonConfiguration commonConfig = configurationLoader.getCommonConfiguration();
 
-        for (GroupConfiguration groupConfig : configurationLoader.getGroups()) {
+        for (GroupConfiguration groupConfig : config.getGroups()) {
             try {
-                GroupedOpenApi groupedOpenApi = groupedOpenApiBuilder.buildGroupedOpenApi(groupConfig, commonConfig);
+                GroupedOpenApi groupedOpenApi = groupedOpenApiBuilder.buildGroupedOpenApi(groupConfig, config.getCommon());
                 groups.add(groupedOpenApi);
             } catch (IllegalArgumentException e) {
                 // Skip groups with invalid configuration (e.g., no interfaces)

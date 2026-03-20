@@ -1,5 +1,6 @@
 package com.czertainly.openapi.codegen;
 
+import com.czertainly.openapi.config.model.SecurityConfiguration;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -28,7 +29,7 @@ public class SecuritySchemeExtractor {
      *
      * @param securityConfig the security configuration containing base interfaces and legacy controllers
      */
-    public SecuritySchemeExtractor(ConfigurationLoader.SecurityConfiguration securityConfig) {
+    public SecuritySchemeExtractor(SecurityConfiguration securityConfig) {
         this.baseSecurityInterfaces = new ArrayList<>(securityConfig.baseSecurityInterfaces());
         this.legacyControllers = new ArrayList<>(securityConfig.legacyControllers());
         initializeBaseClassSchemes();
