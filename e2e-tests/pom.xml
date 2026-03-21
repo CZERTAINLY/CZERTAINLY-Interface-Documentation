@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.otilm</groupId>
+        <artifactId>doc-interface</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>e2e-tests</artifactId>
+    <version>${revision}</version>
+
+    <description>
+        End-to-end tests for the OpenAPI generation pipeline.
+        Uses a small set of self-contained test interfaces (no dependency on com.czertainly:interfaces) to verify
+        hat code-generator, Spring Boot startup, and springdoc all produce correct OpenAPI output.
+    </description>
+
+    <properties>
+        <generated.sources.dir>${project.build.directory}/generated-sources/controllers</generated.sources.dir>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.otilm</groupId>
+            <artifactId>openapi-generator</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.otilm</groupId>
+            <artifactId>e2e-test-interfaces</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.otilm</groupId>
+            <artifactId>code-generator</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Step 1: Generate dummy controllers from the test interfaces in this module -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-dummy-controllers</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.otilm.openapi.codegen.DummyControllerGenerator</mainClass>
+                            <arguments>
+                                <argument>${project.basedir}/groups.yaml</argument>
+                                <argument>${generated.sources.dir}</argument>
+                            </arguments>
+                            <includeProjectDependencies>true</includeProjectDependencies>
+                            <includePluginDependencies>false</includePluginDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Step 2: Register generated sources for compilation -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-generated-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${generated.sources.dir}</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Step 3: Compile everything (test interfaces + generated controllers) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Step 4: Run EndToEndIT via Failsafe.
+                 @SpringBootTest in EndToEndIT starts the Spring context in-process, so no external spring-boot:start/stop is needed. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>integration-tests</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

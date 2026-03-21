@@ -155,6 +155,19 @@
                 </configuration>
             </plugin>
 
+            <!-- Exclude generated dummy controllers from the JAR so downstream modules (e.g. e2e-tests) do not inherit
+             controllers compiled from the real czertainly interfaces. The controllers are only needed during this
+             module's own Spring Boot lifecycle. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>com/otilm/openapi/generated/**</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
             <!-- Step 4: Start a Spring Boot app for integration tests -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -186,6 +199,9 @@
                 </executions>
                 <configuration>
                     <mainClass>com.otilm.openapi.Application</mainClass>
+                    <!-- Repackage the fat jar with an -exec classifier so the plain jar (without BOOT-INF nesting)
+                    remains installable as a normal Maven dependency for the e2e-tests module. -->
+                    <classifier>exec</classifier>
                 </configuration>
             </plugin>
 
