@@ -40,8 +40,7 @@ class OpenApiSecuritySanitizerTest {
         assertNull(openApi.getComponents().getSecuritySchemes(), "Empty securitySchemes map should not be emitted");
 
         List<SecurityRequirement> operationSecurity = openApi.getPaths().get("/v1/test").getGet().getSecurity();
-        assertNotNull(operationSecurity);
-        assertTrue(operationSecurity.isEmpty(), "Invalid operation security requirements should be removed");
+        assertNull(operationSecurity, "Invalid operation security requirements should be removed (normalized to null)");
     }
 
     @Test
@@ -68,5 +67,39 @@ class OpenApiSecuritySanitizerTest {
 
         assertNotNull(openApi.getComponents().getSecuritySchemes());
         assertEquals(Set.of("BearerJWTAuth"), openApi.getComponents().getSecuritySchemes().keySet());
+    }
+
+    @Test
+    void shouldFilterGlobalSecurity() {
+        OpenAPI openApi = new OpenAPI()
+                .addSecurityItem(new SecurityRequirement().addList("BearerJWTAuth"))
+                .addSecurityItem(new SecurityRequirement().addList("SessionAuth"));
+
+        sanitizer.sanitizeSecuritySchemes(openApi, Set.of("BearerJWTAuth"));
+
+        assertNotNull(openApi.getSecurity());
+        assertEquals(1, openApi.getSecurity().size());
+        assertTrue(openApi.getSecurity().get(0).containsKey("BearerJWTAuth"));
+    }
+
+    @Test
+    void shouldRemoveSecurityRequirementWithMixedValidAndInvalidSchemes() {
+        // In OpenAPI, a security requirement (AND logic) is only valid if ALL schemes are present
+        OpenAPI openApi = new OpenAPI()
+                .addSecurityItem(new SecurityRequirement()
+                        .addList("BearerJWTAuth")
+                        .addList("SessionAuth"));
+
+        sanitizer.sanitizeSecuritySchemes(openApi, Set.of("BearerJWTAuth"));
+
+        assertNull(openApi.getSecurity(), "Requirement with an invalid scheme should be completely removed (normalized to null)");
+    }
+
+    @Test
+    void shouldHandleNullInputsGracefully() {
+        assertDoesNotThrow(() -> sanitizer.sanitizeSecuritySchemes(null, Set.of("auth")));
+
+        OpenAPI openApi = new OpenAPI();
+        assertDoesNotThrow(() -> sanitizer.sanitizeSecuritySchemes(openApi, null));
     }
 }
