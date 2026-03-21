@@ -165,7 +165,9 @@ public class IndexHtmlGenerator {
     private static void printSummary(Map<String, List<GroupConfiguration>> buckets) {
         log.info("index.html updated:");
         for (String cat : CATEGORY_ORDER) {
-            log.info("  {}: {} entries", VAR_NAMES.get(cat), buckets.get(cat).size());
+            String category = VAR_NAMES.get(cat);
+            int count = buckets.get(cat).size();
+            log.info("  {}: {} entries", category, count);
         }
     }
 

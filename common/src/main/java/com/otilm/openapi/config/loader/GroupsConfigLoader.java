@@ -8,13 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Centralized loader for groups.yaml configuration.
@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 public class GroupsConfigLoader {
     private static final Logger logger = LoggerFactory.getLogger(GroupsConfigLoader.class);
 
-    public static final String DEFAULT_GROUPS_YAML = "groups.yaml";
-    public static final List<String> GROUPS_YAML_FILESYSTEM_PATHS = List.of(DEFAULT_GROUPS_YAML, "../" + DEFAULT_GROUPS_YAML);
+    public static final String GROUPS_YAML = "groups.yaml";
+    public static final List<String> GROUPS_YAML_FILESYSTEM_PATHS = List.of(GROUPS_YAML, ".." + File.separator + GROUPS_YAML);
 
     private final ExtensionReferenceResolver extensionReferenceResolver = new ExtensionReferenceResolver();
     private final boolean resolveExtensions;
@@ -59,13 +59,13 @@ public class GroupsConfigLoader {
             }
         }
 
-        // 2. Try from classpath
-        GroupsConfig config = loadFromClasspath(DEFAULT_GROUPS_YAML);
+        // 2. Try from the classpath
+        GroupsConfig config = loadFromClasspath(GROUPS_YAML);
         if (config != null) {
             return config;
         }
 
-        throw new IllegalStateException("Cannot find " + DEFAULT_GROUPS_YAML + " configuration file in filesystem or classpath");
+        throw new IllegalStateException("Cannot find " + GROUPS_YAML + " configuration file in filesystem or classpath");
     }
 
     /**
@@ -79,8 +79,7 @@ public class GroupsConfigLoader {
                 logger.info("Loading configuration from filesystem: {}", filePath.toAbsolutePath());
                 return load(is);
             } catch (IOException e) {
-                logger.error("Failed to load configuration from filesystem: {}", path, e);
-                throw new IOException("Failed to load configuration from " + path, e);
+                throw new IOException("Failed to load " + GROUPS_YAML + " configuration from " + path, e);
             }
         }
         return null;
@@ -91,15 +90,14 @@ public class GroupsConfigLoader {
      * Returns null if the resource does not exist.
      */
     public GroupsConfig loadFromClasspath(String resourceName) throws IOException {
-        String normalizedPath = resourceName.startsWith("/") ? resourceName : "/" + resourceName;
+        String normalizedPath = resourceName.startsWith(File.separator) ? resourceName : File.separator + resourceName;
         try (InputStream is = getClass().getResourceAsStream(normalizedPath)) {
             if (is != null) {
                 logger.info("Loading configuration from classpath: {}", normalizedPath);
                 return load(is);
             }
         } catch (IOException e) {
-            logger.error("Failed to load configuration from classpath: {}", normalizedPath, e);
-            throw new IOException("Failed to load configuration from classpath: " + normalizedPath, e);
+            throw new IOException("Failed to load " + GROUPS_YAML + " configuration from classpath: " + normalizedPath, e);
         }
         return null;
     }

@@ -9,7 +9,6 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Component;
 
-import java.io.InvalidClassException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,7 +62,6 @@ public class SecuritySchemeMetadataReader {
                 log.debug("Found security metadata: {} → base={}, schemes={}", clazz.getSimpleName(), baseClassName, annotation.securitySchemes());
             }
         } catch (ClassNotFoundException e) {
-            log.error("Could not load class {}: {}", candidate.getBeanClassName(), e.getMessage());
             throw new IllegalStateException("Could not load class " + candidate.getBeanClassName(), e);
         }
     }

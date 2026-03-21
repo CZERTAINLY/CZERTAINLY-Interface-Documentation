@@ -28,7 +28,7 @@ public class SecuritySchemeExtractor {
      *
      * @param securityConfig the security configuration containing base interfaces and legacy controllers
      */
-    public SecuritySchemeExtractor(SecurityConfiguration securityConfig) {
+    public SecuritySchemeExtractor(SecurityConfiguration securityConfig) throws ClassNotFoundException {
         this.baseSecurityInterfaces = new ArrayList<>(securityConfig.baseSecurityInterfaces());
         this.legacyControllers = new ArrayList<>(securityConfig.legacyControllers());
         initializeBaseClassSchemes();
@@ -38,7 +38,7 @@ public class SecuritySchemeExtractor {
      * Loads and analyzes the base security controller interfaces.
      * Extracts their @SecurityScheme annotations.
      */
-    private void initializeBaseClassSchemes() {
+    private void initializeBaseClassSchemes() throws ClassNotFoundException {
         try {
             for (String baseInterface : baseSecurityInterfaces) {
                 analyzeBaseClass(baseInterface);
@@ -47,7 +47,7 @@ public class SecuritySchemeExtractor {
                 analyzeLegacyController(legacyController);
             }
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Failed to load base security controller classes: " + e.getMessage(), e);
+            throw new ClassNotFoundException("Failed to load base security controller classes: " + e.getMessage(), e);
         }
     }
 

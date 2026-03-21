@@ -34,7 +34,7 @@ public class DummyControllerGenerator {
         this.configLoader = new GroupsConfigLoader();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws ClassNotFoundException, IOException {
         if (args.length != 2) {
             log.error("Usage: DummyControllerGenerator <groups.yaml path> <output directory>");
             System.exit(1);
@@ -52,7 +52,7 @@ public class DummyControllerGenerator {
     /**
      * Main generation method that orchestrates the entire process.
      */
-    public void generate(String groupsYamlPath, String outputDir) throws IOException {
+    public void generate(String groupsYamlPath, String outputDir) throws ClassNotFoundException, IOException {
         // Load configuration
         GroupsConfig groupsConfig = configLoader.loadFromFilesystem(groupsYamlPath);
         if (groupsConfig == null) {

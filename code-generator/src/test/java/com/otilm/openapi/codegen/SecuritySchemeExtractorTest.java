@@ -18,7 +18,7 @@ class SecuritySchemeExtractorTest {
     private static final String LEGACY = LegacyController.class.getName();
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws ClassNotFoundException {
         SecurityConfiguration config = new SecurityConfiguration(
                 List.of(BASE1, BASE2),
                 List.of(LEGACY)
@@ -101,6 +101,6 @@ class SecuritySchemeExtractorTest {
                 List.of("com.nonexistent.BaseClass"),
                 List.of()
         );
-        assertThrows(RuntimeException.class, () -> new SecuritySchemeExtractor(config));
+        assertThrows(ClassNotFoundException.class, () -> new SecuritySchemeExtractor(config));
     }
 }
