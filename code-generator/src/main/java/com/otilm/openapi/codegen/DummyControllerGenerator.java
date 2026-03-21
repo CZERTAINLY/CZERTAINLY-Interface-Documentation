@@ -26,6 +26,7 @@ public class DummyControllerGenerator {
     private static final Logger log = LoggerFactory.getLogger(DummyControllerGenerator.class);
 
     private static final String PACKAGE_NAME = "com.otilm.openapi.generated";
+    private static final String HEADING_SEPARATOR = "======================================================================";
 
     private final GroupsConfigLoader configLoader;
     private SecuritySchemeExtractor securitySchemeExtractor;
@@ -152,20 +153,20 @@ public class DummyControllerGenerator {
     }
 
     private static void printHeader(String configPath, String outputDir) {
-        log.info("======================================================================");
+        log.info(HEADING_SEPARATOR);
         log.info("Dummy Controller Generator");
-        log.info("======================================================================");
+        log.info(HEADING_SEPARATOR);
         log.info("Configuration: {}", configPath);
         log.info("Output directory: {}", outputDir);
     }
 
     private static void printSummary(GenerationResult result) {
-        log.info("======================================================================");
+        log.info(HEADING_SEPARATOR);
         log.info("✅ Successfully generated {} dummy controller classes", result.successCount);
         if (result.failCount > 0) {
             log.error("❌ Failed to generate {} classes", result.failCount);
         }
-        log.info("======================================================================");
+        log.info(HEADING_SEPARATOR);
     }
 
     private record GenerationResult(int successCount, int failCount) {
