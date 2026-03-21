@@ -47,55 +47,71 @@ public class TypeResolver {
      */
     public String getTypeName(Type type) {
         if (type instanceof Class<?> clazz) {
-            if (clazz.isArray()) {
-                return getTypeName(clazz.getComponentType()) + "[]";
-            }
-
-            String simpleName = clazz.getSimpleName();
-            if (conflictingNames.contains(simpleName)) {
-                return clazz.getName().replace('$', '.');
-            }
-            return simpleName;
+            return getClassTypeName(clazz);
         }
 
         if (type instanceof ParameterizedType parameterizedType) {
-            Type rawType = parameterizedType.getRawType();
-            Type[] typeArguments = parameterizedType.getActualTypeArguments();
-
-            StringBuilder builder = new StringBuilder();
-            builder.append(getTypeName(rawType));
-            builder.append("<");
-            for (int i = 0; i < typeArguments.length; i++) {
-                if (i > 0) {
-                    builder.append(", ");
-                }
-                builder.append(getTypeName(typeArguments[i]));
-            }
-            builder.append("> ");
-            return builder.toString().trim();
+            return getParameterizedTypeName(parameterizedType);
         }
 
         if (type instanceof WildcardType wildcardType) {
-            Type[] lowerBounds = wildcardType.getLowerBounds();
-            if (lowerBounds.length > 0) {
-                return "? super " + joinBounds(lowerBounds);
-            }
-            Type[] upperBounds = wildcardType.getUpperBounds();
-            if (upperBounds.length == 0 || isObjectOnly(upperBounds)) {
-                return "?";
-            }
-            return "? extends " + joinBounds(upperBounds);
+            return getWildcardTypeName(wildcardType);
         }
 
-        if (type instanceof TypeVariable<?>) {
-            return ((TypeVariable<?>) type).getName();
+        if (type instanceof TypeVariable<?> typeVariable) {
+            return typeVariable.getName();
         }
 
         if (type instanceof GenericArrayType arrayType) {
-            return getTypeName(arrayType.getGenericComponentType()) + "[]";
+            return getGenericArrayTypeName(arrayType);
         }
 
         return type.getTypeName();
+    }
+
+    private String getClassTypeName(Class<?> clazz) {
+        if (clazz.isArray()) {
+            return getTypeName(clazz.getComponentType()) + "[]";
+        }
+
+        String simpleName = clazz.getSimpleName();
+        if (conflictingNames.contains(simpleName)) {
+            return clazz.getName().replace('$', '.');
+        }
+        return simpleName;
+    }
+
+    private String getParameterizedTypeName(ParameterizedType parameterizedType) {
+        Type rawType = parameterizedType.getRawType();
+        Type[] typeArguments = parameterizedType.getActualTypeArguments();
+
+        StringBuilder builder = new StringBuilder();
+        builder.append(getTypeName(rawType));
+        builder.append("<");
+        for (int i = 0; i < typeArguments.length; i++) {
+            if (i > 0) {
+                builder.append(", ");
+            }
+            builder.append(getTypeName(typeArguments[i]));
+        }
+        builder.append(">");
+        return builder.toString();
+    }
+
+    private String getWildcardTypeName(WildcardType wildcardType) {
+        Type[] lowerBounds = wildcardType.getLowerBounds();
+        if (lowerBounds.length > 0) {
+            return "? super " + joinBounds(lowerBounds);
+        }
+        Type[] upperBounds = wildcardType.getUpperBounds();
+        if (upperBounds.length == 0 || isObjectOnly(upperBounds)) {
+            return "?";
+        }
+        return "? extends " + joinBounds(upperBounds);
+    }
+
+    private String getGenericArrayTypeName(GenericArrayType arrayType) {
+        return getTypeName(arrayType.getGenericComponentType()) + "[]";
     }
 
     /**
@@ -284,7 +300,7 @@ public class TypeResolver {
         if (type.isPrimitive() || type.isArray()) {
             return false;
         }
-        
+
         String packageName = type.getPackage() != null ? type.getPackage().getName() : "";
         return !packageName.isEmpty() && !packageName.equals("java.lang");
     }

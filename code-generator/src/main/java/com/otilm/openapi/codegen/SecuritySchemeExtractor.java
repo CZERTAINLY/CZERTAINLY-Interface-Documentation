@@ -120,48 +120,45 @@ public class SecuritySchemeExtractor {
      * @throws IllegalArgumentException if the interface doesn't inherit from any base class
      */
     public String determineBaseSecurityClass(Class<?> interfaceClass) {
-        // Check if it's a legacy controller
         if (legacyControllers.contains(interfaceClass.getName())) {
             return interfaceClass.getName();
         }
 
-        String matchedBase = null;
-
-        // Check direct interfaces and parent interfaces
-        for (Class<?> iface : interfaceClass.getInterfaces()) {
-            if (isBaseSecurityClass(iface.getName())) {
-                if (matchedBase != null && !matchedBase.equals(iface.getName())) {
-                    throw new IllegalArgumentException(
-                            "Interface " + interfaceClass.getName() +
-                                    " extends multiple base security classes. This is invalid."
-                    );
-                }
-                matchedBase = iface.getName();
-            }
-        }
-
-        // Check parent interfaces transitively (skip base classes to avoid recursion errors)
-        for (Class<?> iface : interfaceClass.getInterfaces()) {
-            if (isBaseSecurityClass(iface.getName())) {
-                continue;
-            }
-            String parentBase = determineBaseSecurityClass(iface);
-            if (parentBase != null) {
-                if (matchedBase != null && !matchedBase.equals(parentBase)) {
-                    throw new IllegalArgumentException(
-                            "Interface " + interfaceClass.getName() +
-                                    " transitively extends multiple base security classes. This is invalid."
-                    );
-                }
-                matchedBase = parentBase;
-            }
-        }
+        String matchedBase = findBaseSecurityClass(interfaceClass);
 
         if (matchedBase == null) {
             throw new IllegalArgumentException(
                     "Controller interface " + interfaceClass.getName() + " does not extend any of the base security interfaces: " + baseSecurityInterfaces +
                             ". Legacy exception allowed only for: " + legacyControllers
             );
+        }
+
+        return matchedBase;
+    }
+
+    /**
+     * Recursively searches for exactly one base security interface in the inheritance hierarchy.
+     */
+    private String findBaseSecurityClass(Class<?> interfaceClass) {
+        String matchedBase = null;
+
+        for (Class<?> iface : interfaceClass.getInterfaces()) {
+            String foundBase;
+            if (isBaseSecurityClass(iface.getName())) {
+                foundBase = iface.getName();
+            } else {
+                foundBase = findBaseSecurityClass(iface);
+            }
+
+            if (foundBase != null) {
+                if (matchedBase != null && !matchedBase.equals(foundBase)) {
+                    throw new IllegalArgumentException(
+                            "Interface " + interfaceClass.getName() +
+                                    " (transitively) extends multiple base security classes: " + matchedBase + " and " + foundBase + ". This is invalid."
+                    );
+                }
+                matchedBase = foundBase;
+            }
         }
 
         return matchedBase;
