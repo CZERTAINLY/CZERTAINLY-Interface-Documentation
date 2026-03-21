@@ -40,7 +40,22 @@ class OpenApiSecuritySanitizerTest {
         assertNull(openApi.getComponents().getSecuritySchemes(), "Empty securitySchemes map should not be emitted");
 
         List<SecurityRequirement> operationSecurity = openApi.getPaths().get("/v1/test").getGet().getSecurity();
-        assertNull(operationSecurity, "Invalid operation security requirements should be removed (normalized to null)");
+        assertNull(operationSecurity, "Operation with all schemes filtered out should have security field removed (inherits global)");
+    }
+
+    @Test
+    void shouldPreserveExplicitlyEmptyOperationSecurity() {
+        // Operations with security: [] explicitly declare "no authentication required".
+        // This is semantically different from an absent security field (which inherits global security).
+        OpenAPI openApi = new OpenAPI()
+                .paths(new Paths().addPathItem("/v1/public", new PathItem().get(new Operation()
+                        .security(List.of()))));
+
+        sanitizer.sanitizeSecuritySchemes(openApi, Set.of("BearerJWTAuth"));
+
+        List<SecurityRequirement> operationSecurity = openApi.getPaths().get("/v1/public").getGet().getSecurity();
+        assertNotNull(operationSecurity, "Explicitly empty security list (security: []) must not be removed");
+        assertTrue(operationSecurity.isEmpty(), "Explicitly empty security list must remain empty");
     }
 
     @Test

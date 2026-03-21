@@ -74,11 +74,8 @@ public class SecuritySchemeMetadataReader {
 
                 Collections.addAll(schemes, annotation.securitySchemes());
 
-                log.debug("Found security metadata: {} → base={}, schemes={}",
-                        clazz.getSimpleName(),
-                        baseClass.substring(baseClass.lastIndexOf('.') + 1),
-                        annotation.securitySchemes()
-                );
+                String baseClassName = baseClass.substring(baseClass.lastIndexOf('.') + 1);
+                log.debug("Found security metadata: {} → base={}, schemes={}", clazz.getSimpleName(), baseClassName, annotation.securitySchemes());
             }
         } catch (ClassNotFoundException e) {
             log.error("Could not load class {}: {}", candidate.getBeanClassName(), e.getMessage());

@@ -72,9 +72,16 @@ public class OpenApiSecuritySanitizer {
         }
         for (Operation operation : pathItem.readOperationsMap().values()) {
             if (operation.getSecurity() != null) {
+                boolean originallyEmpty = operation.getSecurity().isEmpty();
                 var filteredOperationSecurity = new ArrayList<>(operation.getSecurity());
                 filteredOperationSecurity.removeIf(secReq -> !isValidSecurityRequirement(secReq, validSchemeNames));
-                operation.setSecurity(filteredOperationSecurity.isEmpty() ? null : filteredOperationSecurity);
+                // Preserve an explicitly empty security list (security: []) to maintain "no auth required"
+                // semantics. Only nullify if the original list was non-empty, but all entries were filtered out.
+                if (filteredOperationSecurity.isEmpty() && !originallyEmpty) {
+                    operation.setSecurity(null);
+                } else {
+                    operation.setSecurity(filteredOperationSecurity);
+                }
             }
         }
     }

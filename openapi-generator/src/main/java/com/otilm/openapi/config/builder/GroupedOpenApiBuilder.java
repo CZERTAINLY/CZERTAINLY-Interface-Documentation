@@ -130,11 +130,8 @@ public class GroupedOpenApiBuilder {
                     Set<String> schemesForBase = securitySchemeMetadataReader.getSchemesForBaseClass(baseClass);
                     allowedSchemes.addAll(schemesForBase);
 
-                    log.debug("Interface {} → base class {}, schemes: {}",
-                            interfaceFqn,
-                            baseClass.substring(baseClass.lastIndexOf('.') + 1),
-                            schemesForBase
-                    );
+                    String baseClassName = baseClass.substring(baseClass.lastIndexOf('.') + 1);
+                    log.debug("Interface {} → base class {}, schemes: {}", interfaceFqn, baseClassName, schemesForBase);
                 }
             } catch (ClassNotFoundException e) {
                 log.warn("Could not load generated class for interface {}: {}", interfaceFqn, e.getMessage());
