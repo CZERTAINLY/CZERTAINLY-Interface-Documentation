@@ -22,12 +22,22 @@ public class CommonConfiguration {
 
     public void setServers(List<ServerConfiguration> servers) {
         if (servers != null) {
+            if (servers.contains(null)) {
+                throw new IllegalArgumentException(
+                    "Servers list contains null elements in common configuration"
+                );
+            }
             this.servers = List.copyOf(servers);
         }
     }
 
     public void setExtensions(Map<String, Object> extensions) {
         if (extensions != null) {
+            if (extensions.containsKey(null) || extensions.containsValue(null)) {
+                throw new IllegalArgumentException(
+                    "Extensions map contains null keys or values in common configuration"
+                );
+            }
             this.extensions = Map.copyOf(extensions);
         }
     }

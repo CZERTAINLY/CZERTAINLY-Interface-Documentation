@@ -24,12 +24,22 @@ public class GroupConfiguration {
 
     public void setInterfaces(List<String> interfaces) {
         if (interfaces != null) {
+            if (interfaces.contains(null)) {
+                throw new IllegalArgumentException(
+                        "Interfaces list contains null elements for group '" + (id != null ? id : "<unknown>") + "'"
+                );
+            }
             this.interfaces = List.copyOf(interfaces);
         }
     }
 
     public void setExtensions(Map<String, Object> extensions) {
         if (extensions != null) {
+            if (extensions.containsKey(null) || extensions.containsValue(null)) {
+                throw new IllegalArgumentException(
+                        "Extensions map contains null keys or values for group '" + (id != null ? id : "<unknown>") + "'"
+                );
+            }
             this.extensions = Map.copyOf(extensions);
         }
     }

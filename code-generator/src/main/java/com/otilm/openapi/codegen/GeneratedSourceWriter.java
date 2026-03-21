@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 /**
  * Handles file I/O operations for writing generated controller classes.
  */
-public record FileWriter(String outputDirectory, String packageName) {
+public record GeneratedSourceWriter(String outputDirectory, String packageName) {
 
     /**
      * Writes the generated source code to a file in the appropriate package directory.

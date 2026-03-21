@@ -86,13 +86,13 @@ public class DummyControllerGenerator {
      * Generates dummy controllers for all interfaces.
      */
     private GenerationResult generateAllControllers(Set<String> interfaces, String outputDir) {
-        FileWriter fileWriter = new FileWriter(outputDir, PACKAGE_NAME);
+        GeneratedSourceWriter generatedSourceWriter = new GeneratedSourceWriter(outputDir, PACKAGE_NAME);
         int successCount = 0;
         int failCount = 0;
 
         for (String interfaceFqn : interfaces) {
             try {
-                generateDummyController(interfaceFqn, fileWriter);
+                generateDummyController(interfaceFqn, generatedSourceWriter);
                 successCount++;
             } catch (ClassNotFoundException | IOException e) {
                 log.error("❌ Failed to generate dummy for {}: {}", interfaceFqn, e.getMessage());
@@ -107,7 +107,7 @@ public class DummyControllerGenerator {
      * Generates a single dummy controller implementation for the given interface.
      * Validates that the interface extends one of the three base security controllers.
      */
-    private void generateDummyController(String interfaceFqn, FileWriter fileWriter) throws ClassNotFoundException, IOException {
+    private void generateDummyController(String interfaceFqn, GeneratedSourceWriter generatedSourceWriter) throws ClassNotFoundException, IOException {
         Class<?> interfaceClass = loadInterfaceClass(interfaceFqn);
 
         String baseSecurityClass = securitySchemeExtractor.determineBaseSecurityClass(interfaceClass);
@@ -120,7 +120,7 @@ public class DummyControllerGenerator {
                 baseSecurityClass, securitySchemes);
         String sourceCode = codeGenerator.generateImplementation(interfaceClass);
 
-        fileWriter.writeImplementation(implClassName, sourceCode);
+        generatedSourceWriter.writeImplementation(implClassName, sourceCode);
 
         int methodCount = countNonObjectMethods(interfaceClass);
         String baseClassName = baseSecurityClass.substring(baseSecurityClass.lastIndexOf('.') + 1);
