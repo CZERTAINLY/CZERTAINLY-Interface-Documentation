@@ -1,6 +1,7 @@
 package com.otilm.openapi.codegen;
 
 import com.otilm.openapi.config.loader.GroupsConfigLoader;
+import com.otilm.openapi.config.util.ClassNameResolver;
 import com.otilm.openapi.config.model.GroupsConfig;
 import com.otilm.openapi.config.model.SecurityConfiguration;
 

@@ -36,7 +36,7 @@ public class TypeResolver {
 
     /**
      * Gets the appropriate type name to use in generated code.
-     * Returns simple name for non-conflicting types, fully qualified name for conflicting types.
+     * Returns a simple name for non-conflicting types, fully qualified name for conflicting types.
      */
     public String getTypeName(Class<?> type) {
         return getTypeName((Type) type);
@@ -46,8 +46,7 @@ public class TypeResolver {
      * Gets the appropriate type name to use in generated code for generic types.
      */
     public String getTypeName(Type type) {
-        if (type instanceof Class<?>) {
-            Class<?> clazz = (Class<?>) type;
+        if (type instanceof Class<?> clazz) {
             if (clazz.isArray()) {
                 return getTypeName(clazz.getComponentType()) + "[]";
             }
@@ -59,8 +58,7 @@ public class TypeResolver {
             return simpleName;
         }
 
-        if (type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
+        if (type instanceof ParameterizedType parameterizedType) {
             Type rawType = parameterizedType.getRawType();
             Type[] typeArguments = parameterizedType.getActualTypeArguments();
 
@@ -77,8 +75,7 @@ public class TypeResolver {
             return builder.toString().trim();
         }
 
-        if (type instanceof WildcardType) {
-            WildcardType wildcardType = (WildcardType) type;
+        if (type instanceof WildcardType wildcardType) {
             Type[] lowerBounds = wildcardType.getLowerBounds();
             if (lowerBounds.length > 0) {
                 return "? super " + joinBounds(lowerBounds);
@@ -94,8 +91,7 @@ public class TypeResolver {
             return ((TypeVariable<?>) type).getName();
         }
 
-        if (type instanceof GenericArrayType) {
-            GenericArrayType arrayType = (GenericArrayType) type;
+        if (type instanceof GenericArrayType arrayType) {
             return getTypeName(arrayType.getGenericComponentType()) + "[]";
         }
 
@@ -137,8 +133,7 @@ public class TypeResolver {
             return;
         }
 
-        if (type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
+        if (type instanceof ParameterizedType parameterizedType) {
             addTypeToMap(map, parameterizedType.getRawType());
             for (Type argument : parameterizedType.getActualTypeArguments()) {
                 addTypeToMap(map, argument);
@@ -146,8 +141,7 @@ public class TypeResolver {
             return;
         }
 
-        if (type instanceof WildcardType) {
-            WildcardType wildcardType = (WildcardType) type;
+        if (type instanceof WildcardType wildcardType) {
             for (Type bound : wildcardType.getUpperBounds()) {
                 addTypeToMap(map, bound);
             }
@@ -157,16 +151,14 @@ public class TypeResolver {
             return;
         }
 
-        if (type instanceof TypeVariable<?>) {
-            TypeVariable<?> typeVariable = (TypeVariable<?>) type;
+        if (type instanceof TypeVariable<?> typeVariable) {
             for (Type bound : typeVariable.getBounds()) {
                 addTypeToMap(map, bound);
             }
             return;
         }
 
-        if (type instanceof GenericArrayType) {
-            GenericArrayType arrayType = (GenericArrayType) type;
+        if (type instanceof GenericArrayType arrayType) {
             addTypeToMap(map, arrayType.getGenericComponentType());
         }
     }
@@ -240,8 +232,7 @@ public class TypeResolver {
             return;
         }
 
-        if (type instanceof ParameterizedType) {
-            ParameterizedType parameterizedType = (ParameterizedType) type;
+        if (type instanceof ParameterizedType parameterizedType) {
             addImportForType(imports, parameterizedType.getRawType());
             for (Type argument : parameterizedType.getActualTypeArguments()) {
                 addImportForType(imports, argument);
@@ -249,8 +240,7 @@ public class TypeResolver {
             return;
         }
 
-        if (type instanceof WildcardType) {
-            WildcardType wildcardType = (WildcardType) type;
+        if (type instanceof WildcardType wildcardType) {
             for (Type bound : wildcardType.getUpperBounds()) {
                 addImportForType(imports, bound);
             }
@@ -260,16 +250,14 @@ public class TypeResolver {
             return;
         }
 
-        if (type instanceof TypeVariable<?>) {
-            TypeVariable<?> typeVariable = (TypeVariable<?>) type;
+        if (type instanceof TypeVariable<?> typeVariable) {
             for (Type bound : typeVariable.getBounds()) {
                 addImportForType(imports, bound);
             }
             return;
         }
 
-        if (type instanceof GenericArrayType) {
-            GenericArrayType arrayType = (GenericArrayType) type;
+        if (type instanceof GenericArrayType arrayType) {
             addImportForType(imports, arrayType.getGenericComponentType());
         }
     }

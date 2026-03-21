@@ -23,9 +23,8 @@ import java.util.stream.Collectors;
 public class GroupsConfigLoader {
     private static final Logger logger = LoggerFactory.getLogger(GroupsConfigLoader.class);
 
-    public static final List<String> GROUPS_YAML_FILESYSTEM_PATHS = List.of("groups.yaml", "../groups.yaml");
-    public static final String GROUPS_YAML_PATH_PROPERTY = "openapi.groups.config.path";
     public static final String DEFAULT_GROUPS_YAML = "groups.yaml";
+    public static final List<String> GROUPS_YAML_FILESYSTEM_PATHS = List.of(DEFAULT_GROUPS_YAML, "../" + DEFAULT_GROUPS_YAML);
 
     private final ExtensionReferenceResolver extensionReferenceResolver = new ExtensionReferenceResolver();
     private final boolean resolveExtensions;
@@ -215,7 +214,7 @@ public class GroupsConfigLoader {
         if (serversMap != null) {
             List<CommonConfiguration.ServerConfiguration> servers = serversMap.stream()
                     .map(this::parseServer)
-                    .collect(Collectors.toList());
+                    .toList();
             common.setServers(servers);
         }
 
@@ -235,7 +234,6 @@ public class GroupsConfigLoader {
         return server;
     }
 
-    @SuppressWarnings("unchecked")
     private List<GroupConfiguration> parseGroups(List<Map<String, Object>> rawGroups) {
         if (rawGroups == null) {
             logger.warn("No groups found in configuration");
@@ -244,7 +242,7 @@ public class GroupsConfigLoader {
 
         return rawGroups.stream()
                 .map(this::parseGroup)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @SuppressWarnings("unchecked")

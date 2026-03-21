@@ -1,4 +1,4 @@
-package com.otilm.openapi.codegen;
+package com.otilm.openapi.config.util;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ClassNameResolverTest {
+class ClassNameResolverTest {
 
     private static final List<String> INTERFACE_FQNS = List.of(
             "com.czertainly.api.interfaces.core.web.CertificateController",

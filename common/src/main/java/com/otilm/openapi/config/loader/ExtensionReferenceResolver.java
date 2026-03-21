@@ -149,7 +149,7 @@ public class ExtensionReferenceResolver {
                     ));
                 }
                 Object nested = sanitizeYamlSafeValue(entry.getValue(), extensionKey, contextLabel,
-                        path + "." + String.valueOf(entry.getKey()));
+                        path + "." + entry.getKey());
                 sanitized.put(entry.getKey(), nested);
             }
             return sanitized;

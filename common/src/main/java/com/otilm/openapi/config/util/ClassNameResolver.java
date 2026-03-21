@@ -1,4 +1,4 @@
-package com.otilm.openapi.codegen;
+package com.otilm.openapi.config.util;
 
 /**
  * Utility class for generating unique, collision-free class names for dummy implementations.
@@ -13,6 +13,9 @@ package com.otilm.openapi.codegen;
 public class ClassNameResolver {
 
     private static final String BASE_PACKAGE = "com.czertainly.api.interfaces.";
+    public static final String DUMMY_IMPL = "DummyImpl";
+
+    private ClassNameResolver() {}
 
     /**
      * Generates a unique implementation class name for the given interface.
@@ -24,7 +27,7 @@ public class ClassNameResolver {
     public static String generateImplementationClassName(Class<?> interfaceClass) {
         String packagePrefix = extractPackagePrefix(interfaceClass.getPackageName());
         String simpleName = interfaceClass.getSimpleName();
-        return packagePrefix + simpleName + "DummyImpl";
+        return packagePrefix + simpleName + DUMMY_IMPL;
     }
 
     /**
@@ -42,9 +45,9 @@ public class ClassNameResolver {
         }
         String packageName = interfaceFqn.substring(0, lastDotIndex);
         String simpleName = interfaceFqn.substring(lastDotIndex + 1);
-        
+
         String packagePrefix = extractPackagePrefix(packageName);
-        return packagePrefix + simpleName + "DummyImpl";
+        return packagePrefix + simpleName + DUMMY_IMPL;
     }
 
     /**
@@ -61,14 +64,14 @@ public class ClassNameResolver {
      */
     private static String extractPackagePrefix(String packageName) {
         // Remove the common base package
-        String relativePath = packageName.startsWith(BASE_PACKAGE) 
+        String relativePath = packageName.startsWith(BASE_PACKAGE)
                 ? packageName.substring(BASE_PACKAGE.length())
                 : packageName;
 
         // If no relative path, use the last segment of the package
         if (relativePath.isEmpty()) {
             int lastDotIndex = packageName.lastIndexOf('.');
-            relativePath = lastDotIndex >= 0 
+            relativePath = lastDotIndex >= 0
                     ? packageName.substring(lastDotIndex + 1)
                     : packageName;
         }
@@ -76,7 +79,7 @@ public class ClassNameResolver {
         // Split into segments and capitalize each
         String[] segments = relativePath.split("\\.");
         StringBuilder prefix = new StringBuilder();
-        
+
         for (String segment : segments) {
             if (!segment.isEmpty()) {
                 // Capitalize first letter, keep rest as-is (to preserve v2, v3, etc.)
@@ -95,6 +98,6 @@ public class ClassNameResolver {
      * @return true if the class name ends with "DummyImpl"
      */
     public static boolean isValidImplementationClassName(String className) {
-        return className != null && className.endsWith("DummyImpl");
+        return className != null && className.endsWith(DUMMY_IMPL);
     }
 }

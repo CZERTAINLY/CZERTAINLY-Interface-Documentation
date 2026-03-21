@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,11 +36,8 @@ class GroupsConfigLoaderTest {
     }
 
     @Test
-    void testLoadDefault() throws Exception {
+    void testLoadDefault() {
         GroupsConfigLoader loader = new GroupsConfigLoader();
-        // Since we are in the project root, groups.yaml should exist or we can mock it
-        // For testing purposes, let's create a temporary groups.yaml in the current directory if it doesn't exist
-        // or just rely on the fact that it exists in the repo
         GroupsConfig config = loader.load();
         assertNotNull(config);
     }
@@ -55,22 +53,22 @@ class GroupsConfigLoaderTest {
         assertEquals("Apache 2.0", config.getCommon().getLicense().getName());
         assertEquals("support@example.com", config.getCommon().getContact().getEmail());
         assertEquals(1, config.getCommon().getServers().size());
-        assertEquals("https://api.example.com", config.getCommon().getServers().get(0).getUrl());
+        assertEquals("https://api.example.com", config.getCommon().getServers().getFirst().getUrl());
 
         assertEquals(1, config.getGroups().size());
-        assertEquals("group1", config.getGroups().get(0).getId());
-        assertEquals(2, config.getGroups().get(0).getInterfaces().size());
-        assertTrue(config.getGroups().get(0).getInterfaces().contains("com.example.Interface1"));
-        assertEquals("value", config.getGroups().get(0).getExtensions().get("x-test"));
-        Object resolved = config.getGroups().get(0).getExtensions().get("x-resolved");
-        assertTrue(resolved instanceof java.util.Map);
+        assertEquals("group1", config.getGroups().getFirst().getId());
+        assertEquals(2, config.getGroups().getFirst().getInterfaces().size());
+        assertTrue(config.getGroups().getFirst().getInterfaces().contains("com.example.Interface1"));
+        assertEquals("value", config.getGroups().getFirst().getExtensions().get("x-test"));
+        Object resolved = config.getGroups().getFirst().getExtensions().get("x-resolved");
+        assertInstanceOf(Map.class, resolved);
         assertEquals(1, ((java.util.Map<?, ?>) resolved).get("version"));
 
         assertNotNull(config.getSecurity());
         assertEquals(1, config.getSecurity().baseSecurityInterfaces().size());
-        assertEquals("com.czertainly.openapi.BaseInterface", config.getSecurity().baseSecurityInterfaces().get(0));
+        assertEquals("com.czertainly.openapi.BaseInterface", config.getSecurity().baseSecurityInterfaces().getFirst());
         assertEquals(1, config.getSecurity().legacyControllers().size());
-        assertEquals("com.example.LegacyController", config.getSecurity().legacyControllers().get(0));
+        assertEquals("com.example.LegacyController", config.getSecurity().legacyControllers().getFirst());
     }
 
     @Test
