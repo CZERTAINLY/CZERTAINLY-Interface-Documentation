@@ -4,6 +4,8 @@ import com.otilm.openapi.config.loader.GroupsConfigLoader;
 import com.otilm.openapi.config.util.ClassNameResolver;
 import com.otilm.openapi.config.model.GroupsConfig;
 import com.otilm.openapi.config.model.SecurityConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
  * <p>
  */
 public class DummyControllerGenerator {
+    private static final Logger log = LoggerFactory.getLogger(DummyControllerGenerator.class);
 
     private static final String PACKAGE_NAME = "com.otilm.openapi.generated";
 
@@ -33,7 +36,7 @@ public class DummyControllerGenerator {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 2) {
-            System.err.println("Usage: DummyControllerGenerator <groups.yaml path> <output directory>");
+            log.error("Usage: DummyControllerGenerator <groups.yaml path> <output directory>");
             System.exit(1);
         }
 
@@ -66,8 +69,7 @@ public class DummyControllerGenerator {
                 .collect(Collectors.toSet());
         int groupCount = groupsConfig.getGroups().size();
 
-        System.out.println("Found " + groupCount + " groups with " + allInterfaces.size() + " unique interfaces");
-        System.out.println();
+        log.info("Found {} groups with {} unique interfaces", groupCount, allInterfaces.size());
 
         // Generate implementations
         GenerationResult result = generateAllControllers(allInterfaces, outputDir);
@@ -92,7 +94,7 @@ public class DummyControllerGenerator {
                 generateDummyController(interfaceFqn, fileWriter);
                 successCount++;
             } catch (Exception e) {
-                System.err.println("❌ Failed to generate dummy for " + interfaceFqn + ": " + e.getMessage());
+                log.error("❌ Failed to generate dummy for {}: {}", interfaceFqn, e.getMessage());
                 failCount++;
             }
         }
@@ -121,7 +123,7 @@ public class DummyControllerGenerator {
 
         int methodCount = countNonObjectMethods(interfaceClass);
         String baseClassName = baseSecurityClass.substring(baseSecurityClass.lastIndexOf('.') + 1);
-        System.out.println("✓ Generated " + implClassName + " (" + methodCount + " methods, " + baseClassName + ")");
+        log.info("✓ Generated {} ({} methods, {})", implClassName, methodCount, baseClassName);
     }
 
     /**
@@ -150,22 +152,20 @@ public class DummyControllerGenerator {
     }
 
     private static void printHeader(String configPath, String outputDir) {
-        System.out.println("=".repeat(70));
-        System.out.println("Dummy Controller Generator");
-        System.out.println("=".repeat(70));
-        System.out.println("Configuration: " + configPath);
-        System.out.println("Output directory: " + outputDir);
-        System.out.println();
+        log.info("======================================================================");
+        log.info("Dummy Controller Generator");
+        log.info("======================================================================");
+        log.info("Configuration: {}", configPath);
+        log.info("Output directory: {}", outputDir);
     }
 
     private static void printSummary(GenerationResult result) {
-        System.out.println();
-        System.out.println("=".repeat(70));
-        System.out.println("✅ Successfully generated " + result.successCount + " dummy controller classes");
+        log.info("======================================================================");
+        log.info("✅ Successfully generated {} dummy controller classes", result.successCount);
         if (result.failCount > 0) {
-            System.err.println("❌ Failed to generate " + result.failCount + " classes");
+            log.error("❌ Failed to generate {} classes", result.failCount);
         }
-        System.out.println("=".repeat(70));
+        log.info("======================================================================");
     }
 
     private record GenerationResult(int successCount, int failCount) {

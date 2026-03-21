@@ -3,6 +3,8 @@ package com.otilm.openapi.collector;
 import com.otilm.openapi.config.loader.GroupsConfigLoader;
 import com.otilm.openapi.config.model.GroupConfiguration;
 import com.otilm.openapi.config.model.GroupsConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
  * </ul>
  */
 public class IndexHtmlGenerator {
+    private static final Logger log = LoggerFactory.getLogger(IndexHtmlGenerator.class);
 
     /**
      * Category names in the order they appear in the JS block.
@@ -58,7 +61,7 @@ public class IndexHtmlGenerator {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 3) {
-            System.err.println("Usage: IndexHtmlGenerator <groups.yaml> <index.html.template> <index.html>");
+            log.error("Usage: IndexHtmlGenerator <groups.yaml> <index.html.template> <index.html>");
             System.exit(1);
         }
 
@@ -77,15 +80,15 @@ public class IndexHtmlGenerator {
 
     private static void validatePaths(Path groupsYamlPath, Path templateHtmlPath, Path indexHtmlPath) {
         if (!Files.exists(groupsYamlPath)) {
-            System.err.println("Error: groups.yaml not found at " + groupsYamlPath);
+            log.error("Error: groups.yaml not found at {}", groupsYamlPath);
             System.exit(1);
         }
         if (!Files.exists(templateHtmlPath)) {
-            System.err.println("Error: index.html.template not found at " + templateHtmlPath);
+            log.error("Error: index.html.template not found at {}", templateHtmlPath);
             System.exit(1);
         }
         if (indexHtmlPath.getParent() != null && !Files.exists(indexHtmlPath.getParent())) {
-            System.err.println("Error: output directory does not exist: " + indexHtmlPath.getParent());
+            log.error("Error: output directory does not exist: {}", indexHtmlPath.getParent());
             System.exit(1);
         }
     }
@@ -94,7 +97,7 @@ public class IndexHtmlGenerator {
         GroupsConfig config = GroupsConfigLoader.withoutExtensionResolution()
                 .loadFromFilesystem(groupsYamlPath.toString());
         if (config == null) {
-            System.err.println("Error: failed to load groups.yaml from " + groupsYamlPath);
+            log.error("Error: failed to load groups.yaml from {}", groupsYamlPath);
             System.exit(1);
         }
         return config;
@@ -148,7 +151,7 @@ public class IndexHtmlGenerator {
         String html = Files.readString(templateHtmlPath);
         Matcher m = ARRAYS_PATTERN.matcher(html);
         if (!m.find()) {
-            System.err.println("Error: could not find the '// placeholder for the list of APIS' line in index.html.");
+            log.error("Error: could not find the '// placeholder for the list of APIS' line in index.html.");
             System.exit(1);
         }
         String indent = m.group(1);
@@ -159,9 +162,9 @@ public class IndexHtmlGenerator {
     }
 
     private static void printSummary(Map<String, List<GroupConfiguration>> buckets) {
-        System.out.println("index.html updated:");
+        log.info("index.html updated:");
         for (String cat : CATEGORY_ORDER) {
-            System.out.printf("  %-20s %d entries%n", VAR_NAMES.get(cat) + ":", buckets.get(cat).size());
+            log.info("  {:<20} {} entries", VAR_NAMES.get(cat) + ":", buckets.get(cat).size());
         }
     }
 

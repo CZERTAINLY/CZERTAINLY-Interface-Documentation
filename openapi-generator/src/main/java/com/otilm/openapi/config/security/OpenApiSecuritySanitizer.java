@@ -4,6 +4,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -30,48 +31,33 @@ public class OpenApiSecuritySanitizer {
      * Keeps only those in the allowedSchemes set.
      */
     public void sanitizeSecuritySchemes(OpenAPI openApi, Set<String> allowedSchemes) {
-        if (openApi == null || openApi.getComponents() == null) {
-            log.debug("No components found in OpenAPI spec");
+        if (openApi == null) {
             return;
         }
 
         Set<String> validSchemes = allowedSchemes == null ? Collections.emptySet() : allowedSchemes;
 
-        Map<String, ?> securitySchemes = openApi.getComponents().getSecuritySchemes();
-        if (securitySchemes != null) {
-            Set<String> schemesToRemove = new HashSet<>();
-
-            // Identify schemes to remove
-            for (String schemeName : securitySchemes.keySet()) {
-                if (!validSchemes.contains(schemeName)) {
-                    schemesToRemove.add(schemeName);
-                }
-            }
-
-            // Remove unwanted schemes from components
-            for (String schemeName : schemesToRemove) {
-                openApi.getComponents().getSecuritySchemes().remove(schemeName);
-                log.debug("Removed unwanted security scheme: {}", schemeName);
-            }
+        // 1. Sanitize components/securitySchemes
+        if (openApi.getComponents() != null && openApi.getComponents().getSecuritySchemes() != null) {
+            Map<String, SecurityScheme> securitySchemes = openApi.getComponents().getSecuritySchemes();
+            securitySchemes.keySet().removeIf(schemeName -> !validSchemes.contains(schemeName));
 
             // Avoid emitting an empty map as `securitySchemes: {}` in YAML output.
-            if (openApi.getComponents().getSecuritySchemes().isEmpty()) {
+            if (securitySchemes.isEmpty()) {
                 openApi.getComponents().setSecuritySchemes(null);
             }
         }
 
-        // Remove references to deleted schemes from all operations
-        if (openApi.getPaths() != null) {
-            for (PathItem pathItem : openApi.getPaths().values()) {
-                removeInvalidSecurityRequirements(pathItem, validSchemes);
-            }
-        }
-
-        // Remove references from global security
+        // 2. Remove references from global security
         if (openApi.getSecurity() != null) {
             var filteredGlobalSecurity = new ArrayList<>(openApi.getSecurity());
             filteredGlobalSecurity.removeIf(secReq -> !isValidSecurityRequirement(secReq, validSchemes));
-            openApi.setSecurity(filteredGlobalSecurity);
+            openApi.setSecurity(filteredGlobalSecurity.isEmpty() ? null : filteredGlobalSecurity);
+        }
+
+        // 3. Remove references to deleted schemes from all operations
+        if (openApi.getPaths() != null) {
+            openApi.getPaths().values().forEach(pathItem -> removeInvalidSecurityRequirements(pathItem, validSchemes));
         }
 
         log.debug("Sanitized security schemes. Kept: {}", validSchemes);
@@ -81,11 +67,14 @@ public class OpenApiSecuritySanitizer {
      * Removes security requirements from a path item that reference deleted schemes.
      */
     private void removeInvalidSecurityRequirements(PathItem pathItem, Set<String> validSchemeNames) {
+        if (pathItem.readOperationsMap() == null) {
+            return;
+        }
         for (Operation operation : pathItem.readOperationsMap().values()) {
             if (operation.getSecurity() != null) {
                 var filteredOperationSecurity = new ArrayList<>(operation.getSecurity());
                 filteredOperationSecurity.removeIf(secReq -> !isValidSecurityRequirement(secReq, validSchemeNames));
-                operation.setSecurity(filteredOperationSecurity);
+                operation.setSecurity(filteredOperationSecurity.isEmpty() ? null : filteredOperationSecurity);
             }
         }
     }
@@ -96,15 +85,10 @@ public class OpenApiSecuritySanitizer {
      */
     private boolean isValidSecurityRequirement(SecurityRequirement secReq, Set<String> validSchemeNames) {
         if (secReq == null || secReq.isEmpty()) {
-            return true; // Empty security requirement is valid
+            return true;
         }
 
         // All schemes in this requirement must be in the valid set
-        for (String schemeName : secReq.keySet()) {
-            if (!validSchemeNames.contains(schemeName)) {
-                return false;
-            }
-        }
-        return true;
+        return validSchemeNames.containsAll(secReq.keySet());
     }
 }

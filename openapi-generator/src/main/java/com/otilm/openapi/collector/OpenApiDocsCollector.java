@@ -3,6 +3,8 @@ package com.otilm.openapi.collector;
 import com.otilm.openapi.config.loader.GroupsConfigLoader;
 import com.otilm.openapi.config.model.GroupConfiguration;
 import com.otilm.openapi.config.model.GroupsConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -24,10 +26,11 @@ import java.util.List;
  * args[2] - Output directory
  */
 public class OpenApiDocsCollector {
+    private static final Logger log = LoggerFactory.getLogger(OpenApiDocsCollector.class);
 
     public static void main(String[] args) throws Exception {
         if (args.length < 3) {
-            System.err.println("Usage: OpenApiDocsCollector <groups.yaml> <server-port> <output-dir>");
+            log.error("Usage: OpenApiDocsCollector <groups.yaml> <server-port> <output-dir>");
             System.exit(1);
         }
 
@@ -35,15 +38,14 @@ public class OpenApiDocsCollector {
         int serverPort = Integer.parseInt(args[1]);
         Path outputDir = Paths.get(args[2]);
 
-        System.out.println("Generating OpenAPI documentation files...");
-        System.out.println("Groups config: " + groupsYamlPath);
-        System.out.println("Server port:   " + serverPort);
-        System.out.println("Output directory: " + outputDir);
-        System.out.println();
+        log.info("Generating OpenAPI documentation files...");
+        log.info("Groups config: {}", groupsYamlPath);
+        log.info("Server port:   {}", serverPort);
+        log.info("Output directory: {}", outputDir);
 
         GroupsConfig config = new GroupsConfigLoader().loadFromFilesystem(groupsYamlPath);
         if (config == null) {
-            System.err.println("Error: groups.yaml not found at " + groupsYamlPath);
+            log.error("Error: groups.yaml not found at {}", groupsYamlPath);
             System.exit(1);
         }
 
@@ -55,7 +57,7 @@ public class OpenApiDocsCollector {
                 String url = "http://localhost:" + serverPort + "/v3/api-docs.yaml/" + group.getGroupName();
                 Path outputFile = outputDir.resolve(group.getId() + ".yaml");
 
-                System.out.println("Generating " + group.getId() + " from " + url + " ...");
+                log.info("Generating {} from {} ...", group.getId(), url);
 
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(url))
@@ -66,22 +68,21 @@ public class OpenApiDocsCollector {
 
                 if (response.statusCode() == 200) {
                     Files.writeString(outputFile, response.body());
-                    System.out.println("  ✓ Generated: " + outputFile);
+                    log.info("  ✓ Generated: {}", outputFile);
                 } else {
-                    System.err.println("  ✗ Failed to generate " + group.getId() + " (HTTP " + response.statusCode() + ")");
-                    System.err.println("    URL: " + url);
+                    log.error("  ✗ Failed to generate {} (HTTP {})", group.getId(), response.statusCode());
+                    log.error("    URL: {}", url);
                     failed.add(group.getId());
                 }
             }
         }
 
-        System.out.println();
         if (!failed.isEmpty()) {
-            System.err.println("Failed to generate " + failed.size() + " OpenAPI documentation file(s): " + failed);
+            log.error("Failed to generate {} OpenAPI documentation file(s): {}", failed.size(), failed);
             System.exit(1);
         }
 
-        System.out.println("Successfully generated " + config.getGroups().size() + " OpenAPI documentation files");
-        System.out.println("OpenAPI documentation generation complete!");
+        log.info("Successfully generated {} OpenAPI documentation files", config.getGroups().size());
+        log.info("OpenAPI documentation generation complete!");
     }
 }
