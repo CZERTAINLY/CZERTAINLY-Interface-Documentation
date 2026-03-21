@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ClassNameResolverTest {
@@ -58,6 +59,24 @@ public class ClassNameResolverTest {
                 .collect(Collectors.toSet());
 
         assertEquals(INTERFACE_FQNS.size(), names.size());
+    }
+
+    @Test
+    void throwsOnSimpleNameWithoutPackage() {
+        assertThrows(IllegalArgumentException.class,
+                () -> ClassNameResolver.generateImplementationClassName("MyController"));
+    }
+
+    @Test
+    void throwsOnEmptyString() {
+        assertThrows(IllegalArgumentException.class,
+                () -> ClassNameResolver.generateImplementationClassName(""));
+    }
+
+    @Test
+    void throwsWhenNameStartsWithDot() {
+        assertThrows(IllegalArgumentException.class,
+                () -> ClassNameResolver.generateImplementationClassName(".MyController"));
     }
 
     private static Stream<Arguments> interfaceNameCases() {

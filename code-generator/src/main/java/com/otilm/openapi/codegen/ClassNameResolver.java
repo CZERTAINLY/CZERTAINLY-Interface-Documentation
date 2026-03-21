@@ -36,6 +36,10 @@ public class ClassNameResolver {
      */
     public static String generateImplementationClassName(String interfaceFqn) {
         int lastDotIndex = interfaceFqn.lastIndexOf('.');
+        if (lastDotIndex <= 0) {
+            throw new IllegalArgumentException(
+                    "Invalid interface name: '" + interfaceFqn + "'. Must be a fully qualified class name.");
+        }
         String packageName = interfaceFqn.substring(0, lastDotIndex);
         String simpleName = interfaceFqn.substring(lastDotIndex + 1);
         
