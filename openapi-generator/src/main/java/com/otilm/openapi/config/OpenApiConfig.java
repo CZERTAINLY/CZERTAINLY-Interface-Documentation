@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +32,10 @@ public class OpenApiConfig {
 
     /**
      * Creates GroupedOpenApi beans dynamically for each group defined in groups.yaml.
-     * Each group is configured to include only the controllers that implement
-     * its specified interfaces.
+     * Each group is configured to include only the controllers that implement its specified interfaces.
      */
     @Bean
-    public List<GroupedOpenApi> groupedOpenApis() {
+    public List<GroupedOpenApi> groupedOpenApis() throws IOException {
         GroupsConfig config = groupsConfigLoader.load();
         List<GroupedOpenApi> groups = new ArrayList<>();
 

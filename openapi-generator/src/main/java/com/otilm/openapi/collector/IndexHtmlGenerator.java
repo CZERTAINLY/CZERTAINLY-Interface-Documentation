@@ -6,6 +6,7 @@ import com.otilm.openapi.config.model.GroupsConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -94,13 +95,13 @@ public class IndexHtmlGenerator {
     }
 
     private static GroupsConfig loadConfig(Path groupsYamlPath) {
-        GroupsConfig config = GroupsConfigLoader.withoutExtensionResolution()
-                .loadFromFilesystem(groupsYamlPath.toString());
-        if (config == null) {
+        try {
+            return GroupsConfigLoader.withoutExtensionResolution().loadFromFilesystem(groupsYamlPath.toString());
+        } catch (IOException e) {
             log.error("Error: failed to load groups.yaml from {}", groupsYamlPath);
             System.exit(1);
+            return null;
         }
-        return config;
     }
 
     /**
@@ -147,7 +148,7 @@ public class IndexHtmlGenerator {
      * and writes the result to {@code indexHtmlPath}.
      * The original indentation of the placeholder line is preserved.
      */
-    private static void updateIndexHtml(Path templateHtmlPath, Path indexHtmlPath, String newBlock) throws Exception {
+    private static void updateIndexHtml(Path templateHtmlPath, Path indexHtmlPath, String newBlock) throws IOException {
         String html = Files.readString(templateHtmlPath);
         Matcher m = ARRAYS_PATTERN.matcher(html);
         if (!m.find()) {
@@ -164,7 +165,7 @@ public class IndexHtmlGenerator {
     private static void printSummary(Map<String, List<GroupConfiguration>> buckets) {
         log.info("index.html updated:");
         for (String cat : CATEGORY_ORDER) {
-            log.info("  {:<20} {} entries", VAR_NAMES.get(cat) + ":", buckets.get(cat).size());
+            log.info("  {}: {} entries", VAR_NAMES.get(cat), buckets.get(cat).size());
         }
     }
 

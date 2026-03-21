@@ -3,6 +3,7 @@ package com.otilm.openapi.config.loader;
 import com.otilm.openapi.config.model.GroupsConfig;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -12,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GroupsConfigLoaderTest {
 
     @Test
-    void testLoadFromClasspath() {
+    void testLoadFromClasspath() throws IOException {
         GroupsConfigLoader loader = new GroupsConfigLoader();
         GroupsConfig config = loader.loadFromClasspath("test-groups.yaml");
         assertNotNull(config);
@@ -36,14 +37,14 @@ class GroupsConfigLoaderTest {
     }
 
     @Test
-    void testLoadDefault() {
+    void testLoadDefault() throws IOException {
         GroupsConfigLoader loader = new GroupsConfigLoader();
         GroupsConfig config = loader.load();
         assertNotNull(config);
     }
 
     @Test
-    void testLoadConfiguration() {
+    void testLoadConfiguration() throws IOException {
         GroupsConfigLoader loader = new GroupsConfigLoader();
         GroupsConfig config = loader.loadFromClasspath("/test-groups.yaml");
 

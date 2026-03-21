@@ -93,7 +93,7 @@ public class DummyControllerGenerator {
             try {
                 generateDummyController(interfaceFqn, fileWriter);
                 successCount++;
-            } catch (Exception e) {
+            } catch (ClassNotFoundException | IOException e) {
                 log.error("❌ Failed to generate dummy for {}: {}", interfaceFqn, e.getMessage());
                 failCount++;
             }
@@ -106,7 +106,7 @@ public class DummyControllerGenerator {
      * Generates a single dummy controller implementation for the given interface.
      * Validates that the interface extends one of the three base security controllers.
      */
-    private void generateDummyController(String interfaceFqn, FileWriter fileWriter) throws Exception {
+    private void generateDummyController(String interfaceFqn, FileWriter fileWriter) throws ClassNotFoundException, IOException {
         Class<?> interfaceClass = loadInterfaceClass(interfaceFqn);
 
         String baseSecurityClass = securitySchemeExtractor.determineBaseSecurityClass(interfaceClass);

@@ -119,7 +119,7 @@ public class GroupedOpenApiBuilder {
 
         // For each interface, find its base class and add allowed schemes
         for (String interfaceFqn : groupConfig.getInterfaces()) {
-            // The base class info was extracted during codegen and stored in annotations
+            // The base class info was extracted in code-generator and stored in annotations
             String generatedClassName = ClassNameResolver.generateImplementationClassName(interfaceFqn);
             try {
                 Class<?> generatedClass = Class.forName(BASE_PACKAGE + "." + generatedClassName);
@@ -134,7 +134,7 @@ public class GroupedOpenApiBuilder {
                     log.debug("Interface {} → base class {}, schemes: {}", interfaceFqn, baseClassName, schemesForBase);
                 }
             } catch (ClassNotFoundException e) {
-                log.warn("Could not load generated class for interface {}: {}", interfaceFqn, e.getMessage());
+                log.error("Could not load generated class for interface {}: {}", interfaceFqn, e.getMessage());
             }
         }
 

@@ -50,7 +50,7 @@ public class GroupsConfigLoader {
      * Loads the configuration from the first available location.
      * Tries filesystem paths, then classpath.
      */
-    public GroupsConfig load() {
+    public GroupsConfig load() throws IOException {
         // 1. Try from filesystem paths
         for (String path : GROUPS_YAML_FILESYSTEM_PATHS) {
             GroupsConfig config = loadFromFilesystem(path);
@@ -72,7 +72,7 @@ public class GroupsConfigLoader {
      * Loads the configuration from the filesystem.
      * Returns null if the file does not exist.
      */
-    public GroupsConfig loadFromFilesystem(String path) {
+    public GroupsConfig loadFromFilesystem(String path) throws IOException {
         Path filePath = Paths.get(path);
         if (Files.exists(filePath)) {
             try (InputStream is = Files.newInputStream(filePath)) {
@@ -80,7 +80,7 @@ public class GroupsConfigLoader {
                 return load(is);
             } catch (IOException e) {
                 logger.error("Failed to load configuration from filesystem: {}", path, e);
-                throw new RuntimeException("Failed to load configuration from " + path, e);
+                throw new IOException("Failed to load configuration from " + path, e);
             }
         }
         return null;
@@ -90,7 +90,7 @@ public class GroupsConfigLoader {
      * Loads the configuration from the classpath.
      * Returns null if the resource does not exist.
      */
-    public GroupsConfig loadFromClasspath(String resourceName) {
+    public GroupsConfig loadFromClasspath(String resourceName) throws IOException {
         String normalizedPath = resourceName.startsWith("/") ? resourceName : "/" + resourceName;
         try (InputStream is = getClass().getResourceAsStream(normalizedPath)) {
             if (is != null) {
@@ -99,7 +99,7 @@ public class GroupsConfigLoader {
             }
         } catch (IOException e) {
             logger.error("Failed to load configuration from classpath: {}", normalizedPath, e);
-            throw new RuntimeException("Failed to load configuration from classpath: " + normalizedPath, e);
+            throw new IOException("Failed to load configuration from classpath: " + normalizedPath, e);
         }
         return null;
     }
