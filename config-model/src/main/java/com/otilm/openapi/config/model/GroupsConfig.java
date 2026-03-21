@@ -1,29 +1,35 @@
 package com.otilm.openapi.config.model;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Unified model for the entire groups.yaml configuration
  */
 public class GroupsConfig {
-    private CommonConfiguration common;
-    private List<GroupConfiguration> groups;
-    private SecurityConfiguration security;
+    private CommonConfiguration common = new CommonConfiguration();
+    private List<GroupConfiguration> groups = Collections.emptyList();
+    private SecurityConfiguration security = new SecurityConfiguration(Collections.emptyList(), Collections.emptyList());
 
     public CommonConfiguration getCommon() {
         return common;
     }
 
     public void setCommon(CommonConfiguration common) {
-        this.common = common;
+        if (common != null) {
+            this.common = common;
+        }
     }
 
     public List<GroupConfiguration> getGroups() {
-        return groups;
+        return Collections.unmodifiableList(groups);
     }
 
     public void setGroups(List<GroupConfiguration> groups) {
-        this.groups = groups;
+        if (groups != null) {
+            this.groups = Collections.unmodifiableList(groups);
+        }
     }
 
     public SecurityConfiguration getSecurity() {
@@ -31,6 +37,8 @@ public class GroupsConfig {
     }
 
     public void setSecurity(SecurityConfiguration security) {
-        this.security = security;
+        if (security != null) {
+            this.security = security;
+        }
     }
 }

@@ -119,14 +119,12 @@ public class GroupsConfigLoader {
     }
 
     private void resolveExtensions(GroupsConfig config) {
-        if (config.getCommon() != null && config.getCommon().getExtensions() != null) {
+        if (!config.getCommon().getExtensions().isEmpty()) {
             config.getCommon().setExtensions(resolveTopLevelExtensions(config.getCommon().getExtensions(), "common configuration"));
         }
-        if (config.getGroups() != null) {
-            for (GroupConfiguration group : config.getGroups()) {
-                if (group.getExtensions() != null) {
-                    group.setExtensions(resolveTopLevelExtensions(group.getExtensions(), "group " + group.getId()));
-                }
+        for (GroupConfiguration group : config.getGroups()) {
+            if (!group.getExtensions().isEmpty()) {
+                group.setExtensions(resolveTopLevelExtensions(group.getExtensions(), "group " + group.getId()));
             }
         }
     }

@@ -45,7 +45,7 @@ public class OpenApiInfoBuilder {
      * Adds all extensions from common configuration to Info object
      */
     private void addExtensions(Info info, CommonConfiguration commonConfig) {
-        if (commonConfig.getExtensions() != null && !commonConfig.getExtensions().isEmpty()) {
+        if (!commonConfig.getExtensions().isEmpty()) {
             info.extensions(new HashMap<>(commonConfig.getExtensions()));
         }
     }
@@ -90,13 +90,11 @@ public class OpenApiInfoBuilder {
     private void addServers(OpenAPI openAPI, CommonConfiguration commonConfig, String serverUrlOverride) {
         List<CommonConfiguration.ServerConfiguration> servers = commonConfig.getServers();
 
-        if (servers != null && !servers.isEmpty()) {
+        if (!servers.isEmpty()) {
             List<Server> serverList = servers.stream()
                     .map(serverConfig -> buildServerWithUrlOverride(serverConfig, serverUrlOverride))
                     .toList();
             openAPI.servers(serverList);
-        } else {
-            openAPI.servers(null);
         }
     }
 

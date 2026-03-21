@@ -2,6 +2,7 @@ package com.otilm.openapi.codegen;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,6 +21,6 @@ public record FileWriter(String outputDirectory, String packageName) {
         Files.createDirectories(packagePath);
 
         Path javaFile = packagePath.resolve(className + ".java");
-        Files.write(javaFile, sourceCode.getBytes());
+        Files.writeString(javaFile, sourceCode);
     }
 }

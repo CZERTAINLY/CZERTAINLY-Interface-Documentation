@@ -21,7 +21,7 @@ public @interface SecuritySchemeCategory {
     String baseClass();
 
     /**
-     * The names of security scheme applicable to this controller.
+     * The names of security schemes applicable to this controller.
      * Extracted from @SecurityScheme annotations on the base class.
      */
     String[] securitySchemes() default {};

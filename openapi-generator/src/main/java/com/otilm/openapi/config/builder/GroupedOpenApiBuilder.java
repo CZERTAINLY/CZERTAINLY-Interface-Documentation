@@ -69,7 +69,7 @@ public class GroupedOpenApiBuilder {
      * Validates that the group configuration has required data
      */
     private void validateGroupConfiguration(GroupConfiguration groupConfig) {
-        if (groupConfig.getInterfaces() == null || groupConfig.getInterfaces().isEmpty()) {
+        if (groupConfig.getInterfaces().isEmpty()) {
             log.warn("Group {} has no interfaces, skipping", groupConfig.getGroupName());
             throw new IllegalArgumentException("Group has no interfaces");
         }
@@ -91,7 +91,7 @@ public class GroupedOpenApiBuilder {
         infoBuilder.addCommonElements(openApi, commonConfig, groupConfig.getServerUrl());
 
         // Apply group-specific extensions to the Info object
-        if (groupConfig.getExtensions() != null && !groupConfig.getExtensions().isEmpty()) {
+        if (!groupConfig.getExtensions().isEmpty()) {
             if (info.getExtensions() == null) {
                 info.setExtensions(new java.util.HashMap<>());
             }

@@ -1,7 +1,9 @@
 package com.otilm.openapi.config.model;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Model class representing a single group configuration from groups.yaml
@@ -11,9 +13,9 @@ public class GroupConfiguration {
     private String groupName;
     private String title;
     private String description;
-    private List<String> interfaces;
+    private List<String> interfaces = Collections.emptyList();
     private String serverUrl;
-    private Map<String, Object> extensions;
+    private Map<String, Object> extensions = Collections.emptyMap();
     private String indexCategory;
 
     public String getId() {
@@ -53,7 +55,9 @@ public class GroupConfiguration {
     }
 
     public void setInterfaces(List<String> interfaces) {
-        this.interfaces = interfaces;
+        if (interfaces != null) {
+            this.interfaces = Collections.unmodifiableList(interfaces);
+        }
     }
 
     public String getServerUrl() {
@@ -69,7 +73,9 @@ public class GroupConfiguration {
     }
 
     public void setExtensions(Map<String, Object> extensions) {
-        this.extensions = extensions;
+        if (extensions != null) {
+            this.extensions = Collections.unmodifiableMap(extensions);
+        }
     }
 
     /**

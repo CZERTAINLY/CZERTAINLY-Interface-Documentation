@@ -1,7 +1,9 @@
 package com.otilm.openapi.config.model;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Model class representing common configuration elements from groups.yaml
@@ -11,8 +13,8 @@ public class CommonConfiguration {
     private LicenseConfiguration license;
     private ContactConfiguration contact;
     private ExternalDocsConfiguration externalDocs;
-    private List<ServerConfiguration> servers;
-    private Map<String, Object> extensions;
+    private List<ServerConfiguration> servers = Collections.emptyList();
+    private Map<String, Object> extensions = Collections.emptyMap();
 
     public LogoConfiguration getLogo() {
         return logo;
@@ -51,7 +53,9 @@ public class CommonConfiguration {
     }
 
     public void setServers(List<ServerConfiguration> servers) {
-        this.servers = servers;
+        if (servers != null) {
+            this.servers = Collections.unmodifiableList(servers);
+        }
     }
 
     public Map<String, Object> getExtensions() {
@@ -59,7 +63,9 @@ public class CommonConfiguration {
     }
 
     public void setExtensions(Map<String, Object> extensions) {
-        this.extensions = extensions;
+        if (extensions != null) {
+            this.extensions = Collections.unmodifiableMap(extensions);
+        }
     }
 
     public static class LogoConfiguration {
