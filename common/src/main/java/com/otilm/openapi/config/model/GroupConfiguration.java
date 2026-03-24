@@ -21,6 +21,7 @@ public class GroupConfiguration {
     private String serverUrl;
     private Map<String, Object> extensions = Collections.emptyMap();
     private String indexCategory;
+    private List<Map<String, List<String>>> security;
 
     public void setInterfaces(List<String> interfaces) {
         if (interfaces != null) {

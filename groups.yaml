@@ -47,6 +47,11 @@ security:
 #   serverUrl      Overrides the default server URL defined in common.servers for this specific group.
 #   interfaces     (required) Ordered list of fully-qualified Java controller interface names whose operations
 #                  are merged into this group.
+#   security       Overrides the set of OpenAPI security schemes included in the generated OpenAPI document's
+#                  components/securitySchemes section. When omitted (default), the OpenAPI generator derives the schemes
+#                  automatically from the interfaces listed above by inspecting which baseSecurityInterfaces
+#                  they extend. Set to an empty list ([]) to suppress all security scheme generation for the
+#                  group — useful for aggregate/umbrella documents (e.g. doc-openapi-ilm-core).
 #   extensions     Arbitrary OpenAPI extension properties (x-*) to add at the info object level of the generated document.
 # ---------------------------------------------------------------------------
 groups:
@@ -474,6 +479,7 @@ groups:
     groupName: czertainly-core
     title: Core API
     description: REST API for CZERTAINLY Core
+    security: []
     interfaces:
       - com.czertainly.api.interfaces.core.client.v2.ClientOperationController
       - com.czertainly.api.interfaces.core.connector.ConnectorRegistrationController

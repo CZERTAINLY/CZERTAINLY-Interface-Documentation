@@ -254,6 +254,7 @@ public class GroupsConfigLoader {
         group.setServerUrl((String) groupMap.get("serverUrl"));
         group.setExtensions((Map<String, Object>) groupMap.get("extensions"));
         group.setIndexCategory((String) groupMap.get("indexCategory"));
+        group.setSecurity((List<Map<String, List<String>>>) groupMap.get("security"));
         return group;
     }
 

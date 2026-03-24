@@ -7,7 +7,10 @@ import com.otilm.openapi.config.security.OpenApiSecuritySanitizer;
 import com.otilm.openapi.config.security.SecuritySchemeMetadataReader;
 import com.otilm.openapi.codegen.SecuritySchemeCategory;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.Operation;
+import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springdoc.core.models.GroupedOpenApi;
@@ -15,8 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -103,11 +108,18 @@ public class GroupedOpenApiBuilder {
                     groupConfig.getExtensions().keySet());
         }
 
-        // Determine which security schemes are allowed for this group's interfaces
-        Set<String> allowedSchemes = determineAllowedSecuritySchemes(groupConfig);
-
-        // Sanitize: remove unwanted security schemes
-        openApiSecuritySanitizer.sanitizeSecuritySchemes(openApi, allowedSchemes);
+        // Check for explicit security override in group configuration
+        log.debug("Group {} security config: {}", groupConfig.getGroupName(), groupConfig.getSecurity());
+        if (groupConfig.getSecurity() != null) {
+            // Use explicit security from configuration
+            log.info("Using explicit security configuration for group {}", groupConfig.getGroupName());
+            applyExplicitSecurity(openApi, groupConfig);
+        } else {
+            // Derive security from interfaces (default behavior)
+            log.debug("Using default security derivation for group {}", groupConfig.getGroupName());
+            Set<String> allowedSchemes = determineAllowedSecuritySchemes(groupConfig);
+            openApiSecuritySanitizer.sanitizeSecuritySchemes(openApi, allowedSchemes);
+        }
     }
 
     /**
@@ -140,6 +152,64 @@ public class GroupedOpenApiBuilder {
 
         log.debug("Group {} allowed security schemes: {}", groupConfig.getGroupName(), allowedSchemes);
         return allowedSchemes;
+    }
+
+    /**
+     * Applies explicit security configuration from the group configuration.
+     * This overrides the default security derived from interfaces.
+     */
+    private void applyExplicitSecurity(OpenAPI openApi, GroupConfiguration groupConfig) {
+        List<Map<String, List<String>>> securityConfig = groupConfig.getSecurity();
+
+        // Convert the configuration format to OpenAPI SecurityRequirement objects
+        List<SecurityRequirement> securityRequirements = convertToSecurityRequirements(securityConfig);
+
+        // Set document-level security
+        openApi.setSecurity(securityRequirements.isEmpty() ? new ArrayList<>() : securityRequirements);
+
+        // If security is empty (security: []), remove all operation-level security
+        if (securityRequirements.isEmpty()) {
+            removeAllOperationSecurity(openApi);
+            log.info("Applied explicit empty security ([]) for group {}", groupConfig.getGroupName());
+        } else {
+            log.info("Applied explicit security requirements for group {}: {}",
+                    groupConfig.getGroupName(), securityRequirements);
+        }
+    }
+
+    /**
+     * Converts security configuration from YAML format to OpenAPI SecurityRequirement objects.
+     */
+    private List<SecurityRequirement> convertToSecurityRequirements(List<Map<String, List<String>>> securityConfig) {
+        List<SecurityRequirement> requirements = new ArrayList<>();
+
+        for (Map<String, List<String>> securityMap : securityConfig) {
+            SecurityRequirement requirement = new SecurityRequirement();
+            for (Map.Entry<String, List<String>> entry : securityMap.entrySet()) {
+                requirement.addList(entry.getKey(), entry.getValue());
+            }
+            requirements.add(requirement);
+        }
+
+        return requirements;
+    }
+
+    /**
+     * Removes all operation-level security requirements from the OpenAPI specification.
+     * Used when document-level security is set to [] (no authentication required).
+     */
+    private void removeAllOperationSecurity(OpenAPI openApi) {
+        if (openApi.getPaths() == null) {
+            return;
+        }
+
+        for (PathItem pathItem : openApi.getPaths().values()) {
+            if (pathItem.readOperationsMap() != null) {
+                for (Operation operation : pathItem.readOperationsMap().values()) {
+                    operation.setSecurity(null);
+                }
+            }
+        }
     }
 
     /**
