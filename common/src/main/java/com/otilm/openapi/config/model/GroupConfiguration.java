@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jspecify.annotations.NonNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +16,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class GroupConfiguration {
+    private static final String UNKNOWN_GROUP = "<unknown>";
     private String id;
     private String groupName;
     private String title;
@@ -28,7 +31,7 @@ public class GroupConfiguration {
         if (interfaces != null) {
             if (interfaces.contains(null)) {
                 throw new IllegalArgumentException(
-                        "Interfaces list contains null elements for group '" + (id != null ? id : "<unknown>") + "'"
+                        "Interfaces list contains null elements for group '" + (id != null ? id : UNKNOWN_GROUP) + "'"
                 );
             }
             this.interfaces = List.copyOf(interfaces);
@@ -39,7 +42,7 @@ public class GroupConfiguration {
         if (extensions != null) {
             if (extensions.containsKey(null) || extensions.containsValue(null)) {
                 throw new IllegalArgumentException(
-                        "Extensions map contains null keys or values for group '" + (id != null ? id : "<unknown>") + "'"
+                        "Extensions map contains null keys or values for group '" + (id != null ? id : UNKNOWN_GROUP) + "'"
                 );
             }
             this.extensions = Map.copyOf(extensions);
@@ -50,17 +53,17 @@ public class GroupConfiguration {
         if (security != null) {
             if (security.contains(null)) {
                 throw new IllegalArgumentException(
-                        "Security list contains null elements for group '" + (id != null ? id : "<unknown>") + "'"
+                        "Security list contains null elements for group '" + (id != null ? id : UNKNOWN_GROUP) + "'"
                 );
             }
-            List<Map<String, List<String>>> copy = new java.util.ArrayList<>(security.size());
+            List<Map<String, List<String>>> copy = new ArrayList<>(security.size());
             for (Map<String, List<String>> requirement : security) {
                 if (requirement.containsKey(null)) {
                     throw new IllegalArgumentException(
-                            "Security requirement map contains null keys for group '" + (id != null ? id : "<unknown>") + "'"
+                            "Security requirement map contains null keys for group '" + (id != null ? id : UNKNOWN_GROUP) + "'"
                     );
                 }
-                Map<String, List<String>> reqCopy = new java.util.LinkedHashMap<>(requirement.size());
+                Map<String, List<String>> reqCopy = LinkedHashMap.newLinkedHashMap(requirement.size());
                 for (Map.Entry<String, List<String>> entry : requirement.entrySet()) {
                     List<String> scopes = getScopes(entry);
                     reqCopy.put(entry.getKey(), List.copyOf(scopes));
@@ -76,13 +79,13 @@ public class GroupConfiguration {
         if (scopes == null) {
             throw new IllegalArgumentException(
                     "Security requirement map contains null scope list for scheme '" + entry.getKey()
-                            + "' in group '" + (id != null ? id : "<unknown>") + "'"
+                            + "' in group '" + (id != null ? id : UNKNOWN_GROUP) + "'"
             );
         }
         if (scopes.contains(null)) {
             throw new IllegalArgumentException(
                     "Security scope list contains null elements for scheme '" + entry.getKey()
-                            + "' in group '" + (id != null ? id : "<unknown>") + "'"
+                            + "' in group '" + (id != null ? id : UNKNOWN_GROUP) + "'"
             );
         }
         return scopes;

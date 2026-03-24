@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +99,7 @@ public class GroupedOpenApiBuilder {
         // Apply group-specific extensions to the Info object
         if (!groupConfig.getExtensions().isEmpty()) {
             if (info.getExtensions() == null) {
-                info.setExtensions(new java.util.HashMap<>());
+                info.setExtensions(new HashMap<>());
             }
             // Merge group-specific extensions (they override common extensions if there's a conflict)
             info.getExtensions().putAll(groupConfig.getExtensions());

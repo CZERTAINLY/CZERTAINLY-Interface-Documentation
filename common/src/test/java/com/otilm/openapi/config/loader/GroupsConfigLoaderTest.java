@@ -63,7 +63,7 @@ class GroupsConfigLoaderTest {
         assertEquals("value", config.getGroups().getFirst().getExtensions().get("x-test"));
         Object resolved = config.getGroups().getFirst().getExtensions().get("x-resolved");
         assertInstanceOf(Map.class, resolved);
-        assertEquals(1, ((java.util.Map<?, ?>) resolved).get("version"));
+        assertEquals(1, ((Map<?, ?>) resolved).get("version"));
 
         assertNotNull(config.getSecurity());
         assertEquals(1, config.getSecurity().baseSecurityInterfaces().size());
@@ -76,7 +76,7 @@ class GroupsConfigLoaderTest {
     void testLoadEmptySecurity() {
         GroupsConfigLoader loader = new GroupsConfigLoader();
         String yaml = "groups: []";
-        java.util.Map<String, Object> raw = new org.yaml.snakeyaml.Yaml().load(yaml);
+        Map<String, Object> raw = new org.yaml.snakeyaml.Yaml().load(yaml);
         GroupsConfig config = loader.parse(raw);
 
         assertNotNull(config.getSecurity());
