@@ -2,6 +2,7 @@ package com.otilm.openapi.config.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,5 +44,47 @@ public class GroupConfiguration {
             }
             this.extensions = Map.copyOf(extensions);
         }
+    }
+
+    public void setSecurity(List<Map<String, List<String>>> security) {
+        if (security != null) {
+            if (security.contains(null)) {
+                throw new IllegalArgumentException(
+                        "Security list contains null elements for group '" + (id != null ? id : "<unknown>") + "'"
+                );
+            }
+            List<Map<String, List<String>>> copy = new java.util.ArrayList<>(security.size());
+            for (Map<String, List<String>> requirement : security) {
+                if (requirement.containsKey(null)) {
+                    throw new IllegalArgumentException(
+                            "Security requirement map contains null keys for group '" + (id != null ? id : "<unknown>") + "'"
+                    );
+                }
+                Map<String, List<String>> reqCopy = new java.util.LinkedHashMap<>(requirement.size());
+                for (Map.Entry<String, List<String>> entry : requirement.entrySet()) {
+                    List<String> scopes = getScopes(entry);
+                    reqCopy.put(entry.getKey(), List.copyOf(scopes));
+                }
+                copy.add(Map.copyOf(reqCopy));
+            }
+            this.security = List.copyOf(copy);
+        }
+    }
+
+    private @NonNull List<String> getScopes(Map.Entry<String, List<String>> entry) {
+        List<String> scopes = entry.getValue();
+        if (scopes == null) {
+            throw new IllegalArgumentException(
+                    "Security requirement map contains null scope list for scheme '" + entry.getKey()
+                            + "' in group '" + (id != null ? id : "<unknown>") + "'"
+            );
+        }
+        if (scopes.contains(null)) {
+            throw new IllegalArgumentException(
+                    "Security scope list contains null elements for scheme '" + entry.getKey()
+                            + "' in group '" + (id != null ? id : "<unknown>") + "'"
+            );
+        }
+        return scopes;
     }
 }
