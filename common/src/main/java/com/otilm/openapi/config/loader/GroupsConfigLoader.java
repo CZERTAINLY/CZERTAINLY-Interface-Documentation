@@ -90,7 +90,7 @@ public class GroupsConfigLoader {
      * Returns null if the resource does not exist.
      */
     public GroupsConfig loadFromClasspath(String resourceName) throws IOException {
-        String normalizedPath = resourceName.startsWith(File.separator) ? resourceName : File.separator + resourceName;
+        String normalizedPath = resourceName.startsWith("/") ? resourceName : "/" + resourceName;
         try (InputStream is = getClass().getResourceAsStream(normalizedPath)) {
             if (is != null) {
                 logger.info("Loading configuration from classpath: {}", normalizedPath);
