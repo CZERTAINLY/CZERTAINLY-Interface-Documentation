@@ -18,12 +18,12 @@ class AmbiguousMappingFailureAnalyzerTest {
 
     @Test
     void analyze_withAmbiguousMappingException_returnsBothConflictingMethods() {
-        String springMessage = "Error creating bean with name 'requestMappingHandlerMapping': " +
-                "Ambiguous mapping. Cannot map 'myControllerDummyImpl' method \n" +
-                "com.example.MyControllerDummyImpl#createFoo(FooCreateRequest)\n" +
-                "to {POST [/v1/foos], consumes [application/json], produces [application/json]}: " +
-                "There is already 'myControllerDummyImpl' bean method\n" +
-                "com.example.MyControllerDummyImpl#listFoos(SearchRequestDto) mapped.";
+        String springMessage = """
+Error creating bean with name 'requestMappingHandlerMapping': Ambiguous mapping. Cannot map 'myControllerDummyImpl' method
+com.example.MyControllerDummyImpl#createFoo(FooCreateRequest)
+to {POST [/v1/foos], consumes [application/json], produces [application/json]}: There is already 'myControllerDummyImpl' bean method
+com.example.MyControllerDummyImpl#listFoos(SearchRequestDto) mapped.
+""";
 
         BeanCreationException cause = new BeanCreationException(springMessage);
         FailureAnalysis analysis = analyzer.analyze(new RuntimeException(cause), cause);
