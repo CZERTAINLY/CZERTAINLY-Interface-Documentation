@@ -28,6 +28,13 @@ import java.util.stream.Collectors;
  * or {@code protocol}) is included in the corresponding JavaScript array. Groups
  * without the field (e.g. cert-manager, ilm-core, legacy variants) are ignored.
  * <p>
+ * The display name for each entry is resolved in the following order:
+ * <ol>
+ *   <li>{@code navLabel} – when present, used verbatim</li>
+ *   <li>{@code title} – used after stripping a trailing {@code " API"} suffix</li>
+ *   <li>{@code id} – fallback when title is also absent</li>
+ * </ol>
+ * <p>
  * Arguments:
  * <ul>
  *   <li>args[0] – Path to groups.yaml</li>
@@ -133,14 +140,21 @@ public class IndexHtmlGenerator {
         for (String cat : CATEGORY_ORDER) {
             js.append("    var ").append(VAR_NAMES.get(cat)).append(" = [\n");
             for (GroupConfiguration g : buckets.get(cat)) {
-                String rawName = g.getTitle() != null ? g.getTitle() : g.getId();
-                String name = rawName.endsWith(" API") ? rawName.substring(0, rawName.length() - 4) : rawName;
+                String name = resolveNavName(g);
                 js.append("      {\"name\": ").append(jsonString(name))
                         .append(", \"url\": ").append(jsonString(g.getId() + ".html")).append("},\n");
             }
             js.append("    ];\n\n");
         }
         return js.toString().stripTrailing();
+    }
+
+    static String resolveNavName(GroupConfiguration g) {
+        if (g.getNavLabel() != null && !g.getNavLabel().isBlank()) {
+            return g.getNavLabel();
+        }
+        String rawName = g.getTitle() != null ? g.getTitle() : g.getId();
+        return rawName.endsWith(" API") ? rawName.substring(0, rawName.length() - 4) : rawName;
     }
 
     /**
