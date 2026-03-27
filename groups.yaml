@@ -1,0 +1,601 @@
+# Configuration for OpenAPI documentation groups.
+#
+# This file drives the code generator that produces per-group OpenAPI YAML files (written to the openapi/ directory)
+# from the compiled Java interfaces. It has three top-level keys:
+#
+#   security – Identifies which Java interfaces carry authentication annotations so the generator can propagate
+#              the correct security schemes.
+#   groups – Ordered list of API groups; each group becomes one OpenAPI file.
+#   common – Shared metadata (version, license, contact, servers…) that is merged into every generated OpenAPI document.
+
+# ---------------------------------------------------------------------------
+# security
+#
+# baseSecurityInterfaces
+#   Fully qualified names of the marker interfaces that controllers extend to declare their authentication requirements.
+#   The generator uses these to decide which security scheme (bearer token, no-auth…) to attach to each
+#   generated operation.
+#
+# legacyControllers
+#   Controllers that use the legacy auth model and therefore need special-case handling during generation.
+# ---------------------------------------------------------------------------
+security:
+  baseSecurityInterfaces:
+    - com.czertainly.api.interfaces.AuthProtectedController
+    - com.czertainly.api.interfaces.AuthProtectedConnectorController
+    - com.czertainly.api.interfaces.connector.common.v2.AuthProtectedConnectorController
+    - com.czertainly.api.interfaces.NoAuthController
+    - com.czertainly.api.interfaces.connector.common.v2.NoAuthConnectorController
+  legacyControllers:
+    - com.czertainly.api.interfaces.core.web.InfoController
+
+# ---------------------------------------------------------------------------
+# groups
+#
+# Each entry defines one API group rendered into its own OpenAPI file.
+# Supported fields per group entry:
+#
+#   id             (required) Unique identifier; also used as the output file name: openapi/<id>.yaml.
+#   groupName      (required) Short slug used in URL paths and Redocly portal navigation.
+#   title          (required) Human-readable display name shown in the portal.
+#   description    Short prose describing the purpose of this API group.
+#   indexCategory  Portal navigation category. Recognized values:
+#                    connector  – connector-side APIs
+#                    core       – platform core APIs
+#                    protocol   – protocol gateway APIs
+#                  Groups without this field are not included in the portal navigation page.
+#   navLabel       Optional override for the display name used in the generated portal navigation entry.
+#                  When present, this value is used verbatim. When absent, the name is derived from title
+#                  by stripping the trailing " API" suffix (or falling back to id if title is absent).
+#                  Only meaningful for groups that have indexCategory set.
+#   serverUrl      Overrides the default server URL defined in common.servers for this specific group.
+#   interfaces     (required) Ordered list of fully-qualified Java controller interface names whose operations
+#                  are merged into this group.
+#   security       Overrides the set of OpenAPI security schemes included in the generated OpenAPI document's
+#                  components/securitySchemes section. When omitted (default), the OpenAPI generator derives the schemes
+#                  automatically from the interfaces listed above by inspecting which baseSecurityInterfaces
+#                  they extend. Set to an empty list ([]) to suppress all security scheme generation for the
+#                  group — useful for aggregate/umbrella documents (e.g. doc-openapi-ilm-core).
+#   extensions     Arbitrary OpenAPI extension properties (x-*) to add at the info object level of the generated document.
+# ---------------------------------------------------------------------------
+groups:
+  - id: doc-openapi-cert-manager
+    groupName: cert-manager
+    title: Cert Manager
+    description: REST API for implementations of cert-manager issuer
+    interfaces:
+      - com.czertainly.api.interfaces.core.client.v2.ClientOperationController
+      - com.czertainly.api.interfaces.core.web.ApprovalController
+      - com.czertainly.api.interfaces.core.web.AuthController
+      - com.czertainly.api.interfaces.core.web.CertificateController
+      - com.czertainly.api.interfaces.core.web.InfoController
+      - com.czertainly.api.interfaces.core.web.RAProfileManagementController
+
+  - id: doc-openapi-connector-authority-provider-legacy
+    groupName: connector-authority-provider-legacy
+    title: Authority Provider Legacy API
+    indexCategory: connector
+    description: REST API for implementations of custom Legacy Authority Provider
+    serverUrl: https://demo.czertainly.online
+    interfaces:
+      - com.czertainly.api.interfaces.connector.AttributesController
+      - com.czertainly.api.interfaces.connector.AuthorityInstanceController
+      - com.czertainly.api.interfaces.connector.CertificateController
+      - com.czertainly.api.interfaces.connector.EndEntityController
+      - com.czertainly.api.interfaces.connector.EndEntityProfilesController
+      - com.czertainly.api.interfaces.connector.HealthController
+      - com.czertainly.api.interfaces.connector.InfoController
+
+  - id: doc-openapi-connector-authority-provider-v2
+    groupName: connector-authority-provider-v2
+    title: Authority Provider v2 API
+    indexCategory: connector
+    description: REST API for implementations of custom v2 Authority Provider
+    serverUrl: https://demo.czertainly.online
+    interfaces:
+      - com.czertainly.api.interfaces.connector.AttributesController
+      - com.czertainly.api.interfaces.connector.AuthorityInstanceController
+      - com.czertainly.api.interfaces.connector.HealthController
+      - com.czertainly.api.interfaces.connector.InfoController
+      - com.czertainly.api.interfaces.connector.v2.CertificateController
+
+  - id: doc-openapi-connector-compliance-provider
+    groupName: connector-compliance-provider
+    title: Compliance Provider API
+    indexCategory: connector
+    description: REST API for implementations of custom Compliance Provider
+    serverUrl: https://demo.czertainly.online
+    interfaces:
+      - com.czertainly.api.interfaces.connector.AttributesController
+      - com.czertainly.api.interfaces.connector.ComplianceController
+      - com.czertainly.api.interfaces.connector.ComplianceRulesController
+      - com.czertainly.api.interfaces.connector.HealthController
+      - com.czertainly.api.interfaces.connector.InfoController
+
+  - id: doc-openapi-connector-compliance-provider-v2
+    groupName: connector-compliance-provider-v2
+    title: Compliance Provider v2 API
+    indexCategory: connector
+    description: REST API for implementations of custom v2 Compliance Provider
+    serverUrl: https://demo.czertainly.online
+    interfaces:
+      - com.czertainly.api.interfaces.connector.AttributesController
+      - com.czertainly.api.interfaces.connector.HealthController
+      - com.czertainly.api.interfaces.connector.InfoController
+      - com.czertainly.api.interfaces.connector.v2.ComplianceController
+      - com.czertainly.api.interfaces.connector.v2.ComplianceRuleController
+
+  - id: doc-openapi-connector-credential-provider
+    groupName: connector-credential-provider
+    title: Credential Provider API
+    indexCategory: connector
+    description: REST API for implementations of custom Credential Provider
+    serverUrl: https://demo.czertainly.online
+    interfaces:
+      - com.czertainly.api.interfaces.connector.AttributesController
+      - com.czertainly.api.interfaces.connector.HealthController
+      - com.czertainly.api.interfaces.connector.InfoController
+
+  - id: doc-openapi-connector-cryptography-provider
+    groupName: connector-cryptography-provider
+    title: Cryptography Provider API
+    indexCategory: connector
+    description: REST API for implementations of custom Cryptography Provider
+    serverUrl: https://demo.czertainly.online
+    interfaces:
+      - com.czertainly.api.interfaces.connector.AttributesController
+      - com.czertainly.api.interfaces.connector.HealthController
+      - com.czertainly.api.interfaces.connector.InfoController
+      - com.czertainly.api.interfaces.connector.cryptography.CryptographicOperationsController
+      - com.czertainly.api.interfaces.connector.cryptography.KeyManagementController
+      - com.czertainly.api.interfaces.connector.cryptography.TokenInstanceController
+
+  - id: doc-openapi-connector-discovery-provider
+    groupName: connector-discovery-provider
+    title: Discovery Provider API
+    indexCategory: connector
+    description: REST API for implementations of custom Discovery Provider
+    serverUrl: https://demo.czertainly.online
+    interfaces:
+      - com.czertainly.api.interfaces.connector.AttributesController
+      - com.czertainly.api.interfaces.connector.DiscoveryController
+      - com.czertainly.api.interfaces.connector.HealthController
+      - com.czertainly.api.interfaces.connector.InfoController
+
+  - id: doc-openapi-connector-entity-provider
+    groupName: connector-entity-provider
+    title: Entity Provider API
+    indexCategory: connector
+    description: REST API for implementations of custom Entity Provider
+    serverUrl: https://demo.czertainly.online
+    interfaces:
+      - com.czertainly.api.interfaces.connector.AttributesController
+      - com.czertainly.api.interfaces.connector.HealthController
+      - com.czertainly.api.interfaces.connector.InfoController
+      - com.czertainly.api.interfaces.connector.entity.EntityController
+      - com.czertainly.api.interfaces.connector.entity.LocationController
+
+  - id: doc-openapi-connector-notification-provider
+    groupName: connector-notification-provider
+    title: Notification Provider API
+    indexCategory: connector
+    description: REST API for implementations of custom Notification Provider
+    serverUrl: https://demo.czertainly.online
+    interfaces:
+      - com.czertainly.api.interfaces.connector.AttributesController
+      - com.czertainly.api.interfaces.connector.HealthController
+      - com.czertainly.api.interfaces.connector.InfoController
+      - com.czertainly.api.interfaces.connector.NotificationInstanceController
+
+  - id: doc-openapi-connector-secret-provider
+    groupName: connector-secret-provider
+    title: Secret Provider API
+    indexCategory: connector
+    description: REST API for implementations of custom Secret Provider
+    serverUrl: https://demo.czertainly.online
+    extensions:
+      x-metrics-profile: "`com.czertainly.api.interfaces.connector.common.v2.MetricsController.METRICS_CONFIG`"
+    interfaces:
+      - com.czertainly.api.interfaces.connector.common.v2.HealthController
+      - com.czertainly.api.interfaces.connector.common.v2.InfoController
+      - com.czertainly.api.interfaces.connector.common.v2.MetricsController
+      - com.czertainly.api.interfaces.connector.secrets.SecretController
+      - com.czertainly.api.interfaces.connector.secrets.VaultController
+
+  - id: doc-openapi-core-acme
+    groupName: core-acme
+    title: ACME API
+    indexCategory: core
+    description: REST API for managing ACME Profiles and ACME Accounts in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.AcmeAccountController
+      - com.czertainly.api.interfaces.core.web.AcmeProfileController
+
+  - id: doc-openapi-core-approval
+    groupName: core-approval
+    title: Approvals API
+    indexCategory: core
+    description: REST API for approvals in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.ApprovalController
+      - com.czertainly.api.interfaces.core.web.ApprovalProfileController
+
+  - id: doc-openapi-core-attribute
+    groupName: core-attribute
+    title: Attribute API
+    indexCategory: core
+    description: REST API for managing Custom attributes and global metadata in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.CustomAttributeController
+      - com.czertainly.api.interfaces.core.web.GlobalMetadataController
+
+  - id: doc-openapi-core-auth
+    groupName: core-auth
+    title: Auth API
+    indexCategory: core
+    description: REST API for managing users, roles, permissions and OAuth2 provider logins in the platform.
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.AuthController
+      - com.czertainly.api.interfaces.core.web.RoleManagementController
+      - com.czertainly.api.interfaces.core.web.UserManagementController
+      - com.czertainly.api.interfaces.core.web.v2.OAuth2LoginController
+
+  - id: doc-openapi-core-authority
+    groupName: core-authority
+    title: Authority API
+    indexCategory: core
+    description: REST API for managing Authorities in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.AuthorityInstanceController
+
+  - id: doc-openapi-core-certificate
+    groupName: core-certificate
+    title: Certificate API
+    indexCategory: core
+    description: REST API for managing Certificates in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.CertificateController
+
+  - id: doc-openapi-core-client-operations
+    groupName: core-client-operations
+    title: Client Operations API
+    indexCategory: core
+    description: REST API for Client Operations
+    interfaces:
+      - com.czertainly.api.interfaces.core.client.ClientOperationController
+      - com.czertainly.api.interfaces.core.client.v2.ClientOperationController
+
+  - id: doc-openapi-core-client-operations-legacy
+    groupName: core-client-operations-legacy
+    title: Legacy Client Operations API
+    description: REST API for Legacy Client Operations
+    interfaces:
+      - com.czertainly.api.interfaces.core.client.ClientOperationController
+
+  - id: doc-openapi-core-client-operations-v2
+    groupName: core-client-operations-v2
+    title: Client Operations v2 API
+    description: REST API for v2 Client Operations
+    interfaces:
+      - com.czertainly.api.interfaces.core.client.v2.ClientOperationController
+
+  - id: doc-openapi-core-cmp
+    groupName: core-cmp
+    title: CMP API
+    indexCategory: core
+    description: REST API for managing CMP Profiles in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.CmpProfileController
+
+  - id: doc-openapi-core-compliance-profile
+    groupName: core-compliance-profile
+    title: Compliance Profile API
+    indexCategory: core
+    description: REST API for managing Compliance Profiles in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.ComplianceProfileController
+
+  - id: doc-openapi-core-compliance-v2
+    groupName: core-compliance-v2
+    title: Compliance v2 API
+    indexCategory: core
+    description: REST API for managing Compliance Profiles v2 and check compliance v2
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.v2.ComplianceController
+      - com.czertainly.api.interfaces.core.web.v2.ComplianceProfileController
+
+  - id: doc-openapi-core-connector
+    groupName: core-connector
+    title: Connector API
+    indexCategory: core
+    description: REST API for managing Connectors in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.connector.ConnectorRegistrationController
+      - com.czertainly.api.interfaces.core.web.CallbackController
+      - com.czertainly.api.interfaces.core.web.ConnectorAuthController
+      - com.czertainly.api.interfaces.core.web.ConnectorController
+      - com.czertainly.api.interfaces.core.web.v2.ConnectorController
+
+  - id: doc-openapi-core-credential
+    groupName: core-credential
+    title: Credential API
+    indexCategory: core
+    description: REST API for managing Credentials in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.CredentialController
+
+  - id: doc-openapi-core-cryptographic-key
+    groupName: core-cryptographic-key
+    title: Cryptographic Key API
+    indexCategory: core
+    navLabel: Key
+    description: REST API for managing keys in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.CryptographicKeyController
+
+  - id: doc-openapi-core-cryptographic-operations
+    groupName: core-cryptographic-operations
+    title: Cryptographic Operations API
+    indexCategory: core
+    description: REST API for Cryptographic Operations
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.CryptographicOperationsController
+
+  - id: doc-openapi-core-discovery
+    groupName: core-discovery
+    title: Discovery API
+    indexCategory: core
+    description: REST API for managing Discoveries in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.DiscoveryController
+
+  - id: doc-openapi-core-entity
+    groupName: core-entity
+    title: Entity API
+    indexCategory: core
+    description: REST API for managing Entities in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.EntityInstanceController
+
+  - id: doc-openapi-core-group
+    groupName: core-group
+    title: Group API
+    indexCategory: core
+    description: REST API for managing Group in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.GroupController
+
+  - id: doc-openapi-core-local
+    groupName: core-local
+    title: Local API
+    indexCategory: core
+    description: REST API for local administration operations without authentication
+    interfaces:
+      - com.czertainly.api.interfaces.core.local.LocalController
+
+  - id: doc-openapi-core-location
+    groupName: core-location
+    title: Location API
+    indexCategory: core
+    description: REST API for managing Locations in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.LocationManagementController
+
+  - id: doc-openapi-core-notification
+    groupName: core-notification
+    title: Notification API
+    indexCategory: core
+    description: REST API for notifications in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.NotificationController
+      - com.czertainly.api.interfaces.core.web.NotificationInstanceController
+      - com.czertainly.api.interfaces.core.web.NotificationProfileController
+
+  - id: doc-openapi-core-other
+    groupName: core-other
+    title: Uncategorized API
+    indexCategory: core
+    navLabel: Other
+    description: Various uncategorized REST APIs of the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.AuditLogController
+      - com.czertainly.api.interfaces.core.web.CbomController
+      - com.czertainly.api.interfaces.core.web.CustomOidEntryController
+      - com.czertainly.api.interfaces.core.web.EnumController
+      - com.czertainly.api.interfaces.core.web.InfoController
+      - com.czertainly.api.interfaces.core.web.ResourceController
+      - com.czertainly.api.interfaces.core.web.SettingController
+      - com.czertainly.api.interfaces.core.web.StatisticsController
+
+  - id: doc-openapi-core-ra-profile
+    groupName: core-ra-profile
+    title: RA Profile API
+    indexCategory: core
+    description: REST API for managing RA Profiles in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.RAProfileManagementController
+
+  - id: doc-openapi-core-scep
+    groupName: core-scep
+    title: SCEP API
+    indexCategory: core
+    description: REST API for managing SCEP Profiles in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.ScepProfileController
+
+  - id: doc-openapi-core-scheduler
+    groupName: core-scheduler
+    title: Scheduler API
+    indexCategory: core
+    description: REST API for managing Scheduler and its jobs in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.SchedulerController
+
+  - id: doc-openapi-core-secret
+    groupName: core-secret
+    title: Secret Management API
+    indexCategory: core
+    description: REST API for managing secrets in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.SecretManagementController
+
+  - id: doc-openapi-core-token
+    groupName: core-token
+    title: Token Management API
+    indexCategory: core
+    navLabel: Token
+    description: REST API for managing tokens in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.TokenInstanceController
+
+  - id: doc-openapi-core-token-profile
+    groupName: core-token-profile
+    title: Token Profile API
+    indexCategory: core
+    description: REST API for managing Token Profiles in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.TokenProfileController
+
+  - id: doc-openapi-core-vault
+    groupName: core-vault
+    title: Vault API
+    indexCategory: core
+    description: REST API for managing Vaults in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.VaultInstanceController
+
+  - id: doc-openapi-core-vault-profile
+    groupName: core-vault-profile
+    title: Vault Profile API
+    indexCategory: core
+    description: REST API for managing Vault Profiles in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.VaultProfileController
+
+  - id: doc-openapi-core-workflows
+    groupName: core-workflows
+    title: Workflows API
+    indexCategory: core
+    description: REST API for managing workflows resources in the platform
+    interfaces:
+      - com.czertainly.api.interfaces.core.web.ActionController
+      - com.czertainly.api.interfaces.core.web.RuleController
+      - com.czertainly.api.interfaces.core.web.TriggerController
+
+  - id: doc-openapi-ilm-core
+    groupName: czertainly-core
+    title: Core API
+    description: REST API for CZERTAINLY Core
+    security: []
+    interfaces:
+      - com.czertainly.api.interfaces.core.client.v2.ClientOperationController
+      - com.czertainly.api.interfaces.core.connector.ConnectorRegistrationController
+      - com.czertainly.api.interfaces.core.local.LocalController
+      - com.czertainly.api.interfaces.core.web.AcmeAccountController
+      - com.czertainly.api.interfaces.core.web.AcmeProfileController
+      - com.czertainly.api.interfaces.core.web.ActionController
+      - com.czertainly.api.interfaces.core.web.ApprovalController
+      - com.czertainly.api.interfaces.core.web.ApprovalProfileController
+      - com.czertainly.api.interfaces.core.web.AuditLogController
+      - com.czertainly.api.interfaces.core.web.AuthController
+      - com.czertainly.api.interfaces.core.web.AuthorityInstanceController
+      - com.czertainly.api.interfaces.core.web.CallbackController
+      - com.czertainly.api.interfaces.core.web.CbomController
+      - com.czertainly.api.interfaces.core.web.CertificateController
+      - com.czertainly.api.interfaces.core.web.CmpProfileController
+      - com.czertainly.api.interfaces.core.web.ComplianceProfileController
+      - com.czertainly.api.interfaces.core.web.ConnectorAuthController
+      - com.czertainly.api.interfaces.core.web.ConnectorController
+      - com.czertainly.api.interfaces.core.web.CredentialController
+      - com.czertainly.api.interfaces.core.web.CryptographicKeyController
+      - com.czertainly.api.interfaces.core.web.CryptographicOperationsController
+      - com.czertainly.api.interfaces.core.web.CustomAttributeController
+      - com.czertainly.api.interfaces.core.web.CustomOidEntryController
+      - com.czertainly.api.interfaces.core.web.DiscoveryController
+      - com.czertainly.api.interfaces.core.web.EntityInstanceController
+      - com.czertainly.api.interfaces.core.web.EnumController
+      - com.czertainly.api.interfaces.core.web.GlobalMetadataController
+      - com.czertainly.api.interfaces.core.web.GroupController
+      - com.czertainly.api.interfaces.core.web.InfoController
+      - com.czertainly.api.interfaces.core.web.LocationManagementController
+      - com.czertainly.api.interfaces.core.web.NotificationController
+      - com.czertainly.api.interfaces.core.web.NotificationInstanceController
+      - com.czertainly.api.interfaces.core.web.NotificationProfileController
+      - com.czertainly.api.interfaces.core.web.RAProfileManagementController
+      - com.czertainly.api.interfaces.core.web.ResourceController
+      - com.czertainly.api.interfaces.core.web.RoleManagementController
+      - com.czertainly.api.interfaces.core.web.RuleController
+      - com.czertainly.api.interfaces.core.web.ScepProfileController
+      - com.czertainly.api.interfaces.core.web.SchedulerController
+      - com.czertainly.api.interfaces.core.web.SecretManagementController
+      - com.czertainly.api.interfaces.core.web.SettingController
+      - com.czertainly.api.interfaces.core.web.StatisticsController
+      - com.czertainly.api.interfaces.core.web.TokenInstanceController
+      - com.czertainly.api.interfaces.core.web.TokenProfileController
+      - com.czertainly.api.interfaces.core.web.TriggerController
+      - com.czertainly.api.interfaces.core.web.UserManagementController
+      - com.czertainly.api.interfaces.core.web.VaultInstanceController
+      - com.czertainly.api.interfaces.core.web.VaultProfileController
+      - com.czertainly.api.interfaces.core.web.v2.ComplianceController
+      - com.czertainly.api.interfaces.core.web.v2.ComplianceProfileController
+      - com.czertainly.api.interfaces.core.web.v2.ConnectorController
+      - com.czertainly.api.interfaces.core.web.v2.OAuth2LoginController
+
+  - id: doc-openapi-protocol-acme
+    groupName: protocol-acme
+    title: ACME API
+    indexCategory: protocol
+    description: ACME API according to the RFC 8555
+    interfaces:
+      - com.czertainly.api.interfaces.core.acme.AcmeController
+      - com.czertainly.api.interfaces.core.acme.AcmeRaProfileController
+
+  - id: doc-openapi-protocol-cmp
+    groupName: protocol-cmp
+    title: CMP API
+    indexCategory: protocol
+    description: CMP API according to the RFC 4210
+    interfaces:
+      - com.czertainly.api.interfaces.core.cmp.CmpController
+      - com.czertainly.api.interfaces.core.cmp.CmpRaProfileController
+
+  - id: doc-openapi-protocol-scep
+    groupName: protocol-scep
+    title: SCEP API
+    indexCategory: protocol
+    description: SCEP API according to the RFC 8894
+    interfaces:
+      - com.czertainly.api.interfaces.core.scep.ScepController
+      - com.czertainly.api.interfaces.core.scep.ScepRaProfileController
+
+# ---------------------------------------------------------------------------
+# common
+#
+# Metadata merged into the OpenAPI `info` and top-level objects of every generated document.
+# Individual groups can override specific values (e.g. serverUrl) where needed.
+#
+#   version       API version injected at build time via Maven filtering (resolves the ${api.version} placeholder).
+#   license       SPDX license identifier and URL shown in the portal.
+#   contact       Primary support / maintainer contact information.
+#   externalDocs  Link to the human-readable documentation site.
+#   servers       Default server list; groups may add or replace entries via the group-level `serverUrl` field.
+#   extensions    Arbitrary OpenAPI extension properties added to the info object of every generated document (e.g. x-logo).
+# ---------------------------------------------------------------------------
+common:
+  version: ${api.version}
+  license:
+    name: MIT License
+    url: https://github.com/CZERTAINLY/CZERTAINLY/blob/develop/LICENSE.md
+  contact:
+    name: ILM
+    url: https://www.otilm.com
+    email: info@otilm.com
+  externalDocs:
+    description: ILM Documentation
+    url: https://docs.otilm.com
+  servers:
+    - url: https://demo.czertainly.online/api
+      description: CZERTAINLY Demo server
+  extensions:
+    x-logo:
+      url: images/ilm-logo.svg

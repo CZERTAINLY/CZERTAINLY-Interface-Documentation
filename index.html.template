@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <title>ILM API Docs</title>
+  <link rel="shortcut icon" href="/images/ilm-sign-color.svg"/>
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <!-- Our Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/font-awesome.min.css">
+</head>
+<body scroll="no" style="overflow: hidden;">
+<div class="wrapper">
+  <!-- Sidebar Holder -->
+  <nav id="sidebar">
+    <div class="sidebar-header">
+      <h4><a href="https://docs.otilm.com" target="_blank" rel="noopener noreferrer">Documentation <i class="fa fa-external-link"></i></a></h4>
+      <br/>
+      <img src="images/ilm-logo-white.svg" alt="ILM" width="100">
+<!--      <h3>ILM APIs</h3>-->
+    </div>
+
+    <ul class="list-unstyled components">
+<!--      <p>Connector APIs</p>-->
+      <li class="active">
+        <a href="#coreApiSubmenu" data-toggle="collapse" aria-expanded="false">Core APIs</a>
+        <ul class="collapse list-unstyled" id="coreApiSubmenu">
+        </ul>
+      </li>
+      <li class="active">
+        <a href="#connectorApiSubmenu" data-toggle="collapse" aria-expanded="false">Connector APIs</a>
+        <ul class="collapse list-unstyled" id="connectorApiSubmenu">
+        </ul>
+      </li>
+      <li class="active">
+        <a href="#protocolApiSubmenu" data-toggle="collapse" aria-expanded="false">Protocol APIs</a>
+        <ul class="collapse list-unstyled" id="protocolApiSubmenu">
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Page Content Holder -->
+  <div id="content">
+
+    <div id="iFrameDivision">
+      <iframe
+              key="showapi"
+              id="showapi"
+              src="about:blank"
+              width="100%"
+              height="100%"
+              frameborder="0"
+      ></iframe>
+    </div>
+</div>
+
+  <script>
+    // placeholder for the list of APIS
+
+    // initially render first API
+    var iframe = document.getElementById("showapi");
+    iframe.src = connectorApis[1].url;
+    window.addEventListener("resize", onResize)
+
+    function onResize() {
+      var frame = document.getElementById("showapi");
+      frame.height = frame?.ownerDocument.documentElement.clientHeight + "px";
+    }
+
+    const ifElement =
+            iframe?.ownerDocument.documentElement.clientHeight;
+    iframe.height = ifElement + "px";
+    function onClick() {
+      var url = this.getAttribute("data-link");
+      document.getElementById("showapi").src = url;
+    }
+
+    // dynamically building navigation items
+    var $list = document.getElementById("coreApiSubmenu");
+    coreApis.forEach(function (api) {
+      var $listitem = document.createElement("li");
+      $listitem.setAttribute("data-link", api.url);
+      $listitem.setAttribute("class", "dropdown-item");
+      //$listitem.innerText = api.name;
+      $listitem.addEventListener("click", onClick);
+      var $lista = document.createElement("a");
+      $lista.setAttribute("href", "#");
+      $lista.innerText = api.name;
+      $listitem.appendChild($lista);
+      $list.appendChild($listitem);
+    });
+
+    var $list = document.getElementById("connectorApiSubmenu");
+    connectorApis.forEach(function (api) {
+      var $listitem = document.createElement("li");
+      $listitem.setAttribute("data-link", api.url);
+      $listitem.setAttribute("class", "dropdown-item");
+      //$listitem.innerText = api.name;
+      $listitem.addEventListener("click", onClick);
+      var $lista = document.createElement("a");
+      $lista.setAttribute("href", "#");
+      $lista.innerText = api.name;
+      $listitem.appendChild($lista);
+      $list.appendChild($listitem);
+    });
+
+    var $list = document.getElementById("protocolApiSubmenu");
+    protocolApis.forEach(function (api) {
+      var $listitem = document.createElement("li");
+      $listitem.setAttribute("data-link", api.url);
+      $listitem.setAttribute("class", "dropdown-item");
+      //$listitem.innerText = api.name;
+      $listitem.addEventListener("click", onClick);
+      var $lista = document.createElement("a");
+      $lista.setAttribute("href", "#");
+      $lista.innerText = api.name;
+      $listitem.appendChild($lista);
+      $list.appendChild($listitem);
+    });
+  </script>
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+<!-- Bootstrap Js CDN -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('#sidebarCollapse').on('click', function () {
+      $('#sidebar').toggleClass('active');
+      $(this).toggleClass('active');
+    });
+  });
+</script>
+</body>
+</html>
