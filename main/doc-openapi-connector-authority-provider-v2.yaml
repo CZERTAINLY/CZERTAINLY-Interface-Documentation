@@ -9,7 +9,7 @@ info:
   license:
     name: MIT License
     url: https://github.com/CZERTAINLY/CZERTAINLY/blob/develop/LICENSE.md
-  version: 2.17.0
+  version: 2.17.1-SNAPSHOT
   x-logo:
     url: images/ilm-logo.svg
 externalDocs:
@@ -44,6 +44,8 @@ paths:
       tags:
       - Certificate Management
       summary: Revoke Certificate
+      description: Revoke a certificate. The Authority Provider may complete the operation
+        synchronously or asynchronously.
       operationId: revokeCertificate
       parameters:
       - name: uuid
@@ -60,7 +62,12 @@ paths:
         required: true
       responses:
         "200":
-          description: Certificate revoked
+          description: Certificate revoked synchronously.
+        "202":
+          description: "Revocation is asynchronous; the operation will complete asynchronously.\
+            \ The response body is empty for revocation — the platform tracks the\
+            \ operation by transactionId / certificate identity, not by connector-emitted\
+            \ metadata."
         "422":
           description: Unprocessable Entity
           content:
@@ -92,6 +99,134 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - NoAuth: []
+      - CertificateTLSAuth: []
+      - ConnectorAPIKeyAuth: []
+      - BasicAuth: []
+  /v2/authorityProvider/authorities/{uuid}/certificates/revoke/status:
+    post:
+      tags:
+      - Certificate Management
+      summary: Get Certificate Revocation Status
+      description: |
+        Return the current status of an asynchronous certificate revocation.
+
+        Called for an asynchronous revocation that previously responded
+        `202 Accepted`. For revocation, the `certificateData` field of the response
+        is unused (revocation completion carries no payload).
+      operationId: getRevokeCertificateStatus
+      parameters:
+      - name: uuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateOperationStatusRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "Status retrieved. Response carries one of `IN_PROGRESS`, `COMPLETED`,\
+            \ or `FAILED`."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateOperationStatusResponseDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - NoAuth: []
+      - CertificateTLSAuth: []
+      - ConnectorAPIKeyAuth: []
+      - BasicAuth: []
+  /v2/authorityProvider/authorities/{uuid}/certificates/revoke/cancel:
+    post:
+      tags:
+      - Certificate Management
+      summary: Cancel Certificate Revocation
+      description: |
+        Abort an in-flight certificate revocation.
+
+        Called for an asynchronous revocation that previously responded
+        `202 Accepted`. The request body carries the RA profile attributes and the
+        same `MetadataAttribute` entries returned in the original `202 Accepted`
+        response.
+      operationId: cancelRevokeCertificate
+      parameters:
+      - name: uuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateOperationCancelRequestDto"
+        required: true
+      responses:
+        "204":
+          description: The operation has been aborted.
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: "The Authority Provider tracks the operation but refuses to\
+            \ abort it (e.g., the revocation has already been submitted to a CRL)."
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - CA does not support cancellation
+              - Revocation already submitted to CRL
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
       security:
@@ -166,6 +301,8 @@ paths:
       tags:
       - Certificate Management
       summary: Renew Certificate
+      description: Renew a certificate. The Authority Provider may complete the operation
+        synchronously or asynchronously.
       operationId: renewCertificate
       parameters:
       - name: uuid
@@ -182,7 +319,17 @@ paths:
         required: true
       responses:
         "200":
-          description: Certificate renewed
+          description: Certificate renewed synchronously; response carries the new
+            certificate.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateDataResponseDto"
+        "202":
+          description: Renewal is asynchronous; the operation will complete asynchronously.
+            The optional response body may carry `MetadataAttribute` entries — technology-specific
+            state — that the platform will return on subsequent calls related to this
+            operation.
           content:
             application/json:
               schema:
@@ -230,6 +377,8 @@ paths:
       tags:
       - Certificate Management
       summary: Issue Certificate
+      description: Issue a certificate. The Authority Provider may complete the operation
+        synchronously or asynchronously.
       operationId: issueCertificate
       parameters:
       - name: uuid
@@ -246,7 +395,17 @@ paths:
         required: true
       responses:
         "200":
-          description: Certificate issued
+          description: Certificate issued synchronously; response carries the issued
+            certificate.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateDataResponseDto"
+        "202":
+          description: Issuance is asynchronous; the operation will complete asynchronously.
+            The optional response body may carry `MetadataAttribute` entries — technology-specific
+            state — that the platform will return on subsequent calls related to this
+            operation.
           content:
             application/json:
               schema:
@@ -282,6 +441,138 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - NoAuth: []
+      - CertificateTLSAuth: []
+      - ConnectorAPIKeyAuth: []
+      - BasicAuth: []
+  /v2/authorityProvider/authorities/{uuid}/certificates/issue/status:
+    post:
+      tags:
+      - Certificate Management
+      summary: Get Certificate Issuance Status
+      description: |
+        Return the current status of an asynchronous certificate issuance.
+
+        Called for an asynchronous issuance or renewal that previously responded
+        `202 Accepted`. The request body carries the RA profile attributes and the
+        same `MetadataAttribute` entries returned in the original `202 Accepted`
+        response, so the Authority Provider can resolve the operation.
+      operationId: getIssueCertificateStatus
+      parameters:
+      - name: uuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateOperationStatusRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "Status retrieved. Response carries one of `IN_PROGRESS`, `COMPLETED`,\
+            \ or `FAILED`. When `COMPLETED`, the response includes the issued certificate\
+            \ (Base64) in `certificateData`."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateOperationStatusResponseDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - NoAuth: []
+      - CertificateTLSAuth: []
+      - ConnectorAPIKeyAuth: []
+      - BasicAuth: []
+  /v2/authorityProvider/authorities/{uuid}/certificates/issue/cancel:
+    post:
+      tags:
+      - Certificate Management
+      summary: Cancel Certificate Issuance or Renewal
+      description: |
+        Abort an in-flight certificate issuance or renewal.
+
+        Called for an asynchronous issuance, renewal, or rekey that previously
+        responded `202 Accepted`. The request body carries the RA profile
+        attributes and the same `MetadataAttribute` entries returned in the
+        original `202 Accepted` response, so the Authority Provider can resolve
+        the operation it must abort.
+      operationId: cancelIssueCertificate
+      parameters:
+      - name: uuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateOperationCancelRequestDto"
+        required: true
+      responses:
+        "204":
+          description: The operation has been aborted.
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: "The Authority Provider tracks the operation but refuses to\
+            \ abort it (e.g., the underlying CA does not support cancel, or the issuance\
+            \ is past a point of no return)."
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - CA does not support cancellation
+              - Issuance is past the point of no return
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
       security:
@@ -2597,39 +2888,24 @@ components:
       - code
       - message
       - statusCode
-    CertificateRenewRequestDto:
+    CertificateOperationStatusRequestDto:
       type: object
       properties:
-        request:
-          type: string
-          description: Certificate signing request encoded as Base64 string
-        format:
-          $ref: "#/components/schemas/CertificateRequestFormat"
-          default: pkcs10
-          description: Certificate signing request format
         raProfileAttributes:
           type: array
-          description: List of RA Profiles attributes
+          description: List of RA Profile attributes
           items:
             $ref: "#/components/schemas/RequestAttribute"
-        certificate:
-          type: string
-          description: Base64 Certificate content. (Certificate to be renewed)
         meta:
           type: array
-          description: Metadata for the Certificate
+          description: "Technology-specific metadata that was returned by the Authority\
+            \ Provider in the original `202 Accepted` response, sent back here so\
+            \ the Authority Provider can resolve the in-flight operation and report\
+            \ its status."
           items:
             $ref: "#/components/schemas/MetadataAttribute"
       required:
-      - certificate
-      - meta
       - raProfileAttributes
-      - request
-    CertificateRequestFormat:
-      type: string
-      enum:
-      - pkcs10
-      - crmf
     MetadataAttribute:
       description: Metadata Attribute definition
       oneOf:
@@ -2760,12 +3036,93 @@ components:
       - type
       - uuid
       - version
+    CertificateOperationStatus:
+      type: string
+      enum:
+      - inProgress
+      - completed
+      - failed
+    CertificateOperationStatusResponseDto:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/CertificateOperationStatus"
+          description: Operation status as known to the Authority Provider
+        certificateData:
+          type: string
+          description: Base64-encoded certificate content. Present when status=COMPLETED
+            for issue/renew. Unused for revoke status responses.
+        meta:
+          type: array
+          description: Updated technology-specific metadata. The Authority Provider
+            may report a refreshed value on each call.
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        reason:
+          type: string
+          description: Failure detail when `status` is `FAILED`.
+      required:
+      - status
+    CertificateOperationCancelRequestDto:
+      type: object
+      properties:
+        raProfileAttributes:
+          type: array
+          description: List of RA Profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        meta:
+          type: array
+          description: "Technology-specific metadata that was returned by the Authority\
+            \ Provider in the original `202 Accepted` response, sent back here so\
+            \ the Authority Provider can identify the in-flight operation it must\
+            \ abort."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+      required:
+      - raProfileAttributes
+    CertificateRenewRequestDto:
+      type: object
+      properties:
+        request:
+          type: string
+          description: Certificate signing request encoded as Base64 string
+        format:
+          $ref: "#/components/schemas/CertificateRequestFormat"
+          default: pkcs10
+          description: Certificate signing request format
+        raProfileAttributes:
+          type: array
+          description: List of RA Profiles attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        certificate:
+          type: string
+          description: Base64 Certificate content. (Certificate to be renewed)
+        meta:
+          type: array
+          description: Metadata for the Certificate
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+      required:
+      - certificate
+      - meta
+      - raProfileAttributes
+      - request
+    CertificateRequestFormat:
+      type: string
+      enum:
+      - pkcs10
+      - crmf
     CertificateDataResponseDto:
       type: object
       properties:
         certificateData:
           type: string
-          description: Base64 encoded Certificate content
+          description: "Base64 encoded Certificate content. Required for synchronous\
+            \ (HTTP 200) responses; absent for asynchronous (HTTP 202) responses,\
+            \ where the operation is still in flight and only optional metadata may\
+            \ be carried in the body."
         uuid:
           type: string
           description: UUID of Certificate
@@ -2778,8 +3135,6 @@ components:
           $ref: "#/components/schemas/CertificateType"
           default: X509
           description: Type of the Certificate
-      required:
-      - certificateData
     CertificateSignRequestDto:
       type: object
       properties:
@@ -2895,14 +3250,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type

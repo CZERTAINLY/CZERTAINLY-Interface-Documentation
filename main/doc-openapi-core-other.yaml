@@ -9,7 +9,7 @@ info:
   license:
     name: MIT License
     url: https://github.com/CZERTAINLY/CZERTAINLY/blob/develop/LICENSE.md
-  version: 2.17.0
+  version: 2.17.1-SNAPSHOT
   x-logo:
     url: images/ilm-logo.svg
 externalDocs:
@@ -1690,6 +1690,7 @@ components:
       - protocols
       - scheduler
       - secrets
+      - signing
       - workflows
     Resource:
       type: string
@@ -1703,6 +1704,7 @@ components:
       - connectors
       - attributes
       - jobs
+      - proxies
       - users
       - roles
       - acmeAccounts
@@ -1748,9 +1750,12 @@ components:
       - cmpTransactions
       - endEntityProfiles
       - authenticationProviders
+      - trustedCertificates
       - vaults
       - vaultProfiles
       - secrets
+      - timeQualityConfigurations
+      - tspProfiles
     ResourceLoggingSettingsDto:
       type: object
       properties:
@@ -1897,6 +1902,9 @@ components:
           default: 900
           description: "Duration, in seconds, after which an inactive user's session\
             \ will be terminated. Default value is 900 seconds."
+        usernameClaim:
+          type: string
+          description: The claim name used to extract the username from the token.
       required:
       - name
     OAuth2ProviderSettingsUpdateDto:
@@ -1963,6 +1971,9 @@ components:
           default: 900
           description: "Duration, in seconds, after which an inactive user's session\
             \ will be terminated. Default value is 900 seconds."
+        usernameClaim:
+          type: string
+          description: The claim name used to extract the username from the token.
     AdditionalOidPropertiesDto:
       description: Additional properties of custom OID entry
     CustomOidEntryUpdateRequestDto:
@@ -2498,8 +2509,12 @@ components:
       - promoteMetadata
       - archive
       - unarchive
+      - finalizeIssue
+      - confirmRevoke
+      - cancel
       - getAssociations
       - listVersions
+      - getProxyInstallation
       - listCertificateProfiles
       - listCas
     OperationResult:
@@ -2848,6 +2863,9 @@ components:
           default: 900
           description: "Duration, in seconds, after which an inactive user's session\
             \ will be terminated. Default value is 900 seconds."
+        usernameClaim:
+          type: string
+          description: The claim name used to extract the username from the token.
         name:
           type: string
           description: Name of OAuth2 Provider

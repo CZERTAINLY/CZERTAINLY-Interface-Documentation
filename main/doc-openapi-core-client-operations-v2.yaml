@@ -9,7 +9,7 @@ info:
   license:
     name: MIT License
     url: https://github.com/CZERTAINLY/CZERTAINLY/blob/develop/LICENSE.md
-  version: 2.17.0
+  version: 2.17.1-SNAPSHOT
   x-logo:
     url: images/ilm-logo.svg
 externalDocs:
@@ -26,7 +26,11 @@ paths:
     post:
       tags:
       - Client Operations v2
-      summary: Issue Certificate
+      summary: Issue certificate
+      description: "Submit a new certificate signing request and trigger issuance\
+        \ through this RA profile. If the issuance is asynchronous, the certificate\
+        \ is returned in state `PENDING_ISSUE` and must be finalized once it has been\
+        \ issued."
       operationId: issueCertificate
       parameters:
       - name: authorityUuid
@@ -107,7 +111,10 @@ paths:
     post:
       tags:
       - Client Operations v2
-      summary: Revoke Certificate
+      summary: Revoke certificate
+      description: "Revoke a certificate currently in state `ISSUED`. If the revocation\
+        \ is asynchronous, the certificate moves to state `PENDING_REVOKE` and must\
+        \ be confirmed once the revocation has been performed."
       operationId: revokeCertificate
       parameters:
       - name: authorityUuid
@@ -175,11 +182,96 @@ paths:
       - BearerJWTAuth: []
       - CertificateAuth: []
       - SessionAuth: []
+  /v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/revoke/confirm:
+    post:
+      tags:
+      - Client Operations v2
+      summary: Confirm an asynchronous certificate revocation
+      description: |
+        Confirm that a revoked certificate has been revoked. The certificate
+        must be in state `PENDING_REVOKE`. The platform applies the destroy-key flag and
+        revoke attributes from the original revoke request, transitions the certificate
+        to `REVOKED`, and clears the data carried over from the original request.
+      operationId: manuallyConfirmRevoke
+      parameters:
+      - name: authorityUuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      - name: raProfileUuid
+        in: path
+        description: RA Profile UUID
+        required: true
+        schema:
+          type: string
+      - name: certificateUuid
+        in: path
+        description: Certificate UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Revocation confirmed
+        "422":
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Certificate is not in PENDING_REVOKE state
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
   /v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/renew:
     post:
       tags:
       - Client Operations v2
-      summary: Renew Certificate
+      summary: Renew certificate
+      description: "Renew an existing certificate using the same key pair. The original\
+        \ certificate stays in state `ISSUED`; the renewed certificate is returned\
+        \ and, if its issuance is asynchronous, ends in state `PENDING_ISSUE` until\
+        \ it is finalized."
       operationId: renewCertificate
       parameters:
       - name: authorityUuid
@@ -359,7 +451,10 @@ paths:
     post:
       tags:
       - Client Operations v2
-      summary: Issue existing certificate with status Requested
+      summary: Issue an existing certificate request
+      description: "Trigger issuance for a certificate already in state `REQUESTED`.\
+        \ Used after the certificate request has been created (typically via a protocol\
+        \ such as ACME, SCEP, or CMP) and any approval and compliance flows have completed."
       operationId: issueRequestedCertificate
       parameters:
       - name: authorityUuid
@@ -436,11 +531,217 @@ paths:
       - BearerJWTAuth: []
       - CertificateAuth: []
       - SessionAuth: []
+  /v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/issue/finalize:
+    post:
+      tags:
+      - Client Operations v2
+      summary: Finalize an asynchronous certificate issuance
+      description: |
+        Upload an issued certificate to finalize a certificate currently in
+        state `PENDING_ISSUE`. On success, the certificate transitions to `ISSUED`
+        and is pushed to any pre-associated locations.
+
+        Validation:
+        - the certificate request's public key must match the uploaded certificate's
+          public key (mandatory);
+        - the certificate request's subject DN should match the uploaded certificate's
+          subject DN (warning on mismatch — some CAs canonicalise the DN);
+        - the uploaded certificate must be verifiable against the certificate
+          authority associated with the RA profile (mandatory).
+
+        Request body carries a Base64-encoded single certificate and an optional list
+        of certificate-level custom attributes.
+      operationId: manuallyIssueCertificate
+      parameters:
+      - name: authorityUuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      - name: raProfileUuid
+        in: path
+        description: RA Profile UUID
+        required: true
+        schema:
+          type: string
+      - name: certificateUuid
+        in: path
+        description: Certificate UUID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadCertificateRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Certificate finalized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateDetailDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Certificate is not in PENDING_ISSUE state
+              - Public key mismatch with certificate request
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/{certificateUuid}/cancel:
+    post:
+      tags:
+      - Client Operations v2
+      summary: Cancel a pending certificate operation
+      description: |
+        State-aware cancel for a certificate currently in state `PENDING_ISSUE` or
+        `PENDING_REVOKE`. Transitions:
+
+        - `PENDING_ISSUE` → `FAILED`
+        - `PENDING_REVOKE` → `ISSUED`
+
+        The optional `reason` from the request body is recorded in the certificate
+        event history.
+
+        If the underlying operation cannot be aborted (for example, it has
+        progressed beyond a point where cancellation is possible), the response is
+        `422 Unprocessable Entity` with the reason, and the certificate **stays in
+        its pending state**. In that case the operation can still be resolved by
+        waiting for it to complete and then finalizing or confirming
+        the certificate, or by retrying the cancel later if circumstances change.
+      operationId: cancelPendingCertificateOperation
+      parameters:
+      - name: authorityUuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      - name: raProfileUuid
+        in: path
+        description: RA Profile UUID
+        required: true
+        schema:
+          type: string
+      - name: certificateUuid
+        in: path
+        description: Certificate UUID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelPendingCertificateRequestDto"
+      responses:
+        "200":
+          description: Cancellation completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateDetailDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Certificate is not in a pending state
+              - "Authority refused to cancel: CA does not support cancellation"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
   /v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/revoke/validate:
     post:
       tags:
       - Client Operations v2
-      summary: Validate revocation Attributes
+      summary: Validate revocation attributes
+      description: Validate a candidate set of revocation attributes against this
+        RA profile's schema before submitting a revocation request.
       operationId: validateRevokeCertificateAttributes
       parameters:
       - name: authorityUuid
@@ -508,7 +809,10 @@ paths:
     post:
       tags:
       - Client Operations v2
-      summary: Validate issue Certificate Attributes
+      summary: Validate issue certificate attributes
+      description: Validate a candidate set of issuance attributes against this RA
+        profile's schema before submitting an issuance request. Returns 422 with a
+        list of error messages when the attributes are not acceptable.
       operationId: validateIssueCertificateAttributes
       parameters:
       - name: authorityUuid
@@ -587,7 +891,9 @@ paths:
     get:
       tags:
       - Client Operations v2
-      summary: Get revocation Attributes
+      summary: Get revocation attributes
+      description: Return the list of attributes the client must populate when revoking
+        a certificate through this RA profile.
       operationId: listRevokeCertificateAttributes
       parameters:
       - name: authorityUuid
@@ -653,7 +959,10 @@ paths:
     get:
       tags:
       - Client Operations v2
-      summary: Get issue Certificate Attributes
+      summary: Get issue certificate attributes
+      description: Return the list of attributes the client must populate when requesting
+        an issuance through this RA profile. The list reflects the certificate authority's
+        current attribute schema.
       operationId: listIssueCertificateAttributes
       parameters:
       - name: authorityUuid
@@ -2228,6 +2537,1086 @@ components:
             \ alternative attributes will be used to generate the new CSR"
           items:
             $ref: "#/components/schemas/RequestAttribute"
+    UploadCertificateRequestDto:
+      type: object
+      properties:
+        certificate:
+          type: string
+          description: Base64 Content of the Certificate
+        customAttributes:
+          type: array
+          description: Custom Attributes for the Certificate
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - certificate
+      - customAttributes
+    CertificateComplianceResultDto:
+      type: object
+      properties:
+        connectorName:
+          type: string
+          description: Name of the Compliance Provider
+          examples:
+          - Provider1
+        ruleName:
+          type: string
+          description: Name of the rule
+          examples:
+          - RuleName
+        ruleDescription:
+          type: string
+          description: Description of the rule
+          examples:
+          - Description sample
+        status:
+          $ref: "#/components/schemas/ComplianceRuleStatus"
+          description: Status of the rule
+          examples:
+          - nok
+        attributes:
+          type: array
+          description: Attributes of the rule
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+      required:
+      - connectorName
+      - ruleDescription
+      - ruleName
+      - status
+    CertificateDetailDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Certificate
+        commonName:
+          type: string
+          description: Certificate common name
+        serialNumber:
+          type: string
+          description: Certificate serial number
+        issuerCommonName:
+          type: string
+          description: Certificate issuer common name
+        issuerDn:
+          type: string
+          description: Issuer DN of the Certificate
+        subjectDn:
+          type: string
+          description: Subject DN of the Certificate
+        notBefore:
+          type: string
+          format: date-time
+          description: Certificate validity start date
+        notAfter:
+          type: string
+          format: date-time
+          description: Certificate expiration date
+        publicKeyAlgorithm:
+          type: string
+          description: Public key algorithm
+        altPublicKeyAlgorithm:
+          type: string
+          description: Alternative Public key algorithm
+        signatureAlgorithm:
+          type: string
+          description: Certificate signature algorithm
+        altSignatureAlgorithm:
+          type: string
+          description: Certificate alternative signature algorithm
+        hybridCertificate:
+          type: boolean
+          description: Indicator whether the certificate is hybrid
+        keySize:
+          type: integer
+          format: int32
+          description: Certificate key size
+        altKeySize:
+          type: integer
+          format: int32
+          description: Certificate key size of the alternative key
+        state:
+          $ref: "#/components/schemas/CertificateState"
+          description: State of the Certificate
+        validationStatus:
+          $ref: "#/components/schemas/CertificateValidationStatus"
+          description: Current validation status of the certificate
+        raProfile:
+          $ref: "#/components/schemas/SimplifiedRaProfileDto"
+          description: RA Profile associated to the Certificate
+        fingerprint:
+          type: string
+          description: SHA256 fingerprint of the Certificate
+        groups:
+          type: array
+          description: Groups associated to the Certificate
+          items:
+            $ref: "#/components/schemas/GroupDto"
+        owner:
+          type: string
+          description: Certificate Owner
+        ownerUuid:
+          type: string
+          description: Certificate Owner UUID
+        certificateType:
+          $ref: "#/components/schemas/CertificateType"
+          description: Certificate type
+        issuerSerialNumber:
+          type: string
+          description: Serial number of the issuer
+        complianceStatus:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Certificate compliance status
+        issuerCertificateUuid:
+          type: string
+          description: UUID of the issuer certificate
+        privateKeyAvailability:
+          type: boolean
+          description: Private Key Availability
+        trustedCa:
+          type: boolean
+          description: "Indicator whether CA is marked as trusted, set to null if\
+            \ certificate is not CA"
+        archived:
+          type: boolean
+          default: false
+          description: Certificate is archived
+        extendedKeyUsage:
+          type: array
+          description: Extended key usages
+          items:
+            type: string
+        keyUsage:
+          type: array
+          description: Key usages
+          items:
+            $ref: "#/components/schemas/CertificateKeyUsage"
+        subjectType:
+          $ref: "#/components/schemas/CertificateSubjectType"
+          description: Certificate subject type
+        metadata:
+          type: array
+          description: Certificate metadata
+          items:
+            $ref: "#/components/schemas/MetadataResponseDto"
+        certificateContent:
+          type: string
+          description: Base64 encoded Certificate content
+        subjectAlternativeNames:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Subject alternative names
+        locations:
+          type: array
+          description: Locations associated to the Certificate
+          items:
+            $ref: "#/components/schemas/LocationDto"
+          uniqueItems: true
+        nonCompliantRules:
+          type: array
+          deprecated: true
+          description: "Certificate compliance check result. Deprecated, use `complianceResult`\
+            \ property instead."
+          items:
+            $ref: "#/components/schemas/CertificateComplianceResultDto"
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        key:
+          $ref: "#/components/schemas/KeyDto"
+          description: Key Pair of the certificate
+        altKey:
+          $ref: "#/components/schemas/KeyDto"
+          description: Alternative Key Pair of the certificate
+        certificateRequest:
+          $ref: "#/components/schemas/CertificateRequestDto"
+          description: Certificate request data
+        sourceCertificateUuid:
+          type: string
+          format: uuid
+          deprecated: true
+          description: Source certificate UUID
+        issueAttributes:
+          type: array
+          description: List of issue attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        revokeAttributes:
+          type: array
+          description: List of revoke attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        relatedCertificates:
+          type: array
+          deprecated: true
+          description: List of related certificates
+          items:
+            $ref: "#/components/schemas/CertificateDto"
+        protocolInfo:
+          $ref: "#/components/schemas/CertificateProtocolDto"
+          description: Information about protocol used to issue the certificate
+      required:
+      - certificateType
+      - commonName
+      - complianceStatus
+      - hybridCertificate
+      - keySize
+      - privateKeyAvailability
+      - publicKeyAlgorithm
+      - state
+      - subjectDn
+      - uuid
+      - validationStatus
+    CertificateDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Certificate
+        commonName:
+          type: string
+          description: Certificate common name
+        serialNumber:
+          type: string
+          description: Certificate serial number
+        issuerCommonName:
+          type: string
+          description: Certificate issuer common name
+        issuerDn:
+          type: string
+          description: Issuer DN of the Certificate
+        subjectDn:
+          type: string
+          description: Subject DN of the Certificate
+        notBefore:
+          type: string
+          format: date-time
+          description: Certificate validity start date
+        notAfter:
+          type: string
+          format: date-time
+          description: Certificate expiration date
+        publicKeyAlgorithm:
+          type: string
+          description: Public key algorithm
+        altPublicKeyAlgorithm:
+          type: string
+          description: Alternative Public key algorithm
+        signatureAlgorithm:
+          type: string
+          description: Certificate signature algorithm
+        altSignatureAlgorithm:
+          type: string
+          description: Certificate alternative signature algorithm
+        hybridCertificate:
+          type: boolean
+          description: Indicator whether the certificate is hybrid
+        keySize:
+          type: integer
+          format: int32
+          description: Certificate key size
+        altKeySize:
+          type: integer
+          format: int32
+          description: Certificate key size of the alternative key
+        state:
+          $ref: "#/components/schemas/CertificateState"
+          description: State of the Certificate
+        validationStatus:
+          $ref: "#/components/schemas/CertificateValidationStatus"
+          description: Current validation status of the certificate
+        raProfile:
+          $ref: "#/components/schemas/SimplifiedRaProfileDto"
+          description: RA Profile associated to the Certificate
+        fingerprint:
+          type: string
+          description: SHA256 fingerprint of the Certificate
+        groups:
+          type: array
+          description: Groups associated to the Certificate
+          items:
+            $ref: "#/components/schemas/GroupDto"
+        owner:
+          type: string
+          description: Certificate Owner
+        ownerUuid:
+          type: string
+          description: Certificate Owner UUID
+        certificateType:
+          $ref: "#/components/schemas/CertificateType"
+          description: Certificate type
+        issuerSerialNumber:
+          type: string
+          description: Serial number of the issuer
+        complianceStatus:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Certificate compliance status
+        issuerCertificateUuid:
+          type: string
+          description: UUID of the issuer certificate
+        privateKeyAvailability:
+          type: boolean
+          description: Private Key Availability
+        trustedCa:
+          type: boolean
+          description: "Indicator whether CA is marked as trusted, set to null if\
+            \ certificate is not CA"
+        archived:
+          type: boolean
+          default: false
+          description: Certificate is archived
+      required:
+      - certificateType
+      - commonName
+      - complianceStatus
+      - hybridCertificate
+      - keySize
+      - privateKeyAvailability
+      - publicKeyAlgorithm
+      - state
+      - subjectDn
+      - uuid
+      - validationStatus
+    CertificateInLocationDto:
+      type: object
+      properties:
+        certificateUuid:
+          type: string
+          description: UUID of the Certificate
+        state:
+          $ref: "#/components/schemas/CertificateState"
+          description: State of the Certificate
+        validationStatus:
+          $ref: "#/components/schemas/CertificateValidationStatus"
+          description: Current validation status of the certificate
+        commonName:
+          type: string
+          description: Common Name of the Subject DN field of the Certificate
+        serialNumber:
+          type: string
+          description: Serial number in HEX of the Certificate
+        metadata:
+          type: array
+          description: Metadata of the Certificate in Location
+          items:
+            $ref: "#/components/schemas/MetadataResponseDto"
+        pushAttributes:
+          type: array
+          description: Applied push attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        csrAttributes:
+          type: array
+          description: Applied issue attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        withKey:
+          type: boolean
+          default: false
+          description: If the Certificate in Location has associated private key
+      required:
+      - certificateUuid
+      - commonName
+      - serialNumber
+      - state
+      - validationStatus
+    CertificateKeyUsage:
+      type: string
+      enum:
+      - digitalSignature
+      - nonRepudiation
+      - keyEncipherment
+      - dataEncipherment
+      - keyAgreement
+      - keyCertSign
+      - cRLSign
+      - encipherOnly
+      - decipherOnly
+    CertificateProtocol:
+      type: string
+      enum:
+      - acme
+      - scep
+      - cmp
+    CertificateProtocolDto:
+      type: object
+      properties:
+        protocol:
+          $ref: "#/components/schemas/CertificateProtocol"
+          description: Protocol used to issue certificate
+        protocolProfileUuid:
+          type: string
+          format: uuid
+          description: UUID of the protocol
+        additionalProtocolUuid:
+          type: string
+          format: uuid
+          description: "Additional UUID for use of the protocol, for example ACME\
+            \ Account UUID in case of ACME protocol"
+      required:
+      - protocol
+      - protocolProfileUuid
+    CertificateRequestDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of the Certificate Request
+        certificateType:
+          $ref: "#/components/schemas/CertificateType"
+          description: Certificate type
+        certificateRequestFormat:
+          $ref: "#/components/schemas/CertificateRequestFormat"
+          description: Certificate request format
+        publicKeyAlgorithm:
+          type: string
+          description: Public key algorithm
+        signatureAlgorithm:
+          type: string
+          description: Certificate signature algorithm
+        altSignatureAlgorithm:
+          type: string
+          description: Certificate alternative signature algorithm
+        content:
+          type: string
+          description: Certificate request content
+        commonName:
+          type: string
+          description: Certificate common name
+        subjectDn:
+          type: string
+          description: Subject DN of the Certificate
+        subjectAlternativeNames:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          description: Subject alternative names
+        attributes:
+          type: array
+          description: CSR Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        signatureAttributes:
+          type: array
+          description: Signature Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        altSignatureAttributes:
+          type: array
+          description: Alternative Signature Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        keyUuid:
+          type: string
+          description: UUID of the Key
+        altKeyUuid:
+          type: string
+          description: UUID of the Alternative Key
+        complianceStatus:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Certificate request compliance status
+      required:
+      - certificateRequestFormat
+      - certificateType
+      - commonName
+      - complianceStatus
+      - content
+      - publicKeyAlgorithm
+      - signatureAlgorithm
+      - subjectDn
+      - uuid
+    CertificateState:
+      type: string
+      enum:
+      - requested
+      - rejected
+      - pending_approval
+      - pending_issue
+      - pending_revoke
+      - failed
+      - issued
+      - revoked
+    CertificateSubjectType:
+      type: string
+      enum:
+      - endEntity
+      - selfSignedEndEntity
+      - intermediateCa
+      - rootCa
+    CertificateValidationStatus:
+      type: string
+      enum:
+      - not_checked
+      - failed
+      - inactive
+      - invalid
+      - valid
+      - revoked
+      - expiring
+      - expired
+    ComplianceRuleStatus:
+      type: string
+      enum:
+      - ok
+      - nok
+      - na
+      - not_available
+    ComplianceStatus:
+      type: string
+      enum:
+      - not_checked
+      - ok
+      - nok
+      - na
+      - failed
+    GroupDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        description:
+          type: string
+          description: Description of the Group
+        email:
+          type: string
+          description: Group contact email
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+      required:
+      - name
+      - uuid
+    KeyAlgorithm:
+      type: string
+      enum:
+      - RSA
+      - ECDSA
+      - FALCON
+      - ML-DSA
+      - SLH-DSA
+      - ML-KEM
+      - CRYSTALS-Dilithium
+      - SPHINCS+
+      - Unknown
+    KeyDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        description:
+          type: string
+          description: Description of the Key
+        creationTime:
+          type: string
+          format: date-time
+          description: "Creation time of the Key. If the key is discovered from the\
+            \ connector, then it will be returned"
+        tokenProfileUuid:
+          type: string
+          description: UUID of the Token Profile
+        tokenProfileName:
+          type: string
+          description: Name of the Token Profile
+        tokenInstanceUuid:
+          type: string
+          description: Token Instance UUID
+        tokenInstanceName:
+          type: string
+          description: Token Instance Name
+        owner:
+          type: string
+          description: Owner of the Key
+        ownerUuid:
+          type: string
+          description: UUID of the owner of the Key
+        groups:
+          type: array
+          description: Groups associated to the key
+          items:
+            $ref: "#/components/schemas/GroupDto"
+        items:
+          type: array
+          description: Key Items
+          items:
+            $ref: "#/components/schemas/KeyItemDto"
+        associations:
+          type: integer
+          format: int32
+          description: Number of associated objects
+        complianceStatus:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Key compliance status
+      required:
+      - associations
+      - complianceStatus
+      - creationTime
+      - items
+      - name
+      - uuid
+    KeyFormat:
+      type: string
+      enum:
+      - Raw
+      - SubjectPublicKeyInfo
+      - PrivateKeyInfo
+      - EncryptedPrivateKeyInfo
+      - Custom
+    KeyItemDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        description:
+          type: string
+          description: Description of the Key
+        creationTime:
+          type: string
+          format: date-time
+          description: "Creation time of the Key. If the key is discovered from the\
+            \ connector, then it will be returned"
+        keyWrapperUuid:
+          type: string
+          description: UUID of the wrapper object
+        tokenProfileUuid:
+          type: string
+          description: UUID of the Token Profile
+        tokenProfileName:
+          type: string
+          description: Name of the Token Profile
+        tokenInstanceUuid:
+          type: string
+          description: Token Instance UUID
+        tokenInstanceName:
+          type: string
+          description: Token Instance Name
+        owner:
+          type: string
+          description: Owner of the Key
+        ownerUuid:
+          type: string
+          description: UUID of the owner of the Key
+        groups:
+          type: array
+          description: Groups associated to the Key
+          items:
+            $ref: "#/components/schemas/GroupDto"
+        associations:
+          type: integer
+          format: int32
+          description: Number of associated objects
+        keyReferenceUuid:
+          type: string
+          description: UUID of the key item in the Connector
+        type:
+          $ref: "#/components/schemas/KeyType"
+          description: Type of the Key
+        keyAlgorithm:
+          $ref: "#/components/schemas/KeyAlgorithm"
+          description: Key Algorithm
+        format:
+          $ref: "#/components/schemas/KeyFormat"
+          description: Key Format
+        length:
+          type: integer
+          format: int32
+          description: Key Length
+        usage:
+          type: array
+          description: Key Usages
+          items:
+            $ref: "#/components/schemas/KeyUsage"
+        enabled:
+          type: boolean
+          description: Boolean describing if the key is enabled or not
+        state:
+          $ref: "#/components/schemas/KeyState"
+          description: Key State
+        complianceStatus:
+          $ref: "#/components/schemas/ComplianceStatus"
+          description: Key compliance status
+      required:
+      - associations
+      - complianceStatus
+      - creationTime
+      - enabled
+      - format
+      - keyAlgorithm
+      - keyWrapperUuid
+      - length
+      - name
+      - state
+      - type
+      - uuid
+    KeyState:
+      type: string
+      enum:
+      - pre-active
+      - active
+      - deactivated
+      - compromised
+      - destroyed
+      - destroyedCompromised
+    KeyType:
+      type: string
+      enum:
+      - Secret
+      - Public
+      - Private
+      - Split
+    KeyUsage:
+      type: string
+      enum:
+      - sign
+      - verify
+      - encrypt
+      - decrypt
+      - wrap
+      - unwrap
+    LocationDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        description:
+          type: string
+          description: Description of the Location
+        entityInstanceUuid:
+          type: string
+          description: UUID of Entity instance
+        entityInstanceName:
+          type: string
+          description: Name of Entity instance
+        attributes:
+          type: array
+          description: List of Location attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        enabled:
+          type: boolean
+          description: Enabled flag - true = enabled; false = disabled
+        supportMultipleEntries:
+          type: boolean
+          default: false
+          description: If the location supports multiple Certificates
+        supportKeyManagement:
+          type: boolean
+          default: false
+          description: If the location supports key management operations
+        certificates:
+          type: array
+          description: List of Certificates in Location
+          items:
+            $ref: "#/components/schemas/CertificateInLocationDto"
+        metadata:
+          type: array
+          description: Location metadata
+          items:
+            $ref: "#/components/schemas/MetadataResponseDto"
+      required:
+      - attributes
+      - certificates
+      - enabled
+      - entityInstanceName
+      - entityInstanceUuid
+      - name
+      - supportKeyManagement
+      - supportMultipleEntries
+      - uuid
+    MetadataResponseDto:
+      type: object
+      description: Metadata response attributes with their source connector
+      properties:
+        connectorUuid:
+          type: string
+          description: UUID of the Connector
+        connectorName:
+          type: string
+          description: Name of the Connector
+        sourceObjectType:
+          $ref: "#/components/schemas/Resource"
+          description: Source Object Type
+        items:
+          type: array
+          description: List of Metadata
+          items:
+            $ref: "#/components/schemas/ResponseMetadataDto"
+      required:
+      - items
+    NameAndUuidDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+      required:
+      - name
+      - uuid
+    Resource:
+      type: string
+      enum:
+      - NONE
+      - ANY
+      - dashboard
+      - settings
+      - auditLogs
+      - credentials
+      - connectors
+      - attributes
+      - jobs
+      - proxies
+      - users
+      - roles
+      - acmeAccounts
+      - acmeProfiles
+      - cboms
+      - scepProfiles
+      - cmpProfiles
+      - authorities
+      - raProfiles
+      - certificates
+      - certificateRequests
+      - groups
+      - complianceProfiles
+      - discoveries
+      - oids
+      - entities
+      - locations
+      - tokenProfiles
+      - tokens
+      - keys
+      - approvalProfiles
+      - approvals
+      - notificationProfiles
+      - notificationInstances
+      - rules
+      - actions
+      - triggers
+      - resources
+      - resourceEvents
+      - searchFilters
+      - keyItems
+      - platformEnums
+      - notifications
+      - conditions
+      - executions
+      - complianceRules
+      - complianceGroups
+      - customAttributes
+      - globalMetadata
+      - acmeOrders
+      - acmeAuthorizations
+      - acmeChallenges
+      - cmpTransactions
+      - endEntityProfiles
+      - authenticationProviders
+      - trustedCertificates
+      - vaults
+      - vaultProfiles
+      - secrets
+      - timeQualityConfigurations
+      - tspProfiles
+    ResponseMetadataDto:
+      type: object
+      description: Request attribute to send attribute content for object
+      discriminator:
+        propertyName: version
+        mapping:
+          v2: "#/components/schemas/ResponseMetadataV2"
+          v3: "#/components/schemas/ResponseMetadataV3"
+      oneOf:
+      - $ref: "#/components/schemas/ResponseMetadataV3"
+      - $ref: "#/components/schemas/ResponseMetadataV2"
+      required:
+      - contentType
+      - label
+      - name
+      - sourceObjects
+      - type
+      - version
+    ResponseMetadataV2:
+      type: object
+      description: Response metadata attribute instance with content
+      properties:
+        sourceObjects:
+          type: array
+          description: Source Objects
+          items:
+            $ref: "#/components/schemas/NameAndUuidDto"
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of the Attribute
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute
+          examples:
+          - Attribute
+        label:
+          type: string
+          description: Label of the the Attribute
+          examples:
+          - Attribute Name
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Content Type of the Attribute
+          examples:
+          - Attribute
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
+        version:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Version of the Attribute
+          examples:
+          - Attribute
+      required:
+      - contentType
+      - label
+      - name
+      - sourceObjects
+      - type
+      - version
+    ResponseMetadataV3:
+      type: object
+      description: Response metadata attribute instance with content
+      properties:
+        sourceObjects:
+          type: array
+          description: Source Objects
+          items:
+            $ref: "#/components/schemas/NameAndUuidDto"
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of the Attribute
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute
+          examples:
+          - Attribute
+        label:
+          type: string
+          description: Label of the the Attribute
+          examples:
+          - Attribute Name
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Content Type of the Attribute
+          examples:
+          - Attribute
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
+        version:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Version of the Attribute
+          examples:
+          - Attribute
+      required:
+      - contentType
+      - label
+      - name
+      - sourceObjects
+      - type
+      - version
+    SimplifiedRaProfileDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        enabled:
+          type: boolean
+          description: Enabled flag - true = enabled; false = disabled
+        authorityInstanceUuid:
+          type: string
+          description: Authority Instance UUID
+      required:
+      - enabled
+      - name
+      - uuid
+    CancelPendingCertificateRequestDto:
+      type: object
+      properties:
+        reason:
+          type: string
+          description: Optional free-text reason from the user explaining why the
+            pending operation is being cancelled. Recorded in the certificate event
+            history.
+          maxLength: 1000
+          minLength: 0
     BaseAttributeDto:
       type: object
       description: Base Attribute definition
@@ -2243,14 +3632,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
