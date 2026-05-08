@@ -4185,60 +4185,6 @@ components:
       - url
       - uuid
       - version
-    ConnectorDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: Object identifier
-          examples:
-          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
-        name:
-          type: string
-          description: Object Name
-          examples:
-          - Name
-        url:
-          type: string
-          description: URL of the Connector
-          examples:
-          - http://network-discovery-provider:8080
-        authType:
-          $ref: "#/components/schemas/AuthType"
-          description: Type of authentication for the Connector
-          examples:
-          - none
-        authAttributes:
-          type: array
-          description: List of Attributes for the authentication type
-          items:
-            $ref: "#/components/schemas/ResponseAttribute"
-        status:
-          $ref: "#/components/schemas/ConnectorStatus"
-          description: Status of the Connector
-          examples:
-          - CONNECTED
-        proxy:
-          $ref: "#/components/schemas/ProxyDto"
-          description: "Proxy for message queue routing. When set, connector communicates\
-            \ via message queue proxy. When null, connector uses direct REST communication."
-        functionGroups:
-          type: array
-          description: List of Function Groups implemented by the Connector
-          items:
-            $ref: "#/components/schemas/FunctionGroupDto"
-        customAttributes:
-          type: array
-          description: List of Custom Attributes
-          items:
-            $ref: "#/components/schemas/ResponseAttribute"
-      required:
-      - authType
-      - functionGroups
-      - name
-      - status
-      - url
-      - uuid
     ConnectorInterface:
       type: string
       enum:
@@ -4281,6 +4227,34 @@ components:
       - connected
       - failed
       - offline
+    ConnectorSummaryDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        url:
+          type: string
+          description: URL of the Connector
+          examples:
+          - http://network-discovery-provider:8080
+        status:
+          $ref: "#/components/schemas/ConnectorStatus"
+          description: Status of the Connector
+          examples:
+          - CONNECTED
+      required:
+      - name
+      - status
+      - url
+      - uuid
     ConnectorVersion:
       type: string
       enum:
@@ -4410,7 +4384,7 @@ components:
           type: array
           description: List of Connectors associated with the Proxy
           items:
-            $ref: "#/components/schemas/ConnectorDto"
+            $ref: "#/components/schemas/ConnectorSummaryDto"
       required:
       - code
       - name
@@ -4452,6 +4426,60 @@ components:
         proxyUuid:
           type: string
           description: UUID of the Proxy
+    ConnectorDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        url:
+          type: string
+          description: URL of the Connector
+          examples:
+          - http://network-discovery-provider:8080
+        authType:
+          $ref: "#/components/schemas/AuthType"
+          description: Type of authentication for the Connector
+          examples:
+          - none
+        authAttributes:
+          type: array
+          description: List of Attributes for the authentication type
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        status:
+          $ref: "#/components/schemas/ConnectorStatus"
+          description: Status of the Connector
+          examples:
+          - CONNECTED
+        proxy:
+          $ref: "#/components/schemas/ProxyDto"
+          description: "Proxy for message queue routing. When set, connector communicates\
+            \ via message queue proxy. When null, connector uses direct REST communication."
+        functionGroups:
+          type: array
+          description: List of Function Groups implemented by the Connector
+          items:
+            $ref: "#/components/schemas/FunctionGroupDto"
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+      required:
+      - authType
+      - functionGroups
+      - name
+      - status
+      - url
+      - uuid
     ConnectDto:
       type: object
       properties:
@@ -5156,14 +5184,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type

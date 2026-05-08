@@ -42,6 +42,8 @@ tags:
     \ that can be used to notify recipient(s) about events that were triggered in\
     \ the platform. Note that this API does not handle internal notifications. For\
     \ internal notifications, please refer to the Internal Notification API"
+- name: TSP Profile Management
+  description: Timestamping Protocol (TSP) Profile Management API
 - name: Entity Management
   description: Entity Management API
 - name: RA Profile Management
@@ -113,6 +115,10 @@ tags:
   description: CBOM management API
 - name: ACME Account Management
   description: ACME Account Management API
+- name: Time Quality Configuration Management
+  description: Time Quality Configuration Management API
+- name: Trusted Certificate Management
+  description: Trusted Certificate Management API
 - name: Settings
   description: Settings API
 - name: Vault Instance Management
@@ -131,6 +137,8 @@ tags:
   description: APIs for managing Vault Profiles
 - name: Resource Management
   description: Resource Management API
+- name: Proxy Management
+  description: Proxy Management API
 paths:
   /v2/connectors/{uuid}:
     get:
@@ -1808,6 +1816,152 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+  /v1/tspProfiles/{uuid}:
+    get:
+      tags:
+      - TSP Profile Management
+      summary: Details of a TSP Profile
+      operationId: getTspProfile
+      parameters:
+      - name: uuid
+        in: path
+        description: TSP Profile UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: TSP Profile details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TspProfileDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    put:
+      tags:
+      - TSP Profile Management
+      summary: Update TSP Profile
+      operationId: updateTspProfile
+      parameters:
+      - name: uuid
+        in: path
+        description: TSP Profile UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TspProfileRequestDto"
+        required: true
+      responses:
+        "200":
+          description: TSP Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TspProfileDto"
+        "409":
+          description: Already Exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    delete:
+      tags:
+      - TSP Profile Management
+      summary: Delete TSP Profile
+      operationId: deleteTspProfile
+      parameters:
+      - name: uuid
+        in: path
+        description: TSP Profile UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: TSP Profile deleted
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/tokens/{uuid}:
     get:
       tags:
@@ -2334,6 +2488,152 @@ paths:
           description: Connector Communication Error
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/timeQualityConfigurations/{uuid}:
+    get:
+      tags:
+      - Time Quality Configuration Management
+      summary: Details of a Time Quality Configuration
+      operationId: getTimeQualityConfiguration
+      parameters:
+      - name: uuid
+        in: path
+        description: Time Quality Configuration UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Time Quality Configuration details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimeQualityConfigurationDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    put:
+      tags:
+      - Time Quality Configuration Management
+      summary: Update Time Quality Configuration
+      operationId: updateTimeQualityConfiguration
+      parameters:
+      - name: uuid
+        in: path
+        description: Time Quality Configuration UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TimeQualityConfigurationRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Time Quality Configuration updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimeQualityConfigurationDto"
+        "409":
+          description: Already Exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    delete:
+      tags:
+      - Time Quality Configuration Management
+      summary: Delete Time Quality Configuration
+      operationId: deleteTimeQualityConfiguration
+      parameters:
+      - name: uuid
+        in: path
+        description: Time Quality Configuration UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Time Quality Configuration deleted
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
   /v1/settings/platform:
@@ -3411,6 +3711,143 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+  /v1/proxies/{uuid}:
+    get:
+      tags:
+      - Proxy Management
+      summary: Get details of a Proxy
+      operationId: getProxy
+      parameters:
+      - name: uuid
+        in: path
+        description: Proxy UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Proxy details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProxyDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    put:
+      tags:
+      - Proxy Management
+      summary: Edit a Proxy
+      operationId: editProxy
+      parameters:
+      - name: uuid
+        in: path
+        description: Proxy UUID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProxyUpdateRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Proxy updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProxyDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    delete:
+      tags:
+      - Proxy Management
+      summary: Delete a Proxy
+      operationId: deleteProxy
+      parameters:
+      - name: uuid
+        in: path
+        description: Proxy UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Proxy deleted
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/oids/{oid}:
     get:
       tags:
@@ -9560,6 +9997,264 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+  /v1/tspProfiles:
+    post:
+      tags:
+      - TSP Profile Management
+      summary: Add new TSP Profile
+      operationId: createTspProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TspProfileRequestDto"
+        required: true
+      responses:
+        "201":
+          description: New TSP Profile added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TspProfileDto"
+        "409":
+          description: Already Exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    delete:
+      tags:
+      - TSP Profile Management
+      summary: Delete multiple TSP Profiles
+      operationId: bulkDeleteTspProfiles
+      requestBody:
+        description: TSP Profile UUIDs
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+            example:
+            - c2f685d4-6a3e-11ec-90d6-0242ac120003
+            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+        required: true
+      responses:
+        "200":
+          description: TSP Profiles deleted
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkActionMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/tspProfiles/list:
+    post:
+      tags:
+      - TSP Profile Management
+      summary: List of available TSP Profiles
+      operationId: listTspProfiles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequestDto"
+        required: true
+      responses:
+        "200":
+          description: TSP Profiles retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginationResponseDtoTspProfileListDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/trustedCertificates:
+    get:
+      tags:
+      - Trusted Certificate Management
+      summary: List Trusted Certificates
+      operationId: listTrustedCertificates
+      responses:
+        "200":
+          description: List of Trusted Certificates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrustedCertificateDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    post:
+      tags:
+      - Trusted Certificate Management
+      summary: Create a new Trusted Certificate
+      operationId: createTrustedCertificate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrustedCertificateRequestDto"
+        required: true
+      responses:
+        "201":
+          description: New Trusted Certificate created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UuidDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/tokens:
     get:
       tags:
@@ -9784,6 +10479,176 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+  /v1/timeQualityConfigurations:
+    post:
+      tags:
+      - Time Quality Configuration Management
+      summary: Add new Time Quality Configuration
+      operationId: createTimeQualityConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TimeQualityConfigurationRequestDto"
+        required: true
+      responses:
+        "201":
+          description: New Time Quality Configuration added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimeQualityConfigurationDto"
+        "409":
+          description: Already Exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    delete:
+      tags:
+      - Time Quality Configuration Management
+      summary: Delete multiple Time Quality Configurations
+      operationId: bulkDeleteTimeQualityConfigurations
+      requestBody:
+        description: Time Quality Configuration UUIDs
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+            example:
+            - c2f685d4-6a3e-11ec-90d6-0242ac120003
+            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+        required: true
+      responses:
+        "200":
+          description: Time Quality Configurations deleted
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkActionMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/timeQualityConfigurations/list:
+    post:
+      tags:
+      - Time Quality Configuration Management
+      summary: List of available Time Quality Configurations
+      operationId: listTimeQualityConfigurations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Time Quality Configurations retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginationResponseDtoTimeQualityConfigurationListDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/secrets:
     post:
       tags:
@@ -10219,6 +11084,100 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
       deprecated: true
+  /v1/proxies:
+    get:
+      tags:
+      - Proxy Management
+      summary: List Proxies by Status
+      operationId: listProxies
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          $ref: "#/components/schemas/ProxyStatus"
+      responses:
+        "200":
+          description: List all Proxies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProxyListDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    post:
+      tags:
+      - Proxy Management
+      summary: Create a new Proxy
+      operationId: createProxy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProxyRequestDto"
+        required: true
+      responses:
+        "201":
+          description: New Proxy created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UuidDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/operations/tokens/{tokenInstanceUuid}/tokenProfiles/{tokenProfileUuid}/keys/{uuid}/items/{keyItemUuid}/verify:
     post:
       tags:
@@ -15084,6 +16043,206 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+  /v1/tspProfiles/{uuid}/enable:
+    patch:
+      tags:
+      - TSP Profile Management
+      summary: Enable TSP Profile
+      operationId: enableTspProfile
+      parameters:
+      - name: uuid
+        in: path
+        description: TSP Profile UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: TSP Profile enabled
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/tspProfiles/{uuid}/disable:
+    patch:
+      tags:
+      - TSP Profile Management
+      summary: Disable TSP Profile
+      operationId: disableTspProfile
+      parameters:
+      - name: uuid
+        in: path
+        description: TSP Profile UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: TSP Profile disabled
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/tspProfiles/enable:
+    patch:
+      tags:
+      - TSP Profile Management
+      summary: Enable multiple TSP Profiles
+      operationId: bulkEnableTspProfiles
+      requestBody:
+        description: TSP Profile UUIDs
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+            example:
+            - c2f685d4-6a3e-11ec-90d6-0242ac120003
+            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+        required: true
+      responses:
+        "200":
+          description: TSP Profiles enabled
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkActionMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/tspProfiles/disable:
+    patch:
+      tags:
+      - TSP Profile Management
+      summary: Disable multiple TSP Profiles
+      operationId: bulkDisableTspProfiles
+      requestBody:
+        description: TSP Profile UUIDs
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+                format: uuid
+            example:
+            - c2f685d4-6a3e-11ec-90d6-0242ac120003
+            - b9b09548-a97c-4c6a-a06a-e4ee6fc2da98
+        required: true
+      responses:
+        "200":
+          description: TSP Profiles disabled
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BulkActionMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/tokens/{uuid}/deactivate:
     patch:
       tags:
@@ -20940,6 +22099,122 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+  /v1/tspProfiles/search:
+    get:
+      tags:
+      - TSP Profile Management
+      summary: List search filters for TSP Profiles
+      operationId: listTspProfileSearchableFields
+      responses:
+        "200":
+          description: List of search filters retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchFieldDataByGroupDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/trustedCertificates/{uuid}:
+    get:
+      tags:
+      - Trusted Certificate Management
+      summary: Get details of a Trusted Certificate
+      operationId: getTrustedCertificate
+      parameters:
+      - name: uuid
+        in: path
+        description: Trusted Certificate UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Trusted Certificate details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrustedCertificateDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    delete:
+      tags:
+      - Trusted Certificate Management
+      summary: Delete a Trusted Certificate
+      operationId: deleteTrustedCertificate
+      parameters:
+      - name: uuid
+        in: path
+        description: Trusted Certificate UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Trusted Certificate deleted
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/tokens/{uuid}/tokenProfiles/attributes:
     get:
       tags:
@@ -21407,6 +22682,43 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "503":
           description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/timeQualityConfigurations/search:
+    get:
+      tags:
+      - Time Quality Configuration Management
+      summary: List search filters for Time Quality Configurations
+      operationId: listTimeQualityConfigurationSearchableFields
+      responses:
+        "200":
+          description: List of search filters retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchFieldDataByGroupDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -22172,6 +23484,48 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "503":
           description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/proxies/{uuid}/instructions:
+    get:
+      tags:
+      - Proxy Management
+      summary: Get instructions to install a Proxy
+      operationId: getInstallationInstructions
+      parameters:
+      - name: uuid
+        in: path
+        description: Proxy UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Proxy installation instructions retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProxyInstallInstructionsDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
           content:
             application/json:
               schema:
@@ -27876,60 +29230,6 @@ components:
       - url
       - uuid
       - version
-    ConnectorDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: Object identifier
-          examples:
-          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
-        name:
-          type: string
-          description: Object Name
-          examples:
-          - Name
-        url:
-          type: string
-          description: URL of the Connector
-          examples:
-          - http://network-discovery-provider:8080
-        authType:
-          $ref: "#/components/schemas/AuthType"
-          description: Type of authentication for the Connector
-          examples:
-          - none
-        authAttributes:
-          type: array
-          description: List of Attributes for the authentication type
-          items:
-            $ref: "#/components/schemas/ResponseAttribute"
-        status:
-          $ref: "#/components/schemas/ConnectorStatus"
-          description: Status of the Connector
-          examples:
-          - CONNECTED
-        proxy:
-          $ref: "#/components/schemas/ProxyDto"
-          description: "Proxy for message queue routing. When set, connector communicates\
-            \ via message queue proxy. When null, connector uses direct REST communication."
-        functionGroups:
-          type: array
-          description: List of Function Groups implemented by the Connector
-          items:
-            $ref: "#/components/schemas/FunctionGroupDto"
-        customAttributes:
-          type: array
-          description: List of Custom Attributes
-          items:
-            $ref: "#/components/schemas/ResponseAttribute"
-      required:
-      - authType
-      - functionGroups
-      - name
-      - status
-      - url
-      - uuid
     ConnectorInterface:
       type: string
       enum:
@@ -27972,6 +29272,34 @@ components:
       - connected
       - failed
       - offline
+    ConnectorSummaryDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        url:
+          type: string
+          description: URL of the Connector
+          examples:
+          - http://network-discovery-provider:8080
+        status:
+          $ref: "#/components/schemas/ConnectorStatus"
+          description: Status of the Connector
+          examples:
+          - CONNECTED
+      required:
+      - name
+      - status
+      - url
+      - uuid
     ConnectorVersion:
       type: string
       enum:
@@ -28101,7 +29429,7 @@ components:
           type: array
           description: List of Connectors associated with the Proxy
           items:
-            $ref: "#/components/schemas/ConnectorDto"
+            $ref: "#/components/schemas/ConnectorSummaryDto"
       required:
       - code
       - name
@@ -28510,14 +29838,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
@@ -29715,6 +31043,61 @@ components:
       - systemUser
       - username
       - uuid
+    TspProfileRequestDto:
+      type: object
+      description: Request to create or update a TSP (Timestamping Protocol) Profile
+      properties:
+        name:
+          type: string
+          description: Name of the TSP Profile
+          example: TSP-Profile-1
+          minLength: 1
+        description:
+          type: string
+          description: Description of the TSP Profile
+          example: TSP profile for production timestamping
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - name
+    TspProfileDto:
+      type: object
+      description: TSP (Timestamping Protocol) profile details
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        description:
+          type: string
+          description: Description of the TSP Profile
+          example: TSP profile for production timestamping
+        enabled:
+          type: boolean
+          description: Enabled flag of the TSP Profile
+          example: true
+        signingUrl:
+          type: string
+          description: TSP URL for signing
+          example: https://ilm.otilm.com/api/v1/protocols/tsp/tsp-profile-1/sign
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+      required:
+      - enabled
+      - name
+      - uuid
     TokenInstanceRequestDto:
       type: object
       properties:
@@ -30096,6 +31479,143 @@ components:
       required:
       - usage
       - uuids
+    TimeQualityConfigurationRequestDto:
+      type: object
+      description: Request to create or update a Time Quality Configuration
+      properties:
+        name:
+          type: string
+          description: Name of the Time Quality Configuration
+          example: NTP-Config-1
+          minLength: 1
+        accuracy:
+          type: string
+          description: "Desired accuracy for the time quality, in ISO 8601 duration\
+            \ format"
+          example: PT1S
+        ntpServers:
+          type: array
+          description: List of NTP server addresses
+          example:
+          - pool.ntp.org
+          - time.google.com
+          items:
+            type: string
+          minItems: 1
+        ntpCheckInterval:
+          type: string
+          description: "Interval between NTP checks, in ISO 8601 duration format"
+          example: PT30S
+        ntpSamplesPerServer:
+          type: integer
+          format: int32
+          default: 3
+          description: Number of NTP samples to take per server during each check
+          example: 3
+        ntpCheckTimeout:
+          type: string
+          description: "Timeout for the entire NTP check cycle, in ISO 8601 duration\
+            \ format"
+          example: PT10S
+        ntpServersMinReachable:
+          type: integer
+          format: int32
+          default: 1
+          description: Minimum number of NTP servers that must be reachable
+          example: 1
+        maxClockDrift:
+          type: string
+          description: "Maximum allowed clock drift from NTP reference time, in ISO\
+            \ 8601 duration format"
+          example: PT500MS
+        leapSecondGuard:
+          type: boolean
+          default: true
+          description: Whether to guard against leap second anomalies
+          example: true
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - accuracy
+      - maxClockDrift
+      - name
+      - ntpCheckInterval
+      - ntpCheckTimeout
+      - ntpServers
+    TimeQualityConfigurationDto:
+      type: object
+      description: Time quality configuration details
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        accuracy:
+          type: string
+          default: PT1S
+          description: "Declared accuracy of the profile, in ISO 8601 duration format"
+          example: PT1S
+        ntpServers:
+          type: array
+          description: List of NTP server addresses
+          example:
+          - pool.ntp.org
+          - time.google.com
+          items:
+            type: string
+        ntpCheckInterval:
+          type: string
+          default: PT30S
+          description: "Interval between NTP checks, in ISO 8601 duration format"
+          example: PT30S
+        ntpSamplesPerServer:
+          type: integer
+          format: int32
+          default: 3
+          description: Number of NTP samples to take per server during each check
+          example: 3
+        ntpCheckTimeout:
+          type: string
+          default: PT10S
+          description: "Timeout for the entire NTP check cycle, in ISO 8601 duration\
+            \ format"
+          example: PT10S
+        ntpServersMinReachable:
+          type: integer
+          format: int32
+          default: 1
+          description: Minimum number of NTP servers that must be reachable
+          example: 1
+        maxClockDrift:
+          type: string
+          default: PT500MS
+          description: "Maximum allowed clock drift from NTP reference time, in ISO\
+            \ 8601 duration format"
+          example: PT500MS
+        leapSecondGuard:
+          type: boolean
+          default: true
+          description: Whether to guard against leap second anomalies
+          example: true
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+      required:
+      - accuracy
+      - name
+      - ntpServers
+      - uuid
     CertificateSettingsUpdateDto:
       type: object
       properties:
@@ -31100,6 +32620,14 @@ components:
       required:
       - name
       - uuid
+    ProxyUpdateRequestDto:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Detailed description of the Proxy
+          examples:
+          - This proxy is used for connecting to external connectors in DMZ network
     AdditionalOidPropertiesDto:
       description: Additional properties of custom OID entry
     CustomOidEntryUpdateRequestDto:
@@ -31912,6 +33440,60 @@ components:
         proxyUuid:
           type: string
           description: UUID of the Proxy
+    ConnectorDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        url:
+          type: string
+          description: URL of the Connector
+          examples:
+          - http://network-discovery-provider:8080
+        authType:
+          $ref: "#/components/schemas/AuthType"
+          description: Type of authentication for the Connector
+          examples:
+          - none
+        authAttributes:
+          type: array
+          description: List of Attributes for the authentication type
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        status:
+          $ref: "#/components/schemas/ConnectorStatus"
+          description: Status of the Connector
+          examples:
+          - CONNECTED
+        proxy:
+          $ref: "#/components/schemas/ProxyDto"
+          description: "Proxy for message queue routing. When set, connector communicates\
+            \ via message queue proxy. When null, connector uses direct REST communication."
+        functionGroups:
+          type: array
+          description: List of Function Groups implemented by the Connector
+          items:
+            $ref: "#/components/schemas/FunctionGroupDto"
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+      required:
+      - authType
+      - functionGroups
+      - name
+      - status
+      - url
+      - uuid
     ConnectDto:
       type: object
       properties:
@@ -34186,6 +35768,71 @@ components:
         authenticationToken:
           type: string
           description: Authentication Token
+    PaginationResponseDtoTspProfileListDto:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items returned
+          items:
+            $ref: "#/components/schemas/TspProfileListDto"
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+      required:
+      - items
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
+    TspProfileListDto:
+      type: object
+      description: TSP (Timestamping Protocol) profile details for listing
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        description:
+          type: string
+          description: Description of the TSP Profile
+          example: TSP profile for production timestamping
+        enabled:
+          type: boolean
+          description: Enabled flag of the TSP Profile
+          example: true
+      required:
+      - enabled
+      - name
+      - uuid
+    TrustedCertificateRequestDto:
+      type: object
+      properties:
+        certificateContent:
+          type: string
+          format: byte
+          description: Raw certificate content serialized as Base64 String in JSON
+      required:
+      - certificateContent
     AddTokenProfileRequestDto:
       type: object
       properties:
@@ -34254,6 +35901,62 @@ components:
       - attributes
       - description
       - name
+    PaginationResponseDtoTimeQualityConfigurationListDto:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items returned
+          items:
+            $ref: "#/components/schemas/TimeQualityConfigurationListDto"
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+      required:
+      - items
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
+    TimeQualityConfigurationListDto:
+      type: object
+      description: Time quality configuration details for listing
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        ntpServers:
+          type: array
+          description: List of NTP server addresses
+          example:
+          - pool.ntp.org
+          - time.google.com
+          items:
+            type: string
+      required:
+      - name
+      - ntpServers
+      - uuid
     PaginationResponseDtoSecretDto:
       type: object
       properties:
@@ -34502,6 +36205,21 @@ components:
       required:
       - allowAllResources
       - resources
+    ProxyRequestDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the Proxy
+          examples:
+          - MyProxy123
+        description:
+          type: string
+          description: Detailed description of the Proxy
+          examples:
+          - This proxy is used for connecting to external connectors in DMZ network
+      required:
+      - name
     SignatureRequestData:
       type: object
       properties:
@@ -37210,6 +38928,42 @@ components:
       - name
       - resource
       - uuid
+    TrustedCertificateDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Trusted Certificate
+        certificateContent:
+          type: string
+          format: byte
+          description: Raw certificate content serialized as Base64 String in JSON
+        issuer:
+          type: string
+          description: Certificate issuer DN
+        san:
+          type: string
+          description: Subject alternative names
+        serialNumber:
+          type: string
+          description: Certificate serial number
+        subject:
+          type: string
+          description: Certificate subject DN
+        thumbprint:
+          type: string
+          description: Certificate thumbprint (fingerprint)
+        notBefore:
+          type: string
+          format: date-time
+          description: Certificate validity start date
+        notAfter:
+          type: string
+          format: date-time
+          description: Certificate expiration date
+      required:
+      - certificateContent
+      - uuid
     TokenInstanceDto:
       type: object
       properties:
@@ -37895,6 +39649,54 @@ components:
           description: Resource of objects that are subject of event
       required:
       - event
+    ProxyListDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        description:
+          type: string
+          description: Detailed description of the Proxy
+          examples:
+          - This proxy is used for connecting to external connectors in DMZ network
+        status:
+          $ref: "#/components/schemas/ProxyStatus"
+          description: Status of the Proxy
+          examples:
+          - connected
+        lastActivity:
+          type: string
+          format: date-time
+          description: Timestamp of the last activity from the Proxy
+          examples:
+          - 2024-01-15T10:15:30+01:00
+      required:
+      - name
+      - status
+      - uuid
+    ProxyInstallInstructionsDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Proxy identifier
+          examples:
+          - 7b55be1c-844f-11dc-a8a3-0242ac120002
+        installationInstructions:
+          type: string
+          description: Installation instructions for the Proxy
+          examples:
+          - helm install my-proxy ./czertainly-proxy --set proxy.code=my-proxy-123
+      required:
+      - uuid
     NotificationDto:
       type: object
       properties:
