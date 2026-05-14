@@ -1949,6 +1949,11 @@ components:
           type: string
           description: Description of the TSP Profile
           example: TSP profile for production timestamping
+        defaultSigningProfileUuid:
+          type: string
+          format: uuid
+          description: UUID of the default Signing Profile
+          example: 6b55de1c-844f-11ec-a8a3-0242ac120002
         customAttributes:
           type: array
           description: List of Custom Attributes
@@ -1983,6 +1988,27 @@ components:
       - code
       - message
       - statusCode
+    SimplifiedSigningProfileDto:
+      type: object
+      description: Simplified Signing Profile
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        enabled:
+          type: boolean
+          description: Enabled flag - true = enabled; false = disabled
+      required:
+      - enabled
+      - name
+      - uuid
     TspProfileDto:
       type: object
       description: TSP (Timestamping Protocol) profile details
@@ -2005,6 +2031,9 @@ components:
           type: boolean
           description: Enabled flag of the TSP Profile
           example: true
+        defaultSigningProfile:
+          $ref: "#/components/schemas/SimplifiedSigningProfileDto"
+          description: Default Signing Profile
         signingUrl:
           type: string
           description: TSP URL for signing
@@ -2135,6 +2164,9 @@ components:
           type: string
           description: Description of the TSP Profile
           example: TSP profile for production timestamping
+        defaultSigningProfile:
+          $ref: "#/components/schemas/SimplifiedSigningProfileDto"
+          description: Default Signing Profile
         enabled:
           type: boolean
           description: Enabled flag of the TSP Profile
@@ -2243,6 +2275,11 @@ components:
       - SecretType
       - KeyStoreType
       - SecretState
+      - ManagedSigningType
+      - QcType
+      - SigningProtocol
+      - SigningScheme
+      - SigningWorkflowType
     SearchFieldDataByGroupDto:
       type: object
       properties:

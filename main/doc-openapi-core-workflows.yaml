@@ -23,6 +23,8 @@ tags:
   description: Workflow Actions Management API
 - name: Workflow Rules Management
   description: Workflow Rules Management API
+- name: Workflow Event Management
+  description: Workflow Event Management API
 - name: Workflow Triggers Management
   description: Workflow Triggers Management API
 paths:
@@ -1006,6 +1008,123 @@ paths:
       - BearerJWTAuth: []
       - CertificateAuth: []
       - SessionAuth: []
+  /v1/workflows/events/{event}/{resource}/{uuid}/history:
+    post:
+      tags:
+      - Workflow Event Management
+      summary: Get history of event defined by an object
+      operationId: getObjectDefinedEventHistory
+      parameters:
+      - name: event
+        in: path
+        description: Event name
+        required: true
+        schema:
+          $ref: "#/components/schemas/ResourceEvent"
+      - name: resource
+        in: path
+        description: Resource
+        required: true
+        schema:
+          $ref: "#/components/schemas/Resource"
+      - name: uuid
+        in: path
+        description: Object UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventHistoryRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Event history retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginationResponseDtoEventHistoryDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
+  /v1/workflows/events/{event}/history:
+    post:
+      tags:
+      - Workflow Event Management
+      summary: Get history of event defined in platform settings
+      operationId: getPlatformSettingsEventHistory
+      parameters:
+      - name: event
+        in: path
+        description: Event name
+        required: true
+        schema:
+          $ref: "#/components/schemas/ResourceEvent"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EventHistoryRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Event history retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginationResponseDtoEventHistoryDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
   /v1/workflows/conditions:
     get:
       tags:
@@ -1264,6 +1383,78 @@ paths:
       - BearerJWTAuth: []
       - CertificateAuth: []
       - SessionAuth: []
+  /v1/workflows/events/{resource}/{uuid}/history:
+    get:
+      tags:
+      - Workflow Event Management
+      summary: Get event history for a resource object
+      operationId: getObjectEventHistory
+      parameters:
+      - name: resource
+        in: path
+        description: Resource
+        required: true
+        schema:
+          $ref: "#/components/schemas/Resource"
+      - name: uuid
+        in: path
+        description: Object UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: itemsPerPage
+        in: query
+        description: Number of entries per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
+      responses:
+        "200":
+          description: Event history retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginationResponseDtoObjectEventHistoryDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - BearerJWTAuth: []
+      - CertificateAuth: []
+      - SessionAuth: []
   /v1/workflows/events/{resource}/{associationObjectUuid}:
     get:
       tags:
@@ -1380,6 +1571,7 @@ components:
       - vaults
       - vaultProfiles
       - secrets
+      - signingProfiles
       - timeQualityConfigurations
       - tspProfiles
     ResourceEvent:
@@ -1902,6 +2094,210 @@ components:
       - objectUuid
       - resource
       - triggerUuids
+    EventHistoryRequestDto:
+      type: object
+      properties:
+        pagination:
+          $ref: "#/components/schemas/PaginationRequestDto"
+          description: Pagination parameters for the list of event history entries.
+        objectsPagination:
+          $ref: "#/components/schemas/PaginationRequestDto"
+          description: Pagination parameters for the list of individual object histories
+            within each event history entry.
+    PaginationRequestDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+        pageNumber:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
+    EventHistoryDto:
+      type: object
+      properties:
+        startedAt:
+          type: string
+          format: date-time
+          description: Time at which the event firing started.
+        finishedAt:
+          type: string
+          format: date-time
+          description: Time at which the event firing finished.
+        status:
+          $ref: "#/components/schemas/EventStatus"
+          description: Status of the event firing.
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource of the objects that triggers have been evaluated on.
+        objectsEvaluated:
+          type: integer
+          format: int32
+          description: Number of objects evaluated.
+        objectsMatched:
+          type: integer
+          format: int32
+          description: Number of objects matched at least by one trigger.
+        objectsIgnored:
+          type: integer
+          format: int32
+          description: Number of objects matched by ignore triggers.
+        objectHistories:
+          $ref: "#/components/schemas/PaginationResponseDtoTriggerHistoryObjectSummaryDto"
+          description: Paginated list of trigger evaluations on individual objects.
+      required:
+      - objectHistories
+      - objectsEvaluated
+      - objectsIgnored
+      - objectsMatched
+      - resource
+      - startedAt
+      - status
+    EventStatus:
+      type: string
+      enum:
+      - inProgress
+      - finished
+      - failed
+    PaginationResponseDtoEventHistoryDto:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items returned
+          items:
+            $ref: "#/components/schemas/EventHistoryDto"
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+      required:
+      - items
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
+    PaginationResponseDtoTriggerHistoryObjectSummaryDto:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items returned
+          items:
+            $ref: "#/components/schemas/TriggerHistoryObjectSummaryDto"
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+      required:
+      - items
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
+    TriggerHistoryObjectSummaryDto:
+      type: object
+      properties:
+        objectUuid:
+          type: string
+          format: uuid
+          description: UUID of the object that the trigger has been evaluated on.
+        referenceObjectUuid:
+          type: string
+          format: uuid
+          description: Reference UUID of the object that the trigger has been evaluated
+            on.
+        matched:
+          type: boolean
+          description: Was matched at least by one trigger.
+        ignored:
+          type: boolean
+          description: Was matched by ignore trigger.
+        triggers:
+          type: array
+          description: List of records for each trigger that has been evaluated.
+          items:
+            $ref: "#/components/schemas/TriggerHistoryObjectTriggerSummaryDto"
+      required:
+      - ignored
+      - matched
+      - triggers
+    TriggerHistoryObjectTriggerSummaryDto:
+      type: object
+      properties:
+        triggerUuid:
+          type: string
+          format: uuid
+          description: UUID of the object that the trigger has been evaluated on.
+        triggerName:
+          type: string
+          description: Reference UUID of the object that the trigger has been evaluated
+            on.
+        triggeredAt:
+          type: string
+          format: date-time
+          description: Time at which has the trigger been triggered
+        message:
+          type: string
+          description: 'Additional message. '
+        notificationsSent:
+          type: boolean
+          description: "If trigger was sending notifications, confirmation whether\
+            \ notification has been sent successfully or not."
+        records:
+          type: array
+          description: List of records for each action that has not been performed
+            and each condition that has not been evaluated.
+          items:
+            $ref: "#/components/schemas/TriggerHistoryRecordDto"
+      required:
+      - records
+      - triggerName
+      - triggerUuid
+      - triggeredAt
+    TriggerHistoryRecordDto:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message with cause of action/condition failure.
+        condition:
+          $ref: "#/components/schemas/ConditionDto"
+          description: Condition that is referenced by history record
+        execution:
+          $ref: "#/components/schemas/ExecutionDto"
+          description: Execution that is referenced by history record
+      required:
+      - message
     ConditionRequestDto:
       type: object
       properties:
@@ -2026,80 +2422,6 @@ components:
       - triggerUuid
       - triggeredAt
       - uuid
-    TriggerHistoryRecordDto:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Message with cause of action/condition failure.
-        condition:
-          $ref: "#/components/schemas/ConditionDto"
-          description: Condition that is referenced by history record
-        execution:
-          $ref: "#/components/schemas/ExecutionDto"
-          description: Execution that is referenced by history record
-      required:
-      - message
-    TriggerHistoryObjectSummaryDto:
-      type: object
-      properties:
-        objectUuid:
-          type: string
-          format: uuid
-          description: UUID of the object that the trigger has been evaluated on.
-        referenceObjectUuid:
-          type: string
-          format: uuid
-          description: Reference UUID of the object that the trigger has been evaluated
-            on.
-        matched:
-          type: boolean
-          description: Was matched at least by one trigger.
-        ignored:
-          type: boolean
-          description: Was matched by ignore trigger.
-        triggers:
-          type: array
-          description: List of records for each trigger that has been evaluated.
-          items:
-            $ref: "#/components/schemas/TriggerHistoryObjectTriggerSummaryDto"
-      required:
-      - ignored
-      - matched
-      - triggers
-    TriggerHistoryObjectTriggerSummaryDto:
-      type: object
-      properties:
-        triggerUuid:
-          type: string
-          format: uuid
-          description: UUID of the object that the trigger has been evaluated on.
-        triggerName:
-          type: string
-          description: Reference UUID of the object that the trigger has been evaluated
-            on.
-        triggeredAt:
-          type: string
-          format: date-time
-          description: Time at which has the trigger been triggered
-        message:
-          type: string
-          description: 'Additional message. '
-        notificationsSent:
-          type: boolean
-          description: "If trigger was sending notifications, confirmation whether\
-            \ notification has been sent successfully or not."
-        records:
-          type: array
-          description: List of records for each action that has not been performed
-            and each condition that has not been evaluated.
-          items:
-            $ref: "#/components/schemas/TriggerHistoryRecordDto"
-      required:
-      - records
-      - triggerName
-      - triggerUuid
-      - triggeredAt
     TriggerHistorySummaryDto:
       type: object
       properties:
@@ -2161,6 +2483,117 @@ components:
       - name
       - resource
       - uuid
+    NameAndUuidDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+      required:
+      - name
+      - uuid
+    ObjectEventHistoryDto:
+      type: object
+      properties:
+        event:
+          $ref: "#/components/schemas/ResourceEvent"
+          description: Resource event that was triggered.
+        trigger:
+          $ref: "#/components/schemas/NameAndUuidDto"
+          description: Trigger that evaluated the event.
+        origin:
+          $ref: "#/components/schemas/ResourceObjectDto"
+          description: Origin that caused the event to be triggered.
+        conditionsMatched:
+          type: boolean
+          description: All conditions in the trigger have been matched.
+        actionsPerformed:
+          type: boolean
+          description: All actions in the trigger have been performed.
+        triggeredAt:
+          type: string
+          format: date-time
+          description: Time at which the event was triggered.
+        message:
+          type: string
+          description: Additional message.
+        notificationsSent:
+          type: boolean
+          description: "If trigger was sending notifications, confirmation whether\
+            \ notification has been sent successfully or not."
+        records:
+          type: array
+          description: List of records for each condition that has not been matched
+            and each action that has not been performed.
+          items:
+            $ref: "#/components/schemas/TriggerHistoryRecordDto"
+      required:
+      - actionsPerformed
+      - conditionsMatched
+      - event
+      - records
+      - trigger
+      - triggeredAt
+    PaginationResponseDtoObjectEventHistoryDto:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items returned
+          items:
+            $ref: "#/components/schemas/ObjectEventHistoryDto"
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+      required:
+      - items
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
+    ResourceObjectDto:
+      type: object
+      properties:
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource of object
+          examples:
+          - certificates
+        objectUuid:
+          type: string
+          format: uuid
+          description: Object UUID
+          examples:
+          - 2dcc528b-9e16-46c6-877e-74eae258173f
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+      required:
+      - name
+      - objectUuid
+      - resource
     ActionDto:
       type: object
       properties:

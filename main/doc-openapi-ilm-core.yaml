@@ -22686,6 +22686,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/timeQualityConfigurations/{uuid}/signingProfiles:
+    get:
+      tags:
+      - Time Quality Configuration Management
+      summary: List Signing Profiles using this Time Quality Configuration
+      operationId: listSigningProfilesForTimeQualityConfiguration
+      parameters:
+      - name: uuid
+        in: path
+        description: Time Quality Configuration UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Signing Profiles retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SimplifiedSigningProfileDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/timeQualityConfigurations/search:
     get:
       tags:
@@ -29243,6 +29288,8 @@ components:
       - cryptography
       - notification
       - secret
+      - signatureFormatting
+      - signing
     ConnectorInterfaceDto:
       type: object
       properties:
@@ -29345,6 +29392,8 @@ components:
       - openMetrics
       - secretVersioning
       - secretRotation
+      - contentSigning
+      - timestamping
     FunctionGroupCode:
       type: string
       enum:
@@ -29780,6 +29829,7 @@ components:
       - vaults
       - vaultProfiles
       - secrets
+      - signingProfiles
       - timeQualityConfigurations
       - tspProfiles
     ComplianceInternalRuleRequestDto:
@@ -29838,14 +29888,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
@@ -31056,6 +31106,11 @@ components:
           type: string
           description: Description of the TSP Profile
           example: TSP profile for production timestamping
+        defaultSigningProfileUuid:
+          type: string
+          format: uuid
+          description: UUID of the default Signing Profile
+          example: 6b55de1c-844f-11ec-a8a3-0242ac120002
         customAttributes:
           type: array
           description: List of Custom Attributes
@@ -31063,6 +31118,27 @@ components:
             $ref: "#/components/schemas/RequestAttribute"
       required:
       - name
+    SimplifiedSigningProfileDto:
+      type: object
+      description: Simplified Signing Profile
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        enabled:
+          type: boolean
+          description: Enabled flag - true = enabled; false = disabled
+      required:
+      - enabled
+      - name
+      - uuid
     TspProfileDto:
       type: object
       description: TSP (Timestamping Protocol) profile details
@@ -31085,6 +31161,9 @@ components:
           type: boolean
           description: Enabled flag of the TSP Profile
           example: true
+        defaultSigningProfile:
+          $ref: "#/components/schemas/SimplifiedSigningProfileDto"
+          description: Default Signing Profile
         signingUrl:
           type: string
           description: TSP URL for signing
@@ -32657,6 +32736,7 @@ components:
       enum:
       - rdnAttributeType
       - extendedKeyUsage
+      - qcStatement
       - generic
     RdnAttributeTypeOidPropertiesDto:
       allOf:
@@ -33442,6 +33522,7 @@ components:
           description: UUID of the Proxy
     ConnectorDto:
       type: object
+      description: Connector details (V1)
       properties:
         uuid:
           type: string
@@ -34691,6 +34772,10 @@ components:
         protocolInfo:
           $ref: "#/components/schemas/CertificateProtocolDto"
           description: Information about protocol used to issue the certificate
+        qcStatements:
+          $ref: "#/components/schemas/CertificateQcStatementsDto"
+          description: Parsed ETSI QCStatements extension (RFC 3739 / ETSI EN 319
+            412-5). Absent when the extension is not present in the certificate.
       required:
       - certificateType
       - commonName
@@ -34739,6 +34824,32 @@ components:
       required:
       - protocol
       - protocolProfileUuid
+    CertificateQcStatementsDto:
+      type: object
+      description: Parsed QC Statements from a qualified certificate
+      properties:
+        qcCompliance:
+          type: boolean
+          description: "Certificate is a qualified certificate per ETSI EN 319 412\
+            \ (id-etsi-qcs-QcCompliance, OID 0.4.0.1862.1.1)"
+        qcSscd:
+          type: boolean
+          description: "Private key resides in a Qualified Electronic Signature Creation\
+            \ Device (id-etsi-qcs-QcSSCD, OID 0.4.0.1862.1.4)"
+        qcType:
+          type: array
+          description: "Intended purpose of the qualified certificate (id-etsi-qcs-QcType,\
+            \ OID 0.4.0.1862.1.6). Absent means purpose is unspecified (all uses allowed\
+            \ by key usage)."
+          items:
+            $ref: "#/components/schemas/QcType"
+        qcCcLegislation:
+          type: array
+          description: "Country codes of national legislation under which the certificate\
+            \ is issued (id-etsi-qcs-QcCClegislation, OID 0.4.0.1862.1.7). ISO 3166-1\
+            \ alpha-2."
+          items:
+            type: string
     CertificateRequestDto:
       type: object
       properties:
@@ -34982,6 +35093,12 @@ components:
       - state
       - type
       - uuid
+    QcType:
+      type: string
+      enum:
+      - esign
+      - eseal
+      - web
     CancelPendingCertificateRequestDto:
       type: object
       properties:
@@ -35816,6 +35933,9 @@ components:
           type: string
           description: Description of the TSP Profile
           example: TSP profile for production timestamping
+        defaultSigningProfile:
+          $ref: "#/components/schemas/SimplifiedSigningProfileDto"
+          description: Default Signing Profile
         enabled:
           type: boolean
           description: Enabled flag of the TSP Profile
@@ -38493,6 +38613,11 @@ components:
       - SecretType
       - KeyStoreType
       - SecretState
+      - ManagedSigningType
+      - QcType
+      - SigningProtocol
+      - SigningScheme
+      - SigningWorkflowType
     SearchFieldDataByGroupDto:
       type: object
       properties:
