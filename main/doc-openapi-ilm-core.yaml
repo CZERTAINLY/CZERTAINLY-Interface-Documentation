@@ -14205,6 +14205,47 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/certificates/upload/async:
+    post:
+      tags:
+      - Certificate Inventory
+      summary: Upload a new Certificate
+      operationId: uploadAsync
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UploadCertificateRequestDto"
+        required: true
+      responses:
+        "202":
+          description: Certificate accepted for processing of upload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FingerprintDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/certificates/delete:
     post:
       tags:
@@ -30703,6 +30744,7 @@ components:
       - certificate_discovered
       - certificate_expiring
       - certificate_not_compliant
+      - certificate_uploaded
       - discovery_finished
       - approval_requested
       - approval_closed
@@ -34168,11 +34210,11 @@ components:
       - $ref: "#/components/schemas/BaseAttributeContentDtoV2"
       - $ref: "#/components/schemas/BaseAttributeContentDtoV3"
       properties:
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
         reference:
           type: string
         data: {}
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
     CustomAttributeUpdateRequestDto:
       type: object
       properties:
@@ -37711,6 +37753,15 @@ components:
       - pageNumber
       - totalItems
       - totalPages
+    FingerprintDto:
+      type: object
+      description: Fingerprint DTO for certificate operations
+      properties:
+        fingerprint:
+          type: string
+          description: Fingerprint of the certificate
+      required:
+      - fingerprint
     RemoveCertificateDto:
       type: object
       properties:
