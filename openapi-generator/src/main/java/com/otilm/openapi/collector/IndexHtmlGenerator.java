@@ -21,12 +21,14 @@ import java.util.stream.Collectors;
 
 /**
  * Generates index.html from an index.html.template file, injecting the API list
- * arrays (coreApis, connectorApis, protocolApis) derived from groups.yaml in place
- * of the {@code // placeholder for the list of APIS} marker line.
+ * arrays (coreApis, connectorApis, messagingApis, protocolApis) derived from
+ * groups.yaml in place of the {@code // placeholder for the list of APIS} marker line.
  * <p>
  * Each group with an {@code indexCategory} field ({@code core}, {@code connector},
- * or {@code protocol}) is included in the corresponding JavaScript array. Groups
- * without the field (e.g. cert-manager, ilm-core, legacy variants) are ignored.
+ * {@code messaging}, or {@code protocol}) is included in the corresponding
+ * JavaScript array. Groups without the field (e.g. cert-manager, ilm-core, legacy
+ * variants) are ignored. Groups with an unrecognized {@code indexCategory} value
+ * cause the generator to fail.
  * <p>
  * The display name for each entry is resolved in the following order:
  * <ol>
@@ -48,7 +50,7 @@ public class IndexHtmlGenerator {
     /**
      * Category names in the order they appear in the JS block.
      */
-    private static final List<String> CATEGORY_ORDER = List.of("core", "connector", "protocol");
+    private static final List<String> CATEGORY_ORDER = List.of("core", "connector", "messaging", "protocol");
 
     /**
      * Maps indexCategory value → JS variable name.
@@ -56,6 +58,7 @@ public class IndexHtmlGenerator {
     private static final Map<String, String> VAR_NAMES = Map.of(
             "core", "coreApis",
             "connector", "connectorApis",
+            "messaging", "messagingApis",
             "protocol", "protocolApis"
     );
 
@@ -122,9 +125,15 @@ public class IndexHtmlGenerator {
         }
         for (GroupConfiguration group : groups) {
             String cat = group.getIndexCategory();
-            if (cat != null && buckets.containsKey(cat)) {
-                buckets.get(cat).add(group);
+            if (cat == null) {
+                continue;
             }
+            if (!buckets.containsKey(cat)) {
+                log.error("Error: group '{}' has unknown indexCategory '{}'. Allowed values: {}",
+                        group.getId(), cat, CATEGORY_ORDER);
+                System.exit(1);
+            }
+            buckets.get(cat).add(group);
         }
         buckets.values().forEach(list -> list.sort(
                 Comparator.comparing(g -> g.getTitle() != null ? g.getTitle() : g.getId())));
