@@ -30138,14 +30138,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
@@ -30941,6 +30941,13 @@ components:
             notification execution type)
         data:
           description: Data of the execution item
+        sourceFieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: "Source field source for attribute mapping (META, DATA, or\
+            \ CUSTOM)"
+        sourceFieldIdentifier:
+          type: string
+          description: "Source field identifier for attribute mapping (format: name|ContentType)"
     ExecutionType:
       type: string
       enum:
@@ -31052,7 +31059,19 @@ components:
           type: string
           description: UUID of the Notification profile
         data:
-          description: Data of the execution item
+          description: Static data of the execution item. Must be null when sourceFieldSource
+            or sourceFieldIdentifier is set
+        sourceFieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: "Source field source for mapping (META, DATA, or CUSTOM). When\
+            \ set, value is read from this source instead of static data. Must be\
+            \ provided together with sourceFieldIdentifier; neither field is valid\
+            \ on its own."
+        sourceFieldIdentifier:
+          type: string
+          description: "Source field identifier for mapping (format: name|ContentType).\
+            \ Must be provided together with sourceFieldSource; neither field is valid\
+            \ on its own."
     UpdateExecutionRequestDto:
       type: object
       properties:
@@ -33093,6 +33112,7 @@ components:
       - group
       - role
       - owner
+      - mapped
     NotificationProfileDetailDto:
       type: object
       properties:
@@ -42223,34 +42243,3 @@ components:
       - connectorUuid
       - kind
       - ruleUuid
-  securitySchemes:
-    ConnectorAPIKeyAuth:
-      type: apiKey
-      description: API Key in header configured for connector
-      name: X-API-KEY
-      in: header
-    BasicAuth:
-      type: http
-      scheme: Basic
-    SessionAuth:
-      type: apiKey
-      description: Session-based authentication with session ID stored in 'czertainly-session'
-        cookie
-      name: czertainly-session
-      in: cookie
-    CertificateAuth:
-      type: apiKey
-      description: Base64 encoded X.509 certificate passed in header
-      name: ssl-client-cert
-      in: header
-    CertificateTLSAuth:
-      type: mutualTLS
-      description: Client certificate authentication
-    NoAuth:
-      type: http
-      description: No authentication
-      scheme: none
-    BearerJWTAuth:
-      type: http
-      scheme: Bearer
-      bearerFormat: JWT

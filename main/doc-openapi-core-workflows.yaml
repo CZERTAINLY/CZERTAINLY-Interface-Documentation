@@ -1824,6 +1824,13 @@ components:
             notification execution type)
         data:
           description: Data of the execution item
+        sourceFieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: "Source field source for attribute mapping (META, DATA, or\
+            \ CUSTOM)"
+        sourceFieldIdentifier:
+          type: string
+          description: "Source field identifier for attribute mapping (format: name|ContentType)"
     ExecutionType:
       type: string
       enum:
@@ -1965,7 +1972,19 @@ components:
           type: string
           description: UUID of the Notification profile
         data:
-          description: Data of the execution item
+          description: Static data of the execution item. Must be null when sourceFieldSource
+            or sourceFieldIdentifier is set
+        sourceFieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: "Source field source for mapping (META, DATA, or CUSTOM). When\
+            \ set, value is read from this source instead of static data. Must be\
+            \ provided together with sourceFieldIdentifier; neither field is valid\
+            \ on its own."
+        sourceFieldIdentifier:
+          type: string
+          description: "Source field identifier for mapping (format: name|ContentType).\
+            \ Must be provided together with sourceFieldSource; neither field is valid\
+            \ on its own."
     UpdateExecutionRequestDto:
       type: object
       properties:
