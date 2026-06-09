@@ -6,13 +6,13 @@ package com.otilm.openapi.config.util;
  * packages generate unique implementation class names.
  * <p>
  * For example:
- * - com.czertainly.api.interfaces.core.web.CertificateController -> CoreWebCertificateControllerDummyImpl
- * - com.czertainly.api.interfaces.connector.CertificateController -> ConnectorCertificateControllerDummyImpl
- * - com.czertainly.api.interfaces.connector.v2.CertificateController -> ConnectorV2CertificateControllerDummyImpl
+ * - com.otilm.api.interfaces.core.web.CertificateController -> CoreWebCertificateControllerDummyImpl
+ * - com.otilm.api.interfaces.connector.CertificateController -> ConnectorCertificateControllerDummyImpl
+ * - com.otilm.api.interfaces.connector.v2.CertificateController -> ConnectorV2CertificateControllerDummyImpl
  */
 public class ClassNameResolver {
 
-    private static final String BASE_PACKAGE = "com.czertainly.api.interfaces.";
+    private static final String BASE_PACKAGE = "com.otilm.api.interfaces.";
     public static final String DUMMY_IMPL = "DummyImpl";
 
     private ClassNameResolver() {}
@@ -55,9 +55,9 @@ public class ClassNameResolver {
      * and capitalizing each segment.
      * <p>
      * Examples:
-     * - "com.czertainly.api.interfaces.core.web" -> "CoreWeb"
-     * - "com.czertainly.api.interfaces.connector.v2" -> "ConnectorV2"
-     * - "com.czertainly.api.interfaces.connector.common.v2" -> "ConnectorCommonV2"
+     * - "com.otilm.api.interfaces.core.web" -> "CoreWeb"
+     * - "com.otilm.api.interfaces.connector.v2" -> "ConnectorV2"
+     * - "com.otilm.api.interfaces.connector.common.v2" -> "ConnectorCommonV2"
      *
      * @param packageName the full package name
      * @return capitalized package prefix

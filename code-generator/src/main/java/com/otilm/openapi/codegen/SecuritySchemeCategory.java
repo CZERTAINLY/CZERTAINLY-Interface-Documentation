@@ -16,7 +16,7 @@ public @interface SecuritySchemeCategory {
     /**
      * The fully qualified name of the base security controller class that the interface extends.
      * This should be one of the configured base security interfaces, or the legacy
-     * com.czertainly.api.interfaces.core.web.InfoController exception.
+     * com.otilm.api.interfaces.core.web.InfoController exception.
      */
     String baseClass();
 

@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * <p>Spins up a full Spring Boot context (via {@code @SpringBootTest}) using the test interfaces and groups.yaml
  * defined in this module. Then queries the running springdoc endpoint and asserts on the content of the generated YAML documents.
  *
- * <p>No dependency on {@code com.czertainly:interfaces} is required — the pipeline is exercised entirely with
+ * <p>No dependency on {@code com.otilm:interfaces} is required — the pipeline is exercised entirely with
  * the self-contained test interfaces in this module.
  */
 @SpringBootTest(

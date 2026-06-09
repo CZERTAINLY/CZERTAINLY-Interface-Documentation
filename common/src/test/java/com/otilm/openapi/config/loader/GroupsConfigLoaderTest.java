@@ -67,7 +67,7 @@ class GroupsConfigLoaderTest {
 
         assertNotNull(config.getSecurity());
         assertEquals(1, config.getSecurity().baseSecurityInterfaces().size());
-        assertEquals("com.czertainly.openapi.BaseInterface", config.getSecurity().baseSecurityInterfaces().getFirst());
+        assertEquals("com.otilm.openapi.BaseInterface", config.getSecurity().baseSecurityInterfaces().getFirst());
         assertEquals(1, config.getSecurity().legacyControllers().size());
         assertEquals("com.example.LegacyController", config.getSecurity().legacyControllers().getFirst());
     }
