@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
-  title: Secret Provider API
-  description: REST API for implementations of custom Secret Provider
+  title: Signature Formatter Provider API
+  description: REST API for implementations of custom Signature Formatter Provider
   contact:
     name: ILM
     url: https://www.otilm.com
@@ -104,13 +104,9 @@ servers:
 - url: https://demo.otilm.com
   description: ILM Demo server
 tags:
-- name: Secret Management
-  description: Secret Management API
 - name: Metrics API
   description: Connector metrics API. Connector metrics API is exposing standard Prometheus/OpenMetrics
     metrics that can be scraped by observability solutions and collectors.
-- name: Vault Management
-  description: Vault Management API
 - name: Health check v2
   description: "Connector Health check API. Connector returns own status and in some\
     \ cases can return status of components on which it depends like database, HSM\
@@ -122,240 +118,42 @@ tags:
     \ interface, this is validated by the core. You can also implement helper end\
     \ points that are used for callbacks and other relevant operations specific to\
     \ implementation."
+- name: Signature Formatter
+  description: "Signature Formatter API defines operations for protocol-specific formatting\
+    \ of digital signing requests. The formatter is stateless and handles the conversion\
+    \ between raw signing material and protocol-specific formats (e.g. TSA TimeStampToken,\
+    \ AdES signature containers)."
 paths:
-  /v1/secretProvider/secrets:
-    put:
+  /v1/signatureProvider/formatting/formatResponse:
+    post:
       tags:
-      - Secret Management
-      summary: Update Secret
-      operationId: updateSecret
+      - Signature Formatter
+      summary: Assemble final formatted output
+      operationId: formatSigningResponse
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateSecretRequestDto"
+              $ref: "#/components/schemas/FormatResponseInterface"
         required: true
       responses:
         "200":
-          description: Secret updated
+          description: Formatted response assembled
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/SecretResponseDto"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Unprocessable Entity. Secret value validation failed
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "503":
-          description: Service Unavailable
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-    post:
-      tags:
-      - Secret Management
-      summary: Create Secret
-      operationId: createSecret
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/CreateSecretRequestDto"
-        required: true
-      responses:
-        "201":
-          description: Secret created
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SecretResponseDto"
-        "409":
-          description: Conflict. Secret already exists
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SecretResponseDto"
-        "422":
-          description: Unprocessable Entity. Secret value validation failed.
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "503":
-          description: Service Unavailable
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-    delete:
-      tags:
-      - Secret Management
-      summary: Delete Secret
-      operationId: deleteSecret
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SecretRequestDto"
-        required: true
-      responses:
-        "204":
-          description: Secret deleted
-        "404":
-          description: Not Found. Endpoint not found or not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "503":
-          description: Service Unavailable
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-  /v1/secretProvider/vaults:
-    post:
-      tags:
-      - Vault Management
-      summary: Check connection to Vault Instance
-      operationId: checkVaultConnection
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: Vault attributes
-              items:
-                $ref: "#/components/schemas/RequestAttribute"
-        required: true
-      responses:
-        "204":
-          description: Vault instance connected
+                $ref: "#/components/schemas/FormattedResponseDto"
         "422":
           description: Unprocessable Entity
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "503":
-          description: Service Unavailable
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-  /v1/secretProvider/vaultProfiles/attributes:
-    post:
-      tags:
-      - Vault Management
-      summary: List Vault Profile Attributes
-      operationId: listVaultProfileAttributes
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              description: Vault attributes
-              items:
-                $ref: "#/components/schemas/RequestAttribute"
-        required: true
-      responses:
-        "200":
-          description: Vault Profile Attributes retrieved
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/BaseAttributeDto"
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "401":
           description: Unauthorized
           content:
@@ -379,99 +177,44 @@ paths:
       - CertificateTLSAuth: []
       - NoAuth: []
       - BasicAuth: []
-  /v1/secretProvider/secrets/rotate:
+  /v1/signatureProvider/formatting/formatDtbs:
     post:
       tags:
-      - Secret Management
-      summary: Rotate Secret
-      operationId: rotateSecret
+      - Signature Formatter
+      summary: Compute data-to-be-signed bytes
+      operationId: formatDtbs
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SecretRequestDto"
+              $ref: "#/components/schemas/FormatDtbsInterface"
         required: true
       responses:
         "200":
-          description: Secret rotated
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SecretResponseDto"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Unprocessable Entity. Secret value validation failed
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "503":
-          description: Service Unavailable
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-  /v1/secretProvider/secrets/content:
-    post:
-      tags:
-      - Secret Management
-      summary: Get Secret Content
-      operationId: getSecretContent
-      parameters:
-      - name: version
-        in: query
-        required: false
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SecretRequestDto"
-        required: true
-      responses:
-        "200":
-          description: Secret content retrieved
+          description: Data-to-be-signed bytes computed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SecretContentResponseDto"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
+                $ref: "#/components/schemas/FormatDtbsResponseDto"
+        "422":
+          description: Unprocessable Entity
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "503":
-          description: Service Unavailable
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "401":
           description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
           content:
             application/problem+json:
               schema:
@@ -613,98 +356,15 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
       security: []
-  /v1/secretProvider/vaults/attributes:
+  /v1/signatureProvider/formatting/attributes:
     get:
       tags:
-      - Vault Management
-      summary: List Vault Attributes
-      operationId: listVaultAttributes
+      - Signature Formatter
+      summary: List Formatter Attributes
+      operationId: listFormatterAttributes
       responses:
         "200":
-          description: Vault Attributes retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BaseAttributeDto"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-  /v1/secretProvider/secrets/{secretType}/attributes:
-    get:
-      tags:
-      - Secret Management
-      summary: Get Secret Attributes
-      operationId: getSecretAttributes
-      parameters:
-      - name: secretType
-        in: path
-        description: Secret type
-        required: true
-        schema:
-          $ref: "#/components/schemas/SecretType"
-      responses:
-        "200":
-          description: Secret attributes retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BaseAttributeDto"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-  /v1/secretProvider/secrets/rotate/attributes:
-    get:
-      tags:
-      - Secret Management
-      summary: Get Rotate Attributes
-      operationId: getRotateAttributes
-      responses:
-        "200":
-          description: Rotate attributes retrieved
+          description: Attributes retrieved
           content:
             application/json:
               schema:
@@ -1085,6 +745,44 @@ components:
       required:
       - contentType
       - data
+    ContentSigningFormatResponseRequestDto:
+      type: object
+      description: Response formatting request for Content Signing
+      properties:
+        type:
+          $ref: "#/components/schemas/SigningWorkflowType"
+          description: Signing workflow type
+          examples:
+          - timestamping
+        dtbs:
+          type: string
+          format: byte
+          description: "Data-to-be-signed bytes returned by formatDtbs (already contains\
+            \ serialNumber, signingTime, etc.)"
+        signature:
+          type: string
+          format: byte
+          description: Raw signature bytes from the Cryptography Provider
+        certificateChain:
+          type: array
+          description: Certificate chain where the first element is the signer certificate
+          items:
+            type: string
+            format: byte
+          minItems: 1
+        formatAttributes:
+          type: array
+          description: "Formatter-specific parameters, same attributes as passed to\
+            \ formatDtbs"
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - certificateChain
+      - dtbs
+      - formatAttributes
+      - signature
+      - type
+      title: ContentSigningFormatResponseRequestDto
     CredentialAttributeContentData:
       type: object
       properties:
@@ -1326,6 +1024,38 @@ components:
       required:
       - contentType
       - data
+    DigestAlgorithm:
+      type: string
+      enum:
+      - MD5
+      - SHA-1
+      - SHA-224
+      - SHA-256
+      - SHA-384
+      - SHA-512
+      - SHA3-256
+      - SHA3-384
+      - SHA3-512
+    ExtensionDto:
+      type: object
+      description: "ASN.1 extension (OID, criticality, value)"
+      properties:
+        oid:
+          type: string
+          description: OID of the extension
+          example: 1.3.6.1.5.5.7.1.1
+          minLength: 1
+        critical:
+          type: boolean
+          description: Whether the extension is critical
+        value:
+          type: string
+          description: Base64-encoded DER value of the extension
+      required:
+      - critical
+      - oid
+      - value
+      title: ExtensionDto
     FileAttributeContentData:
       type: object
       properties:
@@ -1402,6 +1132,19 @@ components:
       required:
       - contentType
       - data
+    FormatResponseInterface:
+      type: object
+      description: Response formatting request specific to the signing workflow type
+      discriminator:
+        propertyName: type
+        mapping:
+          timestamping: "#/components/schemas/TimestampingFormatResponseRequestDto"
+          content_signing: "#/components/schemas/ContentSigningFormatResponseRequestDto"
+      oneOf:
+      - $ref: "#/components/schemas/TimestampingFormatResponseRequestDto"
+      - $ref: "#/components/schemas/ContentSigningFormatResponseRequestDto"
+      required:
+      - type
     GenericSecretContent:
       type: object
       description: Secret representing generic content represented as string
@@ -1517,136 +1260,6 @@ components:
       - content
       - type
       title: KeyValueSecretContent
-    MetadataAttribute:
-      description: Metadata Attribute definition
-      oneOf:
-      - $ref: "#/components/schemas/MetadataAttributeV2"
-      - $ref: "#/components/schemas/MetadataAttributeV3"
-    MetadataAttributeProperties:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Friendly name of the the Attribute
-          examples:
-          - Attribute Name
-        visible:
-          type: boolean
-          default: true
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
-        group:
-          type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          examples:
-          - requiredAttributes
-        global:
-          type: boolean
-          default: false
-          description: Boolean determining if the Metadata is a global metadata.
-        overwrite:
-          type: boolean
-          default: false
-          description: Boolean determining if the new metadata content should overwrite
-            (replace) existing content instead of appending.
-        protectionLevel:
-          $ref: "#/components/schemas/ProtectionLevel"
-          default: none
-          description: Protection level of the attribute content
-      required:
-      - label
-      - visible
-    MetadataAttributeV2:
-      type: object
-      description: Info attribute contains content that is for metadata. Its content
-        can not be edited and is not send in requests to store.
-      properties:
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/MetadataAttributeProperties"
-          description: Properties of the Attributes
-      required:
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
-      - version
-    MetadataAttributeV3:
-      type: object
-      description: Info attribute contains content that is for metadata. Its content
-        can not be edited and is not send in requests to store.
-      properties:
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/MetadataAttributeProperties"
-          description: Properties of the Attributes
-        schemaVersion:
-          $ref: "#/components/schemas/AttributeVersion"
-          description: Schema version of the Attribute
-      required:
-      - contentType
-      - name
-      - properties
-      - schemaVersion
-      - type
-      - uuid
-      - version
     ObjectAttributeContentV2:
       type: object
       description: Object attribute content for data with custom structure
@@ -2151,6 +1764,29 @@ components:
       - keyStore
       - keyValue
       - generic
+    SignatureAlgorithm:
+      type: string
+      enum:
+      - SHA256withRSA
+      - SHA384withRSA
+      - SHA512withRSA
+      - SHA256withRSAandMGF1
+      - SHA384withRSAandMGF1
+      - SHA512withRSAandMGF1
+      - SHA256withECDSA
+      - SHA384withECDSA
+      - SHA512withECDSA
+      - Ed25519
+      - Ed448
+      - FALCON-1024
+      - ML-DSA-65
+      - SLH-DSA-SHA2-128F
+    SigningWorkflowType:
+      type: string
+      enum:
+      - content_signing
+      - raw_signing
+      - timestamping
     StringAttributeContentV2:
       type: object
       description: String attribute content
@@ -2235,42 +1871,96 @@ components:
       required:
       - contentType
       - data
-    UpdateSecretRequestDto:
+    TimestampingFormatResponseRequestDto:
       type: object
-      description: Update Secret request
+      description: Response formatting request for Timestamping
       properties:
-        name:
-          type: string
-          description: Name of the secret
+        type:
+          $ref: "#/components/schemas/SigningWorkflowType"
+          description: Signing workflow type
           examples:
-          - MyServerCredentials
-          minLength: 1
-        secret:
-          $ref: "#/components/schemas/SecretContent"
-          description: Secret content
-        vaultAttributes:
+          - timestamping
+        dtbs:
+          type: string
+          format: byte
+          description: "Data-to-be-signed bytes returned by formatDtbs (already contains\
+            \ serialNumber, signingTime, etc.)"
+        signature:
+          type: string
+          format: byte
+          description: Raw signature bytes from the Cryptography Provider
+        certificateChain:
           type: array
-          description: Vault attributes
+          description: Certificate chain where the first element is the signer certificate
+          items:
+            type: string
+            format: byte
+          minItems: 1
+        formatAttributes:
+          type: array
+          description: "Formatter-specific parameters, same attributes as passed to\
+            \ formatDtbs"
           items:
             $ref: "#/components/schemas/RequestAttribute"
-        vaultProfileAttributes:
+        serialNumber:
+          type: integer
+          description: "Serial number generated by Core, recorded in the Signature\
+            \ inventory"
+        signingTime:
+          type: string
+          format: date-time
+          description: Signing time captured by Core from the time quality system
+          example: 2024-05-01T12:00:00Z
+        accuracy:
+          type: string
+          description: "Accuracy of the signing time, captured by Core from the time\
+            \ quality system (ISO 8601 duration, e.g. PT0.001S for 1 ms). Optional\
+            \ per RFC 3161 — absent when no Time Quality Configuration applies (e.g.\
+            \ a non-qualified local-clock timestamp)."
+          example: PT0.001S
+        signatureAlgorithm:
+          $ref: "#/components/schemas/SignatureAlgorithm"
+          description: Signature algorithm to be used for timestamping
+        hashAlgorithm:
+          $ref: "#/components/schemas/DigestAlgorithm"
+          description: Hash algorithm used to produce the message imprint in the timestamp
+            request
+        policy:
+          type: string
+          description: TSA policy OID requested by the client
+        nonce:
+          type: integer
+          description: Nonce from the timestamp request for replay protection
+        includeSignerCertificate:
+          type: boolean
+          description: Whether the signer certificate should be included in the response
+        qualifiedTimestamp:
+          type: boolean
+          description: Whether the timestamp is ETSI qualified electronic timestamp
+        requestExtensions:
           type: array
-          description: Vault profile attributes
+          description: Extensions from the timestamp request
           items:
-            $ref: "#/components/schemas/RequestAttribute"
-        secretAttributes:
-          type: array
-          description: Secret attributes
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-        metadata:
-          type: array
-          description: Metadata for the secret
-          items:
-            $ref: "#/components/schemas/MetadataAttribute"
+            $ref: "#/components/schemas/ExtensionDto"
+        data:
+          type: string
+          format: byte
+          description: The hashed message (message imprint) — needed to rebuild the
+            TimeStampRequest
       required:
-      - name
-      - secret
+      - certificateChain
+      - data
+      - dtbs
+      - formatAttributes
+      - hashAlgorithm
+      - includeSignerCertificate
+      - qualifiedTimestamp
+      - serialNumber
+      - signature
+      - signatureAlgorithm
+      - signingTime
+      - type
+      title: TimestampingFormatResponseRequestDto
     ErrorCode:
       type: string
       enum:
@@ -2348,30 +2038,265 @@ components:
       - status
       - timestamp
       - type
-    SecretResponseDto:
+    FormattedResponseDto:
       type: object
       properties:
+        response:
+          type: string
+          format: byte
+          description: Final formatted output bytes (e.g. DER-encoded TimeStampResp
+            for TSA)
+      required:
+      - response
+    ContentSigningFormatDtbsRequestDto:
+      type: object
+      description: DTBS formatting request for Content Signing
+      properties:
+        type:
+          $ref: "#/components/schemas/SigningWorkflowType"
+          description: Signing workflow type
+          examples:
+          - timestamping
+        certificateChain:
+          type: array
+          description: Certificate chain where the first element is the signer certificate.
+            Individual certificates are DER encoded X.509 certificates (represented
+            as Base64 strings in the JSON transport).
+          items:
+            type: string
+            format: byte
+          minItems: 1
+        data:
+          type: string
+          format: byte
+          description: Data to be formatted into the protocol-specific data-to-be-signed
+            bytes
+        formatAttributes:
+          type: array
+          description: "Formatter-specific parameters (e.g. message imprint hash and\
+            \ algorithm, nonce, policy OID for TSA)"
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - certificateChain
+      - data
+      - formatAttributes
+      - type
+      title: ContentSigningFormatDtbsRequestDto
+    FormatDtbsInterface:
+      type: object
+      description: DTBS formatting request specific to the signing workflow type
+      discriminator:
+        propertyName: type
+        mapping:
+          timestamping: "#/components/schemas/TimestampingFormatDtbsRequestDto"
+          content_signing: "#/components/schemas/ContentSigningFormatDtbsRequestDto"
+      oneOf:
+      - $ref: "#/components/schemas/TimestampingFormatDtbsRequestDto"
+      - $ref: "#/components/schemas/ContentSigningFormatDtbsRequestDto"
+      required:
+      - type
+    TimestampingFormatDtbsRequestDto:
+      type: object
+      description: DTBS formatting request for Timestamping
+      properties:
+        type:
+          $ref: "#/components/schemas/SigningWorkflowType"
+          description: Signing workflow type
+          examples:
+          - timestamping
+        certificateChain:
+          type: array
+          description: Certificate chain where the first element is the signer certificate.
+            Individual certificates are DER encoded X.509 certificates (represented
+            as Base64 strings in the JSON transport).
+          items:
+            type: string
+            format: byte
+          minItems: 1
+        data:
+          type: string
+          format: byte
+          description: Data to be formatted into the protocol-specific data-to-be-signed
+            bytes
+        formatAttributes:
+          type: array
+          description: "Formatter-specific parameters (e.g. message imprint hash and\
+            \ algorithm, nonce, policy OID for TSA)"
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        serialNumber:
+          type: integer
+          description: "Serial number generated by Core, recorded in the Signature\
+            \ inventory"
+        signingTime:
+          type: string
+          format: date-time
+          description: Signing time captured by Core from the time quality system
+          example: 2024-05-01T12:00:00Z
+        accuracy:
+          type: string
+          description: "Accuracy of the signing time, captured by Core from the time\
+            \ quality system (ISO 8601 duration, e.g. PT0.001S for 1 ms). Optional\
+            \ per RFC 3161 — absent when no Time Quality Configuration applies (e.g.\
+            \ a non-qualified local-clock timestamp)."
+          example: PT0.001S
+        signatureAlgorithm:
+          $ref: "#/components/schemas/SignatureAlgorithm"
+          description: Signature algorithm to be used for timestamping
+        hashAlgorithm:
+          $ref: "#/components/schemas/DigestAlgorithm"
+          description: Hash algorithm used to produce the message imprint in the timestamp
+            request
+        policy:
+          type: string
+          description: TSA policy OID requested by the client
+        nonce:
+          type: integer
+          description: Nonce from the timestamp request for replay protection
+        includeSignerCertificate:
+          type: boolean
+          description: Whether the signer certificate should be included in the response
+        qualifiedTimestamp:
+          type: boolean
+          description: Whether the timestamp is ETSI qualified electronic timestamp
+        requestExtensions:
+          type: array
+          description: Extensions from the timestamp request
+          items:
+            $ref: "#/components/schemas/ExtensionDto"
+      required:
+      - certificateChain
+      - data
+      - formatAttributes
+      - hashAlgorithm
+      - includeSignerCertificate
+      - qualifiedTimestamp
+      - serialNumber
+      - signatureAlgorithm
+      - signingTime
+      - type
+      title: TimestampingFormatDtbsRequestDto
+    FormatDtbsResponseDto:
+      type: object
+      properties:
+        dtbs:
+          type: string
+          format: byte
+          description: Data-to-be-signed bytes (e.g. DER-encoded TSTInfo for TSA)
+      required:
+      - dtbs
+    ConnectorInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the connector
         name:
           type: string
-          description: Name of the secret
-          examples:
-          - MyServerCredentials
-        type:
-          $ref: "#/components/schemas/SecretType"
-          description: Secret type
-          examples:
-          - apiKey
+          description: Name of the connector
         version:
           type: string
-          description: "Secret version, if versioning is supported"
+          description: Version of the connector
+        description:
+          type: string
+          description: Description of the connector
         metadata:
-          type: array
-          description: Metadata for the secret
-          items:
-            $ref: "#/components/schemas/MetadataAttribute"
+          type: object
+          additionalProperties: {}
+          description: Metadata of the connector
       required:
+      - id
       - name
-      - type
+      - version
+    ConnectorInterface:
+      type: string
+      enum:
+      - info
+      - health
+      - metrics
+      - authority
+      - discovery
+      - entity
+      - compliance
+      - cryptography
+      - notification
+      - secret
+      - signatureFormatting
+      - signing
+    ConnectorInterfaceInfo:
+      type: object
+      properties:
+        code:
+          $ref: "#/components/schemas/ConnectorInterface"
+          description: Code of the implemented connector interface
+        version:
+          type: string
+          description: Version of the implemented connector interface
+        features:
+          type: array
+          description: Features supported by the connector interface
+          items:
+            $ref: "#/components/schemas/FeatureFlag"
+      required:
+      - code
+      - version
+    FeatureFlag:
+      type: string
+      enum:
+      - stateless
+      - openMetrics
+      - secretVersioning
+      - secretRotation
+      - contentSigning
+      - timestamping
+    InfoResponse:
+      type: object
+      properties:
+        connector:
+          $ref: "#/components/schemas/ConnectorInfo"
+          description: Connector Information
+        interfaces:
+          type: array
+          description: Interfaces supported and implemented by the connector
+          items:
+            $ref: "#/components/schemas/ConnectorInterfaceInfo"
+      required:
+      - connector
+      - interfaces
+    HealthInfo:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/HealthStatus"
+          description: Current connector operational status
+        components:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/HealthInfoComponent"
+          description: Health status of connector components
+      required:
+      - status
+    HealthInfoComponent:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/HealthStatus"
+          description: Current status of component
+        details:
+          type: object
+          additionalProperties: {}
+          description: Additional details about the component status
+      required:
+      - status
+    HealthStatus:
+      type: string
+      enum:
+      - UP
+      - DEGRADED
+      - DOWN
+      - OUT_OF_SERVICE
+      - UNKNOWN
     BaseAttributeDto:
       type: object
       description: Base Attribute definition
@@ -2833,197 +2758,131 @@ components:
       - schemaVersion
       - type
       - uuid
-    CreateSecretRequestDto:
+    MetadataAttributeProperties:
       type: object
-      description: Create Secret request
       properties:
+        label:
+          type: string
+          description: Friendly name of the the Attribute
+          examples:
+          - Attribute Name
+        visible:
+          type: boolean
+          default: true
+          description: "Boolean determining if the Attribute is visible and can be\
+            \ displayed, otherwise it should be hidden to the user."
+        group:
+          type: string
+          description: "Group of the Attribute, used for the logical grouping of the\
+            \ Attribute"
+          examples:
+          - requiredAttributes
+        global:
+          type: boolean
+          default: false
+          description: Boolean determining if the Metadata is a global metadata.
+        overwrite:
+          type: boolean
+          default: false
+          description: Boolean determining if the new metadata content should overwrite
+            (replace) existing content instead of appending.
+        protectionLevel:
+          $ref: "#/components/schemas/ProtectionLevel"
+          default: none
+          description: Protection level of the attribute content
+      required:
+      - label
+      - visible
+    MetadataAttributeV2:
+      type: object
+      description: Info attribute contains content that is for metadata. Its content
+        can not be edited and is not send in requests to store.
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         name:
           type: string
-          description: Name of the secret
+          description: Name of the Attribute that is used for identification
           examples:
-          - MyServerCredentials
-          minLength: 1
-        secret:
-          $ref: "#/components/schemas/SecretContent"
-          description: Secret content
-        vaultAttributes:
-          type: array
-          description: Vault attributes
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-        vaultProfileAttributes:
-          type: array
-          description: Vault profile attributes
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-        secretAttributes:
-          type: array
-          description: Secret attributes
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-      required:
-      - name
-      - secret
-    SecretRequestDto:
-      type: object
-      description: Secret request
-      properties:
-        name:
-          type: string
-          description: Name of the secret
-          examples:
-          - MyServerCredentials
-          minLength: 1
-        type:
-          $ref: "#/components/schemas/SecretType"
-          description: Secret type
-          examples:
-          - apiKey
-        vaultAttributes:
-          type: array
-          description: Vault attributes
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-        vaultProfileAttributes:
-          type: array
-          description: Vault profile attributes
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-        secretAttributes:
-          type: array
-          description: Secret attributes
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-        metadata:
-          type: array
-          description: Metadata for the secret
-          items:
-            $ref: "#/components/schemas/MetadataAttribute"
-      required:
-      - name
-      - type
-    SecretContentResponseDto:
-      type: object
-      properties:
-        version:
-          type: string
-          description: "Secret version, if versioning is supported"
-        content:
-          $ref: "#/components/schemas/SecretContent"
-          description: Secret Content
-      required:
-      - content
-    ConnectorInfo:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the connector
-        name:
-          type: string
-          description: Name of the connector
-        version:
-          type: string
-          description: Version of the connector
+          - Attribute
         description:
           type: string
-          description: Description of the connector
-        metadata:
-          type: object
-          additionalProperties: {}
-          description: Metadata of the connector
-      required:
-      - id
-      - name
-      - version
-    ConnectorInterface:
-      type: string
-      enum:
-      - info
-      - health
-      - metrics
-      - authority
-      - discovery
-      - entity
-      - compliance
-      - cryptography
-      - notification
-      - secret
-      - signatureFormatting
-      - signing
-    ConnectorInterfaceInfo:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/ConnectorInterface"
-          description: Code of the implemented connector interface
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
         version:
-          type: string
-          description: Version of the implemented connector interface
-        features:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        content:
           type: array
-          description: Features supported by the connector interface
+          description: Content of the Attribute
           items:
-            $ref: "#/components/schemas/FeatureFlag"
+            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/MetadataAttributeProperties"
+          description: Properties of the Attributes
       required:
-      - code
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
       - version
-    FeatureFlag:
-      type: string
-      enum:
-      - stateless
-      - openMetrics
-      - secretVersioning
-      - secretRotation
-      - contentSigning
-      - timestamping
-    InfoResponse:
+    MetadataAttributeV3:
       type: object
+      description: Info attribute contains content that is for metadata. Its content
+        can not be edited and is not send in requests to store.
       properties:
-        connector:
-          $ref: "#/components/schemas/ConnectorInfo"
-          description: Connector Information
-        interfaces:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        version:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        content:
           type: array
-          description: Interfaces supported and implemented by the connector
+          description: Content of the Attribute
           items:
-            $ref: "#/components/schemas/ConnectorInterfaceInfo"
+            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/MetadataAttributeProperties"
+          description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
       required:
-      - connector
-      - interfaces
-    HealthInfo:
-      type: object
-      properties:
-        status:
-          $ref: "#/components/schemas/HealthStatus"
-          description: Current connector operational status
-        components:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/HealthInfoComponent"
-          description: Health status of connector components
-      required:
-      - status
-    HealthInfoComponent:
-      type: object
-      properties:
-        status:
-          $ref: "#/components/schemas/HealthStatus"
-          description: Current status of component
-        details:
-          type: object
-          additionalProperties: {}
-          description: Additional details about the component status
-      required:
-      - status
-    HealthStatus:
-      type: string
-      enum:
-      - UP
-      - DEGRADED
-      - DOWN
-      - OUT_OF_SERVICE
-      - UNKNOWN
+      - contentType
+      - name
+      - properties
+      - schemaVersion
+      - type
+      - uuid
+      - version
   securitySchemes:
     ConnectorAPIKeyAuth:
       type: apiKey
