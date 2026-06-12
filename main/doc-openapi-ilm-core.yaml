@@ -133,6 +133,8 @@ tags:
   description: Vault Instance Management API
 - name: SCEP Profile Management
   description: SCEP Profile Management API
+- name: TSP Profile Basic Credential Management
+  description: APIs for managing Basic credentials of a TSP Profile
 - name: Compliance Profile Management
   description: Compliance Profile Management API
 - name: Cryptographic Operations Controller
@@ -1980,6 +1982,185 @@ paths:
           description: TSP Profile deleted
         "400":
           description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/tspProfiles/{tspProfileUuid}/basicCredentials/{uuid}:
+    get:
+      tags:
+      - TSP Profile Basic Credential Management
+      summary: Get a Basic credential
+      operationId: getTspProfileBasicCredential
+      parameters:
+      - name: tspProfileUuid
+        in: path
+        description: TSP Profile UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: uuid
+        in: path
+        description: Basic credential UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Basic credential retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TspBasicCredentialDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    put:
+      tags:
+      - TSP Profile Basic Credential Management
+      summary: Update a Basic credential
+      operationId: updateTspProfileBasicCredential
+      parameters:
+      - name: tspProfileUuid
+        in: path
+        description: TSP Profile UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: uuid
+        in: path
+        description: Basic credential UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TspBasicCredentialRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Basic credential updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TspBasicCredentialDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "409":
+          description: Already Exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "503":
+          description: Vault Connector Unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    delete:
+      tags:
+      - TSP Profile Basic Credential Management
+      summary: Delete a Basic credential
+      operationId: deleteTspProfileBasicCredential
+      parameters:
+      - name: tspProfileUuid
+        in: path
+        description: TSP Profile UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: uuid
+        in: path
+        description: Basic credential UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Basic credential deleted
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Vault Connector Unavailable
           content:
             '*/*':
               schema:
@@ -10497,6 +10678,122 @@ paths:
               - Error Message 2
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/tspProfiles/{tspProfileUuid}/basicCredentials:
+    get:
+      tags:
+      - TSP Profile Basic Credential Management
+      summary: List Basic credentials of a TSP Profile
+      operationId: listTspProfileBasicCredentials
+      parameters:
+      - name: tspProfileUuid
+        in: path
+        description: TSP Profile UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Basic credentials retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TspBasicCredentialDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    post:
+      tags:
+      - TSP Profile Basic Credential Management
+      summary: Create a Basic credential
+      operationId: createTspProfileBasicCredential
+      parameters:
+      - name: tspProfileUuid
+        in: path
+        description: TSP Profile UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TspBasicCredentialRequestDto"
+        required: true
+      responses:
+        "201":
+          description: Basic credential created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TspBasicCredentialDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "409":
+          description: Already Exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "503":
+          description: Vault Connector Unavailable
           content:
             application/json:
               schema:
@@ -31429,6 +31726,7 @@ components:
       - signingRecords
       - timeQualityConfigurations
       - tspProfiles
+      - tspProfileBasicCredentials
     ComplianceInternalRuleRequestDto:
       type: object
       properties:
@@ -32723,6 +33021,12 @@ components:
       - systemUser
       - username
       - uuid
+    TspAuthenticationMethod:
+      type: string
+      enum:
+      - clientCertificate
+      - bearerToken
+      - basicPassword
     TspProfileRequestDto:
       type: object
       description: Request to create or update a TSP (Timestamping Protocol) Profile
@@ -32741,6 +33045,18 @@ components:
           format: uuid
           description: UUID of the default Signing Profile
           example: 6b55de1c-844f-11ec-a8a3-0242ac120002
+        vaultProfileUuid:
+          type: string
+          format: uuid
+          description: Vault profile that stores this profile's Basic credentials;
+            required when Basic credentials are configured
+          example: 6b55de1c-844f-11ec-a8a3-0242ac120002
+        allowedAuthenticationMethods:
+          type: array
+          description: Authentication methods this TSP Profile accepts on the TSP
+            protocol endpoints. Allowed to be empty for the transitional period.
+          items:
+            $ref: "#/components/schemas/TspAuthenticationMethod"
         customAttributes:
           type: array
           description: List of Custom Attributes
@@ -32798,6 +33114,15 @@ components:
           type: string
           description: TSP URL for signing
           example: https://ilm.otilm.com/api/v1/protocols/tsp/tsp-profile-1/sign
+        vaultProfile:
+          $ref: "#/components/schemas/VaultProfileDto"
+          description: Vault profile that stores this profile's Basic credentials;
+            required when Basic credentials are configured
+        allowedAuthenticationMethods:
+          type: array
+          description: Authentication methods this TSP Profile accepts
+          items:
+            $ref: "#/components/schemas/TspAuthenticationMethod"
         customAttributes:
           type: array
           description: List of Custom Attributes
@@ -32806,6 +33131,77 @@ components:
       required:
       - enabled
       - name
+      - uuid
+    VaultProfileDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        description:
+          type: string
+          description: Description of the Vault profile
+        vaultInstance:
+          $ref: "#/components/schemas/NameAndUuidDto"
+          description: Vault instance associated with this Vault profile
+        enabled:
+          type: boolean
+          description: Indicates whether the Vault profile is enabled
+      required:
+      - enabled
+      - name
+      - uuid
+      - vaultInstance
+    TspBasicCredentialRequestDto:
+      type: object
+      description: "A single Basic (username/password) credential on a TSP Profile.\
+        \ The password is write-only: provide it to create or rotate the credential;\
+        \ leave it blank on update to keep the existing secret."
+      properties:
+        username:
+          type: string
+          description: Basic username; unique within the TSP profile.
+          example: svc-account
+          minLength: 1
+        password:
+          type: string
+          description: "Basic password (write-only). On create a value is required\
+            \ — there is no existing secret to keep. On update, blank keeps the existing\
+            \ secret and a value rotates it."
+          writeOnly: true
+        mappedUserUuid:
+          type: string
+          format: uuid
+          description: UUID of the real ILM user this credential authenticates as.
+          example: 6b55de1c-844f-11ec-a8a3-0242ac120002
+      required:
+      - mappedUserUuid
+      - username
+    TspBasicCredentialDto:
+      type: object
+      description: Read-only view of a Basic credential on a TSP Profile.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of this credential
+        username:
+          type: string
+          description: Basic username
+          example: svc-account
+        mappedUser:
+          $ref: "#/components/schemas/NameAndUuidDto"
+          description: The real ILM user this credential authenticates as
+      required:
+      - mappedUser
+      - username
       - uuid
     TokenInstanceRequestDto:
       type: object
@@ -38405,33 +38801,6 @@ components:
       - pageNumber
       - totalItems
       - totalPages
-    VaultProfileDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: Object identifier
-          examples:
-          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
-        name:
-          type: string
-          description: Object Name
-          examples:
-          - Name
-        description:
-          type: string
-          description: Description of the Vault profile
-        vaultInstance:
-          $ref: "#/components/schemas/NameAndUuidDto"
-          description: Vault instance associated with this Vault profile
-        enabled:
-          type: boolean
-          description: Indicates whether the Vault profile is enabled
-      required:
-      - enabled
-      - name
-      - uuid
-      - vaultInstance
     AddUserRequestDto:
       type: object
       properties:
@@ -41444,6 +41813,7 @@ components:
       - SigningProtocol
       - SigningScheme
       - SigningWorkflowType
+      - TspAuthenticationMethod
     SearchFieldDataByGroupDto:
       type: object
       properties:
