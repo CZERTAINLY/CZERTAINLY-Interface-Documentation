@@ -2196,6 +2196,7 @@ components:
         name:
           type: string
           description: Authority instance name
+          minLength: 1
         attributes:
           type: array
           description: List of Authority instance Attributes
@@ -2209,15 +2210,28 @@ components:
         connectorUuid:
           type: string
           description: UUID of Authority provider
+          minLength: 1
+        interfaceUuid:
+          type: string
+          format: uuid
+          description: "UUID of the Connector Interface (AUTHORITY) to bind this instance\
+            \ to. Required to select a specific version when the connector exposes\
+            \ more than one AUTHORITY interface (e.g. v2 and v3 side-by-side). When\
+            \ null, the authority targets a legacy v1 connector that declares no connector\
+            \ interface; if such a connector exposes exactly one AUTHORITY interface\
+            \ it is used."
         kind:
           type: string
-          description: Authority instance Kind
+          description: "Authority instance Kind. Used only by v1 connectors (framework\
+            \ V1), which implement the legacy AttributesController and carry kind\
+            \ in the wire path. v2 connectors ignore it (they dispatch on connector\
+            \ interface)."
           examples:
-          - "LegacyEjbca, ADCS, etc"
+          - LegacyEjbca
+          - ADCS
       required:
       - attributes
       - connectorUuid
-      - kind
       - name
     UuidDto:
       type: object
@@ -2255,14 +2269,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type

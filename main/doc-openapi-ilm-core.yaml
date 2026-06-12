@@ -7689,11 +7689,18 @@ paths:
     post:
       tags:
       - Client Operations v2
-      summary: Issue an existing certificate request
-      description: "Trigger issuance for a certificate already in state `REQUESTED`.\
-        \ Used after the certificate request has been created (typically via a protocol\
-        \ such as ACME, SCEP, or CMP) and any approval and compliance flows have completed."
-      operationId: issueRequestedCertificate
+      summary: Issue an existing certificate (REQUESTED or REGISTERED)
+      description: |
+        Trigger issuance for an existing certificate. Behavior depends on cert state:
+        - `REQUESTED` (no body): the certificate already has a CSR attached (typically from
+          a protocol layer such as ACME, SCEP, or CMP, or after an approval/compliance cycle).
+          Issuance is triggered with the existing CSR.
+        - `REGISTERED` (body required): the certificate was pre-registered (v3 authorities with
+          `CERTIFICATE_REGISTRATION` capability) and is now being finalized with an operator-
+          supplied CSR. The CSR + sign attributes from the body are attached to the existing
+          certificate row, then issuance is triggered. The cert's identity (subject DN, SAN,
+          extensions) and connector-supplied metadata from the registration are preserved.
+      operationId: issueExistingCertificate
       parameters:
       - name: authorityUuid
         in: path
@@ -7713,6 +7720,14 @@ paths:
         required: true
         schema:
           type: string
+      requestBody:
+        description: Sign request body. Required when cert state is REGISTERED (carries
+          the operator's CSR + sign attributes); must be omitted when cert state is
+          REQUESTED.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientCertificateSignRequestDto"
       responses:
         "200":
           description: Certificate issued
@@ -7927,6 +7942,88 @@ paths:
               example:
               - Certificate is not in a pending state
               - "Authority refused to cancel: CA does not support cancellation"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates/register:
+    post:
+      tags:
+      - Client Operations v2
+      summary: Pre-register a certificate with the upstream CA
+      description: |
+        Reserves a slot at the CA for a certificate that will be issued later. Returns
+        a tracking handle (in metadata) that can be used to complete the issuance via
+        the standard issue flow.
+
+        Only supported on v3 authorities advertising the `CERTIFICATE_REGISTRATION`
+        feature flag. The operation may complete synchronously (200) or asynchronously
+        (202 with status polling).
+      operationId: registerCertificate
+      parameters:
+      - name: authorityUuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      - name: raProfileUuid
+        in: path
+        description: RA Profile UUID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClientCertificateRegistrationRequest"
+        required: true
+      responses:
+        "200":
+          description: Registration accepted; tracking handle returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientCertificateDataResponseDto"
+        "422":
+          description: Authority does not support registration
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
         "400":
           description: Bad Request
           content:
@@ -21957,6 +22054,70 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/availableOperations:
+    get:
+      tags:
+      - Client Operations v2
+      summary: List operations supported by this authority/RA profile
+      description: |
+        Returns per-operation support flags (issue/renew/revoke/register) including whether
+        each may complete asynchronously and whether each can be cancelled mid-flight. Operators
+        use this to drive UI affordances and validate flows before invoking them.
+      operationId: listAvailableOperations
+      parameters:
+      - name: authorityUuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      - name: raProfileUuid
+        in: path
+        description: RA Profile UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Capability advertisement returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AvailableOperations"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/revoke:
     get:
       tags:
@@ -30828,6 +30989,7 @@ components:
       - secretRotation
       - contentSigning
       - timestamping
+      - certificateRegistration
     FunctionGroupCode:
       type: string
       enum:
@@ -31323,14 +31485,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
@@ -33575,6 +33737,8 @@ components:
       - pending_approval
       - pending_issue
       - pending_revoke
+      - pending_registration
+      - registered
       - failed
       - issued
       - revoked
@@ -36171,11 +36335,11 @@ components:
       - $ref: "#/components/schemas/BaseAttributeContentDtoV2"
       - $ref: "#/components/schemas/BaseAttributeContentDtoV3"
       properties:
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
         reference:
           type: string
         data: {}
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
     CustomAttributeUpdateRequestDto:
       type: object
       properties:
@@ -37291,6 +37455,69 @@ components:
             history.
           maxLength: 1000
           minLength: 0
+    CertificateExtension:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: "OID of the X.509 extension (dotted-decimal, RFC 5280)"
+          example: 2.5.29.37
+          minLength: 1
+        critical:
+          type: boolean
+          description: Whether the extension is marked critical
+        valueBase64:
+          type: string
+          format: byte
+          description: "DER-encoded extension value, Base64-encoded"
+          minLength: 1
+      required:
+      - critical
+      - oid
+      - valueBase64
+    ClientCertificateRegistrationRequest:
+      type: object
+      description: Pre-registration request for a v3 authority. Reserves a slot/identity
+        at the CA before any CSR exists; the returned tracking handle is later used
+        to complete issuance.
+      properties:
+        subjectDn:
+          type: string
+          description: "Subject DN. Optional per RFC 5280 §4.1.2.6: an empty subject\
+            \ is permitted when subject naming information is carried entirely in\
+            \ the Subject Alternative Name extension (in which case the subjectAltName\
+            \ extension MUST be marked critical at issuance). At least one of subjectDn\
+            \ or subjectAltName must be non-empty — enforced by the cross-field {@code\
+            \ subjectIdentificationProvided} constraint."
+          example: "CN=device-7,O=Acme"
+        subjectAltName:
+          type: string
+          description: "Subject Alternative Name in RFC 5280 textual form (e.g. DNS:foo,IP:1.2.3.4,email:x@y).\
+            \ SAN MUST be carried here ONLY — do not also include it as OID 2.5.29.17\
+            \ in extensions[]. Connectors reject duplicate-source requests with VALIDATION_FAILED.\
+            \ Required when subjectDn is empty (see RFC 5280 §4.1.2.6)."
+        extensions:
+          type: array
+          description: Structured certificate extensions (OID + critical + base64
+            value). All extensions OTHER than SAN go here.
+          items:
+            $ref: "#/components/schemas/CertificateExtension"
+        attributes:
+          type: array
+          description: "Authority-defined registration attributes (e.g., subject DN\
+            \ template, validity hints)."
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        raProfileAttributes:
+          type: array
+          description: RA-profile-scoped override attributes for the registration.
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
     ConnectorRequestDtoV2:
       type: object
       properties:
@@ -40096,6 +40323,7 @@ components:
         name:
           type: string
           description: Authority instance name
+          minLength: 1
         attributes:
           type: array
           description: List of Authority instance Attributes
@@ -40109,15 +40337,28 @@ components:
         connectorUuid:
           type: string
           description: UUID of Authority provider
+          minLength: 1
+        interfaceUuid:
+          type: string
+          format: uuid
+          description: "UUID of the Connector Interface (AUTHORITY) to bind this instance\
+            \ to. Required to select a specific version when the connector exposes\
+            \ more than one AUTHORITY interface (e.g. v2 and v3 side-by-side). When\
+            \ null, the authority targets a legacy v1 connector that declares no connector\
+            \ interface; if such a connector exposes exactly one AUTHORITY interface\
+            \ it is used."
         kind:
           type: string
-          description: Authority instance Kind
+          description: "Authority instance Kind. Used only by v1 connectors (framework\
+            \ V1), which implement the legacy AttributesController and carry kind\
+            \ in the wire path. v2 connectors ignore it (they dispatch on connector\
+            \ interface)."
           examples:
-          - "LegacyEjbca, ADCS, etc"
+          - LegacyEjbca
+          - ADCS
       required:
       - attributes
       - connectorUuid
-      - kind
       - name
     AddRaProfileRequestDto:
       type: object
@@ -41038,6 +41279,43 @@ components:
       properties:
         comment:
           type: string
+    AvailableOperations:
+      type: object
+      description: Per-RA-profile capability advertisement. Operators query this before
+        invoking register/cancel/etc. to know which actions an authority supports.
+      properties:
+        operations:
+          type: array
+          description: List of operations the authority advertises for this RA profile.
+          items:
+            $ref: "#/components/schemas/OperationSupport"
+    CertificateOperationKind:
+      type: string
+      enum:
+      - ISSUE
+      - RENEW
+      - REVOKE
+      - REGISTER
+    OperationSupport:
+      type: object
+      description: Per-operation support flags for an authority/RA profile.
+      properties:
+        operation:
+          $ref: "#/components/schemas/CertificateOperationKind"
+          description: "Operation kind (ISSUE, RENEW, REVOKE, REGISTER)."
+        supported:
+          type: boolean
+          description: Whether the operation is supported by this authority.
+        asyncSupported:
+          type: boolean
+          description: Whether the operation may complete asynchronously (HTTP 202
+            + status polling).
+        cancelSupported:
+          type: boolean
+          description: Whether an in-flight asynchronous execution of this operation
+            can be cancelled.
+      required:
+      - operation
     LoginProviderDto:
       type: object
       description: Login provider information
