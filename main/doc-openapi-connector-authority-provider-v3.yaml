@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
-  title: Signature Formatter Provider API
-  description: REST API for implementations of custom Signature Formatter Provider
+  title: Authority Provider v3 API
+  description: REST API for implementations of custom v3 Authority Provider
   contact:
     name: ILM
     url: https://www.otilm.com
@@ -107,6 +107,9 @@ tags:
 - name: Metrics API
   description: Connector metrics API. Connector metrics API is exposing standard Prometheus/OpenMetrics
     metrics that can be scraped by observability solutions and collectors.
+- name: Certificate Management v3
+  description: Stateless v3 certificate operations by utilizing attributes in request
+    for identifying authority or RA profile
 - name: Health check v2
   description: "Connector Health check API. Connector returns own status and in some\
     \ cases can return status of components on which it depends like database, HSM\
@@ -118,42 +121,37 @@ tags:
     \ interface, this is validated by the core. You can also implement helper end\
     \ points that are used for callbacks and other relevant operations specific to\
     \ implementation."
-- name: Signature Formatter
-  description: "Signature Formatter API defines operations for protocol-specific formatting\
-    \ of digital signing requests. The formatter is stateless and handles the conversion\
-    \ between raw signing material and protocol-specific formats (e.g. TSA TimeStampToken,\
-    \ AdES signature containers)."
+- name: Authority Management v3
+  description: Stateless v3 authority operations achieved by utilizing attributes
+    in requests
 paths:
-  /v1/signatureProvider/formatting/formatResponse:
+  /v3/authorityProvider/certificates/revoke:
     post:
       tags:
-      - Signature Formatter
-      summary: Assemble final formatted output
-      operationId: formatSigningResponse
+      - Certificate Management v3
+      summary: Revoke certificate
+      description: Revoke a certificate (sync 204 or async 202)
+      operationId: revoke
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/FormatResponseInterface"
+              $ref: "#/components/schemas/CertificateRevocationRequestDtoV3"
         required: true
       responses:
-        "200":
-          description: Formatted response assembled
+        "204":
+          description: Revoked synchronously
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/FormattedResponseDto"
-        "422":
-          description: Unprocessable Entity
+                $ref: "#/components/schemas/CertificateDataResponseDtoV3"
+        "202":
+          description: Revocation accepted asynchronously; body carries meta tracking
+            handle
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
+                $ref: "#/components/schemas/CertificateDataResponseDtoV3"
         "401":
           description: Unauthorized
           content:
@@ -177,36 +175,26 @@ paths:
       - CertificateTLSAuth: []
       - NoAuth: []
       - BasicAuth: []
-  /v1/signatureProvider/formatting/formatDtbs:
+  /v3/authorityProvider/certificates/revoke/status:
     post:
       tags:
-      - Signature Formatter
-      summary: Compute data-to-be-signed bytes
-      operationId: formatDtbs
+      - Certificate Management v3
+      summary: Get async revoke operation status
+      description: Get status of an async revoke operation
+      operationId: getRevokeStatus
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/FormatDtbsInterface"
+              $ref: "#/components/schemas/CertificateOperationStatusRequestDtoV3"
         required: true
       responses:
         "200":
-          description: Data-to-be-signed bytes computed
+          description: Revoke operation status retrieved
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/FormatDtbsResponseDto"
-        "422":
-          description: Unprocessable Entity
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
+                $ref: "#/components/schemas/CertificateOperationStatusResponseDtoV3"
         "401":
           description: Unauthorized
           content:
@@ -225,6 +213,761 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/revoke/cancel:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: Cancel async revoke operation
+      description: Cancel an in-flight async revoke operation
+      operationId: cancelRevoke
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateOperationCancelRequestDtoV3"
+        required: true
+      responses:
+        "204":
+          description: Aborted
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Refused — past point of no return
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/revoke/attributes:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: List revoke operation attributes
+      description: List dynamic attributes for revoke
+      operationId: listRevokeAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateAttributeListRequestDtoV3"
+        required: true
+      responses:
+        "200":
+          description: Revoke attributes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/renew:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: Renew certificate
+      description: Renew a certificate (sync 200 or async 202)
+      operationId: renew
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateRenewRequestDtoV3"
+        required: true
+      responses:
+        "200":
+          description: Renewed synchronously
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateDataResponseDtoV3"
+        "202":
+          description: Renewal accepted asynchronously; body carries meta tracking
+            handle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateDataResponseDtoV3"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/register:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: Register certificate
+      description: Pre-register a certificate's identity at the upstream CA (no CSR)
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateRegistrationRequestDtoV3"
+        required: true
+      responses:
+        "200":
+          description: Registered synchronously; end-entity reference returned in
+            meta (no certificate is produced)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateDataResponseDtoV3"
+        "202":
+          description: Registration accepted asynchronously; body carries meta tracking
+            handle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateDataResponseDtoV3"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/register/status:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: Get async register operation status
+      description: Get status of an async register operation
+      operationId: getRegisterStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateOperationStatusRequestDtoV3"
+        required: true
+      responses:
+        "200":
+          description: Register operation status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateOperationStatusResponseDtoV3"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/register/cancel:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: Cancel async register operation
+      description: Cancel an in-flight async register operation
+      operationId: cancelRegister
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateOperationCancelRequestDtoV3"
+        required: true
+      responses:
+        "204":
+          description: Aborted
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Refused — past point of no return
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/register/attributes:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: List register operation attributes
+      description: List dynamic attributes for register
+      operationId: listRegisterAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateAttributeListRequestDtoV3"
+        required: true
+      responses:
+        "200":
+          description: Register attributes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/issue:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: Issue certificate
+      description: Issue a certificate (sync 200 or async 202)
+      operationId: issue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateSignRequestDtoV3"
+        required: true
+      responses:
+        "200":
+          description: Issued synchronously
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateDataResponseDtoV3"
+        "202":
+          description: Issuance accepted asynchronously; body carries meta tracking
+            handle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateDataResponseDtoV3"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/issue/status:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: Get async issue operation status
+      description: Get status of an async issue/renew/rekey operation
+      operationId: getIssueStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateOperationStatusRequestDtoV3"
+        required: true
+      responses:
+        "200":
+          description: Issue operation status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateOperationStatusResponseDtoV3"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/issue/cancel:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: Cancel async issue operation
+      description: Cancel an in-flight async issue/renew/rekey operation
+      operationId: cancelIssue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateOperationCancelRequestDtoV3"
+        required: true
+      responses:
+        "204":
+          description: Aborted
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Refused — past point of no return
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/issue/attributes:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: List issue operation attributes
+      description: List attributes for issue operation
+      operationId: listIssueAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateAttributeListRequestDtoV3"
+        required: true
+      responses:
+        "200":
+          description: Schema retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/identify:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: Identify certificate
+      description: Identify a certificate at the upstream CA (always synchronous)
+      operationId: identify
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateIdentificationRequestDtoV3"
+        required: true
+      responses:
+        "200":
+          description: Certificate identified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CertificateIdentificationResponseDtoV3"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/authorities:
+    post:
+      tags:
+      - Authority Management v3
+      summary: Check authority connection
+      description: Validate authority attributes by attempting to reach the upstream
+        CA
+      operationId: checkAuthorityConnection
+      requestBody:
+        description: Authority attributes
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/RequestAttribute"
+        required: true
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "204":
+          description: Upstream CA is reachable with these attributes
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/authorities/raProfile/attributes:
+    post:
+      tags:
+      - Authority Management v3
+      summary: List RA Profile Attributes
+      description: RA profile attribute schema given authority context
+      operationId: listRaProfileAttributes
+      requestBody:
+        description: Authority attributes
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/RequestAttribute"
+        required: true
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "200":
+          description: RA profile attributes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/authorities/crl:
+    post:
+      tags:
+      - Authority Management v3
+      summary: Get the latest CRL for Authority
+      description: Fetch CRL (full or delta) from the upstream CA based on request
+      operationId: getCrl
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CrlRequestDtoV3"
+        required: true
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "200":
+          description: CRL retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CrlResponseDtoV3"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/authorities/caCertificates:
+    post:
+      tags:
+      - Authority Management v3
+      summary: Get certificate chain for Authority
+      description: Fetch CA certificate chain from the upstream CA
+      operationId: getCaCertificates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CaCertificatesRequestDtoV3"
+        required: true
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "200":
+          description: CA certificate chain retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaCertificatesResponseDtoV3"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/authorities/attributes:
+    get:
+      tags:
+      - Authority Management v3
+      summary: List authority attributes
+      description: Top-level authority attribute schema (for the create-authority
+        UI)
+      operationId: listAuthorityAttributes
+      responses:
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "200":
+          description: Authority attributes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
       security:
       - ConnectorAPIKeyAuth: []
       - CertificateTLSAuth: []
@@ -356,44 +1099,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
       security: []
-  /v1/signatureProvider/formatting/attributes:
-    get:
-      tags:
-      - Signature Formatter
-      summary: List Formatter Attributes
-      operationId: listFormatterAttributes
-      responses:
-        "200":
-          description: Attributes retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BaseAttributeDto"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
   /v1/metrics:
     get:
       tags:
@@ -695,6 +1400,58 @@ components:
       required:
       - contentType
       - data
+    CertificateRevocationReason:
+      type: string
+      enum:
+      - unspecified
+      - keyCompromise
+      - cACompromise
+      - affiliationChanged
+      - superseded
+      - cessationOfOperation
+      - certificateHold
+      - privilegeWithdrawn
+      - aACompromise
+    CertificateRevocationRequestDtoV3:
+      type: object
+      properties:
+        authorityAttributes:
+          type: array
+          description: Authority attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        raProfileAttributes:
+          type: array
+          description: RA profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        certificate:
+          type: string
+          format: byte
+          description: Base64 of cert to revoke. Serial + issuer DN parsed from this
+            constitute the cert identity at the CA.
+          minLength: 1
+        reason:
+          $ref: "#/components/schemas/CertificateRevocationReason"
+          description: Revocation reason
+        attributes:
+          type: array
+          description: Revoke-specific dynamic attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        meta:
+          type: array
+          description: Optional connector-defined metadata. Populated when Core has
+            the original issue meta. CAs that revoke purely by serial+issuer ignore
+            it; CAs that track revocation via an upstream handle (e.g. DigiCert order
+            ID) consume it.
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+      required:
+      - authorityAttributes
+      - certificate
+      - raProfileAttributes
+      - reason
     CertificateType:
       type: string
       enum:
@@ -745,44 +1502,6 @@ components:
       required:
       - contentType
       - data
-    ContentSigningFormatResponseRequestDto:
-      type: object
-      description: Response formatting request for Content Signing
-      properties:
-        type:
-          $ref: "#/components/schemas/SigningWorkflowType"
-          description: Signing workflow type
-          examples:
-          - timestamping
-        dtbs:
-          type: string
-          format: byte
-          description: "Data-to-be-signed bytes returned by formatDtbs (already contains\
-            \ serialNumber, signingTime, etc.)"
-        signature:
-          type: string
-          format: byte
-          description: Raw signature bytes from the Cryptography Provider
-        certificateChain:
-          type: array
-          description: Certificate chain where the first element is the signer certificate
-          items:
-            type: string
-            format: byte
-          minItems: 1
-        formatAttributes:
-          type: array
-          description: "Formatter-specific parameters, same attributes as passed to\
-            \ formatDtbs"
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-      required:
-      - certificateChain
-      - dtbs
-      - formatAttributes
-      - signature
-      - type
-      title: ContentSigningFormatResponseRequestDto
     CredentialAttributeContentData:
       type: object
       properties:
@@ -1024,38 +1743,6 @@ components:
       required:
       - contentType
       - data
-    DigestAlgorithm:
-      type: string
-      enum:
-      - MD5
-      - SHA-1
-      - SHA-224
-      - SHA-256
-      - SHA-384
-      - SHA-512
-      - SHA3-256
-      - SHA3-384
-      - SHA3-512
-    ExtensionDto:
-      type: object
-      description: "ASN.1 extension (OID, criticality, value)"
-      properties:
-        oid:
-          type: string
-          description: OID of the extension
-          example: 1.3.6.1.5.5.7.1.1
-          minLength: 1
-        critical:
-          type: boolean
-          description: Whether the extension is critical
-        value:
-          type: string
-          description: Base64-encoded DER value of the extension
-      required:
-      - critical
-      - oid
-      - value
-      title: ExtensionDto
     FileAttributeContentData:
       type: object
       properties:
@@ -1132,19 +1819,6 @@ components:
       required:
       - contentType
       - data
-    FormatResponseInterface:
-      type: object
-      description: Response formatting request specific to the signing workflow type
-      discriminator:
-        propertyName: type
-        mapping:
-          timestamping: "#/components/schemas/TimestampingFormatResponseRequestDto"
-          content_signing: "#/components/schemas/ContentSigningFormatResponseRequestDto"
-      oneOf:
-      - $ref: "#/components/schemas/TimestampingFormatResponseRequestDto"
-      - $ref: "#/components/schemas/ContentSigningFormatResponseRequestDto"
-      required:
-      - type
     GenericSecretContent:
       type: object
       description: Secret representing generic content represented as string
@@ -1260,6 +1934,136 @@ components:
       - content
       - type
       title: KeyValueSecretContent
+    MetadataAttribute:
+      description: Metadata Attribute definition
+      oneOf:
+      - $ref: "#/components/schemas/MetadataAttributeV2"
+      - $ref: "#/components/schemas/MetadataAttributeV3"
+    MetadataAttributeProperties:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Friendly name of the the Attribute
+          examples:
+          - Attribute Name
+        visible:
+          type: boolean
+          default: true
+          description: "Boolean determining if the Attribute is visible and can be\
+            \ displayed, otherwise it should be hidden to the user."
+        group:
+          type: string
+          description: "Group of the Attribute, used for the logical grouping of the\
+            \ Attribute"
+          examples:
+          - requiredAttributes
+        global:
+          type: boolean
+          default: false
+          description: Boolean determining if the Metadata is a global metadata.
+        overwrite:
+          type: boolean
+          default: false
+          description: Boolean determining if the new metadata content should overwrite
+            (replace) existing content instead of appending.
+        protectionLevel:
+          $ref: "#/components/schemas/ProtectionLevel"
+          default: none
+          description: Protection level of the attribute content
+      required:
+      - label
+      - visible
+    MetadataAttributeV2:
+      type: object
+      description: Info attribute contains content that is for metadata. Its content
+        can not be edited and is not send in requests to store.
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        version:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/MetadataAttributeProperties"
+          description: Properties of the Attributes
+      required:
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
+      - version
+    MetadataAttributeV3:
+      type: object
+      description: Info attribute contains content that is for metadata. Its content
+        can not be edited and is not send in requests to store.
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        version:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/MetadataAttributeProperties"
+          description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
+      required:
+      - contentType
+      - name
+      - properties
+      - schemaVersion
+      - type
+      - uuid
+      - version
     ObjectAttributeContentV2:
       type: object
       description: Object attribute content for data with custom structure
@@ -1764,29 +2568,6 @@ components:
       - keyStore
       - keyValue
       - generic
-    SignatureAlgorithm:
-      type: string
-      enum:
-      - SHA256withRSA
-      - SHA384withRSA
-      - SHA512withRSA
-      - SHA256withRSAandMGF1
-      - SHA384withRSAandMGF1
-      - SHA512withRSAandMGF1
-      - SHA256withECDSA
-      - SHA384withECDSA
-      - SHA512withECDSA
-      - Ed25519
-      - Ed448
-      - FALCON-1024
-      - ML-DSA-65
-      - SLH-DSA-SHA2-128F
-    SigningWorkflowType:
-      type: string
-      enum:
-      - content_signing
-      - raw_signing
-      - timestamping
     StringAttributeContentV2:
       type: object
       description: String attribute content
@@ -1871,96 +2652,6 @@ components:
       required:
       - contentType
       - data
-    TimestampingFormatResponseRequestDto:
-      type: object
-      description: Response formatting request for Timestamping
-      properties:
-        type:
-          $ref: "#/components/schemas/SigningWorkflowType"
-          description: Signing workflow type
-          examples:
-          - timestamping
-        dtbs:
-          type: string
-          format: byte
-          description: "Data-to-be-signed bytes returned by formatDtbs (already contains\
-            \ serialNumber, signingTime, etc.)"
-        signature:
-          type: string
-          format: byte
-          description: Raw signature bytes from the Cryptography Provider
-        certificateChain:
-          type: array
-          description: Certificate chain where the first element is the signer certificate
-          items:
-            type: string
-            format: byte
-          minItems: 1
-        formatAttributes:
-          type: array
-          description: "Formatter-specific parameters, same attributes as passed to\
-            \ formatDtbs"
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-        serialNumber:
-          type: integer
-          description: "Serial number generated by Core, recorded in the Signature\
-            \ inventory"
-        signingTime:
-          type: string
-          format: date-time
-          description: Signing time captured by Core from the time quality system
-          example: 2024-05-01T12:00:00Z
-        accuracy:
-          type: string
-          description: "Accuracy of the signing time, captured by Core from the time\
-            \ quality system (ISO 8601 duration, e.g. PT0.001S for 1 ms). Optional\
-            \ per RFC 3161 — absent when no Time Quality Configuration applies (e.g.\
-            \ a non-qualified local-clock timestamp)."
-          example: PT0.001S
-        signatureAlgorithm:
-          $ref: "#/components/schemas/SignatureAlgorithm"
-          description: Signature algorithm to be used for timestamping
-        hashAlgorithm:
-          $ref: "#/components/schemas/DigestAlgorithm"
-          description: Hash algorithm used to produce the message imprint in the timestamp
-            request
-        policy:
-          type: string
-          description: TSA policy OID requested by the client
-        nonce:
-          type: integer
-          description: Nonce from the timestamp request for replay protection
-        includeSignerCertificate:
-          type: boolean
-          description: Whether the signer certificate should be included in the response
-        qualifiedTimestamp:
-          type: boolean
-          description: Whether the timestamp is ETSI qualified electronic timestamp
-        requestExtensions:
-          type: array
-          description: Extensions from the timestamp request
-          items:
-            $ref: "#/components/schemas/ExtensionDto"
-        data:
-          type: string
-          format: byte
-          description: The hashed message (message imprint) — needed to rebuild the
-            TimeStampRequest
-      required:
-      - certificateChain
-      - data
-      - dtbs
-      - formatAttributes
-      - hashAlgorithm
-      - includeSignerCertificate
-      - qualifiedTimestamp
-      - serialNumber
-      - signature
-      - signatureAlgorithm
-      - signingTime
-      - type
-      title: TimestampingFormatResponseRequestDto
     ErrorCode:
       type: string
       enum:
@@ -2050,266 +2741,118 @@ components:
       - status
       - timestamp
       - type
-    FormattedResponseDto:
+    CertificateDataResponseDtoV3:
       type: object
       properties:
-        response:
+        certificateData:
           type: string
           format: byte
-          description: Final formatted output bytes (e.g. DER-encoded TimeStampResp
-            for TSA)
-      required:
-      - response
-    ContentSigningFormatDtbsRequestDto:
-      type: object
-      description: DTBS formatting request for Content Signing
-      properties:
-        type:
-          $ref: "#/components/schemas/SigningWorkflowType"
-          description: Signing workflow type
-          examples:
-          - timestamping
-        certificateChain:
+          description: Base64-encoded certificate content. Populated only for issue/renew
+            sync 200. Null for any async 202 response; register sync 200 (registration
+            produces no cert); revoke responses (revoke never carries a payload).
+        meta:
           type: array
-          description: Certificate chain where the first element is the signer certificate.
-            Individual certificates are DER encoded X.509 certificates (represented
-            as Base64 strings in the JSON transport).
+          description: Connector-defined metadata. Present on async 202 as the tracking
+            handle Core replays on subsequent /status and /cancel calls; optional
+            on 200 responses.
           items:
-            type: string
-            format: byte
-          minItems: 1
-        data:
-          type: string
-          format: byte
-          description: Data to be formatted into the protocol-specific data-to-be-signed
-            bytes
-        formatAttributes:
+            $ref: "#/components/schemas/MetadataAttribute"
+        certificateType:
+          $ref: "#/components/schemas/CertificateType"
+          default: X.509
+          description: Type hint for the certificate. Default X.509. Set explicitly
+            when issuing non-X.509 certificates (e.g. SSH certificates) so Core does
+            not need to infer type from certificateData.
+    CertificateOperationStatusRequestDtoV3:
+      type: object
+      properties:
+        authorityAttributes:
           type: array
-          description: "Formatter-specific parameters (e.g. message imprint hash and\
-            \ algorithm, nonce, policy OID for TSA)"
+          description: Authority attributes
           items:
             $ref: "#/components/schemas/RequestAttribute"
-      required:
-      - certificateChain
-      - data
-      - formatAttributes
-      - type
-      title: ContentSigningFormatDtbsRequestDto
-    FormatDtbsInterface:
-      type: object
-      description: DTBS formatting request specific to the signing workflow type
-      discriminator:
-        propertyName: type
-        mapping:
-          timestamping: "#/components/schemas/TimestampingFormatDtbsRequestDto"
-          content_signing: "#/components/schemas/ContentSigningFormatDtbsRequestDto"
-      oneOf:
-      - $ref: "#/components/schemas/TimestampingFormatDtbsRequestDto"
-      - $ref: "#/components/schemas/ContentSigningFormatDtbsRequestDto"
-      required:
-      - type
-    TimestampingFormatDtbsRequestDto:
-      type: object
-      description: DTBS formatting request for Timestamping
-      properties:
-        type:
-          $ref: "#/components/schemas/SigningWorkflowType"
-          description: Signing workflow type
-          examples:
-          - timestamping
-        certificateChain:
+        raProfileAttributes:
           type: array
-          description: Certificate chain where the first element is the signer certificate.
-            Individual certificates are DER encoded X.509 certificates (represented
-            as Base64 strings in the JSON transport).
-          items:
-            type: string
-            format: byte
-          minItems: 1
-        data:
-          type: string
-          format: byte
-          description: Data to be formatted into the protocol-specific data-to-be-signed
-            bytes
-        formatAttributes:
-          type: array
-          description: "Formatter-specific parameters (e.g. message imprint hash and\
-            \ algorithm, nonce, policy OID for TSA)"
+          description: RA profile attributes
           items:
             $ref: "#/components/schemas/RequestAttribute"
-        serialNumber:
-          type: integer
-          description: "Serial number generated by Core, recorded in the Signature\
-            \ inventory"
-        signingTime:
-          type: string
-          format: date-time
-          description: Signing time captured by Core from the time quality system
-          example: 2024-05-01T12:00:00Z
-        accuracy:
-          type: string
-          description: "Accuracy of the signing time, captured by Core from the time\
-            \ quality system (ISO 8601 duration, e.g. PT0.001S for 1 ms). Optional\
-            \ per RFC 3161 — absent when no Time Quality Configuration applies (e.g.\
-            \ a non-qualified local-clock timestamp)."
-          example: PT0.001S
-        signatureAlgorithm:
-          $ref: "#/components/schemas/SignatureAlgorithm"
-          description: Signature algorithm to be used for timestamping
-        hashAlgorithm:
-          $ref: "#/components/schemas/DigestAlgorithm"
-          description: Hash algorithm used to produce the message imprint in the timestamp
-            request
-        policy:
-          type: string
-          description: TSA policy OID requested by the client
-        nonce:
-          type: integer
-          description: Nonce from the timestamp request for replay protection
-        includeSignerCertificate:
-          type: boolean
-          description: Whether the signer certificate should be included in the response
-        qualifiedTimestamp:
-          type: boolean
-          description: Whether the timestamp is ETSI qualified electronic timestamp
-        requestExtensions:
+        meta:
           type: array
-          description: Extensions from the timestamp request
+          description: Connector-defined metadata returned in the original 202 Accepted
+            response
           items:
-            $ref: "#/components/schemas/ExtensionDto"
+            $ref: "#/components/schemas/MetadataAttribute"
       required:
-      - certificateChain
-      - data
-      - formatAttributes
-      - hashAlgorithm
-      - includeSignerCertificate
-      - qualifiedTimestamp
-      - serialNumber
-      - signatureAlgorithm
-      - signingTime
-      - type
-      title: TimestampingFormatDtbsRequestDto
-    FormatDtbsResponseDto:
-      type: object
-      properties:
-        dtbs:
-          type: string
-          format: byte
-          description: Data-to-be-signed bytes (e.g. DER-encoded TSTInfo for TSA)
-      required:
-      - dtbs
-    ConnectorInfo:
-      type: object
-      properties:
-        id:
-          type: string
-          description: Unique identifier of the connector
-        name:
-          type: string
-          description: Name of the connector
-        version:
-          type: string
-          description: Version of the connector
-        description:
-          type: string
-          description: Description of the connector
-        metadata:
-          type: object
-          additionalProperties: {}
-          description: Metadata of the connector
-      required:
-      - id
-      - name
-      - version
-    ConnectorInterface:
-      type: string
-      enum:
-      - info
-      - health
-      - metrics
-      - authority
-      - discovery
-      - entity
-      - compliance
-      - cryptography
-      - notification
-      - secret
-      - signatureFormatting
-      - signing
-    ConnectorInterfaceInfo:
-      type: object
-      properties:
-        code:
-          $ref: "#/components/schemas/ConnectorInterface"
-          description: Code of the implemented connector interface
-        version:
-          type: string
-          description: Version of the implemented connector interface
-        features:
-          type: array
-          description: Features supported by the connector interface
-          items:
-            $ref: "#/components/schemas/FeatureFlag"
-      required:
-      - code
-      - version
-    FeatureFlag:
-      type: string
-      enum:
-      - stateless
-      - openMetrics
-      - secretVersioning
-      - secretRotation
-      - contentSigning
-      - timestamping
-      - certificateRegistration
-    InfoResponse:
-      type: object
-      properties:
-        connector:
-          $ref: "#/components/schemas/ConnectorInfo"
-          description: Connector Information
-        interfaces:
-          type: array
-          description: Interfaces supported and implemented by the connector
-          items:
-            $ref: "#/components/schemas/ConnectorInterfaceInfo"
-      required:
-      - connector
-      - interfaces
-    HealthInfo:
+      - authorityAttributes
+      - raProfileAttributes
+    CertificateOperationStatusResponseDtoV3:
       type: object
       properties:
         status:
-          $ref: "#/components/schemas/HealthStatus"
-          description: Current connector operational status
-        components:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/HealthInfoComponent"
-          description: Health status of connector components
+          $ref: "#/components/schemas/CertificateOperationStatusV3"
+          description: Operation status as known to the connector
+        certificateData:
+          type: string
+          format: byte
+          description: Base64-encoded certificate content. Populated when status=COMPLETED
+            for issue/renew. Always null for revoke and register status responses.
+        meta:
+          type: array
+          description: Optional updated connector-defined metadata
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        reason:
+          type: string
+          description: Failure detail when status=FAILED — curated message text (no
+            raw exception messages)
       required:
       - status
-    HealthInfoComponent:
-      type: object
-      properties:
-        status:
-          $ref: "#/components/schemas/HealthStatus"
-          description: Current status of component
-        details:
-          type: object
-          additionalProperties: {}
-          description: Additional details about the component status
-      required:
-      - status
-    HealthStatus:
+    CertificateOperationStatusV3:
       type: string
       enum:
-      - UP
-      - DEGRADED
-      - DOWN
-      - OUT_OF_SERVICE
-      - UNKNOWN
+      - inProgress
+      - completed
+      - failed
+    CertificateOperationCancelRequestDtoV3:
+      type: object
+      properties:
+        authorityAttributes:
+          type: array
+          description: Authority attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        raProfileAttributes:
+          type: array
+          description: RA profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        meta:
+          type: array
+          description: Connector-defined metadata returned in the original 202 Accepted
+            response
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+      required:
+      - authorityAttributes
+      - raProfileAttributes
+    CertificateAttributeListRequestDtoV3:
+      type: object
+      description: Authority + RA-profile context for listing the dynamic-attribute
+        schema.
+      properties:
+        authorityAttributes:
+          type: array
+          description: Authority attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        raProfileAttributes:
+          type: array
+          description: RA profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - authorityAttributes
+      - raProfileAttributes
     BaseAttributeDto:
       type: object
       description: Base Attribute definition
@@ -2771,131 +3314,368 @@ components:
       - schemaVersion
       - type
       - uuid
-    MetadataAttributeProperties:
+    CertificateRenewRequestDtoV3:
       type: object
       properties:
-        label:
+        authorityAttributes:
+          type: array
+          description: Authority attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        raProfileAttributes:
+          type: array
+          description: RA profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        request:
           type: string
-          description: Friendly name of the the Attribute
-          examples:
-          - Attribute Name
-        visible:
-          type: boolean
-          default: true
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
-        group:
+          format: byte
+          description: "Certificate signing request, Base64-encoded. Optional when\
+            \ reuseKey=true."
+        format:
+          $ref: "#/components/schemas/CertificateRequestFormat"
+          default: pkcs10
+          description: CSR format
+        existingCertificate:
           type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          examples:
-          - requiredAttributes
-        global:
+          format: byte
+          description: Base64 of cert to renew. Serial + issuer DN parsed from this
+            constitute the cert identity at the CA.
+          minLength: 1
+        reuseKey:
           type: boolean
           default: false
-          description: Boolean determining if the Metadata is a global metadata.
-        overwrite:
+          description: "When true, request (CSR) is optional. Proof-of-possession\
+            \ is delegated to the upstream CA's renewal policy."
+        attributes:
+          type: array
+          description: Renew-specific dynamic attributes (schema from shared /issue/attributes
+            endpoint)
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        meta:
+          type: array
+          description: Optional connector-defined metadata returned by the original
+            issue/renew/register response. Replayed here so a stateless connector
+            can resolve the upstream end-entity without an extra lookup.
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+      required:
+      - authorityAttributes
+      - existingCertificate
+      - raProfileAttributes
+    CertificateRequestFormat:
+      type: string
+      enum:
+      - pkcs10
+      - crmf
+    CertificateExtension:
+      type: object
+      properties:
+        oid:
+          type: string
+          description: "OID of the X.509 extension (dotted-decimal, RFC 5280)"
+          example: 2.5.29.37
+          minLength: 1
+        critical:
+          type: boolean
+          description: Whether the extension is marked critical
+        valueBase64:
+          type: string
+          format: byte
+          description: "DER-encoded extension value, Base64-encoded"
+          minLength: 1
+      required:
+      - critical
+      - oid
+      - valueBase64
+    CertificateRegistrationRequestDtoV3:
+      type: object
+      properties:
+        authorityAttributes:
+          type: array
+          description: Authority attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        raProfileAttributes:
+          type: array
+          description: RA profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        subjectDn:
+          type: string
+          description: "Subject DN. Optional per RFC 5280 §4.1.2.6: an empty subject\
+            \ is permitted when subject naming information is carried entirely in\
+            \ the Subject Alternative Name extension (which the connector MUST then\
+            \ mark critical at issuance). At least one of subjectDn or subjectAltName\
+            \ must be non-empty."
+          example: "CN=device-7,O=Acme"
+        subjectAltName:
+          type: string
+          description: "Subject Alternative Name in OpenSSL convention textual form\
+            \ (e.g. DNS:foo,IP:1.2.3.4,email:x@y). SAN MUST be carried here ONLY —\
+            \ do not duplicate it as OID 2.5.29.17 in extensions[]. Connectors reject\
+            \ duplicate-source requests with VALIDATION_FAILED. Required when subjectDn\
+            \ is empty (see RFC 5280 §4.1.2.6)."
+        extensions:
+          type: array
+          description: Structured certificate extensions (OID + critical + base64
+            value). All extensions OTHER than SAN go here.
+          items:
+            $ref: "#/components/schemas/CertificateExtension"
+        attributes:
+          type: array
+          description: Register-specific dynamic attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - authorityAttributes
+      - raProfileAttributes
+    CertificateSignRequestDtoV3:
+      type: object
+      properties:
+        authorityAttributes:
+          type: array
+          description: Authority attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        raProfileAttributes:
+          type: array
+          description: RA profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        request:
+          type: string
+          format: byte
+          description: "Certificate signing request, Base64-encoded"
+          minLength: 1
+        format:
+          $ref: "#/components/schemas/CertificateRequestFormat"
+          default: pkcs10
+          description: CSR format
+        attributes:
+          type: array
+          description: Issue-specific dynamic attributes (from shared /issue/attributes
+            schema endpoint)
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        meta:
+          type: array
+          description: "Connector-defined metadata. On issue against a prior registration,\
+            \ this carries the meta returned by the /register response (replayed so\
+            \ the stateless connector can resolve the upstream end-entity). Null/empty\
+            \ = fresh issuance."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+      required:
+      - authorityAttributes
+      - raProfileAttributes
+      - request
+    CertificateIdentificationRequestDtoV3:
+      type: object
+      properties:
+        authorityAttributes:
+          type: array
+          description: Authority attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        raProfileAttributes:
+          type: array
+          description: RA profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        certificate:
+          type: string
+          format: byte
+          description: Base64 of cert to identify at the upstream CA
+          minLength: 1
+      required:
+      - authorityAttributes
+      - certificate
+      - raProfileAttributes
+    CertificateIdentificationResponseDtoV3:
+      type: object
+      properties:
+        meta:
+          type: array
+          description: "Connector-defined metadata describing the cert as known to\
+            \ the upstream CA (end-entity name, status flags, profile binding, etc.)"
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+      required:
+      - meta
+    CrlRequestDtoV3:
+      type: object
+      properties:
+        authorityAttributes:
+          type: array
+          description: Authority attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        raProfileAttributes:
+          type: array
+          description: RA profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        delta:
           type: boolean
           default: false
-          description: Boolean determining if the new metadata content should overwrite
-            (replace) existing content instead of appending.
-        protectionLevel:
-          $ref: "#/components/schemas/ProtectionLevel"
-          default: none
-          description: Protection level of the attribute content
+          description: "If true, the delta CRL is returned where supported; otherwise\
+            \ the full CRL."
       required:
-      - label
-      - visible
-    MetadataAttributeV2:
+      - authorityAttributes
+      - raProfileAttributes
+    CrlResponseDtoV3:
       type: object
-      description: Info attribute contains content that is for metadata. Its content
-        can not be edited and is not send in requests to store.
       properties:
-        uuid:
+        crl:
           type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+          format: byte
+          description: "Base64-encoded CRL (DER). Core parses nextUpdate, issuer,\
+            \ and revoked-entry data from the CRL itself."
+      required:
+      - crl
+    CaCertificatesRequestDtoV3:
+      type: object
+      properties:
+        authorityAttributes:
+          type: array
+          description: Authority attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        raProfileAttributes:
+          type: array
+          description: RA profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - authorityAttributes
+      - raProfileAttributes
+    CaCertificatesResponseDtoV3:
+      type: object
+      properties:
+        certificates:
+          type: array
+          description: "CA certificate chain. Each entry reuses the issued-cert envelope\
+            \ so per-CA meta (chain position hints, AKI/SKI extracts) and certificateType\
+            \ (X509 default; SSH CAs override) are preserved. Convention: issuing\
+            \ CA first, root last."
+          items:
+            $ref: "#/components/schemas/CertificateDataResponseDtoV3"
+      required:
+      - certificates
+    ConnectorInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the connector
         name:
           type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
+          description: Name of the connector
+        version:
+          type: string
+          description: Version of the connector
         description:
           type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/MetadataAttributeProperties"
-          description: Properties of the Attributes
+          description: Description of the connector
+        metadata:
+          type: object
+          additionalProperties: {}
+          description: Metadata of the connector
       required:
-      - contentType
+      - id
       - name
-      - properties
-      - type
-      - uuid
       - version
-    MetadataAttributeV3:
+    ConnectorInterface:
+      type: string
+      enum:
+      - info
+      - health
+      - metrics
+      - authority
+      - discovery
+      - entity
+      - compliance
+      - cryptography
+      - notification
+      - secret
+      - signatureFormatting
+      - signing
+    ConnectorInterfaceInfo:
       type: object
-      description: Info attribute contains content that is for metadata. Its content
-        can not be edited and is not send in requests to store.
       properties:
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
+        code:
+          $ref: "#/components/schemas/ConnectorInterface"
+          description: Code of the implemented connector interface
         version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        content:
+          type: string
+          description: Version of the implemented connector interface
+        features:
           type: array
-          description: Content of the Attribute
+          description: Features supported by the connector interface
           items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/MetadataAttributeProperties"
-          description: Properties of the Attributes
-        schemaVersion:
-          $ref: "#/components/schemas/AttributeVersion"
-          description: Schema version of the Attribute
+            $ref: "#/components/schemas/FeatureFlag"
       required:
-      - contentType
-      - name
-      - properties
-      - schemaVersion
-      - type
-      - uuid
+      - code
       - version
+    FeatureFlag:
+      type: string
+      enum:
+      - stateless
+      - openMetrics
+      - secretVersioning
+      - secretRotation
+      - contentSigning
+      - timestamping
+      - certificateRegistration
+    InfoResponse:
+      type: object
+      properties:
+        connector:
+          $ref: "#/components/schemas/ConnectorInfo"
+          description: Connector Information
+        interfaces:
+          type: array
+          description: Interfaces supported and implemented by the connector
+          items:
+            $ref: "#/components/schemas/ConnectorInterfaceInfo"
+      required:
+      - connector
+      - interfaces
+    HealthInfo:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/HealthStatus"
+          description: Current connector operational status
+        components:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/HealthInfoComponent"
+          description: Health status of connector components
+      required:
+      - status
+    HealthInfoComponent:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/HealthStatus"
+          description: Current status of component
+        details:
+          type: object
+          additionalProperties: {}
+          description: Additional details about the component status
+      required:
+      - status
+    HealthStatus:
+      type: string
+      enum:
+      - UP
+      - DEGRADED
+      - DOWN
+      - OUT_OF_SERVICE
+      - UNKNOWN
   securitySchemes:
     ConnectorAPIKeyAuth:
       type: apiKey
