@@ -2076,7 +2076,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TspBasicCredentialRequestDto"
+              $ref: "#/components/schemas/TspBasicCredentialUpdateRequestDto"
         required: true
       responses:
         "200":
@@ -10760,7 +10760,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TspBasicCredentialRequestDto"
+              $ref: "#/components/schemas/TspBasicCredentialCreateRequestDto"
         required: true
       responses:
         "201":
@@ -31783,14 +31783,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
           example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
       required:
       - name
       - type
@@ -33159,22 +33159,22 @@ components:
       - name
       - uuid
       - vaultInstance
-    TspBasicCredentialRequestDto:
+    TspBasicCredentialUpdateRequestDto:
       type: object
-      description: "A single Basic (username/password) credential on a TSP Profile.\
-        \ The password is write-only: provide it to create or rotate the credential;\
-        \ leave it blank on update to keep the existing secret."
+      description: "A Basic (username/password) credential to update on a TSP Profile.\
+        \ The password is write-only: leave it blank to keep the existing secret,\
+        \ or provide a value to rotate it. Changing the username requires a new password."
       properties:
         username:
           type: string
-          description: Basic username; unique within the TSP profile.
+          description: Basic username; unique within the TSP profile. Changing it
+            requires a new password.
           example: svc-account
           minLength: 1
         password:
           type: string
-          description: "Basic password (write-only). On create a value is required\
-            \ — there is no existing secret to keep. On update, blank keeps the existing\
-            \ secret and a value rotates it."
+          description: Basic password (write-only). Blank keeps the existing secret
+            and a value rotates it; a value is also required when the username changes.
           writeOnly: true
         mappedUserUuid:
           type: string
@@ -38853,6 +38853,29 @@ components:
         authenticationToken:
           type: string
           description: Authentication Token
+    TspBasicCredentialCreateRequestDto:
+      type: object
+      description: A Basic (username/password) credential to create on a TSP Profile.
+      properties:
+        username:
+          type: string
+          description: Basic username; unique within the TSP profile.
+          example: svc-account
+          minLength: 1
+        password:
+          type: string
+          description: Basic password (write-only). Required on create.
+          minLength: 1
+          writeOnly: true
+        mappedUserUuid:
+          type: string
+          format: uuid
+          description: UUID of the real ILM user this credential authenticates as.
+          example: 6b55de1c-844f-11ec-a8a3-0242ac120002
+      required:
+      - mappedUserUuid
+      - password
+      - username
     PaginationResponseDtoTspProfileListDto:
       type: object
       properties:
