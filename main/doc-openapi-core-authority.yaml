@@ -2173,12 +2173,23 @@ components:
         status:
           type: string
           description: Status of Authority instance
+        connector:
+          $ref: "#/components/schemas/NameAndUuidDto"
+          description: Connector (Authority provider) this instance belongs to.
+        connectorInterface:
+          $ref: "#/components/schemas/ConnectorInterfaceDto"
+          description: "Connector Interface this Authority instance is bound to; null\
+            \ for legacy v1 connectors, which are identified by kind instead."
         connectorUuid:
           type: string
-          description: UUID of Authority provider
+          deprecated: true
+          description: UUID of Authority provider. Deprecated — use connector.uuid
+            instead.
         connectorName:
           type: string
-          description: Name of Authority provider
+          deprecated: true
+          description: Name of Authority provider. Deprecated — use connector.name
+            instead.
         kind:
           type: string
           description: Authority Instance Kind
@@ -2186,9 +2197,73 @@ components:
           - "LegacyEjbca, ADCS, etc."
       required:
       - attributes
+      - connector
       - kind
       - name
       - status
+      - uuid
+    ConnectorInterface:
+      type: string
+      enum:
+      - info
+      - health
+      - metrics
+      - authority
+      - discovery
+      - entity
+      - compliance
+      - cryptography
+      - notification
+      - secret
+      - signatureFormatting
+      - signing
+    ConnectorInterfaceDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: UUID of the connector interface
+        code:
+          $ref: "#/components/schemas/ConnectorInterface"
+          description: Code of the implemented connector interface
+        version:
+          type: string
+          description: Version of the implemented connector interface
+        features:
+          type: array
+          description: Features supported by the connector interface
+          items:
+            $ref: "#/components/schemas/FeatureFlag"
+      required:
+      - code
+      - uuid
+      - version
+    FeatureFlag:
+      type: string
+      enum:
+      - stateless
+      - openMetrics
+      - secretVersioning
+      - secretRotation
+      - contentSigning
+      - timestamping
+      - certificateRegistration
+    NameAndUuidDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+      required:
+      - name
       - uuid
     AuthorityInstanceRequestDto:
       type: object

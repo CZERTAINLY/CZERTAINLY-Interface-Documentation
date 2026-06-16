@@ -36538,12 +36538,23 @@ components:
         status:
           type: string
           description: Status of Authority instance
+        connector:
+          $ref: "#/components/schemas/NameAndUuidDto"
+          description: Connector (Authority provider) this instance belongs to.
+        connectorInterface:
+          $ref: "#/components/schemas/ConnectorInterfaceDto"
+          description: "Connector Interface this Authority instance is bound to; null\
+            \ for legacy v1 connectors, which are identified by kind instead."
         connectorUuid:
           type: string
-          description: UUID of Authority provider
+          deprecated: true
+          description: UUID of Authority provider. Deprecated — use connector.uuid
+            instead.
         connectorName:
           type: string
-          description: Name of Authority provider
+          deprecated: true
+          description: Name of Authority provider. Deprecated — use connector.name
+            instead.
         kind:
           type: string
           description: Authority Instance Kind
@@ -36551,6 +36562,7 @@ components:
           - "LegacyEjbca, ADCS, etc."
       required:
       - attributes
+      - connector
       - kind
       - name
       - status
@@ -36731,11 +36743,11 @@ components:
       - $ref: "#/components/schemas/BaseAttributeContentDtoV2"
       - $ref: "#/components/schemas/BaseAttributeContentDtoV3"
       properties:
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
         reference:
           type: string
         data: {}
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
     CustomAttributeUpdateRequestDto:
       type: object
       properties:
