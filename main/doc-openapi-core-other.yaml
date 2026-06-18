@@ -1008,6 +1008,48 @@ paths:
       - SessionAuth: []
       - CertificateAuth: []
       - BearerJWTAuth: []
+  /v1/statistics/signingRecords:
+    get:
+      tags:
+      - Statistics/Dashboard
+      summary: Get Signing Records dashboard statistics
+      operationId: getSigningRecordStatistics
+      parameters:
+      - name: period
+        in: query
+        description: Time window for the volume-over-time series (the count badges
+          and breakdowns are window-independent)
+        required: false
+        schema:
+          $ref: "#/components/schemas/SigningRecordStatisticsPeriod"
+          default: 7d
+      responses:
+        "200":
+          description: Signing Records statistics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SigningRecordStatisticsDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - SessionAuth: []
+      - CertificateAuth: []
+      - BearerJWTAuth: []
   /v1/resources:
     get:
       tags:
@@ -2737,6 +2779,88 @@ components:
             type: integer
             format: int64
           description: Map of Client count by status
+    SigningRecordStatisticsPeriod:
+      type: string
+      enum:
+      - 24h
+      - 7d
+      - 30d
+      - 90d
+    SigningRecordStatisticsDto:
+      type: object
+      description: Signing Records dashboard statistics
+      properties:
+        totalRetained:
+          type: integer
+          format: int64
+          description: Total signing records currently retained (across the retention
+            window)
+        countLast24h:
+          type: integer
+          format: int64
+          description: Signing records whose signing time falls within the last 24
+            hours
+        countLast7d:
+          type: integer
+          format: int64
+          description: Signing records whose signing time falls within the last 7
+            days
+        activeProfileCount:
+          type: integer
+          format: int64
+          description: Number of distinct signing profiles that produced at least
+            one retained record
+        distinctRequesterCount:
+          type: integer
+          format: int64
+          description: Number of distinct requesters that produced at least one retained
+            record. Lets the client render a "+k more" overflow beyond the top-N entries
+            in statByRequester.
+        volumeOverTime:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+          description: "Signing volume over the requested period. Ordered map of bucket\
+            \ start to count, keyed by ISO-8601 UTC instant (hourly buckets for the\
+            \ 24h period, daily otherwise). Buckets are dense: every bucket in the\
+            \ window is present, with 0 for buckets that had no signings."
+        statByProfile:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+          description: Retained record count by signing profile name
+        statByRequester:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+          description: "Retained record count by requester username, limited to the\
+            \ top-N requesters by count. Use distinctRequesterCount for the total.\
+            \ Records with no requester are grouped under \"Unassigned\"."
+        statByWorkflowType:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+          description: Retained record count by signing workflow type. Keys are SigningWorkflowType
+            codes.
+        statByProtocol:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+          description: "Retained record count by signing protocol. Keys are SigningProtocol\
+            \ codes, grouped on the protocol persisted on each record at signing time."
+        statByScheme:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+          description: "Retained record count by signing scheme, flattened as the\
+            \ cross-product of signing scheme and managed signing type: 'delegated',\
+            \ 'managed_static_key', 'managed_one_time_key' (and more later)."
     CertificateSettingsDto:
       type: object
       properties:
