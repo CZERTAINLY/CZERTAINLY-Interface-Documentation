@@ -2022,6 +2022,22 @@ components:
           description: The claim name used to extract the username from the token.
     AdditionalOidPropertiesDto:
       description: Additional properties of custom OID entry
+    CertificateExtensionOidPropertiesDto:
+      allOf:
+      - $ref: "#/components/schemas/AdditionalOidPropertiesDto"
+      - type: object
+        properties:
+          defaultCritical:
+            type: boolean
+            description: Whether this extension should be marked critical by default
+              when placed in a certificate
+          valueEncoding:
+            $ref: "#/components/schemas/ExtensionValueEncoding"
+            description: ASN.1 encoding used to encode the attribute string value
+              into the extension DER value
+      required:
+      - defaultCritical
+      - valueEncoding
     CustomOidEntryUpdateRequestDto:
       type: object
       properties:
@@ -2040,16 +2056,27 @@ components:
         additionalProperties:
           description: Additional properties depending on OID category
           oneOf:
+          - $ref: "#/components/schemas/CertificateExtensionOidPropertiesDto"
           - $ref: "#/components/schemas/RdnAttributeTypeOidPropertiesDto"
       required:
       - category
       - displayName
+    ExtensionValueEncoding:
+      type: string
+      enum:
+      - UTF8String
+      - IA5String
+      - PrintableString
+      - OctetString
+      - BitString
+      - DER
     OidCategory:
       type: string
       enum:
       - rdnAttributeType
       - extendedKeyUsage
       - qcStatement
+      - certificateExtension
       - generic
     RdnAttributeTypeOidPropertiesDto:
       allOf:
@@ -2090,6 +2117,7 @@ components:
         additionalProperties:
           description: Additional properties depending on the OID category
           oneOf:
+          - $ref: "#/components/schemas/CertificateExtensionOidPropertiesDto"
           - $ref: "#/components/schemas/RdnAttributeTypeOidPropertiesDto"
       required:
       - category
@@ -2113,6 +2141,7 @@ components:
         additionalProperties:
           description: Additional properties depending on OID category
           oneOf:
+          - $ref: "#/components/schemas/CertificateExtensionOidPropertiesDto"
           - $ref: "#/components/schemas/RdnAttributeTypeOidPropertiesDto"
         oid:
           type: string

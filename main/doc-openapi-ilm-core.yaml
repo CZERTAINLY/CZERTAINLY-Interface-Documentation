@@ -32137,6 +32137,15 @@ components:
         schemaVersion:
           $ref: "#/components/schemas/AttributeVersion"
           description: Schema version of the Attribute
+        fieldMapping:
+          $ref: "#/components/schemas/FieldMapping"
+          description: Declares which certificate (or other object) fields this attribute's
+            value projects into; presence marks this attribute as a certificate request
+            attribute
+        valueSource:
+          $ref: "#/components/schemas/ValueSource"
+          description: Declares how Core resolves the content of this attribute; orthogonal
+            to fieldMapping
       required:
       - contentType
       - name
@@ -32145,6 +32154,75 @@ components:
       - type
       - uuid
       - version
+    ExtensionMappedField:
+      allOf:
+      - $ref: "#/components/schemas/MappedField"
+      - type: object
+        properties:
+          extensionOid:
+            type: string
+            description: OID of the X.509 extension (dotted-decimal)
+            minLength: 1
+          criticalOverridable:
+            type: boolean
+            description: Whether the requester may override the default criticality
+              of the extension
+      description: Maps an attribute value to an X.509 extension
+      required:
+      - extensionOid
+      - fieldType
+    ExtensionValueEncoding:
+      type: string
+      enum:
+      - UTF8String
+      - IA5String
+      - PrintableString
+      - OctetString
+      - BitString
+      - DER
+    FieldMapping:
+      type: object
+      description: Declares which certificate (or other object) fields an attribute
+        value projects into
+      properties:
+        objectType:
+          $ref: "#/components/schemas/ObjectType"
+          description: Object type this mapping applies to
+        fields:
+          type: array
+          description: "One or more target fields (supports 1-to-many, e.g. CN + dNSName\
+            \ from a single attribute)"
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/ExtensionMappedField"
+            - $ref: "#/components/schemas/RdnMappedField"
+            - $ref: "#/components/schemas/SanMappedField"
+          minItems: 1
+      required:
+      - fields
+      - objectType
+    FieldSource:
+      type: string
+      enum:
+      - csr
+      - platform
+      - csrThenPlatform
+    FieldType:
+      type: string
+      enum:
+      - rdn
+      - san
+      - extension
+    GeneralNameType:
+      type: string
+      enum:
+      - dns
+      - email
+      - ip
+      - uri
+      - otherName
+      - directoryName
+      - registeredId
     GroupAttributeV2:
       type: object
       description: Group attribute and its content represents dynamic list of additional
@@ -32343,6 +32421,28 @@ components:
       - schemaVersion
       - type
       - uuid
+    MappedField:
+      type: object
+      description: Describes a single target field within an object; concrete type
+        is determined by fieldType
+      discriminator:
+        propertyName: fieldType
+      properties:
+        fieldType:
+          $ref: "#/components/schemas/FieldType"
+          description: "Field type, determines the concrete subtype"
+        order:
+          type: integer
+          format: int32
+          description: Ordering index for fields of the same type (e.g. RDN components);
+            ascending
+          minimum: 1
+        source:
+          $ref: "#/components/schemas/FieldSource"
+          description: Provenance of the value when reconciling CSR vs platform-projected
+            values
+      required:
+      - fieldType
     MetadataAttributeProperties:
       type: object
       properties:
@@ -32468,6 +32568,82 @@ components:
       - type
       - uuid
       - version
+    ObjectType:
+      type: string
+      enum:
+      - x509Certificate
+      - sshCertificate
+      - key
+      - secret
+    RdnMappedField:
+      allOf:
+      - $ref: "#/components/schemas/MappedField"
+      - type: object
+        properties:
+          rdn:
+            type: string
+            description: RDN code (e.g. "CN") or dotted-decimal OID; resolved via
+              the OID registry
+            minLength: 1
+      description: Maps an attribute value to an X.509 RDN component
+      required:
+      - fieldType
+      - rdn
+    SanMappedField:
+      allOf:
+      - $ref: "#/components/schemas/MappedField"
+      - type: object
+        properties:
+          generalNameType:
+            $ref: "#/components/schemas/GeneralNameType"
+            description: SAN type
+          otherNameOid:
+            type: string
+            description: OID of the otherName type; required when generalNameType
+              is OTHER_NAME
+          otherNameValueEncoding:
+            $ref: "#/components/schemas/ExtensionValueEncoding"
+            description: ASN.1 encoding for the otherName value; required when generalNameType
+              is OTHER_NAME because different OtherName OIDs carry differently-typed
+              values (e.g. UPN → UTF8String)
+      description: Maps an attribute value to a Subject Alternative Name entry
+      required:
+      - fieldType
+      - generalNameType
+    SourceParam:
+      type: object
+      description: Dependency filter that scopes a value source by another attribute's
+        value
+      properties:
+        attributeUuid:
+          type: string
+          description: UUID of the attribute whose value is used as a filter parameter
+        attributeName:
+          type: string
+          description: Name of the attribute; used as fallback when attributeUuid
+            is not matched
+    ValueSource:
+      type: object
+      description: Declares how Core resolves the content of an attribute; orthogonal
+        to fieldMapping
+      properties:
+        kind:
+          $ref: "#/components/schemas/ValueSourceType"
+          description: How the attribute value is resolved
+        params:
+          type: array
+          description: Optional dependency filters that scope the source by other
+            attributes' values
+          items:
+            $ref: "#/components/schemas/SourceParam"
+      required:
+      - kind
+    ValueSourceType:
+      type: string
+      enum:
+      - none
+      - connectorCallback
+      - staticList
     ResourceEvent:
       type: string
       enum:
@@ -35520,6 +35696,22 @@ components:
           - This proxy is used for connecting to external connectors in DMZ network
     AdditionalOidPropertiesDto:
       description: Additional properties of custom OID entry
+    CertificateExtensionOidPropertiesDto:
+      allOf:
+      - $ref: "#/components/schemas/AdditionalOidPropertiesDto"
+      - type: object
+        properties:
+          defaultCritical:
+            type: boolean
+            description: Whether this extension should be marked critical by default
+              when placed in a certificate
+          valueEncoding:
+            $ref: "#/components/schemas/ExtensionValueEncoding"
+            description: ASN.1 encoding used to encode the attribute string value
+              into the extension DER value
+      required:
+      - defaultCritical
+      - valueEncoding
     CustomOidEntryUpdateRequestDto:
       type: object
       properties:
@@ -35538,6 +35730,7 @@ components:
         additionalProperties:
           description: Additional properties depending on OID category
           oneOf:
+          - $ref: "#/components/schemas/CertificateExtensionOidPropertiesDto"
           - $ref: "#/components/schemas/RdnAttributeTypeOidPropertiesDto"
       required:
       - category
@@ -35548,6 +35741,7 @@ components:
       - rdnAttributeType
       - extendedKeyUsage
       - qcStatement
+      - certificateExtension
       - generic
     RdnAttributeTypeOidPropertiesDto:
       allOf:
@@ -35588,6 +35782,7 @@ components:
         additionalProperties:
           description: Additional properties depending on the OID category
           oneOf:
+          - $ref: "#/components/schemas/CertificateExtensionOidPropertiesDto"
           - $ref: "#/components/schemas/RdnAttributeTypeOidPropertiesDto"
       required:
       - category
@@ -36814,11 +37009,11 @@ components:
       - $ref: "#/components/schemas/BaseAttributeContentDtoV2"
       - $ref: "#/components/schemas/BaseAttributeContentDtoV3"
       properties:
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
         reference:
           type: string
         data: {}
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
     CustomAttributeUpdateRequestDto:
       type: object
       properties:
@@ -39786,6 +39981,7 @@ components:
         additionalProperties:
           description: Additional properties depending on OID category
           oneOf:
+          - $ref: "#/components/schemas/CertificateExtensionOidPropertiesDto"
           - $ref: "#/components/schemas/RdnAttributeTypeOidPropertiesDto"
         oid:
           type: string
