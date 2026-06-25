@@ -29803,6 +29803,14 @@ components:
           items:
             $ref: "#/components/schemas/AttributeCallbackMapping"
           uniqueItems: true
+        dependsOn:
+          type: array
+          description: Names of the attributes this Attributes v2 callback consumes
+            and is triggered by. Marks an NG (Attributes v2) callback; at most one
+            of dependsOn / callbackContext may be set (neither = no callback). Forbidden
+            on RESOURCE attributes. Enforced by Core.
+          items:
+            type: string
       required:
       - mappings
     AttributeCallbackMapping:
@@ -31832,14 +31840,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
@@ -38171,6 +38179,13 @@ components:
         pagination:
           $ref: "#/components/schemas/PaginationRequestDto"
           description: Pagination of the callback response
+        attributes:
+          type: array
+          description: "Attributes v2 callback values: the dependsOn-named attributes\
+            \ the callback consumes, reference-typed values expanded inline by Core.\
+            \ Used by the NG (Attributes v2) callback path."
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - name
     BulkActionMessageDto:
