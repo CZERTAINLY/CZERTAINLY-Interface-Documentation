@@ -904,20 +904,20 @@ paths:
       - SessionAuth: []
       - CertificateAuth: []
       - BearerJWTAuth: []
-  /v1/signingProfiles/signatureFormatterConnectors/{connectorUuid}/formatterAttributes:
+  /v1/signingProfiles/signatureFormattingConnectors/{connectorUuid}/formattingAttributes:
     get:
       tags:
       - Signing Profile Management
-      summary: Get formatter attribute descriptors from a Signature Formatter Connector
-      description: Queries the Signature Formatter Connector for its available formatter
+      summary: Get formatting attribute descriptors from a Signature Formatting Provider
+      description: Queries the Signature Formatting Provider for its available formatting
         attribute descriptors with connector default values. The signingProfileUuid
         parameter is used for authorization only and does not affect the returned
         descriptors.
-      operationId: listSignatureFormatterConnectorAttributes
+      operationId: listSignatureFormattingConnectorAttributes
       parameters:
       - name: connectorUuid
         in: path
-        description: Signature Formatter Connector UUID
+        description: Signature Formatting Provider UUID
         required: true
         schema:
           type: string
@@ -931,7 +931,7 @@ paths:
           format: uuid
       responses:
         "200":
-          description: Formatter attribute descriptors retrieved
+          description: Formatting attribute descriptors retrieved
           content:
             application/json:
               schema:
@@ -1372,15 +1372,15 @@ components:
           description: Signing workflow type
           examples:
           - timestamping
-        signatureFormatterConnectorUuid:
+        signatureFormattingConnectorUuid:
           type: string
           format: uuid
-          description: UUID of the Signature Formatter Connector that constructs the
+          description: UUID of the Signature Formatting Provider that constructs the
             data-to-be-signed (DTBS) for Content signing. Required for ILM-managed
             signing; must be omitted for delegated signing.
-        signatureFormatterConnectorAttributes:
+        signatureFormattingConnectorAttributes:
           type: array
-          description: Attributes for the Signature Formatter Connector that control
+          description: Attributes for the Signature Formatting Provider that control
             DTBS construction for the content signing workflow. Applicable only when
             ILM-managed signing is used.
           items:
@@ -2649,15 +2649,15 @@ components:
           description: Signing workflow type
           examples:
           - timestamping
-        signatureFormatterConnectorUuid:
+        signatureFormattingConnectorUuid:
           type: string
           format: uuid
-          description: UUID of the Signature Formatter Connector that constructs the
+          description: UUID of the Signature Formatting Provider that constructs the
             data-to-be-signed (DTBS) for Timestamping. Required for ILM-managed signing;
             must be omitted for delegated signing.
-        signatureFormatterConnectorAttributes:
+        signatureFormattingConnectorAttributes:
           type: array
-          description: "Attributes for the Signature Formatter Connector that control\
+          description: "Attributes for the Signature Formatting Provider that control\
             \ DTBS construction (e.g. serial number generation strategy, whether to\
             \ include signing time attribute). Applicable only when ILM-managed signing\
             \ is used."
@@ -2836,14 +2836,14 @@ components:
           description: Signing workflow type
           examples:
           - timestamping
-        signatureFormatterConnector:
+        signatureFormattingConnector:
           $ref: "#/components/schemas/NameAndUuidDto"
-          description: Signature Formatter Connector that constructs the data-to-be-signed
+          description: Signature Formatting Provider that constructs the data-to-be-signed
             (DTBS) for Content signing. Present only when ILM-managed signing is used;
             null for delegated signing.
-        signatureFormatterConnectorAttributes:
+        signatureFormattingConnectorAttributes:
           type: array
-          description: Attributes configured on the Signature Formatter Connector
+          description: Attributes configured on the Signature Formatting Provider
             that control DTBS construction for the content signing workflow. Applicable
             only when ILM-managed signing is used.
           items:
@@ -3156,14 +3156,14 @@ components:
           description: Signing workflow type
           examples:
           - timestamping
-        signatureFormatterConnector:
+        signatureFormattingConnector:
           $ref: "#/components/schemas/NameAndUuidDto"
-          description: Signature Formatter Connector that constructs the data-to-be-signed
+          description: Signature Formatting Provider that constructs the data-to-be-signed
             (DTBS) for Timestamping. Present only when ILM-managed signing is used;
             null for delegated signing.
-        signatureFormatterConnectorAttributes:
+        signatureFormattingConnectorAttributes:
           type: array
-          description: "Attributes configured on the Signature Formatter Connector\
+          description: "Attributes configured on the Signature Formatting Provider\
             \ that control DTBS construction (e.g. serial number generation strategy,\
             \ whether to include signing time attribute). Applicable only when ILM-managed\
             \ signing is used."
@@ -3676,14 +3676,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
