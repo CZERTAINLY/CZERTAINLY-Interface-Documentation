@@ -550,6 +550,84 @@ paths:
       - SessionAuth: []
       - CertificateAuth: []
       - BearerJWTAuth: []
+  /v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/requestAttributes:
+    patch:
+      tags:
+      - RA Profile Management
+      summary: Update request-attribute configuration of RA Profile
+      operationId: updateRaProfileRequestAttributesConfiguration
+      parameters:
+      - name: authorityUuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      - name: raProfileUuid
+        in: path
+        description: RA Profile UUID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaProfileCertificateRequestAttributesUpdateDto"
+        required: true
+      responses:
+        "200":
+          description: Configuration of request attributes of RA Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RaProfileDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        "404":
+          description: RA Profile not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - SessionAuth: []
+      - CertificateAuth: []
+      - BearerJWTAuth: []
   /v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/scep/deactivate:
     patch:
       tags:
@@ -3437,6 +3515,731 @@ components:
       - code
       - message
       - statusCode
+    AttributeSetMergeMode:
+      type: string
+      enum:
+      - staticOnly
+      - connectorOnly
+      - merge
+    BaseAttributeDto:
+      type: object
+      description: Base Attribute definition
+      oneOf:
+      - $ref: "#/components/schemas/BaseAttributeDtoV2"
+      - $ref: "#/components/schemas/BaseAttributeDtoV3"
+      properties:
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+      required:
+      - name
+      - type
+      - uuid
+    BaseAttributeDtoV2:
+      description: Base Attribute definition
+      discriminator:
+        propertyName: type
+        mapping:
+          data: "#/components/schemas/DataAttributeV2"
+          info: "#/components/schemas/InfoAttributeV2"
+          group: "#/components/schemas/GroupAttributeV2"
+          meta: "#/components/schemas/MetadataAttributeV2"
+          custom: "#/components/schemas/CustomAttributeV2"
+      oneOf:
+      - $ref: "#/components/schemas/DataAttributeV2"
+      - $ref: "#/components/schemas/InfoAttributeV2"
+      - $ref: "#/components/schemas/GroupAttributeV2"
+      - $ref: "#/components/schemas/MetadataAttributeV2"
+      - $ref: "#/components/schemas/CustomAttributeV2"
+    BaseAttributeDtoV3:
+      type: object
+      description: Base Attribute definition
+      discriminator:
+        propertyName: type
+        mapping:
+          data: "#/components/schemas/DataAttributeV3"
+          info: "#/components/schemas/InfoAttributeV3"
+          group: "#/components/schemas/GroupAttributeV3"
+          meta: "#/components/schemas/MetadataAttributeV3"
+          custom: "#/components/schemas/CustomAttributeV3"
+      oneOf:
+      - $ref: "#/components/schemas/DataAttributeV3"
+      - $ref: "#/components/schemas/InfoAttributeV3"
+      - $ref: "#/components/schemas/GroupAttributeV3"
+      - $ref: "#/components/schemas/MetadataAttributeV3"
+      - $ref: "#/components/schemas/CustomAttributeV3"
+      required:
+      - schemaVersion
+    CustomAttributeProperties:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Friendly name of the the Attribute
+          examples:
+          - Attribute Name
+        visible:
+          type: boolean
+          default: true
+          description: "Boolean determining if the Attribute is visible and can be\
+            \ displayed, otherwise it should be hidden to the user."
+        group:
+          type: string
+          description: "Group of the Attribute, used for the logical grouping of the\
+            \ Attribute"
+          examples:
+          - requiredAttributes
+        required:
+          type: boolean
+          default: false
+          description: "Boolean determining if the Attribute is required. If true,\
+            \ the Attribute must be provided."
+        readOnly:
+          type: boolean
+          default: false
+          description: "Boolean determining if the Attribute is read only. If true,\
+            \ the Attribute content cannot be changed."
+        list:
+          type: boolean
+          default: false
+          description: Boolean determining if the Attribute contains list of values
+            in the content
+        multiSelect:
+          type: boolean
+          default: false
+          description: Boolean determining if the Attribute can have multiple values
+        extensibleList:
+          type: boolean
+          default: false
+          description: Boolean determining if a list Attribute can have values other
+            than predefined options
+        protectionLevel:
+          $ref: "#/components/schemas/ProtectionLevel"
+          default: none
+          description: Protection level of the attribute content
+      required:
+      - extensibleList
+      - label
+      - list
+      - multiSelect
+      - readOnly
+      - required
+      - visible
+    CustomAttributeV2:
+      type: object
+      description: Custom attribute allows to store and transfer dynamic data. Its
+        content can be edited and send in requests to store.
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        version:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/CustomAttributeProperties"
+          description: Properties of the Attributes
+      required:
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
+      - version
+    CustomAttributeV3:
+      type: object
+      description: Custom attribute allows to store and transfer dynamic data. Its
+        content can be edited and send in requests to store.
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        version:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/CustomAttributeProperties"
+          description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
+      required:
+      - contentType
+      - name
+      - properties
+      - schemaVersion
+      - type
+      - uuid
+      - version
+    DataAttributeV3:
+      type: object
+      description: Data attribute allows to store and transfer dynamic data. Its content
+        can be edited and send in requests to store.
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        version:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/DataAttributeProperties"
+          description: Properties of the Attributes
+        constraints:
+          type: array
+          description: Optional constraints used for validating the Attribute content
+          items:
+            $ref: "#/components/schemas/BaseAttributeConstraint"
+        attributeCallback:
+          $ref: "#/components/schemas/AttributeCallback"
+          description: Optional definition of callback for getting the content of
+            the Attribute based on the action
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
+        fieldMapping:
+          $ref: "#/components/schemas/FieldMapping"
+          description: Declares which certificate (or other object) fields this attribute's
+            value projects into; presence marks this attribute as a certificate request
+            attribute
+        valueSource:
+          $ref: "#/components/schemas/ValueSource"
+          description: Declares how Core resolves the content of this attribute; orthogonal
+            to fieldMapping
+      required:
+      - contentType
+      - name
+      - properties
+      - schemaVersion
+      - type
+      - uuid
+      - version
+    ExtensionMappedField:
+      allOf:
+      - $ref: "#/components/schemas/MappedField"
+      - type: object
+        properties:
+          extensionOid:
+            type: string
+            description: OID of the X.509 extension (dotted-decimal)
+            minLength: 1
+          criticalOverridable:
+            type: boolean
+            description: Whether the requester may override the default criticality
+              of the extension
+      description: Maps an attribute value to an X.509 extension
+      required:
+      - extensionOid
+      - fieldType
+    ExtensionValueEncoding:
+      type: string
+      enum:
+      - UTF8String
+      - IA5String
+      - PrintableString
+      - OctetString
+      - BitString
+      - DER
+    FieldMapping:
+      type: object
+      description: Declares which certificate (or other object) fields an attribute
+        value projects into
+      properties:
+        objectType:
+          $ref: "#/components/schemas/ObjectType"
+          description: Object type this mapping applies to
+        fields:
+          type: array
+          description: "One or more target fields (supports 1-to-many, e.g. CN + dNSName\
+            \ from a single attribute)"
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/ExtensionMappedField"
+            - $ref: "#/components/schemas/RdnMappedField"
+            - $ref: "#/components/schemas/SanMappedField"
+          minItems: 1
+      required:
+      - fields
+      - objectType
+    FieldSource:
+      type: string
+      enum:
+      - csr
+      - platform
+      - csrThenPlatform
+    FieldType:
+      type: string
+      enum:
+      - rdn
+      - san
+      - extension
+    GeneralNameType:
+      type: string
+      enum:
+      - dns
+      - email
+      - ip
+      - uri
+      - otherName
+      - directoryName
+      - registeredId
+    GroupAttributeV2:
+      type: object
+      description: Group attribute and its content represents dynamic list of additional
+        attributes retrieved by callback. Its content can not be edited and is not
+        send in requests to store.
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        version:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        content:
+          type: array
+          description: List of all different types of attributes
+          items:
+            $ref: "#/components/schemas/BaseAttributeDtoV2"
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        attributeCallback:
+          $ref: "#/components/schemas/AttributeCallback"
+          description: Optional definition of callback for getting the content of
+            the Attribute based on the action
+      required:
+      - name
+      - type
+      - uuid
+      - version
+    GroupAttributeV3:
+      type: object
+      description: Group attribute and its content represents dynamic list of additional
+        attributes retrieved by callback. Its content can not be edited and is not
+        send in requests to store.
+      properties:
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Version of the Attribute
+          example: 3
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        content:
+          type: array
+          description: List of all different types of attributes
+          items:
+            $ref: "#/components/schemas/BaseAttributeDto"
+        version:
+          type: integer
+          format: int32
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        attributeCallback:
+          $ref: "#/components/schemas/AttributeCallback"
+          description: Optional definition of callback for getting the content of
+            the Attribute based on the action
+      required:
+      - name
+      - schemaVersion
+      - type
+      - uuid
+    InfoAttributeProperties:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Friendly name of the the Attribute
+          examples:
+          - Attribute Name
+        visible:
+          type: boolean
+          default: true
+          description: "Boolean determining if the Attribute is visible and can be\
+            \ displayed, otherwise it should be hidden to the user."
+        group:
+          type: string
+          description: "Group of the Attribute, used for the logical grouping of the\
+            \ Attribute"
+          examples:
+          - requiredAttributes
+      required:
+      - label
+      - visible
+    InfoAttributeV2:
+      type: object
+      description: Info attribute contains content that is for information purpose
+        or represents additional information for object (metadata). Its content can
+        not be edited and is not send in requests to store.
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        version:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/InfoAttributeProperties"
+          description: Properties of the Attributes
+      required:
+      - content
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
+      - version
+    InfoAttributeV3:
+      type: object
+      description: Info attribute contains content that is for information purpose
+        or represents additional information for object (metadata). Its content can
+        not be edited and is not send in requests to store.
+      properties:
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Version of the Attribute
+          example: 3
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
+        version:
+          type: integer
+          format: int32
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/InfoAttributeProperties"
+          description: Properties of the Attributes
+      required:
+      - content
+      - contentType
+      - name
+      - properties
+      - schemaVersion
+      - type
+      - uuid
+    MappedField:
+      type: object
+      description: Describes a single target field within an object; concrete type
+        is determined by fieldType
+      discriminator:
+        propertyName: fieldType
+      properties:
+        fieldType:
+          $ref: "#/components/schemas/FieldType"
+          description: "Field type, determines the concrete subtype"
+        order:
+          type: integer
+          format: int32
+          description: Ordering index for fields of the same type (e.g. RDN components);
+            ascending
+          minimum: 1
+        source:
+          $ref: "#/components/schemas/FieldSource"
+          description: Provenance of the value when reconciling CSR vs platform-projected
+            values
+      required:
+      - fieldType
+    MetadataAttributeProperties:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Friendly name of the the Attribute
+          examples:
+          - Attribute Name
+        visible:
+          type: boolean
+          default: true
+          description: "Boolean determining if the Attribute is visible and can be\
+            \ displayed, otherwise it should be hidden to the user."
+        group:
+          type: string
+          description: "Group of the Attribute, used for the logical grouping of the\
+            \ Attribute"
+          examples:
+          - requiredAttributes
+        global:
+          type: boolean
+          default: false
+          description: Boolean determining if the Metadata is a global metadata.
+        overwrite:
+          type: boolean
+          default: false
+          description: Boolean determining if the new metadata content should overwrite
+            (replace) existing content instead of appending.
+        protectionLevel:
+          $ref: "#/components/schemas/ProtectionLevel"
+          default: none
+          description: Protection level of the attribute content
+      required:
+      - label
+      - visible
+    MetadataAttributeV2:
+      type: object
+      description: Info attribute contains content that is for metadata. Its content
+        can not be edited and is not send in requests to store.
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        version:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/MetadataAttributeProperties"
+          description: Properties of the Attributes
+      required:
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
+      - version
+    MetadataAttributeV3:
+      type: object
+      description: Info attribute contains content that is for metadata. Its content
+        can not be edited and is not send in requests to store.
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        version:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/MetadataAttributeProperties"
+          description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
+      required:
+      - contentType
+      - name
+      - properties
+      - schemaVersion
+      - type
+      - uuid
+      - version
+    ObjectType:
+      type: string
+      enum:
+      - x509Certificate
+      - sshCertificate
+      - key
+      - secret
+    RaProfileCertificateRequestAttributesDto:
+      type: object
+      description: RA Profile static request-attribute definitions and the merge mode.
+      properties:
+        requestAttributes:
+          type: array
+          description: Ordered list of platform-owned request-attribute definitions
+            for this RA Profile
+          items:
+            $ref: "#/components/schemas/BaseAttributeDto"
+        mergeMode:
+          $ref: "#/components/schemas/AttributeSetMergeMode"
+          description: How the static set combines with a connector-supplied set;
+            always the effective mode
+        valueSourceBindings:
+          type: array
+          description: Core-side value-source bindings attached onto connector-supplied
+            (or static) definitions by reference
+          items:
+            $ref: "#/components/schemas/ValueSourceBindingDto"
+        externalCsrValidationStrict:
+          type: boolean
+          description: Whether an external CSR violating the resolved set is rejected
+            (true) or accepted with warnings (false); null inherits the platform default
+      required:
+      - mergeMode
     RaProfileCertificateValidationSettingsDto:
       type: object
       properties:
@@ -3503,10 +4306,109 @@ components:
           $ref: "#/components/schemas/RaProfileCertificateValidationSettingsDto"
           description: Settings for validation of certificates associated with the
             RA Profile
+        certificateRequestAttributes:
+          $ref: "#/components/schemas/RaProfileCertificateRequestAttributesDto"
+          description: Static certificate-request-attribute set configured for the
+            RA Profile
       required:
       - enabled
       - name
       - uuid
+    RdnMappedField:
+      allOf:
+      - $ref: "#/components/schemas/MappedField"
+      - type: object
+        properties:
+          rdn:
+            type: string
+            description: RDN code (e.g. "CN") or dotted-decimal OID; resolved via
+              the OID registry
+            minLength: 1
+      description: Maps an attribute value to an X.509 RDN component
+      required:
+      - fieldType
+      - rdn
+    SanMappedField:
+      allOf:
+      - $ref: "#/components/schemas/MappedField"
+      - type: object
+        properties:
+          generalNameType:
+            $ref: "#/components/schemas/GeneralNameType"
+            description: SAN type
+          otherNameOid:
+            type: string
+            description: OID of the otherName type; required when generalNameType
+              is OTHER_NAME
+          otherNameValueEncoding:
+            $ref: "#/components/schemas/ExtensionValueEncoding"
+            description: ASN.1 encoding for the otherName value; required when generalNameType
+              is OTHER_NAME because different OtherName OIDs carry differently-typed
+              values (e.g. UPN → UTF8String)
+      description: Maps an attribute value to a Subject Alternative Name entry
+      required:
+      - fieldType
+      - generalNameType
+    SourceParam:
+      type: object
+      description: Dependency filter that scopes a value source by another attribute's
+        value
+      properties:
+        attributeUuid:
+          type: string
+          description: UUID of the attribute whose value is used as a filter parameter
+        attributeName:
+          type: string
+          description: Name of the attribute; used as fallback when attributeUuid
+            is not matched
+    ValueSource:
+      type: object
+      description: Declares how Core resolves the content of an attribute; orthogonal
+        to fieldMapping
+      properties:
+        kind:
+          $ref: "#/components/schemas/ValueSourceType"
+          description: How the attribute value is resolved
+        params:
+          type: array
+          description: Optional dependency filters that scope the source by other
+            attributes' values
+          items:
+            $ref: "#/components/schemas/SourceParam"
+      required:
+      - kind
+    ValueSourceBindingDto:
+      type: object
+      description: Core-side value-source binding onto a request-attribute definition;
+        binds by attribute UUID (name fallback).
+      properties:
+        attributeUuid:
+          type: string
+          description: UUID of the target attribute definition; primary binding key
+        attributeName:
+          type: string
+          description: Name of the target attribute definition; fallback binding key
+            when the UUID is absent or rotated
+        valueSourceType:
+          $ref: "#/components/schemas/ValueSourceType"
+          description: Value-source provider type to bind onto the target definition
+        collectionRef:
+          type: string
+          description: Reference to a registered collection/source; used by collection-style
+            value sources
+        params:
+          type: array
+          description: Optional cascading dependency parameters (from other attributes)
+          items:
+            $ref: "#/components/schemas/SourceParam"
+      required:
+      - valueSourceType
+    ValueSourceType:
+      type: string
+      enum:
+      - none
+      - connectorCallback
+      - staticList
     AddRaProfileRequestDto:
       type: object
       properties:
@@ -3564,6 +4466,32 @@ components:
             \ status change to Expiring, when not set, value in platform settings\
             \ is used"
           minimum: 1
+    RaProfileCertificateRequestAttributesUpdateDto:
+      type: object
+      description: Request to set the RA Profile static request-attribute definitions
+        and the merge mode.
+      properties:
+        requestAttributes:
+          type: array
+          description: Ordered list of platform-owned request-attribute definitions
+            for this RA Profile
+          items:
+            $ref: "#/components/schemas/BaseAttributeDto"
+        mergeMode:
+          $ref: "#/components/schemas/AttributeSetMergeMode"
+          default: merge
+          description: How the static set combines with a connector-supplied set;
+            defaults to MERGE when omitted
+        valueSourceBindings:
+          type: array
+          description: Core-side value-source bindings to attach onto connector-supplied
+            (or static) definitions by reference
+          items:
+            $ref: "#/components/schemas/ValueSourceBindingDto"
+        externalCsrValidationStrict:
+          type: boolean
+          description: Whether an external CSR violating the resolved set is rejected
+            (true) or accepted with warnings (false); null inherits the platform default
     ActivateScepForRaProfileRequestDto:
       type: object
       properties:
@@ -4821,768 +5749,6 @@ components:
       - enabled
       - name
       - uuid
-    BaseAttributeDto:
-      type: object
-      description: Base Attribute definition
-      oneOf:
-      - $ref: "#/components/schemas/BaseAttributeDtoV2"
-      - $ref: "#/components/schemas/BaseAttributeDtoV3"
-      properties:
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-      required:
-      - name
-      - type
-      - uuid
-    BaseAttributeDtoV2:
-      description: Base Attribute definition
-      discriminator:
-        propertyName: type
-        mapping:
-          data: "#/components/schemas/DataAttributeV2"
-          info: "#/components/schemas/InfoAttributeV2"
-          group: "#/components/schemas/GroupAttributeV2"
-          meta: "#/components/schemas/MetadataAttributeV2"
-          custom: "#/components/schemas/CustomAttributeV2"
-      oneOf:
-      - $ref: "#/components/schemas/DataAttributeV2"
-      - $ref: "#/components/schemas/InfoAttributeV2"
-      - $ref: "#/components/schemas/GroupAttributeV2"
-      - $ref: "#/components/schemas/MetadataAttributeV2"
-      - $ref: "#/components/schemas/CustomAttributeV2"
-    BaseAttributeDtoV3:
-      type: object
-      description: Base Attribute definition
-      discriminator:
-        propertyName: type
-        mapping:
-          data: "#/components/schemas/DataAttributeV3"
-          info: "#/components/schemas/InfoAttributeV3"
-          group: "#/components/schemas/GroupAttributeV3"
-          meta: "#/components/schemas/MetadataAttributeV3"
-          custom: "#/components/schemas/CustomAttributeV3"
-      oneOf:
-      - $ref: "#/components/schemas/DataAttributeV3"
-      - $ref: "#/components/schemas/InfoAttributeV3"
-      - $ref: "#/components/schemas/GroupAttributeV3"
-      - $ref: "#/components/schemas/MetadataAttributeV3"
-      - $ref: "#/components/schemas/CustomAttributeV3"
-      required:
-      - schemaVersion
-    CustomAttributeProperties:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Friendly name of the the Attribute
-          examples:
-          - Attribute Name
-        visible:
-          type: boolean
-          default: true
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
-        group:
-          type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          examples:
-          - requiredAttributes
-        required:
-          type: boolean
-          default: false
-          description: "Boolean determining if the Attribute is required. If true,\
-            \ the Attribute must be provided."
-        readOnly:
-          type: boolean
-          default: false
-          description: "Boolean determining if the Attribute is read only. If true,\
-            \ the Attribute content cannot be changed."
-        list:
-          type: boolean
-          default: false
-          description: Boolean determining if the Attribute contains list of values
-            in the content
-        multiSelect:
-          type: boolean
-          default: false
-          description: Boolean determining if the Attribute can have multiple values
-        extensibleList:
-          type: boolean
-          default: false
-          description: Boolean determining if a list Attribute can have values other
-            than predefined options
-        protectionLevel:
-          $ref: "#/components/schemas/ProtectionLevel"
-          default: none
-          description: Protection level of the attribute content
-      required:
-      - extensibleList
-      - label
-      - list
-      - multiSelect
-      - readOnly
-      - required
-      - visible
-    CustomAttributeV2:
-      type: object
-      description: Custom attribute allows to store and transfer dynamic data. Its
-        content can be edited and send in requests to store.
-      properties:
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/CustomAttributeProperties"
-          description: Properties of the Attributes
-      required:
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
-      - version
-    CustomAttributeV3:
-      type: object
-      description: Custom attribute allows to store and transfer dynamic data. Its
-        content can be edited and send in requests to store.
-      properties:
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/CustomAttributeProperties"
-          description: Properties of the Attributes
-        schemaVersion:
-          $ref: "#/components/schemas/AttributeVersion"
-          description: Schema version of the Attribute
-      required:
-      - contentType
-      - name
-      - properties
-      - schemaVersion
-      - type
-      - uuid
-      - version
-    DataAttributeV3:
-      type: object
-      description: Data attribute allows to store and transfer dynamic data. Its content
-        can be edited and send in requests to store.
-      properties:
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/DataAttributeProperties"
-          description: Properties of the Attributes
-        constraints:
-          type: array
-          description: Optional constraints used for validating the Attribute content
-          items:
-            $ref: "#/components/schemas/BaseAttributeConstraint"
-        attributeCallback:
-          $ref: "#/components/schemas/AttributeCallback"
-          description: Optional definition of callback for getting the content of
-            the Attribute based on the action
-        schemaVersion:
-          $ref: "#/components/schemas/AttributeVersion"
-          description: Schema version of the Attribute
-        fieldMapping:
-          $ref: "#/components/schemas/FieldMapping"
-          description: Declares which certificate (or other object) fields this attribute's
-            value projects into; presence marks this attribute as a certificate request
-            attribute
-        valueSource:
-          $ref: "#/components/schemas/ValueSource"
-          description: Declares how Core resolves the content of this attribute; orthogonal
-            to fieldMapping
-      required:
-      - contentType
-      - name
-      - properties
-      - schemaVersion
-      - type
-      - uuid
-      - version
-    ExtensionMappedField:
-      allOf:
-      - $ref: "#/components/schemas/MappedField"
-      - type: object
-        properties:
-          extensionOid:
-            type: string
-            description: OID of the X.509 extension (dotted-decimal)
-            minLength: 1
-          criticalOverridable:
-            type: boolean
-            description: Whether the requester may override the default criticality
-              of the extension
-      description: Maps an attribute value to an X.509 extension
-      required:
-      - extensionOid
-      - fieldType
-    ExtensionValueEncoding:
-      type: string
-      enum:
-      - UTF8String
-      - IA5String
-      - PrintableString
-      - OctetString
-      - BitString
-      - DER
-    FieldMapping:
-      type: object
-      description: Declares which certificate (or other object) fields an attribute
-        value projects into
-      properties:
-        objectType:
-          $ref: "#/components/schemas/ObjectType"
-          description: Object type this mapping applies to
-        fields:
-          type: array
-          description: "One or more target fields (supports 1-to-many, e.g. CN + dNSName\
-            \ from a single attribute)"
-          items:
-            oneOf:
-            - $ref: "#/components/schemas/ExtensionMappedField"
-            - $ref: "#/components/schemas/RdnMappedField"
-            - $ref: "#/components/schemas/SanMappedField"
-          minItems: 1
-      required:
-      - fields
-      - objectType
-    FieldSource:
-      type: string
-      enum:
-      - csr
-      - platform
-      - csrThenPlatform
-    FieldType:
-      type: string
-      enum:
-      - rdn
-      - san
-      - extension
-    GeneralNameType:
-      type: string
-      enum:
-      - dns
-      - email
-      - ip
-      - uri
-      - otherName
-      - directoryName
-      - registeredId
-    GroupAttributeV2:
-      type: object
-      description: Group attribute and its content represents dynamic list of additional
-        attributes retrieved by callback. Its content can not be edited and is not
-        send in requests to store.
-      properties:
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        content:
-          type: array
-          description: List of all different types of attributes
-          items:
-            $ref: "#/components/schemas/BaseAttributeDtoV2"
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        attributeCallback:
-          $ref: "#/components/schemas/AttributeCallback"
-          description: Optional definition of callback for getting the content of
-            the Attribute based on the action
-      required:
-      - name
-      - type
-      - uuid
-      - version
-    GroupAttributeV3:
-      type: object
-      description: Group attribute and its content represents dynamic list of additional
-        attributes retrieved by callback. Its content can not be edited and is not
-        send in requests to store.
-      properties:
-        schemaVersion:
-          $ref: "#/components/schemas/AttributeVersion"
-          description: Version of the Attribute
-          example: 3
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        content:
-          type: array
-          description: List of all different types of attributes
-          items:
-            $ref: "#/components/schemas/BaseAttributeDto"
-        version:
-          type: integer
-          format: int32
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        attributeCallback:
-          $ref: "#/components/schemas/AttributeCallback"
-          description: Optional definition of callback for getting the content of
-            the Attribute based on the action
-      required:
-      - name
-      - schemaVersion
-      - type
-      - uuid
-    InfoAttributeProperties:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Friendly name of the the Attribute
-          examples:
-          - Attribute Name
-        visible:
-          type: boolean
-          default: true
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
-        group:
-          type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          examples:
-          - requiredAttributes
-      required:
-      - label
-      - visible
-    InfoAttributeV2:
-      type: object
-      description: Info attribute contains content that is for information purpose
-        or represents additional information for object (metadata). Its content can
-        not be edited and is not send in requests to store.
-      properties:
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/InfoAttributeProperties"
-          description: Properties of the Attributes
-      required:
-      - content
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
-      - version
-    InfoAttributeV3:
-      type: object
-      description: Info attribute contains content that is for information purpose
-        or represents additional information for object (metadata). Its content can
-        not be edited and is not send in requests to store.
-      properties:
-        schemaVersion:
-          $ref: "#/components/schemas/AttributeVersion"
-          description: Version of the Attribute
-          example: 3
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
-        version:
-          type: integer
-          format: int32
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/InfoAttributeProperties"
-          description: Properties of the Attributes
-      required:
-      - content
-      - contentType
-      - name
-      - properties
-      - schemaVersion
-      - type
-      - uuid
-    MappedField:
-      type: object
-      description: Describes a single target field within an object; concrete type
-        is determined by fieldType
-      discriminator:
-        propertyName: fieldType
-      properties:
-        fieldType:
-          $ref: "#/components/schemas/FieldType"
-          description: "Field type, determines the concrete subtype"
-        order:
-          type: integer
-          format: int32
-          description: Ordering index for fields of the same type (e.g. RDN components);
-            ascending
-          minimum: 1
-        source:
-          $ref: "#/components/schemas/FieldSource"
-          description: Provenance of the value when reconciling CSR vs platform-projected
-            values
-      required:
-      - fieldType
-    MetadataAttributeProperties:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Friendly name of the the Attribute
-          examples:
-          - Attribute Name
-        visible:
-          type: boolean
-          default: true
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
-        group:
-          type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          examples:
-          - requiredAttributes
-        global:
-          type: boolean
-          default: false
-          description: Boolean determining if the Metadata is a global metadata.
-        overwrite:
-          type: boolean
-          default: false
-          description: Boolean determining if the new metadata content should overwrite
-            (replace) existing content instead of appending.
-        protectionLevel:
-          $ref: "#/components/schemas/ProtectionLevel"
-          default: none
-          description: Protection level of the attribute content
-      required:
-      - label
-      - visible
-    MetadataAttributeV2:
-      type: object
-      description: Info attribute contains content that is for metadata. Its content
-        can not be edited and is not send in requests to store.
-      properties:
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/MetadataAttributeProperties"
-          description: Properties of the Attributes
-      required:
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
-      - version
-    MetadataAttributeV3:
-      type: object
-      description: Info attribute contains content that is for metadata. Its content
-        can not be edited and is not send in requests to store.
-      properties:
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/MetadataAttributeProperties"
-          description: Properties of the Attributes
-        schemaVersion:
-          $ref: "#/components/schemas/AttributeVersion"
-          description: Schema version of the Attribute
-      required:
-      - contentType
-      - name
-      - properties
-      - schemaVersion
-      - type
-      - uuid
-      - version
-    ObjectType:
-      type: string
-      enum:
-      - x509Certificate
-      - sshCertificate
-      - key
-      - secret
-    RdnMappedField:
-      allOf:
-      - $ref: "#/components/schemas/MappedField"
-      - type: object
-        properties:
-          rdn:
-            type: string
-            description: RDN code (e.g. "CN") or dotted-decimal OID; resolved via
-              the OID registry
-            minLength: 1
-      description: Maps an attribute value to an X.509 RDN component
-      required:
-      - fieldType
-      - rdn
-    SanMappedField:
-      allOf:
-      - $ref: "#/components/schemas/MappedField"
-      - type: object
-        properties:
-          generalNameType:
-            $ref: "#/components/schemas/GeneralNameType"
-            description: SAN type
-          otherNameOid:
-            type: string
-            description: OID of the otherName type; required when generalNameType
-              is OTHER_NAME
-          otherNameValueEncoding:
-            $ref: "#/components/schemas/ExtensionValueEncoding"
-            description: ASN.1 encoding for the otherName value; required when generalNameType
-              is OTHER_NAME because different OtherName OIDs carry differently-typed
-              values (e.g. UPN → UTF8String)
-      description: Maps an attribute value to a Subject Alternative Name entry
-      required:
-      - fieldType
-      - generalNameType
-    SourceParam:
-      type: object
-      description: Dependency filter that scopes a value source by another attribute's
-        value
-      properties:
-        attributeUuid:
-          type: string
-          description: UUID of the attribute whose value is used as a filter parameter
-        attributeName:
-          type: string
-          description: Name of the attribute; used as fallback when attributeUuid
-            is not matched
-    ValueSource:
-      type: object
-      description: Declares how Core resolves the content of an attribute; orthogonal
-        to fieldMapping
-      properties:
-        kind:
-          $ref: "#/components/schemas/ValueSourceType"
-          description: How the attribute value is resolved
-        params:
-          type: array
-          description: Optional dependency filters that scope the source by other
-            attributes' values
-          items:
-            $ref: "#/components/schemas/SourceParam"
-      required:
-      - kind
-    ValueSourceType:
-      type: string
-      enum:
-      - none
-      - connectorCallback
-      - staticList
     ApprovalProfileDto:
       type: object
       properties:

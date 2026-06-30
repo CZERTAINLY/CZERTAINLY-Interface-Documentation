@@ -4391,232 +4391,12 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/RequestAttribute"
-    ClientAddEndEntityRequestDto:
-      type: object
-      properties:
-        raProfile:
-          $ref: "#/components/schemas/RaProfileDto"
-          description: RA profile related to End Entity
-        email:
-          type: string
-          description: End Entity email
-        extensionData:
-          type: array
-          description: End Entity extension data
-          items:
-            $ref: "#/components/schemas/EndEntityExtendedInfoDto"
-        password:
-          type: string
-          description: End Entity password
-        subjectAltName:
-          type: string
-          description: End Entity Subject alternative name
-        subjectDN:
-          type: string
-          description: End Entity subject domain name
-        username:
-          type: string
-          description: End Entity name
-      required:
-      - password
-      - raProfile
-      - subjectDN
-      - username
-    EndEntityExtendedInfoDto:
-      type: object
-      properties:
-        name:
-          type: string
-        value:
-          type: string
-    RaProfileCertificateValidationSettingsDto:
-      type: object
-      properties:
-        enabled:
-          type: boolean
-          description: "Indicator whether validation of certificates associated with\
-            \ RA profile should be enabled, if null, then values in platform settings\
-            \ will be used"
-        frequency:
-          type: integer
-          format: int32
-          description: Frequency of validation of certificates in days
-          minimum: 1
-        expiringThreshold:
-          type: integer
-          format: int32
-          description: How many days before expiration should certificate validation
-            status change to Expiring
-          minimum: 1
-    RaProfileDto:
-      type: object
-      properties:
-        uuid:
-          type: string
-          description: Object identifier
-          examples:
-          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
-        name:
-          type: string
-          description: Object Name
-          examples:
-          - Name
-        description:
-          type: string
-          description: Description of RA Profile
-        authorityInstanceUuid:
-          type: string
-          description: UUID of Authority provider
-        authorityInstanceName:
-          type: string
-          description: Name of Authority instance
-        legacyAuthority:
-          type: boolean
-          description: Has Authority of legacy authority provider
-        enabled:
-          type: boolean
-          description: Enabled flag - true = enabled; false = disabled
-        attributes:
-          type: array
-          description: List of RA Profiles attributes
-          items:
-            $ref: "#/components/schemas/ResponseAttribute"
-        customAttributes:
-          type: array
-          description: List of Custom Attributes
-          items:
-            $ref: "#/components/schemas/ResponseAttribute"
-        enabledProtocols:
-          type: array
-          description: List of protocols enabled
-          items:
-            type: string
-        certificateValidationSettings:
-          $ref: "#/components/schemas/RaProfileCertificateValidationSettingsDto"
-          description: Settings for validation of certificates associated with the
-            RA Profile
-      required:
-      - enabled
-      - name
-      - uuid
-    ClientEditEndEntityRequestDto:
-      type: object
-      properties:
-        raProfile:
-          $ref: "#/components/schemas/RaProfileDto"
-          description: RA profile related to End Entity
-        email:
-          type: string
-          description: End Entity email
-        extensionData:
-          type: array
-          description: End Entity extension data
-          items:
-            $ref: "#/components/schemas/EndEntityExtendedInfoDto"
-        password:
-          type: string
-          description: End Entity password
-        subjectAltName:
-          type: string
-          description: End Entity Subject alternative name
-        subjectDN:
-          type: string
-          description: End Entity subject domain name
-        status:
-          type: string
-          description: End Entity Subject domain name
-          enum:
-          - NEW
-          - FAILED
-          - INITIALIZED
-          - IN_PROCESS
-          - GENERATED
-          - REVOKED
-          - HISTORICAL
-          - KEY_RECOVERY
-          - WAITING_FOR_ADD_APPROVAL
-      required:
-      - password
-      - raProfile
-      - status
-      - subjectDN
-    LegacyClientCertificateRevocationDto:
-      type: object
-      properties:
-        certificateSN:
-          type: string
-          description: Certificate serial number
-        issuerDN:
-          type: string
-          description: Issuer domain name
-        reason:
-          $ref: "#/components/schemas/CertificateRevocationReason"
-          description: Revocation reason
-      required:
-      - certificateSN
-      - issuerDN
-      - reason
-    LegacyClientCertificateSignRequestDto:
-      type: object
-      properties:
-        password:
-          type: string
-          description: End Entity password
-        pkcs10:
-          type: string
-          description: Certificate sign request (PKCS#10) encoded as Base64 string
-        username:
-          type: string
-          description: End Entity username
-      required:
-      - password
-      - pkcs10
-      - username
-    ClientCertificateSignResponseDto:
-      type: object
-      properties:
-        certificateData:
-          type: string
-          description: Date of signed certificate
-      required:
-      - certificateData
-    AvailableOperations:
-      type: object
-      description: Per-RA-profile capability advertisement. Operators query this before
-        invoking register/cancel/etc. to know which actions an authority supports.
-      properties:
-        operations:
-          type: array
-          description: List of operations the authority advertises for this RA profile.
-          items:
-            $ref: "#/components/schemas/OperationSupport"
-    CertificateOperationKind:
+    AttributeSetMergeMode:
       type: string
       enum:
-      - ISSUE
-      - RENEW
-      - REVOKE
-      - REGISTER
-    OperationSupport:
-      type: object
-      description: Per-operation support flags for an authority/RA profile.
-      properties:
-        operation:
-          $ref: "#/components/schemas/CertificateOperationKind"
-          description: "Operation kind (ISSUE, RENEW, REVOKE, REGISTER)."
-        supported:
-          type: boolean
-          description: Whether the operation is supported by this authority.
-        asyncSupported:
-          type: boolean
-          description: Whether the operation may complete asynchronously (HTTP 202
-            + status polling).
-        cancelSupported:
-          type: boolean
-          description: Whether an in-flight asynchronous execution of this operation
-            can be cancelled.
-      required:
-      - operation
+      - staticOnly
+      - connectorOnly
+      - merge
     BaseAttributeDto:
       type: object
       description: Base Attribute definition
@@ -4632,14 +4412,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
@@ -4679,6 +4459,37 @@ components:
       - $ref: "#/components/schemas/CustomAttributeV3"
       required:
       - schemaVersion
+    ClientAddEndEntityRequestDto:
+      type: object
+      properties:
+        raProfile:
+          $ref: "#/components/schemas/RaProfileDto"
+          description: RA profile related to End Entity
+        email:
+          type: string
+          description: End Entity email
+        extensionData:
+          type: array
+          description: End Entity extension data
+          items:
+            $ref: "#/components/schemas/EndEntityExtendedInfoDto"
+        password:
+          type: string
+          description: End Entity password
+        subjectAltName:
+          type: string
+          description: End Entity Subject alternative name
+        subjectDN:
+          type: string
+          description: End Entity subject domain name
+        username:
+          type: string
+          description: End Entity name
+      required:
+      - password
+      - raProfile
+      - subjectDN
+      - username
     CustomAttributeProperties:
       type: object
       properties:
@@ -4889,6 +4700,13 @@ components:
       - type
       - uuid
       - version
+    EndEntityExtendedInfoDto:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
     ExtensionMappedField:
       allOf:
       - $ref: "#/components/schemas/MappedField"
@@ -5310,6 +5128,106 @@ components:
       - sshCertificate
       - key
       - secret
+    RaProfileCertificateRequestAttributesDto:
+      type: object
+      description: RA Profile static request-attribute definitions and the merge mode.
+      properties:
+        requestAttributes:
+          type: array
+          description: Ordered list of platform-owned request-attribute definitions
+            for this RA Profile
+          items:
+            $ref: "#/components/schemas/BaseAttributeDto"
+        mergeMode:
+          $ref: "#/components/schemas/AttributeSetMergeMode"
+          description: How the static set combines with a connector-supplied set;
+            always the effective mode
+        valueSourceBindings:
+          type: array
+          description: Core-side value-source bindings attached onto connector-supplied
+            (or static) definitions by reference
+          items:
+            $ref: "#/components/schemas/ValueSourceBindingDto"
+        externalCsrValidationStrict:
+          type: boolean
+          description: Whether an external CSR violating the resolved set is rejected
+            (true) or accepted with warnings (false); null inherits the platform default
+      required:
+      - mergeMode
+    RaProfileCertificateValidationSettingsDto:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+          description: "Indicator whether validation of certificates associated with\
+            \ RA profile should be enabled, if null, then values in platform settings\
+            \ will be used"
+        frequency:
+          type: integer
+          format: int32
+          description: Frequency of validation of certificates in days
+          minimum: 1
+        expiringThreshold:
+          type: integer
+          format: int32
+          description: How many days before expiration should certificate validation
+            status change to Expiring
+          minimum: 1
+    RaProfileDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        description:
+          type: string
+          description: Description of RA Profile
+        authorityInstanceUuid:
+          type: string
+          description: UUID of Authority provider
+        authorityInstanceName:
+          type: string
+          description: Name of Authority instance
+        legacyAuthority:
+          type: boolean
+          description: Has Authority of legacy authority provider
+        enabled:
+          type: boolean
+          description: Enabled flag - true = enabled; false = disabled
+        attributes:
+          type: array
+          description: List of RA Profiles attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        customAttributes:
+          type: array
+          description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        enabledProtocols:
+          type: array
+          description: List of protocols enabled
+          items:
+            type: string
+        certificateValidationSettings:
+          $ref: "#/components/schemas/RaProfileCertificateValidationSettingsDto"
+          description: Settings for validation of certificates associated with the
+            RA Profile
+        certificateRequestAttributes:
+          $ref: "#/components/schemas/RaProfileCertificateRequestAttributesDto"
+          description: Static certificate-request-attribute set configured for the
+            RA Profile
+      required:
+      - enabled
+      - name
+      - uuid
     RdnMappedField:
       allOf:
       - $ref: "#/components/schemas/MappedField"
@@ -5373,12 +5291,156 @@ components:
             $ref: "#/components/schemas/SourceParam"
       required:
       - kind
+    ValueSourceBindingDto:
+      type: object
+      description: Core-side value-source binding onto a request-attribute definition;
+        binds by attribute UUID (name fallback).
+      properties:
+        attributeUuid:
+          type: string
+          description: UUID of the target attribute definition; primary binding key
+        attributeName:
+          type: string
+          description: Name of the target attribute definition; fallback binding key
+            when the UUID is absent or rotated
+        valueSourceType:
+          $ref: "#/components/schemas/ValueSourceType"
+          description: Value-source provider type to bind onto the target definition
+        collectionRef:
+          type: string
+          description: Reference to a registered collection/source; used by collection-style
+            value sources
+        params:
+          type: array
+          description: Optional cascading dependency parameters (from other attributes)
+          items:
+            $ref: "#/components/schemas/SourceParam"
+      required:
+      - valueSourceType
     ValueSourceType:
       type: string
       enum:
       - none
       - connectorCallback
       - staticList
+    ClientEditEndEntityRequestDto:
+      type: object
+      properties:
+        raProfile:
+          $ref: "#/components/schemas/RaProfileDto"
+          description: RA profile related to End Entity
+        email:
+          type: string
+          description: End Entity email
+        extensionData:
+          type: array
+          description: End Entity extension data
+          items:
+            $ref: "#/components/schemas/EndEntityExtendedInfoDto"
+        password:
+          type: string
+          description: End Entity password
+        subjectAltName:
+          type: string
+          description: End Entity Subject alternative name
+        subjectDN:
+          type: string
+          description: End Entity subject domain name
+        status:
+          type: string
+          description: End Entity Subject domain name
+          enum:
+          - NEW
+          - FAILED
+          - INITIALIZED
+          - IN_PROCESS
+          - GENERATED
+          - REVOKED
+          - HISTORICAL
+          - KEY_RECOVERY
+          - WAITING_FOR_ADD_APPROVAL
+      required:
+      - password
+      - raProfile
+      - status
+      - subjectDN
+    LegacyClientCertificateRevocationDto:
+      type: object
+      properties:
+        certificateSN:
+          type: string
+          description: Certificate serial number
+        issuerDN:
+          type: string
+          description: Issuer domain name
+        reason:
+          $ref: "#/components/schemas/CertificateRevocationReason"
+          description: Revocation reason
+      required:
+      - certificateSN
+      - issuerDN
+      - reason
+    LegacyClientCertificateSignRequestDto:
+      type: object
+      properties:
+        password:
+          type: string
+          description: End Entity password
+        pkcs10:
+          type: string
+          description: Certificate sign request (PKCS#10) encoded as Base64 string
+        username:
+          type: string
+          description: End Entity username
+      required:
+      - password
+      - pkcs10
+      - username
+    ClientCertificateSignResponseDto:
+      type: object
+      properties:
+        certificateData:
+          type: string
+          description: Date of signed certificate
+      required:
+      - certificateData
+    AvailableOperations:
+      type: object
+      description: Per-RA-profile capability advertisement. Operators query this before
+        invoking register/cancel/etc. to know which actions an authority supports.
+      properties:
+        operations:
+          type: array
+          description: List of operations the authority advertises for this RA profile.
+          items:
+            $ref: "#/components/schemas/OperationSupport"
+    CertificateOperationKind:
+      type: string
+      enum:
+      - ISSUE
+      - RENEW
+      - REVOKE
+      - REGISTER
+    OperationSupport:
+      type: object
+      description: Per-operation support flags for an authority/RA profile.
+      properties:
+        operation:
+          $ref: "#/components/schemas/CertificateOperationKind"
+          description: "Operation kind (ISSUE, RENEW, REVOKE, REGISTER)."
+        supported:
+          type: boolean
+          description: Whether the operation is supported by this authority.
+        asyncSupported:
+          type: boolean
+          description: Whether the operation may complete asynchronously (HTTP 202
+            + status polling).
+        cancelSupported:
+          type: boolean
+          description: Whether an in-flight asynchronous execution of this operation
+            can be cancelled.
+      required:
+      - operation
     ClientEndEntityDto:
       type: object
       properties:
