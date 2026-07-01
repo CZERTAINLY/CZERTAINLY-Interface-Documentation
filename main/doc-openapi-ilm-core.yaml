@@ -28154,6 +28154,83 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/authorities/{connectorUuid}/attributes:
+    get:
+      tags:
+      - Authority Management
+      summary: List authority attributes for a connector
+      description: "Connector-scoped authority attribute schema for a stateless authority\
+        \ connector, keyed by connector UUID."
+      operationId: listAuthorityInstanceAttributes
+      parameters:
+      - name: connectorUuid
+        in: path
+        description: Connector UUID
+        required: true
+        schema:
+          type: string
+      - name: interfaceUuid
+        in: query
+        description: AUTHORITY interface UUID; disambiguates when the connector exposes
+          more than one AUTHORITY interface version (e.g. v2 and v3). Optional when
+          a single AUTHORITY interface exists.
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Authority attributes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/protocols/scep:
     get:
       tags:
