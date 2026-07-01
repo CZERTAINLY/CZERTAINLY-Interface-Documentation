@@ -13,7 +13,78 @@ info:
   x-logo:
     url: images/ilm-logo.svg
   x-metrics-profile:
+    version: 1
+    required:
+    - unit: "1"
+      name: app_build_info
+      type: gauge
+      labels:
+      - version
+      - commit
+      - runtime
+    - unit: seconds
+      name: process_start_time_seconds
+      type: gauge
+      labels: []
+    - unit: seconds
+      name: process_cpu_seconds_total
+      type: counter
+      labels: []
+    - unit: bytes
+      name: process_resident_memory_bytes
+      type: gauge
+      labels: []
+    - unit: requests
+      name: http_requests_total
+      type: counter
+      labels:
+      - method
+      - route
+      - status
+    - name: http_request_duration_seconds
+      buckets_ref: http_server_latency_buckets_seconds
+      labels:
+      - method
+      - route
+      type: histogram
+      unit: seconds
+    - unit: requests
+      name: http_server_in_flight_requests
+      type: gauge
+      labels:
+      - route
+    - unit: requests
+      name: http_client_requests_total
+      type: counter
+      labels:
+      - method
+      - target
+      - status
+    - name: http_client_request_duration_seconds
+      buckets_ref: http_client_latency_buckets_seconds
+      labels:
+      - method
+      - target
+      type: histogram
+      unit: seconds
+    - unit: events
+      name: connector_events_total
+      type: counter
+      labels:
+      - event
+      - outcome
     histograms:
+      http_client_latency_buckets_seconds:
+      - 0.01
+      - 0.025
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.5
+      - 1.0
+      - 2.5
+      - 5.0
+      - 10.0
       http_server_latency_buckets_seconds:
       - 0.005
       - 0.01
@@ -26,77 +97,6 @@ info:
       - 2.5
       - 5.0
       - 10.0
-      http_client_latency_buckets_seconds:
-      - 0.01
-      - 0.025
-      - 0.05
-      - 0.1
-      - 0.25
-      - 0.5
-      - 1.0
-      - 2.5
-      - 5.0
-      - 10.0
-    required:
-    - unit: "1"
-      labels:
-      - version
-      - commit
-      - runtime
-      type: gauge
-      name: app_build_info
-    - unit: seconds
-      labels: []
-      type: gauge
-      name: process_start_time_seconds
-    - unit: seconds
-      labels: []
-      type: counter
-      name: process_cpu_seconds_total
-    - unit: bytes
-      labels: []
-      type: gauge
-      name: process_resident_memory_bytes
-    - unit: requests
-      labels:
-      - method
-      - route
-      - status
-      type: counter
-      name: http_requests_total
-    - name: http_request_duration_seconds
-      unit: seconds
-      type: histogram
-      labels:
-      - method
-      - route
-      buckets_ref: http_server_latency_buckets_seconds
-    - unit: requests
-      labels:
-      - route
-      type: gauge
-      name: http_server_in_flight_requests
-    - unit: requests
-      labels:
-      - method
-      - target
-      - status
-      type: counter
-      name: http_client_requests_total
-    - name: http_client_request_duration_seconds
-      unit: seconds
-      type: histogram
-      labels:
-      - method
-      - target
-      buckets_ref: http_client_latency_buckets_seconds
-    - unit: events
-      labels:
-      - event
-      - outcome
-      type: counter
-      name: connector_events_total
-    version: 1
 externalDocs:
   description: ILM Documentation
   url: https://docs.otilm.com
@@ -3692,15 +3692,126 @@ components:
             can resolve the upstream end-entity without an extra lookup.
           items:
             $ref: "#/components/schemas/MetadataAttribute"
+        requestContent:
+          description: "Optional structured request content (typed RDNs, SANs, extensions).\
+            \ Present ONLY when the connector advertises the CERTIFICATE_REQUEST_STRUCTURED\
+            \ feature flag. When present it is the authoritative source of subject\
+            \ identity and extensions for this renewal; otherwise identity is derived\
+            \ from existingCertificate (serial + issuer DN) as documented above."
+          oneOf:
+          - $ref: "#/components/schemas/X509RequestContent"
       required:
       - authorityAttributes
       - existingCertificate
       - raProfileAttributes
+    CertificateRequestContent:
+      type: object
+      description: Typed certificate request content carrying the decoded identity
+        intent; coexists with the raw CSR which remains authoritative for the public
+        key and proof of possession
+      discriminator:
+        propertyName: certificateType
+        mapping:
+          X.509: "#/components/schemas/X509RequestContent"
+      properties:
+        certificateType:
+          $ref: "#/components/schemas/CertificateType"
+          description: "Certificate type, determines the concrete subtype"
+      required:
+      - certificateType
     CertificateRequestFormat:
       type: string
       enum:
       - pkcs10
       - crmf
+    GeneralNameEntry:
+      type: object
+      description: A single Subject Alternative Name entry
+      properties:
+        type:
+          $ref: "#/components/schemas/GeneralNameType"
+          description: SAN type
+        value:
+          type: string
+          description: "SAN value; interpretation depends on type (IP address, DNS\
+            \ name, email, URI, etc.)"
+          minLength: 1
+        otherNameOid:
+          type: string
+          description: OID of the otherName type; required when type is OTHER_NAME
+        valueEncoding:
+          $ref: "#/components/schemas/ExtensionValueEncoding"
+          description: "ASN.1 encoding used for the otherName value string; required\
+            \ when type is OTHER_NAME because different OtherName OIDs carry differently-typed\
+            \ values (e.g. UPN → UTF8String, others may differ)"
+      required:
+      - type
+      - value
+    RdnEntry:
+      type: object
+      description: A single RDN component in an ordered subject DN
+      properties:
+        type:
+          type: string
+          description: "RDN attribute type: a short code (e.g. \"CN\") or a dotted-decimal\
+            \ OID; resolved via the OID registry"
+          minLength: 1
+        value:
+          type: string
+          description: RDN attribute value
+          minLength: 1
+      required:
+      - type
+      - value
+    RequestedExtension:
+      type: object
+      description: A requested X.509 extension; SAN is never duplicated here — it
+        is carried in subjectAltNames only
+      properties:
+        oid:
+          type: string
+          description: "OID of the X.509 extension (dotted-decimal, RFC 5280)"
+          minLength: 1
+        critical:
+          type: boolean
+          description: Whether the extension is marked critical
+        encoding:
+          $ref: "#/components/schemas/ExtensionValueEncoding"
+          description: Encoding of the value string
+        value:
+          type: string
+          description: Extension value; a string whose interpretation is declared
+            by encoding
+          minLength: 1
+      required:
+      - critical
+      - encoding
+      - oid
+      - value
+    X509RequestContent:
+      allOf:
+      - $ref: "#/components/schemas/CertificateRequestContent"
+      - type: object
+        properties:
+          subject:
+            type: array
+            description: Ordered subject DN components
+            items:
+              $ref: "#/components/schemas/RdnEntry"
+          subjectAltNames:
+            type: array
+            description: Subject Alternative Name entries; SAN is never duplicated
+              in extensions
+            items:
+              $ref: "#/components/schemas/GeneralNameEntry"
+          extensions:
+            type: array
+            description: "Requested X.509 extensions, excluding SAN"
+            items:
+              $ref: "#/components/schemas/RequestedExtension"
+      description: Typed identity content of an X.509 certificate request
+      required:
+      - certificateType
     CertificateExtension:
       type: object
       properties:
@@ -3755,6 +3866,14 @@ components:
             value). All extensions OTHER than SAN go here.
           items:
             $ref: "#/components/schemas/CertificateExtension"
+        requestContent:
+          description: "Optional structured request content (typed RDNs, SANs, extensions).\
+            \ Present ONLY when the connector advertises the CERTIFICATE_REQUEST_STRUCTURED\
+            \ feature flag; otherwise Core renders the flat subjectDn/subjectAltName/extensions\
+            \ fields from the same content. The structured form is authoritative when\
+            \ both are present."
+          oneOf:
+          - $ref: "#/components/schemas/X509RequestContent"
         attributes:
           type: array
           description: Register-specific dynamic attributes
@@ -3799,6 +3918,14 @@ components:
             \ = fresh issuance."
           items:
             $ref: "#/components/schemas/MetadataAttribute"
+        requestContent:
+          description: "Optional structured request content (typed RDNs, SANs, extensions).\
+            \ Present ONLY when the connector advertises the CERTIFICATE_REQUEST_STRUCTURED\
+            \ feature flag. When present it is the authoritative source of subject\
+            \ identity and extensions for this issuance; otherwise identity is taken\
+            \ from the submitted CSR (request)."
+          oneOf:
+          - $ref: "#/components/schemas/X509RequestContent"
       required:
       - authorityAttributes
       - raProfileAttributes
@@ -4126,6 +4253,8 @@ components:
       - timestamping
       - certificateRegistration
       - certificateStatusPolling
+      - certificateRequestStructured
+      - certificateIdentityOverride
     InfoResponse:
       type: object
       properties:
