@@ -6625,14 +6625,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
           example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
       required:
       - name
       - type
@@ -7516,20 +7516,29 @@ components:
           description: Email of the user
         groupUuids:
           type: array
-          description: Groups UUIDs of the user (set to empty list to remove certificate
-            from all groups)
+          description: "Groups UUIDs of the user. For creation, omit or provide an\
+            \ empty list for no group membership. For updates, omit to leave the current\
+            \ membership unchanged; set to an empty list to remove the user from all\
+            \ groups."
           items:
             type: string
         certificateData:
           type: string
-          description: Base64 Content of the admin certificate
+          description: Base64 content of the user certificate
         certificateUuid:
           type: string
-          description: UUID of the existing certificate in the Inventory. Mandatory
-            if certificate is not provided
+          description: UUID of the existing certificate in the inventory. Mandatory
+            if certificate data is not provided
         customAttributes:
           type: array
           description: List of Custom Attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        certificateCustomAttributes:
+          type: array
+          description: "List of Custom Attributes set for the user certificate, if\
+            \ a new certificate is uploaded. Ignored if the certificate already exists\
+            \ in the inventory (matched by UUID or fingerprint)."
           items:
             $ref: "#/components/schemas/RequestAttribute"
     NameAndUuidDto:

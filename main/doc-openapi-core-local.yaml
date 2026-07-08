@@ -61,11 +61,6 @@ components:
     AddUserRequestDto:
       type: object
       properties:
-        username:
-          type: string
-          description: Username of the user
-          examples:
-          - user1
         description:
           type: string
           description: Description of the user
@@ -77,26 +72,44 @@ components:
           description: Last name of the user
         email:
           type: string
+          format: email
           description: Email of the user
         groupUuids:
           type: array
-          description: Groups UUIDs of the user
+          description: "Groups UUIDs of the user. For creation, omit or provide an\
+            \ empty list for no group membership. For updates, omit to leave the current\
+            \ membership unchanged; set to an empty list to remove the user from all\
+            \ groups."
           items:
             type: string
-        enabled:
-          type: boolean
-          description: "Status of the user. True = Enabled, False = Disabled"
         certificateData:
           type: string
-          description: Base64 Content of the user certificate
+          description: Base64 content of the user certificate
         certificateUuid:
           type: string
-          description: UUID of the existing certificate in the Inventory
+          description: UUID of the existing certificate in the inventory. Mandatory
+            if certificate data is not provided
         customAttributes:
           type: array
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/RequestAttribute"
+        certificateCustomAttributes:
+          type: array
+          description: "List of Custom Attributes set for the user certificate, if\
+            \ a new certificate is uploaded. Ignored if the certificate already exists\
+            \ in the inventory (matched by UUID or fingerprint)."
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        username:
+          type: string
+          description: Username of the user
+          examples:
+          - user1
+          minLength: 1
+        enabled:
+          type: boolean
+          description: "Status of the user. True = Enabled, False = Disabled"
         name:
           type: string
       required:
