@@ -49,7 +49,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ClientCertificateSignRequestDto"
+              $ref: "#/components/schemas/ClientCertificateIssueRequestDto"
         required: true
       responses:
         "200":
@@ -459,7 +459,7 @@ paths:
           Issuance is triggered with the existing CSR.
         - `REGISTERED` (body required): the certificate was pre-registered (v3 authorities with
           `CERTIFICATE_REGISTRATION` capability) and is now being finalized with an operator-
-          supplied CSR. The CSR + sign attributes from the body are attached to the existing
+          supplied CSR. The CSR + sign attributes and the authorization secret from the body are attached to the existing
           certificate row, then issuance is triggered. The cert's identity (subject DN, SAN,
           extensions) and connector-supplied metadata from the registration are preserved.
       operationId: issueExistingCertificate
@@ -483,13 +483,13 @@ paths:
         schema:
           type: string
       requestBody:
-        description: Sign request body. Required when cert state is REGISTERED (carries
-          the operator's CSR + sign attributes); must be omitted when cert state is
-          REQUESTED.
+        description: Issue request body. Required when cert state is REGISTERED (carries
+          the operator's CSR + sign attributes plus the authorization secret); must
+          be omitted when cert state is REQUESTED.
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ClientCertificateSignRequestDto"
+              $ref: "#/components/schemas/ClientCertificateIssueRequestDto"
       responses:
         "200":
           description: Certificate issued
@@ -1469,7 +1469,7 @@ components:
       enum:
       - X.509
       - SSH
-    ClientCertificateSignRequestDto:
+    ClientCertificateIssueRequestDto:
       type: object
       properties:
         csrAttributes:
@@ -1520,6 +1520,12 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/RequestAttribute"
+        authorizationSecret:
+          type: string
+          description: One-time authorization secret proving the caller may complete
+            a pre-registered certificate. Write-only; ignored for certificates without
+            an active registration.
+          writeOnly: true
       required:
       - attributes
       - request
@@ -2714,6 +2720,12 @@ components:
             \ alternative attributes will be used to generate the new CSR"
           items:
             $ref: "#/components/schemas/RequestAttribute"
+        authorizationSecret:
+          type: string
+          description: One-time authorization secret for rekeying a certificate that
+            has an active registration. Write-only; ignored for certificates without
+            one.
+          writeOnly: true
     UploadCertificateRequestDto:
       type: object
       properties:
