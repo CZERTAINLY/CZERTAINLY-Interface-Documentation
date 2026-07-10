@@ -4812,6 +4812,10 @@ components:
           items:
             $ref: "#/components/schemas/LocationDto"
           uniqueItems: true
+        registration:
+          $ref: "#/components/schemas/CertificateRegistrationDetailDto"
+          description: Pre-registration authorization status; present only for certificates
+            that were pre-registered
         nonCompliantRules:
           type: array
           deprecated: true
@@ -5088,6 +5092,27 @@ components:
             \ alpha-2."
           items:
             type: string
+    CertificateRegistrationDetailDto:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/CertificateRegistrationState"
+          description: Registration authorization state
+        expiresAt:
+          type: string
+          format: date-time
+          description: Issuance deadline for completing the pre-registered certificate
+        failedAttempts:
+          type: integer
+          format: int32
+          description: Number of failed challenge-verification attempts recorded
+    CertificateRegistrationState:
+      type: string
+      enum:
+      - active
+      - expired
+      - locked
+      - closed
     CertificateRequestDto:
       type: object
       properties:

@@ -34844,6 +34844,23 @@ components:
       - $ref: "#/components/schemas/RawSigningWorkflowDto"
       required:
       - type
+    CertificateRegistrationSettingsUpdateDto:
+      type: object
+      properties:
+        defaultIssuanceWindowDays:
+          type: integer
+          format: int32
+          default: 7
+          description: "Default issuance window in days, applied when a pre-registration\
+            \ omits an explicit expiry"
+          minimum: 1
+        maxFailedAttempts:
+          type: integer
+          format: int32
+          default: 5
+          description: Maximum failed challenge-verification attempts before the registration
+            authorization locks
+          minimum: 1
     CertificateRequestAttributesSettingsUpdateDto:
       type: object
       description: Request to set the editable platform default request-attribute
@@ -34867,6 +34884,9 @@ components:
         requestAttributes:
           $ref: "#/components/schemas/CertificateRequestAttributesSettingsUpdateDto"
           description: Platform default request-attribute set
+        registration:
+          $ref: "#/components/schemas/CertificateRegistrationSettingsUpdateDto"
+          description: Certificate pre-registration settings
     CertificateValidationSettingsUpdateDto:
       type: object
       properties:
@@ -37251,11 +37271,11 @@ components:
       - $ref: "#/components/schemas/BaseAttributeContentDtoV2"
       - $ref: "#/components/schemas/BaseAttributeContentDtoV3"
       properties:
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
         reference:
           type: string
         data: {}
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
     CustomAttributeUpdateRequestDto:
       type: object
       properties:
@@ -38001,6 +38021,10 @@ components:
           items:
             $ref: "#/components/schemas/LocationDto"
           uniqueItems: true
+        registration:
+          $ref: "#/components/schemas/CertificateRegistrationDetailDto"
+          description: Pre-registration authorization status; present only for certificates
+            that were pre-registered
         nonCompliantRules:
           type: array
           deprecated: true
@@ -38124,6 +38148,27 @@ components:
             \ alpha-2."
           items:
             type: string
+    CertificateRegistrationDetailDto:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/CertificateRegistrationState"
+          description: Registration authorization state
+        expiresAt:
+          type: string
+          format: date-time
+          description: Issuance deadline for completing the pre-registered certificate
+        failedAttempts:
+          type: integer
+          format: int32
+          description: Number of failed challenge-verification attempts recorded
+    CertificateRegistrationState:
+      type: string
+      enum:
+      - active
+      - expired
+      - locked
+      - closed
     CertificateRequestDto:
       type: object
       properties:
@@ -38446,6 +38491,22 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/RequestAttribute"
+        authorizationSecret:
+          type: string
+          description: Authorization secret (challenge) that gates later issue/rekey
+            of this pre-registered certificate. Write-only and optional — the operator
+            supplies it to opt the registration into challenge-gated completion; the
+            platform never generates one.
+          maxLength: 255
+          minLength: 12
+          pattern: "[\\x20-\\x7E]+"
+          writeOnly: true
+        expiresAt:
+          type: string
+          format: date-time
+          description: "Optional absolute deadline by which the pre-registered certificate\
+            \ must be issued. When omitted, the platform applies the default registration\
+            \ issuance window."
     ConnectorRequestDtoV2:
       type: object
       properties:
@@ -43332,6 +43393,21 @@ components:
       - signingProfile
       - signingTime
       - uuid
+    CertificateRegistrationSettingsDto:
+      type: object
+      properties:
+        defaultIssuanceWindowDays:
+          type: integer
+          format: int32
+          description: "Default issuance window in days, applied when a pre-registration\
+            \ omits an explicit expiry"
+          minimum: 1
+        maxFailedAttempts:
+          type: integer
+          format: int32
+          description: Maximum failed challenge-verification attempts before the registration
+            authorization locks
+          minimum: 1
     CertificateRequestAttributesSettingsDto:
       type: object
       description: Editable platform default request-attribute definitions (terminal
@@ -43353,6 +43429,8 @@ components:
           $ref: "#/components/schemas/CertificateValidationSettingsDto"
         requestAttributes:
           $ref: "#/components/schemas/CertificateRequestAttributesSettingsDto"
+        registration:
+          $ref: "#/components/schemas/CertificateRegistrationSettingsDto"
     CertificateValidationSettingsDto:
       type: object
       properties:

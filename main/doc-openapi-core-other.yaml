@@ -1894,6 +1894,23 @@ components:
       required:
       - contentType
       - data
+    CertificateRegistrationSettingsUpdateDto:
+      type: object
+      properties:
+        defaultIssuanceWindowDays:
+          type: integer
+          format: int32
+          default: 7
+          description: "Default issuance window in days, applied when a pre-registration\
+            \ omits an explicit expiry"
+          minimum: 1
+        maxFailedAttempts:
+          type: integer
+          format: int32
+          default: 5
+          description: Maximum failed challenge-verification attempts before the registration
+            authorization locks
+          minimum: 1
     CertificateRequestAttributesSettingsUpdateDto:
       type: object
       description: Request to set the editable platform default request-attribute
@@ -1917,6 +1934,9 @@ components:
         requestAttributes:
           $ref: "#/components/schemas/CertificateRequestAttributesSettingsUpdateDto"
           description: Platform default request-attribute set
+        registration:
+          $ref: "#/components/schemas/CertificateRegistrationSettingsUpdateDto"
+          description: Certificate pre-registration settings
     CertificateType:
       type: string
       enum:
@@ -4906,6 +4926,21 @@ components:
           description: "Retained record count by signing scheme, flattened as the\
             \ cross-product of signing scheme and managed signing type: 'delegated',\
             \ 'managed_static_key', 'managed_one_time_key' (and more later)."
+    CertificateRegistrationSettingsDto:
+      type: object
+      properties:
+        defaultIssuanceWindowDays:
+          type: integer
+          format: int32
+          description: "Default issuance window in days, applied when a pre-registration\
+            \ omits an explicit expiry"
+          minimum: 1
+        maxFailedAttempts:
+          type: integer
+          format: int32
+          description: Maximum failed challenge-verification attempts before the registration
+            authorization locks
+          minimum: 1
     CertificateRequestAttributesSettingsDto:
       type: object
       description: Editable platform default request-attribute definitions (terminal
@@ -4927,6 +4962,8 @@ components:
           $ref: "#/components/schemas/CertificateValidationSettingsDto"
         requestAttributes:
           $ref: "#/components/schemas/CertificateRequestAttributesSettingsDto"
+        registration:
+          $ref: "#/components/schemas/CertificateRegistrationSettingsDto"
     CertificateValidationSettingsDto:
       type: object
       properties:

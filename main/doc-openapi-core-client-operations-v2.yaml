@@ -2905,6 +2905,10 @@ components:
           items:
             $ref: "#/components/schemas/LocationDto"
           uniqueItems: true
+        registration:
+          $ref: "#/components/schemas/CertificateRegistrationDetailDto"
+          description: Pre-registration authorization status; present only for certificates
+            that were pre-registered
         nonCompliantRules:
           type: array
           deprecated: true
@@ -3181,6 +3185,27 @@ components:
             \ alpha-2."
           items:
             type: string
+    CertificateRegistrationDetailDto:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/CertificateRegistrationState"
+          description: Registration authorization state
+        expiresAt:
+          type: string
+          format: date-time
+          description: Issuance deadline for completing the pre-registered certificate
+        failedAttempts:
+          type: integer
+          format: int32
+          description: Number of failed challenge-verification attempts recorded
+    CertificateRegistrationState:
+      type: string
+      enum:
+      - active
+      - expired
+      - locked
+      - closed
     CertificateRequestDto:
       type: object
       properties:
@@ -3910,6 +3935,22 @@ components:
           description: List of Custom Attributes
           items:
             $ref: "#/components/schemas/RequestAttribute"
+        authorizationSecret:
+          type: string
+          description: Authorization secret (challenge) that gates later issue/rekey
+            of this pre-registered certificate. Write-only and optional — the operator
+            supplies it to opt the registration into challenge-gated completion; the
+            platform never generates one.
+          maxLength: 255
+          minLength: 12
+          pattern: "[\\x20-\\x7E]+"
+          writeOnly: true
+        expiresAt:
+          type: string
+          format: date-time
+          description: "Optional absolute deadline by which the pre-registered certificate\
+            \ must be issued. When omitted, the platform applies the default registration\
+            \ issuance window."
     AvailableOperations:
       type: object
       description: Per-RA-profile capability advertisement. Operators query this before
