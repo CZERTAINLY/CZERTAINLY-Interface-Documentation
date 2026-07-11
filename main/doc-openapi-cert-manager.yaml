@@ -6625,14 +6625,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
@@ -8982,22 +8982,32 @@ components:
           description: "Subject DN. Optional per RFC 5280 §4.1.2.6: an empty subject\
             \ is permitted when subject naming information is carried entirely in\
             \ the Subject Alternative Name extension (in which case the subjectAltName\
-            \ extension MUST be marked critical at issuance). At least one of subjectDn\
-            \ or subjectAltName must be non-empty — enforced by the cross-field {@code\
-            \ subjectIdentificationProvided} constraint."
+            \ extension MUST be marked critical at issuance). At least one of subjectDn,\
+            \ subjectAltName, or csrAttributes must provide subject identity — enforced\
+            \ by the cross-field {@code subjectIdentificationProvided} constraint."
           example: "CN=device-7,O=Acme"
         subjectAltName:
           type: string
           description: "Subject Alternative Name in RFC 5280 textual form (e.g. DNS:foo,IP:1.2.3.4,email:x@y).\
             \ SAN MUST be carried here ONLY — do not also include it as OID 2.5.29.17\
             \ in extensions[]. Connectors reject duplicate-source requests with VALIDATION_FAILED.\
-            \ Required when subjectDn is empty (see RFC 5280 §4.1.2.6)."
+            \ Provides subject identity when subjectDn is empty (see RFC 5280 §4.1.2.6);\
+            \ csrAttributes is a further alternative."
         extensions:
           type: array
           description: Structured certificate extensions (OID + critical + base64
             value). All extensions OTHER than SAN go here.
           items:
             $ref: "#/components/schemas/CertificateExtension"
+        csrAttributes:
+          type: array
+          description: "Structured request-attribute identity content (subject RDNs,\
+            \ SANs, extensions) — the typed alternative to the flat subjectDn/subjectAltName/extensions\
+            \ above, mirroring the issue path. When provided, the platform projects\
+            \ it into the registration identity; the flat fields remain the simple/compatibility\
+            \ shape. When both are supplied, the register handling defines the precedence."
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
         attributes:
           type: array
           description: "Authority-defined registration attributes (e.g., subject DN\
