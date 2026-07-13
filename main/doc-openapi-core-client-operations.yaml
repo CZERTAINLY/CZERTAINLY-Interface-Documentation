@@ -3213,12 +3213,6 @@ components:
             \ alternative attributes will be used to generate the new CSR"
           items:
             $ref: "#/components/schemas/RequestAttribute"
-        authorizationSecret:
-          type: string
-          description: One-time authorization secret for rekeying a certificate that
-            has an active registration. Write-only; ignored for certificates without
-            one.
-          writeOnly: true
     UploadCertificateRequestDto:
       type: object
       properties:
@@ -4441,10 +4435,13 @@ components:
             $ref: "#/components/schemas/RequestAttribute"
         authorizationSecret:
           type: string
-          description: Authorization secret (challenge) that gates later issue/rekey
-            of this pre-registered certificate. Write-only and optional — the operator
-            supplies it to opt the registration into challenge-gated completion; the
-            platform never generates one.
+          description: Authorization secret (challenge) that gates completion of this
+            pre-registered certificate. Write-only and optional — the operator supplies
+            it to opt the registration into challenge-gated issuance; the platform
+            never generates one. Issuing a pre-registered certificate is currently
+            the only challenge-verified completion path; renewal and rekey requests
+            for a certificate with an active registration are rejected (fail-closed)
+            until challenge-gated successor handling is added.
           maxLength: 255
           minLength: 12
           pattern: "[\\x20-\\x7E]+"
@@ -4476,14 +4473,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
           example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
       required:
       - name
       - type
