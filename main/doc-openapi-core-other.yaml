@@ -1220,6 +1220,48 @@ paths:
       - SessionAuth: []
       - CertificateAuth: []
       - BearerJWTAuth: []
+  /v1/oids/system:
+    get:
+      tags:
+      - Custom OID Management
+      summary: "List built-in system OID entries, optionally filtered by category"
+      operationId: listSystemOidEntries
+      parameters:
+      - name: category
+        in: query
+        description: Optional OID category filter
+        required: false
+        schema:
+          $ref: "#/components/schemas/OidCategory"
+      responses:
+        "200":
+          description: System OID entries retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CustomOidEntryDetailResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - SessionAuth: []
+      - CertificateAuth: []
+      - BearerJWTAuth: []
   /v1/oids/search:
     get:
       tags:
