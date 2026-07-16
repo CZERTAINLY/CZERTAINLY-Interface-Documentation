@@ -1309,7 +1309,20 @@ paths:
       tags:
       - Certificate Inventory
       summary: Get CSR Generation Attributes
+      description: |-
+        Returns the request-attribute definitions available for building a certificate request.
+        Without `raProfileUuid`: the editable platform default request-attribute set.
+        With `raProfileUuid`: the resolved request-attribute set for that RA profile.
       operationId: getCsrGenerationAttributes
+      parameters:
+      - name: raProfileUuid
+        in: query
+        description: "RA Profile UUID — when provided, the response is the resolved\
+          \ request-attribute set for this RA profile"
+        required: false
+        schema:
+          type: string
+          format: uuid
       responses:
         "200":
           description: CSR Generation attributes retrieved
@@ -1319,6 +1332,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "400":
           description: Bad Request
           content:
