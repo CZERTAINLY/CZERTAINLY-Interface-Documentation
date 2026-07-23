@@ -22565,6 +22565,71 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/register:
+    get:
+      tags:
+      - Client Operations v2
+      summary: Get registration attributes
+      description: Return the list of attributes the client must populate when pre-registering
+        a certificate through this RA profile. The list reflects the certificate authority's
+        register-operation attribute schema.
+      operationId: listRegisterCertificateAttributes
+      parameters:
+      - name: authorityUuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      - name: raProfileUuid
+        in: path
+        description: RA Profile UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Attributes obtained
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/issue:
     get:
       tags:
@@ -32073,14 +32138,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
@@ -38135,6 +38200,19 @@ components:
         revokeAttributes:
           type: array
           description: List of revoke attributes
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        registerAttributes:
+          type: array
+          description: "List of register attributes: the connector's register-operation\
+            \ attributes submitted when the certificate was pre-registered"
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        registrationRequestAttributes:
+          type: array
+          description: "List of request attributes submitted at registration: the\
+            \ operator-supplied request-attribute values that shaped the pre-registered\
+            \ identity"
           items:
             $ref: "#/components/schemas/ResponseAttribute"
         relatedCertificates:
