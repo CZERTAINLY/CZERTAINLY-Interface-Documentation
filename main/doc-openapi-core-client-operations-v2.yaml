@@ -20,17 +20,63 @@ servers:
   description: ILM Demo server
 tags:
 - name: Client Operations v2
-  description: Client Operations v2 API
+  description: |
+    Certificate lifecycle operations through an RA profile: issue, renew, rekey, register, revoke,
+    finalize, confirm-revoke, and cancel.
+
+    The issue, renew, rekey, and revoke operations are asynchronous: the request is validated,
+    persisted, and queued; the authority-connector call runs afterwards, and an approval step may
+    first move the certificate to
+    PENDING_APPROVAL. The HTTP response therefore does not carry the outcome — a 2xx means the request
+    was accepted, not that it completed — and the issue/renew/rekey responses never carry the signed
+    certificate. Follow an operation by reading the certificate's state, and retrieve the signed
+    certificate from the certificate detail once it reaches ISSUED.
+
+    register runs inline against the connector: it reaches REGISTERED synchronously (and may return
+    certificate data), or PENDING_REGISTRATION when the connector defers completion.
+
+    A certificate left in PENDING_ISSUE or PENDING_REVOKE is completed either by platform status-polling
+    (when the authority advertises it) or by an operator action — issue/finalize, revoke/confirm, or
+    cancel. Query availableOperations first to learn whether asynchronous completion and cancellation
+    apply to a given authority / RA profile.
+
+    Certificate states driven by this API:
+
+    ```
+    Issuance (issueCertificate, renewCertificate, rekeyCertificate,
+              issueExistingCertificate on a REQUESTED cert):
+      REQUESTED --> PENDING_ISSUE --> ISSUED       connector completes (synchronously or via polling);
+                         |                         manuallyIssueCertificate finalizes it the same way
+                         +-- cancel ------------> FAILED
+                         +-- connector failure --> FAILED
+
+    Registration (registerCertificate, then issueExistingCertificate on a REGISTERED cert):
+      PENDING_REGISTRATION --> REGISTERED --> PENDING_ISSUE --> ISSUED
+               |               (connector 2xx or platform-level; then the issuance flow above)
+               +-- setup failure --> FAILED
+
+    Revocation (revokeCertificate):
+      ISSUED --> REVOKED                     authority completes the revocation immediately
+      ISSUED --> PENDING_REVOKE --> REVOKED  deferred, then manuallyConfirmRevoke
+      PENDING_REVOKE --> ISSUED              cancelPendingCertificateOperation
+
+    Approvals: issue / renew / rekey / revoke may pass through PENDING_APPROVAL first;
+               a rejected issuance ends REJECTED (a pre-registered certificate is restored to REGISTERED),
+               a rejected revocation restores the prior state.
+    Terminal (no further transition via this API): REVOKED, REJECTED, FAILED.
+    ```
 paths:
   /v2/operations/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/certificates:
     post:
       tags:
       - Client Operations v2
       summary: Issue certificate
-      description: "Submit a new certificate signing request and trigger issuance\
-        \ through this RA profile. If the issuance is asynchronous, the certificate\
-        \ is returned in state `PENDING_ISSUE` and must be finalized once it has been\
-        \ issued."
+      description: "Submit a new certificate signing request and request issuance\
+        \ through this RA profile. The request is validated, persisted, and queued;\
+        \ issuance runs asynchronously and an approval step may run first. This response\
+        \ returns only the new certificate's UUID — it never carries the signed certificate\
+        \ and does not indicate completion. Track the operation through the certificate's\
+        \ state."
       operationId: issueCertificate
       parameters:
       - name: authorityUuid
@@ -53,11 +99,17 @@ paths:
         required: true
       responses:
         "200":
-          description: Certificate issued
+          description: Issuance request accepted
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ClientCertificateDataResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -69,12 +121,8 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "401":
           description: Unauthorized
         "403":
@@ -83,8 +131,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
         "404":
           description: Not Found
           content:
@@ -112,9 +158,13 @@ paths:
       tags:
       - Client Operations v2
       summary: Revoke certificate
-      description: "Revoke a certificate currently in state `ISSUED`. If the revocation\
-        \ is asynchronous, the certificate moves to state `PENDING_REVOKE` and must\
-        \ be confirmed once the revocation has been performed."
+      description: "Revoke a certificate currently in state `ISSUED`. The request\
+        \ is accepted and queued; revocation runs through the authority and an approval\
+        \ step may run first. This response is returned before the authority call\
+        \ completes, so it does not indicate completion — the certificate ends in\
+        \ `REVOKED` if the authority completes the revocation immediately, or `PENDING_REVOKE`\
+        \ if completion is deferred and later confirmed. Track the result through\
+        \ its state."
       operationId: revokeCertificate
       parameters:
       - name: authorityUuid
@@ -143,13 +193,24 @@ paths:
         required: true
       responses:
         "204":
-          description: Certificate revoked
+          description: Revoke request accepted and queued — observe the certificate
+            state for the outcome.
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Cannot perform operation revoke on certificate in state ...
         "401":
           description: Unauthorized
         "403":
@@ -268,10 +329,10 @@ paths:
       tags:
       - Client Operations v2
       summary: Renew certificate
-      description: "Renew an existing certificate using the same key pair. The original\
-        \ certificate stays in state `ISSUED`; the renewed certificate is returned\
-        \ and, if its issuance is asynchronous, ends in state `PENDING_ISSUE` until\
-        \ it is finalized."
+      description: "Renew a certificate using its existing key pair. The original\
+        \ certificate stays in state `ISSUED`; a new certificate is created, queued,\
+        \ and issued asynchronously. This response returns only the new certificate's\
+        \ UUID — track the result through its state."
       operationId: renewCertificate
       parameters:
       - name: authorityUuid
@@ -300,11 +361,17 @@ paths:
         required: true
       responses:
         "200":
-          description: Certificate renewed
+          description: Renewal request accepted
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ClientCertificateDataResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -316,12 +383,6 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -360,11 +421,11 @@ paths:
       - Client Operations v2
       summary: Rekey Certificate
       description: |
-        The rekey operation is used to request a new certificate with a new key pair.
-        The new certificate will be issued with the same subject and attributes as the original certificate,
-        but with a new public key. Therefore, new certificate signing request (CSR) with new key pair needs
-        to be provided, or new key pair managed by the platform needs to be selected. When the same key pair
-        is used, or the subject is changed, the rekey operation will be rejected.
+        Request a replacement certificate with a new key pair but the same subject and
+        attributes as the original. Provide a new CSR with a new key pair, or select a
+        platform-managed key pair; reusing the same key pair, or changing the subject, is
+        rejected. Queued and issued asynchronously — track the result through the new
+        certificate's state.
       operationId: rekeyCertificate
       parameters:
       - name: authorityUuid
@@ -393,11 +454,17 @@ paths:
         required: true
       responses:
         "200":
-          description: Certificate regenerated
+          description: Rekey request accepted
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ClientCertificateDataResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -409,12 +476,8 @@ paths:
               example:
               - Error Message 1
               - Error Message 2
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "401":
           description: Unauthorized
         "403":
@@ -423,8 +486,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
         "404":
           description: Not Found
           content:
@@ -453,15 +514,16 @@ paths:
       - Client Operations v2
       summary: Issue an existing certificate (REQUESTED or REGISTERED)
       description: |
-        Trigger issuance for an existing certificate. Behavior depends on cert state:
-        - `REQUESTED` (no body): the certificate already has a CSR attached (typically from
-          a protocol layer such as ACME, SCEP, or CMP, or after an approval/compliance cycle).
-          Issuance is triggered with the existing CSR.
-        - `REGISTERED` (body required): the certificate was pre-registered (v3 authorities with
-          `CERTIFICATE_REGISTRATION` capability) and is now being finalized with an operator-
-          supplied CSR. The CSR + sign attributes and the authorization secret from the body are attached to the existing
-          certificate row, then issuance is triggered. The cert's identity (subject DN, SAN,
-          extensions) and connector-supplied metadata from the registration are preserved.
+        Trigger issuance for an existing certificate; behaviour depends on its state:
+        - `REQUESTED` (no body): the certificate already carries a CSR (e.g. from an ACME/SCEP/CMP
+          protocol layer, or after an approval/compliance cycle); issuance runs against that CSR.
+        - `REGISTERED` (body required): a pre-registered certificate is finalized with the operator's
+          CSR (sign attributes as the RA profile requires, and the authorization secret only for
+          challenge-protected registrations); its registered identity (subject DN, SAN, extensions)
+          and connector metadata are preserved.
+
+        Queued and issued asynchronously like `issueCertificate` — track the result through the
+        certificate's state.
       operationId: issueExistingCertificate
       parameters:
       - name: authorityUuid
@@ -483,16 +545,17 @@ paths:
         schema:
           type: string
       requestBody:
-        description: Issue request body. Required when cert state is REGISTERED (carries
-          the operator's CSR + sign attributes plus the authorization secret); must
-          be omitted when cert state is REQUESTED.
+        description: "Issue request body. Required when cert state is REGISTERED (carries\
+          \ the operator's CSR, sign attributes as the RA profile requires, and —\
+          \ for challenge-protected registrations — the authorization secret); must\
+          \ be omitted when cert state is REQUESTED."
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/ClientCertificateIssueRequestDto"
       responses:
         "200":
-          description: Certificate issued
+          description: Issuance request accepted
           content:
             application/json:
               schema:
@@ -552,20 +615,15 @@ paths:
       - Client Operations v2
       summary: Finalize an asynchronous certificate issuance
       description: |
-        Upload an issued certificate to finalize a certificate currently in
-        state `PENDING_ISSUE`. On success, the certificate transitions to `ISSUED`
-        and is pushed to any pre-associated locations.
+        Finalize a certificate in state `PENDING_ISSUE` by uploading the issued certificate. On
+        success it transitions to `ISSUED` and is pushed to any pre-associated locations.
 
-        Validation:
-        - the certificate request's public key must match the uploaded certificate's
-          public key (mandatory);
-        - the certificate request's subject DN should match the uploaded certificate's
-          subject DN (warning on mismatch — some CAs canonicalise the DN);
-        - the uploaded certificate must be verifiable against the certificate
-          authority associated with the RA profile (mandatory).
+        Validation: the certificate request's public key must match the uploaded certificate
+        (mandatory); the subject DN should match (warning only — some CAs canonicalise it); and the
+        uploaded certificate must verify against the RA profile's authority (mandatory).
 
-        Request body carries a Base64-encoded single certificate and an optional list
-        of certificate-level custom attributes.
+        The body carries a Base64-encoded single certificate and optional certificate-level custom
+        attributes.
       operationId: manuallyIssueCertificate
       parameters:
       - name: authorityUuid
@@ -599,6 +657,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CertificateDetailDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -610,12 +680,8 @@ paths:
               example:
               - Certificate is not in PENDING_ISSUE state
               - Public key mismatch with certificate request
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
         "401":
           description: Unauthorized
         "403":
@@ -624,8 +690,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
-        "500":
-          description: Internal Server Error
         "404":
           description: Not Found
           content:
@@ -654,21 +718,15 @@ paths:
       - Client Operations v2
       summary: Cancel a pending certificate operation
       description: |
-        State-aware cancel for a certificate currently in state `PENDING_ISSUE` or
-        `PENDING_REVOKE`. Transitions:
+        State-aware cancel for a certificate in `PENDING_ISSUE` or `PENDING_REVOKE`:
 
         - `PENDING_ISSUE` → `FAILED`
         - `PENDING_REVOKE` → `ISSUED`
 
-        The optional `reason` from the request body is recorded in the certificate
-        event history.
-
-        If the underlying operation cannot be aborted (for example, it has
-        progressed beyond a point where cancellation is possible), the response is
-        `422 Unprocessable Entity` with the reason, and the certificate **stays in
-        its pending state**. In that case the operation can still be resolved by
-        waiting for it to complete and then finalizing or confirming
-        the certificate, or by retrying the cancel later if circumstances change.
+        The optional `reason` is recorded in the certificate event history. If the underlying
+        operation can no longer be aborted, the response is `422` and the certificate stays in its
+        pending state; it can then be resolved by letting it complete and finalizing/confirming, or
+        by retrying the cancel later.
       operationId: cancelPendingCertificateOperation
       parameters:
       - name: authorityUuid
@@ -756,14 +814,14 @@ paths:
       - Client Operations v2
       summary: Pre-register a certificate
       description: |
-        Pre-registers a certificate that will be issued later; the response carries the pre-registered
-        certificate's UUID, and completion runs through the standard issue flow.
+        Pre-register a certificate to be issued later; the response carries the pre-registered
+        certificate's UUID and completion runs through the standard issue flow.
 
-        When the authority's connector supports registration (a v3 connector advertising the
-        `CERTIFICATE_REGISTRATION` feature flag), the registration is made with the upstream CA; otherwise
-        the certificate is pre-registered at the platform level with no connector call — a platform-level
-        pre-registration does not imply a CA-side end-entity exists. Connector-side completion may be
-        asynchronous; it is tracked server-side and finished through the issue flow.
+        When the authority's connector supports registration (a v3 connector advertising
+        `CERTIFICATE_REGISTRATION`), the registration is made with the upstream CA; otherwise the
+        certificate is pre-registered at the platform level with no connector call, which does not imply
+        a CA-side end-entity exists. Connector-side completion may be asynchronous and is tracked
+        server-side.
       operationId: registerCertificate
       parameters:
       - name: authorityUuid
@@ -786,11 +844,17 @@ paths:
         required: true
       responses:
         "200":
-          description: Certificate pre-registered
+          description: Registration request accepted
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ClientCertificateDataResponseDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Invalid registration request
           content:
@@ -799,12 +863,6 @@ paths:
                 type: array
                 items:
                   type: string
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorMessageDto"
         "401":
           description: Unauthorized
         "403":
@@ -869,6 +927,17 @@ paths:
       responses:
         "200":
           description: Attributes validated
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "400":
           description: Bad Request
           content:
@@ -996,7 +1065,7 @@ paths:
       summary: List operations supported by this authority/RA profile
       description: |
         Returns per-operation support flags (issue/renew/revoke/register) including whether
-        each may complete asynchronously and whether each can be cancelled mid-flight. Operators
+        the platform polls for its asynchronous completion and whether each can be cancelled mid-flight. Operators
         use this to drive UI affordances and validate flows before invoking them.
       operationId: listAvailableOperations
       parameters:
@@ -1225,17 +1294,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
-        "422":
-          description: Unprocessable Entity
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
         "400":
           description: Bad Request
           content:
@@ -2699,7 +2757,11 @@ components:
       properties:
         certificateData:
           type: string
-          description: Base64 encoded Certificate content
+          description: Base64-encoded signed certificate. The issuance operations
+            complete asynchronously and leave this empty; register leaves it empty
+            too unless the authority returns certificate data synchronously. Retrieve
+            the signed certificate from the certificate detail once the certificate
+            reaches the ISSUED state.
         uuid:
           type: string
           description: UUID of Certificate
@@ -4094,8 +4156,11 @@ components:
           description: Whether the operation is supported by this authority.
         asyncSupported:
           type: boolean
-          description: Whether the operation may complete asynchronously (HTTP 202
-            + status polling).
+          description: Whether the platform provides managed status-polling for this
+            operation's asynchronous completion (the authority is v3 and advertises
+            status polling). A connector may still complete asynchronously without
+            this — the certificate is then left in a pending state for an operator
+            finalize/confirm action.
         cancelSupported:
           type: boolean
           description: Whether an in-flight asynchronous execution of this operation
