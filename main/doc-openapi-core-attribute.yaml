@@ -10,7 +10,7 @@ info:
   license:
     name: MIT License
     url: https://github.com/OmniTrustILM/ilm/blob/main/LICENSE.md
-  version: 2.19.0
+  version: 2.20.0-SNAPSHOT
   x-logo:
     url: images/ilm-logo.svg
 externalDocs:
@@ -2569,16 +2569,21 @@ components:
         version:
           $ref: "#/components/schemas/AttributeVersion"
           description: Version of the attribute
+        resources:
+          type: array
+          description: List of resources for custom attribute
+          items:
+            $ref: "#/components/schemas/Resource"
+        required:
+          type: boolean
+          description: "Boolean determining if the Attribute is required. If true,\
+            \ the Attribute must be provided."
         type:
           $ref: "#/components/schemas/AttributeType"
           default: custom
           description: Type of the Attribute
           examples:
           - custom
-        required:
-          type: boolean
-          description: "Boolean determining if the Attribute is required. If true,\
-            \ the Attribute must be provided."
         visible:
           type: boolean
           default: true
@@ -2610,11 +2615,6 @@ components:
             of the Attribute must satisfy the type
           items:
             $ref: "#/components/schemas/AttributeContent"
-        resources:
-          type: array
-          description: List of resources which are allowed to use the Custom Attribute
-          items:
-            $ref: "#/components/schemas/Resource"
         extensibleList:
           type: boolean
           description: Boolean determining if a list Attribute can have values other
@@ -2625,6 +2625,7 @@ components:
       - label
       - name
       - required
+      - resources
       - type
       - uuid
     GlobalMetadataCreateRequestDto:
@@ -2844,11 +2845,16 @@ components:
           description: List of resources for custom attribute
           items:
             $ref: "#/components/schemas/Resource"
+        required:
+          type: boolean
+          description: "Boolean determining if the Attribute is required. If true,\
+            \ the Attribute must be provided."
       required:
       - contentType
       - description
       - label
       - name
+      - required
       - resources
       - uuid
     CustomAttribute:

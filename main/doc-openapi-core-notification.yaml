@@ -9,7 +9,7 @@ info:
   license:
     name: MIT License
     url: https://github.com/OmniTrustILM/ilm/blob/main/LICENSE.md
-  version: 2.19.0
+  version: 2.20.0-SNAPSHOT
   x-logo:
     url: images/ilm-logo.svg
 externalDocs:
@@ -898,6 +898,13 @@ paths:
       - BearerJWTAuth: []
 components:
   schemas:
+    NotificationDataCategory:
+      type: string
+      enum:
+      - customAttributes
+      - metadata
+      - associations
+      - objectContent
     NotificationProfileUpdateRequestDto:
       type: object
       properties:
@@ -931,6 +938,13 @@ components:
           type: integer
           format: int32
           description: Maximum number of repetitions of same notification
+        eventDataCategories:
+          type: array
+          description: "Notification data categories included in external notifications\
+            \ sent by this profile. When updating, an absent field keeps the current\
+            \ value and an empty list disables enrichment"
+          items:
+            $ref: "#/components/schemas/NotificationDataCategory"
       required:
       - internalNotification
       - recipientType
@@ -1004,6 +1018,12 @@ components:
           type: integer
           format: int32
           description: Maximum number of repetitions of same notification
+        eventDataCategories:
+          type: array
+          description: Notification data categories included in external notifications
+            sent by this profile
+          items:
+            $ref: "#/components/schemas/NotificationDataCategory"
       required:
       - internalNotification
       - name
@@ -2478,6 +2498,13 @@ components:
           type: integer
           format: int32
           description: Maximum number of repetitions of same notification
+        eventDataCategories:
+          type: array
+          description: "Notification data categories included in external notifications\
+            \ sent by this profile. When updating, an absent field keeps the current\
+            \ value and an empty list disables enrichment"
+          items:
+            $ref: "#/components/schemas/NotificationDataCategory"
         name:
           type: string
           description: Name of the Notification profile
@@ -2694,6 +2721,12 @@ components:
         internalNotification:
           type: boolean
           description: Is notification profile sending internal notifications
+        eventDataCategories:
+          type: array
+          description: Notification data categories included in external notifications
+            sent by this profile
+          items:
+            $ref: "#/components/schemas/NotificationDataCategory"
       required:
       - internalNotification
       - name

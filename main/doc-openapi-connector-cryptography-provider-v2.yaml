@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
-  title: Signature Formatting Provider API
-  description: REST API for implementations of custom Signature Formatting Provider
+  title: Cryptography Provider v2 API
+  description: REST API for implementations of custom v2 Cryptography Provider
   contact:
     name: ILM
     url: https://www.otilm.com
@@ -110,12 +110,9 @@ tags:
 - name: Connector Attributes v2
   description: Attribute-definition registry and stateless callback surface for NG
     connectors.
-- name: Signature Formatting Provider
-  description: Signature Formatting Provider API defines operations for protocol-specific
-    formatting of digital signing requests. The provider is stateless and handles
-    the conversion between raw signing material and protocol-specific formats (e.g.
-    TSA TimeStampToken). It serves the timestamping workflow; AdES content-signature
-    formatting is served by the Content Signing Formatting contract at /v1/signatureProvider/contentSigning.
+- name: Token Management v2
+  description: "Token configuration, status and token-profile schema operations for\
+    \ cryptography providers"
 - name: Health check v2
   description: "Connector Health check API. Connector returns own status and in some\
     \ cases can return status of components on which it depends like database, HSM\
@@ -127,7 +124,1192 @@ tags:
     \ interface, this is validated by the core. You can also implement helper end\
     \ points that are used for callbacks and other relevant operations specific to\
     \ implementation."
+- name: Cryptographic Operations v2
+  description: "Cryptographic operations scoped by token, token-profile and key metadata\
+    \ supplied in requests"
+- name: Key Management v2
+  description: "Key operations scoped by token, token-profile and key metadata supplied\
+    \ in requests"
 paths:
+  /v2/cryptographyProvider/tokens/tokenProfile/keyUsages:
+    post:
+      tags:
+      - Token Management v2
+      summary: List supported token profile key usages
+      description: Returns the key usages supported for the supplied token context
+      operationId: listTokenProfileKeyUsages
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenScopedRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Supported key usages retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KeyUsage"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/tokens/tokenProfile/attributes:
+    post:
+      tags:
+      - Token Management v2
+      summary: List token profile attributes
+      description: Returns the token profile attribute schema for the supplied token
+        context
+      operationId: listTokenProfileAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenScopedRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Token profile attributes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/tokens/status:
+    post:
+      tags:
+      - Token Management v2
+      summary: Check token status
+      description: "Evaluates the supplied token context and returns token reachability,\
+        \ readiness, and lockout information when available"
+      operationId: getTokenStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenScopedRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Token status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenStatusResponseV2Dto"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/tokens/keyRequestTypes:
+    post:
+      tags:
+      - Token Management v2
+      summary: List key request types supported by the Token Profile
+      description: List key types supported for the supplied token and token-profile
+        context
+      operationId: listSupportedKeyRequestTypes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenProfileScopedRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Supported key types retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KeyRequestType"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/operations/verify:
+    post:
+      tags:
+      - Cryptographic Operations v2
+      summary: Verify data
+      description: Verify signatures with the given key (always synchronous)
+      operationId: verifyData
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyDataRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Signatures verified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyDataResponseV2Dto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/operations/verify/attributes:
+    post:
+      tags:
+      - Cryptographic Operations v2
+      summary: List verification attributes
+      description: "Returns the verification parameter schema supported by the connector\
+        \ for the supplied token, profile and key context"
+      operationId: listVerifyAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KeyScopedRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Verification attributes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/operations/sign:
+    post:
+      tags:
+      - Cryptographic Operations v2
+      summary: Sign data
+      description: Sign a batch using the caller-selected execution mode (synchronous
+        200 or asynchronous 202).
+      operationId: signData
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignDataRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Signed synchronously
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignDataResponseV2Dto"
+        "202":
+          description: Signing accepted asynchronously; body carries operationMeta
+            tracking handle for the batch
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignDataResponseV2Dto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/operations/sign/status:
+    post:
+      tags:
+      - Cryptographic Operations v2
+      summary: Get async sign operation status
+      description: Get status of an async sign batch using only its tracking handle.
+      operationId: getSignStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OperationTrackingRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Sign operation status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignOperationStatusResponseV2Dto"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/operations/sign/cancel:
+    post:
+      tags:
+      - Cryptographic Operations v2
+      summary: Cancel async sign operation
+      description: Cancel an in-flight asynchronous sign batch using only its tracking
+        handle. Individual items cannot be cancelled separately
+      operationId: cancelSign
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OperationTrackingRequestV2Dto"
+        required: true
+      responses:
+        "204":
+          description: Aborted
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/operations/sign/attributes:
+    post:
+      tags:
+      - Cryptographic Operations v2
+      summary: List signing attributes
+      description: "Returns the signing parameter schema supported by the connector\
+        \ for the supplied token, profile and key context"
+      operationId: listSignAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KeyScopedRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Signing attributes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/operations/random:
+    post:
+      tags:
+      - Cryptographic Operations v2
+      summary: Generate random data
+      description: Generate random data on the token (always synchronous)
+      operationId: randomData
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RandomDataRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Random data generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RandomDataResponseV2Dto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/operations/random/attributes:
+    post:
+      tags:
+      - Cryptographic Operations v2
+      summary: List random generator attributes
+      description: Random generator attribute schema given token context
+      operationId: listRandomAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TokenProfileScopedRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Random generator attributes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/operations/encrypt:
+    post:
+      tags:
+      - Cryptographic Operations v2
+      summary: Encrypt data
+      description: Encrypt data with the given key (always synchronous)
+      operationId: encryptData
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CipherDataRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Data encrypted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EncryptDataResponseV2Dto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/operations/encrypt/attributes:
+    post:
+      tags:
+      - Cryptographic Operations v2
+      summary: List encryption attributes
+      description: "Returns the encryption parameter schema supported by the connector\
+        \ for the supplied token, profile and key context"
+      operationId: listEncryptAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KeyScopedRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Encryption attributes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/operations/decrypt:
+    post:
+      tags:
+      - Cryptographic Operations v2
+      summary: Decrypt data
+      description: Decrypt data with the given key (always synchronous)
+      operationId: decryptData
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CipherDataRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Data decrypted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DecryptDataResponseV2Dto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/operations/decrypt/attributes:
+    post:
+      tags:
+      - Cryptographic Operations v2
+      summary: List decryption attributes
+      description: "Returns the decryption parameter schema supported by the connector\
+        \ for the supplied token, profile and key context"
+      operationId: listDecryptAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KeyScopedRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Decryption attributes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/keys:
+    post:
+      tags:
+      - Key Management v2
+      summary: Create key
+      description: Create a secret key or key pair synchronously or asynchronously
+      operationId: createKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateKeyRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: "Created synchronously, or existing equivalent operation returned\
+            \ synchronously"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyCreationResponseInterface"
+        "202":
+          description: "Creation accepted asynchronously, or equivalent operation\
+            \ replayed asynchronously; body carries the original operationMeta tracking\
+            \ handle"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyCreationResponseInterface"
+        "409":
+          description: keyCreationId reused with a non-equivalent request (RESOURCE_ALREADY_EXISTS)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyCreationResponseInterface"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/keys/destroy:
+    post:
+      tags:
+      - Key Management v2
+      summary: Destroy key
+      description: "Destroy a key using the caller-selected execution mode (synchronous\
+        \ 200 or asynchronous 202). After accepting asynchronous destruction, the\
+        \ connector must reject new cryptographic operations for that key"
+      operationId: destroyKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DestroyKeyRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Destroyed synchronously; body contains an empty key-operation
+            response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyOperationResponseV2Dto"
+        "202":
+          description: Destruction accepted asynchronously; body carries operationMeta
+            tracking handle
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyOperationResponseV2Dto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/keys/destroy/status:
+    post:
+      tags:
+      - Key Management v2
+      summary: Get async key destruction status
+      description: Get status of an async key destruction using only its tracking
+        handle
+      operationId: getDestroyKeyStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OperationTrackingRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Key destruction status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyDestructionStatusResponseV2Dto"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/keys/destroy/cancel:
+    post:
+      tags:
+      - Key Management v2
+      summary: Cancel async key destruction
+      description: Cancel an in-flight asynchronous key destruction using only its
+        tracking handle
+      operationId: cancelDestroyKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OperationTrackingRequestV2Dto"
+        required: true
+      responses:
+        "204":
+          description: Aborted
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/keys/create/status:
+    post:
+      tags:
+      - Key Management v2
+      summary: Get async key creation status
+      description: Get status of an async secret key or key pair creation using only
+        its tracking handle
+      operationId: getCreateKeyStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OperationTrackingRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Key creation status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyCreationStatusResponseInterface"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/keys/create/cancel:
+    post:
+      tags:
+      - Key Management v2
+      summary: Cancel async key creation
+      description: Cancel an in-flight async secret key or key pair creation using
+        only its tracking handle
+      operationId: cancelCreateKey
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OperationTrackingRequestV2Dto"
+        required: true
+      responses:
+        "204":
+          description: Aborted
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/cryptographyProvider/keys/create/attributes:
+    post:
+      tags:
+      - Key Management v2
+      summary: List key creation attributes
+      description: List attributes for creating the requested key type. Definitions
+        must not contain resolved credentials or secret values.
+      operationId: listCreateKeyAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateKeyAttributesRequestV2Dto"
+        required: true
+      responses:
+        "200":
+          description: Schema retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request validation failed (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
   /v2/attributes/callback:
     post:
       tags:
@@ -163,112 +1345,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-  /v1/signatureProvider/formatting/formatResponse:
-    post:
-      tags:
-      - Signature Formatting Provider
-      summary: Assemble final formatted output
-      operationId: formatSigningResponse
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FormatResponseInterface"
-        required: true
-      responses:
-        "200":
-          description: Formatted response assembled
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FormattedResponseDto"
-        "422":
-          description: Unprocessable Entity
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-  /v1/signatureProvider/formatting/formatDtbs:
-    post:
-      tags:
-      - Signature Formatting Provider
-      summary: Compute data-to-be-signed bytes
-      operationId: formatDtbs
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FormatDtbsInterface"
-        required: true
-      responses:
-        "200":
-          description: Data-to-be-signed bytes computed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FormatDtbsResponseDto"
-        "422":
-          description: Unprocessable Entity
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
           content:
             application/problem+json:
               schema:
@@ -410,6 +1486,45 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
       security: []
+  /v2/cryptographyProvider/tokens/attributes:
+    get:
+      tags:
+      - Token Management v2
+      summary: List token attributes
+      description: Returns the attribute schema used to configure a token
+      operationId: listTokenAttributes
+      responses:
+        "200":
+          description: Token attributes retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
   /v2/attributes:
     get:
       tags:
@@ -489,44 +1604,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-  /v1/signatureProvider/formatting/attributes:
-    get:
-      tags:
-      - Signature Formatting Provider
-      summary: List Formatting Attributes
-      operationId: listFormattingAttributes
-      responses:
-        "200":
-          description: Attributes retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BaseAttributeDto"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
           content:
             application/problem+json:
               schema:
@@ -675,48 +1752,6 @@ components:
       required:
       - targets
       - to
-    AttributeCallbackRequestDto:
-      type: object
-      properties:
-        connectorInterface:
-          $ref: "#/components/schemas/ConnectorInterface"
-          description: Provider interface the triggering schema belongs to. Core-stamped
-            from /v2/info.
-        interfaceVersion:
-          type: string
-          description: Version of the provider interface. Core-stamped from /v2/info.
-          minLength: 1
-        attributeUuid:
-          type: string
-          format: uuid
-          description: Connector-global UUID of the attribute whose callback fired
-            — the dispatch key.
-        attributeName:
-          type: string
-          description: Name of the attribute whose callback fired. Informative / logging.
-          minLength: 1
-        contextAttributes:
-          type: array
-          description: "Route scope chain, credentials expanded inline by Core. Empty\
-            \ when the form has no parent scope."
-          items:
-            $ref: "#/components/schemas/ScopedAttributes"
-        currentAttributes:
-          type: array
-          description: "The dependsOn-named form values only, reference-typed values\
-            \ expanded inline by Core."
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-        pagination:
-          $ref: "#/components/schemas/PaginationRequestDto"
-          description: Optional pagination for content responses.
-      required:
-      - attributeName
-      - attributeUuid
-      - connectorInterface
-      - contextAttributes
-      - currentAttributes
-      - interfaceVersion
     AttributeConstraintType:
       type: string
       enum:
@@ -946,25 +1981,6 @@ components:
       required:
       - contentType
       - data
-    ConnectorInterface:
-      type: string
-      enum:
-      - info
-      - health
-      - metrics
-      - attributes
-      - authority
-      - discovery
-      - entity
-      - compliance
-      - cryptography
-      - notification
-      - secret
-      - signatureFormatting
-      - cadesFormatting
-      - jadesFormatting
-      - padesFormatting
-      - xadesFormatting
     CredentialAttributeContentData:
       type: object
       properties:
@@ -1423,20 +2439,6 @@ components:
       required:
       - contentType
       - data
-    PaginationRequestDto:
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          format: int32
-          default: 10
-          description: Number of entries per page
-          maximum: 1000
-        pageNumber:
-          type: integer
-          format: int32
-          default: 1
-          description: Page number for the request
     PrivateKeySecretContent:
       type: object
       description: Secret representing private key
@@ -1627,73 +2629,6 @@ components:
       - name
       - uuid
       - version
-    Resource:
-      type: string
-      enum:
-      - NONE
-      - ANY
-      - dashboard
-      - settings
-      - auditLogs
-      - credentials
-      - connectors
-      - attributes
-      - jobs
-      - proxies
-      - users
-      - roles
-      - acmeAccounts
-      - acmeProfiles
-      - cboms
-      - scepProfiles
-      - cmpProfiles
-      - authorities
-      - raProfiles
-      - certificates
-      - certificateRequests
-      - groups
-      - complianceProfiles
-      - discoveries
-      - oids
-      - entities
-      - locations
-      - tokenProfiles
-      - tokens
-      - keys
-      - approvalProfiles
-      - approvals
-      - notificationProfiles
-      - notificationInstances
-      - rules
-      - actions
-      - triggers
-      - resources
-      - resourceEvents
-      - searchFilters
-      - keyItems
-      - platformEnums
-      - notifications
-      - conditions
-      - executions
-      - complianceRules
-      - complianceGroups
-      - customAttributes
-      - globalMetadata
-      - acmeOrders
-      - acmeAuthorizations
-      - acmeChallenges
-      - cmpTransactions
-      - endEntityProfiles
-      - authenticationProviders
-      - trustedCertificates
-      - vaults
-      - vaultProfiles
-      - secrets
-      - signingProfiles
-      - signingRecords
-      - timeQualityConfigurations
-      - tspProfiles
-      - tspProfileBasicCredentials
     ResourceCertificateContentData:
       type: object
       description: Content data for resource object attribute containing certificate
@@ -1907,26 +2842,6 @@ components:
       - type
       - uuid
       - version
-    ScopedAttributes:
-      type: object
-      properties:
-        scope:
-          $ref: "#/components/schemas/Resource"
-          description: "Kind of the scope object. Serialized as the plural resource\
-            \ code, e.g. \"authorities\", \"raProfiles\", \"vaults\"."
-        objectUuid:
-          type: string
-          format: uuid
-          description: "UUID of the scope object, for correlation/logging only — never\
-            \ a lookup key on the connector side."
-        attributes:
-          type: array
-          description: Credential-expanded attributes of the scope object.
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-      required:
-      - attributes
-      - scope
     SecretAttributeContentData:
       type: object
       properties:
@@ -2086,6 +3001,18 @@ components:
       required:
       - contentType
       - data
+    TokenScopedRequestV2Dto:
+      type: object
+      additionalProperties: false
+      description: Token context for token and token-profile operations.
+      properties:
+        tokenAttributes:
+          type: array
+          description: Token attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - tokenAttributes
     ErrorCode:
       type: string
       enum:
@@ -2181,27 +3108,15 @@ components:
       - status
       - timestamp
       - type
-    AttributeCallbackResponseDto:
-      type: object
-      properties:
-        content:
-          type: array
-          description: Resolved attribute content (v3 content model). Set this arm
-            for DATA-attribute dropdown options. Exactly one of content or attributes
-            must be set; leave the other unset.
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
-        attributes:
-          type: array
-          description: Runtime-injected attribute definitions. Set this arm to return
-            GROUP children. Exactly one of content or attributes must be set; leave
-            the other unset.
-          items:
-            $ref: "#/components/schemas/BaseAttributeDto"
-        totalItems:
-          type: integer
-          format: int64
-          description: "Total number of items available, for paginated content responses."
+    KeyUsage:
+      type: string
+      enum:
+      - sign
+      - verify
+      - encrypt
+      - decrypt
+      - wrap
+      - unwrap
     BaseAttributeDto:
       type: object
       description: Base Attribute definition
@@ -2964,273 +3879,1099 @@ components:
       - none
       - connectorCallback
       - staticList
-    DigestAlgorithm:
+    TokenStatusResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          $ref: "#/components/schemas/TokenStatusV2"
+          description: Token status
+        detail:
+          type: string
+          description: Optional provider-supplied detail explaining the token status
+      required:
+      - status
+    TokenStatusV2:
+      type: string
+      description: Provider-observable token status
+      enum:
+      - Connected
+      - Disconnected
+      - Warning
+      - Unknown
+    TokenProfileScopedRequestV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        tokenAttributes:
+          type: array
+          description: Token attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        tokenProfileAttributes:
+          type: array
+          description: Token profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        keyUsages:
+          type: array
+          description: Key usages selected on the token profile
+          items:
+            $ref: "#/components/schemas/KeyUsage"
+          minItems: 1
+          uniqueItems: true
+      required:
+      - keyUsages
+      - tokenAttributes
+      - tokenProfileAttributes
+    KeyRequestType:
       type: string
       enum:
-      - MD5
-      - SHA-1
-      - SHA-224
-      - SHA-256
-      - SHA-384
-      - SHA-512
-      - SHA3-256
-      - SHA3-384
-      - SHA3-512
-    ExtensionDto:
-      type: object
-      description: "ASN.1 extension (OID, criticality, value)"
-      properties:
-        oid:
-          type: string
-          description: OID of the extension
-          example: 1.3.6.1.5.5.7.1.1
-          minLength: 1
-        critical:
-          type: boolean
-          description: Whether the extension is critical
-        value:
-          type: string
-          description: Base64-encoded DER value of the extension
-      required:
-      - critical
-      - oid
-      - value
-      title: ExtensionDto
-    FormatResponseInterface:
-      type: object
-      description: Response formatting request specific to the signing workflow type
-      discriminator:
-        propertyName: type
-        mapping:
-          timestamping: "#/components/schemas/TimestampingFormatResponseRequestDto"
+      - secret
+      - keyPair
+    MetadataAttribute:
+      description: Metadata Attribute definition
       oneOf:
-      - $ref: "#/components/schemas/TimestampingFormatResponseRequestDto"
-      required:
-      - type
-    SignatureAlgorithm:
-      type: string
-      enum:
-      - SHA256withRSA
-      - SHA384withRSA
-      - SHA512withRSA
-      - SHA256withRSAandMGF1
-      - SHA384withRSAandMGF1
-      - SHA512withRSAandMGF1
-      - SHA256withECDSA
-      - SHA384withECDSA
-      - SHA512withECDSA
-      - Ed25519
-      - Ed448
-      - FALCON-1024
-      - ML-DSA-65
-      - SLH-DSA-SHA2-128F
-    SigningWorkflowType:
-      type: string
-      enum:
-      - content_signing
-      - raw_signing
-      - timestamping
-    TimestampingFormatResponseRequestDto:
+      - $ref: "#/components/schemas/MetadataAttributeV2"
+      - $ref: "#/components/schemas/MetadataAttributeV3"
+    SignatureDataV2Dto:
       type: object
-      description: Response formatting request for Timestamping
+      additionalProperties: false
       properties:
-        type:
-          $ref: "#/components/schemas/SigningWorkflowType"
-          description: Signing workflow type
-          examples:
-          - timestamping
-        dtbs:
+        data:
           type: string
           format: byte
-          description: "Data-to-be-signed bytes returned by formatDtbs (already contains\
-            \ serialNumber, signingTime, etc.)"
+          description: "Data to be signed or verified, or the resulting signature,\
+            \ depending on the operation direction."
+          minLength: 1
+        identifier:
+          type: string
+          description: Identifier used to correlate the item across request and response
+          examples:
+          - customId
+          minLength: 1
+      required:
+      - data
+      - identifier
+    VerifyDataRequestV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        tokenAttributes:
+          type: array
+          description: Token attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        tokenProfileAttributes:
+          type: array
+          description: Token profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        keyUsages:
+          type: array
+          description: Key usages selected on the token profile
+          items:
+            $ref: "#/components/schemas/KeyUsage"
+          minItems: 1
+          uniqueItems: true
+        keyMeta:
+          type: array
+          description: "Connector-defined metadata identifying the key, as returned\
+            \ when the key was created, listed or identified. Supply the metadata\
+            \ unchanged in subsequent requests for the key. Metadata must identify\
+            \ the key durably—it must remain valid across connector restarts and sessions;\
+            \ ephemeral handles must not be used."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
+        signatureAttributes:
+          type: array
+          description: Signature attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        data:
+          type: array
+          description: "Signed data, correlated to the signatures by identifier"
+          items:
+            $ref: "#/components/schemas/SignatureDataV2Dto"
+          minItems: 1
+        signatures:
+          type: array
+          description: "Signatures to verify, correlated to the signed data by identifier"
+          items:
+            $ref: "#/components/schemas/SignatureDataV2Dto"
+          minItems: 1
+      required:
+      - data
+      - keyMeta
+      - keyUsages
+      - signatureAttributes
+      - signatures
+      - tokenAttributes
+      - tokenProfileAttributes
+    VerificationResponseItemV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        result:
+          type: boolean
+          description: Whether the signature is valid
+        identifier:
+          type: string
+          description: Identifier of the corresponding request item
+          examples:
+          - customId
+          minLength: 1
+        details:
+          description: Additional result details
+      required:
+      - identifier
+      - result
+    VerifyDataResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        verifications:
+          type: array
+          description: "Verification results, correlated to the request items by identifier"
+          items:
+            $ref: "#/components/schemas/VerificationResponseItemV2Dto"
+          minItems: 1
+      required:
+      - verifications
+    KeyScopedRequestV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        tokenAttributes:
+          type: array
+          description: Token attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        tokenProfileAttributes:
+          type: array
+          description: Token profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        keyUsages:
+          type: array
+          description: Key usages selected on the token profile
+          items:
+            $ref: "#/components/schemas/KeyUsage"
+          minItems: 1
+          uniqueItems: true
+        keyMeta:
+          type: array
+          description: "Connector-defined metadata identifying the key, as returned\
+            \ when the key was created, listed or identified. Supply the metadata\
+            \ unchanged in subsequent requests for the key. Metadata must identify\
+            \ the key durably—it must remain valid across connector restarts and sessions;\
+            \ ephemeral handles must not be used."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
+      required:
+      - keyMeta
+      - keyUsages
+      - tokenAttributes
+      - tokenProfileAttributes
+    OperationExecutionMode:
+      type: string
+      description: Whether the connector must complete the operation inline or accept
+        it for asynchronous processing
+      enum:
+      - synchronous
+      - asynchronous
+    SignDataRequestV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        tokenAttributes:
+          type: array
+          description: Token attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        tokenProfileAttributes:
+          type: array
+          description: Token profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        keyUsages:
+          type: array
+          description: Key usages selected on the token profile
+          items:
+            $ref: "#/components/schemas/KeyUsage"
+          minItems: 1
+          uniqueItems: true
+        keyMeta:
+          type: array
+          description: "Connector-defined metadata identifying the key, as returned\
+            \ when the key was created, listed or identified. Supply the metadata\
+            \ unchanged in subsequent requests for the key. Metadata must identify\
+            \ the key durably—it must remain valid across connector restarts and sessions;\
+            \ ephemeral handles must not be used."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
+        executionMode:
+          $ref: "#/components/schemas/OperationExecutionMode"
+          description: Caller-selected execution mode. The connector must not switch
+            modes implicitly.
+        signatureAttributes:
+          type: array
+          description: Signature attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        data:
+          type: array
+          description: Data to be signed
+          items:
+            $ref: "#/components/schemas/SignatureDataV2Dto"
+          minItems: 1
+      required:
+      - data
+      - executionMode
+      - keyMeta
+      - keyUsages
+      - signatureAttributes
+      - tokenAttributes
+      - tokenProfileAttributes
+    SignDataResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        signatures:
+          type: array
+          description: "Signatures, correlated to the request items by identifier.\
+            \ Populated on sync 200; null on async 202."
+          items:
+            $ref: "#/components/schemas/SignatureDataV2Dto"
+        operationMeta:
+          type: array
+          description: Connector-defined signing operation metadata. Present on async
+            202 as the tracking handle for the whole batch. Supply it by itself to
+            /operations/sign/status and /operations/sign/cancel. It must remain valid
+            for the operation's entire tracking lifetime.
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+    OperationTrackingRequestV2Dto:
+      type: object
+      additionalProperties: false
+      description: Tracking handle for polling or cancelling an asynchronous cryptography
+        operation. The connector must keep the handle valid for the operation's entire
+        tracking lifetime.
+      properties:
+        operationMeta:
+          type: array
+          description: "Opaque connector-defined tracking handle returned in the original\
+            \ 202 Accepted response. It is sufficient without token, token-profile,\
+            \ key-usage, or key metadata and must remain valid for the operation's\
+            \ entire tracking lifetime."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
+      required:
+      - operationMeta
+    OperationStatus:
+      type: string
+      enum:
+      - inProgress
+      - completed
+      - failed
+      - cancelled
+    SignOperationStatusResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          description: "Per-item results, one per item of the original sign request,\
+            \ correlated by identifier"
+          items:
+            $ref: "#/components/schemas/SignatureResultItemV2Dto"
+          minItems: 1
+      required:
+      - items
+    SignatureResultItemV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        identifier:
+          type: string
+          description: Identifier of the corresponding item in the original sign request
+          examples:
+          - customId
+          minLength: 1
+        status:
+          $ref: "#/components/schemas/OperationStatus"
+          description: Status of this item
         signature:
           type: string
           format: byte
-          description: Raw signature bytes from the Cryptography Provider
-        certificateChain:
+          description: Signature over the item's data. Populated when status=COMPLETED.
+        reason:
+          type: string
+          description: Failure or cancellation detail when status=FAILED or CANCELLED
+            — curated message text (no raw exception messages)
+      required:
+      - identifier
+      - status
+    RandomDataRequestV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        tokenAttributes:
           type: array
-          description: Certificate chain where the first element is the signer certificate
-          items:
-            type: string
-            format: byte
-          minItems: 1
-        formatAttributes:
-          type: array
-          description: "Formatting-specific parameters, same attributes as passed\
-            \ to formatDtbs"
+          description: Token attributes
           items:
             $ref: "#/components/schemas/RequestAttribute"
-        serialNumber:
-          type: integer
-          description: "Serial number generated by Core, recorded in the Signature\
-            \ inventory"
-        signingTime:
-          type: string
-          format: date-time
-          description: Signing time captured by Core from the time quality system
-          example: 2024-05-01T12:00:00Z
-        accuracy:
-          type: string
-          description: "Accuracy of the signing time, captured by Core from the time\
-            \ quality system (ISO 8601 duration, e.g. PT0.001S for 1 ms). Optional\
-            \ per RFC 3161 — absent when no Time Quality Configuration applies (e.g.\
-            \ a non-qualified local-clock timestamp)."
-          example: PT0.001S
-        signatureAlgorithm:
-          $ref: "#/components/schemas/SignatureAlgorithm"
-          description: Signature algorithm to be used for timestamping
-        hashAlgorithm:
-          $ref: "#/components/schemas/DigestAlgorithm"
-          description: Hash algorithm used to produce the message imprint in the timestamp
-            request
-        policy:
-          type: string
-          description: TSA policy OID requested by the client
-        nonce:
-          type: integer
-          description: Nonce from the timestamp request for replay protection
-        includeSignerCertificate:
-          type: boolean
-          description: Whether the signer certificate should be included in the response
-        qualifiedTimestamp:
-          type: boolean
-          description: Whether the timestamp is ETSI qualified electronic timestamp
-        requestExtensions:
+        tokenProfileAttributes:
           type: array
-          description: Extensions from the timestamp request
+          description: Token profile attributes
           items:
-            $ref: "#/components/schemas/ExtensionDto"
+            $ref: "#/components/schemas/RequestAttribute"
+        keyUsages:
+          type: array
+          description: Key usages selected on the token profile
+          items:
+            $ref: "#/components/schemas/KeyUsage"
+          minItems: 1
+          uniqueItems: true
+        length:
+          type: integer
+          format: int32
+          description: "Number of random bytes to generate, capped at 1 MiB"
+          maximum: 1048576
+        operationAttributes:
+          type: array
+          description: Random generator attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - keyUsages
+      - length
+      - operationAttributes
+      - tokenAttributes
+      - tokenProfileAttributes
+    RandomDataResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
         data:
           type: string
           format: byte
-          description: The hashed message (message imprint) — needed to rebuild the
-            TimeStampRequest
+          description: Random generated data
+          minLength: 1
       required:
-      - certificateChain
       - data
-      - dtbs
-      - formatAttributes
-      - hashAlgorithm
-      - includeSignerCertificate
-      - qualifiedTimestamp
-      - serialNumber
-      - signature
-      - signatureAlgorithm
-      - signingTime
-      - type
-      title: TimestampingFormatResponseRequestDto
-    FormattedResponseDto:
+    CipherDataRequestV2Dto:
       type: object
+      additionalProperties: false
       properties:
-        response:
+        tokenAttributes:
+          type: array
+          description: Token attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        tokenProfileAttributes:
+          type: array
+          description: Token profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        keyUsages:
+          type: array
+          description: Key usages selected on the token profile
+          items:
+            $ref: "#/components/schemas/KeyUsage"
+          minItems: 1
+          uniqueItems: true
+        keyMeta:
+          type: array
+          description: "Connector-defined metadata identifying the key, as returned\
+            \ when the key was created, listed or identified. Supply the metadata\
+            \ unchanged in subsequent requests for the key. Metadata must identify\
+            \ the key durably—it must remain valid across connector restarts and sessions;\
+            \ ephemeral handles must not be used."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
+        cipherAttributes:
+          type: array
+          description: Batch-wide cipher settings.
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        cipherData:
+          type: array
+          description: Data to be encrypted or decrypted
+          items:
+            $ref: "#/components/schemas/CipherDataV2Dto"
+          minItems: 1
+      required:
+      - cipherAttributes
+      - cipherData
+      - keyMeta
+      - keyUsages
+      - tokenAttributes
+      - tokenProfileAttributes
+    CipherDataV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        data:
           type: string
           format: byte
-          description: Final formatted output bytes (e.g. DER-encoded TimeStampResp
-            for TSA)
+          description: "Plaintext or a self-contained encrypted representation, depending\
+            \ on the operation direction."
+          minLength: 1
+        identifier:
+          type: string
+          description: Identifier used to correlate the item across request and response
+          examples:
+          - customId
+          minLength: 1
       required:
-      - response
-    FormatDtbsInterface:
+      - data
+      - identifier
+    EncryptDataResponseV2Dto:
       type: object
-      description: DTBS formatting request specific to the signing workflow type
+      additionalProperties: false
+      properties:
+        encryptedData:
+          type: array
+          description: Encrypted data
+          items:
+            $ref: "#/components/schemas/CipherDataV2Dto"
+          minItems: 1
+      required:
+      - encryptedData
+    DecryptDataResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        decryptedData:
+          type: array
+          description: Decrypted data
+          items:
+            $ref: "#/components/schemas/CipherDataV2Dto"
+          minItems: 1
+      required:
+      - decryptedData
+    CreateKeyRequestV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        tokenAttributes:
+          type: array
+          description: Token attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        tokenProfileAttributes:
+          type: array
+          description: Token profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        keyUsages:
+          type: array
+          description: Key usages selected on the token profile
+          items:
+            $ref: "#/components/schemas/KeyUsage"
+          minItems: 1
+          uniqueItems: true
+        keyRequestType:
+          $ref: "#/components/schemas/KeyRequestType"
+          description: Type of key to create
+        executionMode:
+          $ref: "#/components/schemas/OperationExecutionMode"
+          description: Caller-selected execution mode. The connector must not switch
+            modes implicitly.
+        keyCreationId:
+          type: string
+          description: |
+            Identifier of a key creation operation. Replays must use the same keyRequestType, executionMode,
+            tokenAttributes, tokenProfileAttributes, keyUsages, and createKeyAttributes. An asynchronous replay
+            returns HTTP 202 with the original operationMeta. A synchronous replay returns HTTP 200 with the
+            original result. Non-equivalent reuse returns RESOURCE_ALREADY_EXISTS (HTTP 409).
+          maxLength: 256
+          minLength: 0
+        createKeyAttributes:
+          type: array
+          description: Attributes to create the key
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - createKeyAttributes
+      - executionMode
+      - keyCreationId
+      - keyRequestType
+      - keyUsages
+      - tokenAttributes
+      - tokenProfileAttributes
+    KeyAlgorithm:
+      type: string
+      enum:
+      - RSA
+      - ECDSA
+      - FALCON
+      - ML-DSA
+      - SLH-DSA
+      - ML-KEM
+      - CRYSTALS-Dilithium
+      - SPHINCS+
+      - Unknown
+    KeyCreationResponseInterface:
+      type: object
+      additionalProperties: false
+      description: Key-creation response selected by key request type
       discriminator:
-        propertyName: type
+        propertyName: keyRequestType
         mapping:
-          timestamping: "#/components/schemas/TimestampingFormatDtbsRequestDto"
+          secret: "#/components/schemas/SecretKeyDataResponseV2Dto"
+          keyPair: "#/components/schemas/KeyPairDataResponseV2Dto"
       oneOf:
-      - $ref: "#/components/schemas/TimestampingFormatDtbsRequestDto"
+      - $ref: "#/components/schemas/SecretKeyDataResponseV2Dto"
+      - $ref: "#/components/schemas/KeyPairDataResponseV2Dto"
+      properties:
+        keyRequestType:
+          $ref: "#/components/schemas/KeyRequestType"
+          description: Type of key requested and returned
       required:
-      - type
-    TimestampingFormatDtbsRequestDto:
+      - keyRequestType
+    KeyPairDataResponseV2Dto:
       type: object
-      description: DTBS formatting request for Timestamping
+      additionalProperties: false
+      properties:
+        operationMeta:
+          type: array
+          description: Connector-defined operation tracking metadata. Required and
+            non-empty in the initial response when ASYNCHRONOUS executionMode was
+            requested in CreateKeyRequestV2Dto. Absent from the initial response when
+            SYNCHRONOUS executionMode was requested and from a completed result nested
+            in a status response. This handle must remain valid for the operation's
+            entire tracking lifetime.
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        publicKeyData:
+          $ref: "#/components/schemas/PublicKeyDataResponseV2Dto"
+          description: Data of the public key. Populated on sync 200; null on async
+            202.
+        privateKeyData:
+          $ref: "#/components/schemas/PrivateKeyDataResponseV2Dto"
+          description: Data of the private key. Populated on sync 200; null on async
+            202.
+        keyPairMeta:
+          type: array
+          description: Connector-defined metadata for the pair as a whole. Required
+            on a synchronous 200 and in a completed asynchronous creation-status result;
+            absent from the initial asynchronous 202.
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        keyRequestType:
+          $ref: "#/components/schemas/KeyRequestType"
+          description: Type of key requested and returned
+          enum:
+          - keyPair
+      required:
+      - keyRequestType
+    PrivateKeyDataResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        keyMeta:
+          type: array
+          description: Connector-defined opaque private-key handle. Metadata must
+            identify the key durably—it must remain valid across connector restarts
+            and sessions; ephemeral handles must not be used.
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
+        keyData:
+          $ref: "#/components/schemas/PrivateKeyDataV2Dto"
+          description: Private-key descriptor without key material
+      required:
+      - keyData
+      - keyMeta
+    PrivateKeyDataV2Dto:
+      type: object
+      additionalProperties: false
+      description: Private-key descriptor without key material
       properties:
         type:
-          $ref: "#/components/schemas/SigningWorkflowType"
-          description: Signing workflow type
-          examples:
-          - timestamping
-        certificateChain:
+          type: string
+          const: Private
+          description: Role of the key
+          enum:
+          - Private
+        algorithm:
+          $ref: "#/components/schemas/KeyAlgorithm"
+          description: Cryptographic algorithm of the key
+        length:
+          type: integer
+          format: int32
+          description: Bit length of the key
+        metadata:
           type: array
-          description: Certificate chain where the first element is the signer certificate.
-            Individual certificates are DER encoded X.509 certificates (represented
-            as Base64 strings in the JSON transport).
+          description: "Non-sensitive, provider-specific descriptive metadata"
           items:
-            type: string
-            format: byte
+            $ref: "#/components/schemas/MetadataAttribute"
+      required:
+      - algorithm
+      - length
+      - type
+    PublicKeyDataResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        keyMeta:
+          type: array
+          description: Connector-defined opaque public-key handle. Metadata must identify
+            the key durably—it must remain valid across connector restarts and sessions;
+            ephemeral handles must not be used.
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
           minItems: 1
-        data:
+        keyData:
+          $ref: "#/components/schemas/PublicKeyDataV2Dto"
+          description: "Public-key descriptor, optionally carrying the public key\
+            \ as SPKI"
+      required:
+      - keyData
+      - keyMeta
+    PublicKeyDataV2Dto:
+      type: object
+      additionalProperties: false
+      description: Public-key descriptor with an SPKI representation. Algorithm Unknown
+        accepts any parseable public SPKI and skips algorithm-family matching.
+      properties:
+        type:
+          type: string
+          const: Public
+          description: Role of the key
+          enum:
+          - Public
+        algorithm:
+          $ref: "#/components/schemas/KeyAlgorithm"
+          description: Cryptographic algorithm of the key
+        length:
+          type: integer
+          format: int32
+          description: Bit length of the key
+        metadata:
+          type: array
+          description: "Non-sensitive, provider-specific descriptive metadata"
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        publicKeySpki:
           type: string
           format: byte
-          description: Data to be formatted into the protocol-specific data-to-be-signed
-            bytes
-        formatAttributes:
+          description: Base64-encoded DER SubjectPublicKeyInfo.
+      required:
+      - algorithm
+      - length
+      - publicKeySpki
+      - type
+    SecretKeyDataResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        operationMeta:
           type: array
-          description: "Formatting-specific parameters (e.g. message imprint hash\
-            \ and algorithm, nonce, policy OID for TSA)"
+          description: Connector-defined operation tracking metadata. Required and
+            non-empty in the initial response when ASYNCHRONOUS executionMode was
+            requested in CreateKeyRequestV2Dto. Absent from the initial response when
+            SYNCHRONOUS executionMode was requested and from a completed result nested
+            in a status response. This handle must remain valid for the operation's
+            entire tracking lifetime.
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        keyData:
+          $ref: "#/components/schemas/SecretKeyDataV2Dto"
+          description: Created secret-key descriptor. Null on an asynchronous 202
+            response.
+        keyMeta:
+          type: array
+          description: Connector-defined key handle. Present on a synchronous 200
+            response. Metadata must identify the key durably—it must remain valid
+            across connector restarts and sessions; ephemeral handles must not be
+            used.
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        keyRequestType:
+          $ref: "#/components/schemas/KeyRequestType"
+          description: Type of key requested and returned
+          enum:
+          - secret
+      required:
+      - keyRequestType
+    SecretKeyDataV2Dto:
+      type: object
+      additionalProperties: false
+      description: Secret-key descriptor without key material
+      properties:
+        type:
+          type: string
+          const: Secret
+          description: Role of the key
+          enum:
+          - Secret
+        algorithm:
+          $ref: "#/components/schemas/KeyAlgorithm"
+          description: Cryptographic algorithm of the key
+        length:
+          type: integer
+          format: int32
+          description: Bit length of the key
+        metadata:
+          type: array
+          description: "Non-sensitive, provider-specific descriptive metadata"
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+      required:
+      - algorithm
+      - length
+      - type
+    DestroyKeyRequestV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        tokenAttributes:
+          type: array
+          description: Token attributes
           items:
             $ref: "#/components/schemas/RequestAttribute"
-        serialNumber:
-          type: integer
-          description: "Serial number generated by Core, recorded in the Signature\
-            \ inventory"
-        signingTime:
-          type: string
-          format: date-time
-          description: Signing time captured by Core from the time quality system
-          example: 2024-05-01T12:00:00Z
-        accuracy:
-          type: string
-          description: "Accuracy of the signing time, captured by Core from the time\
-            \ quality system (ISO 8601 duration, e.g. PT0.001S for 1 ms). Optional\
-            \ per RFC 3161 — absent when no Time Quality Configuration applies (e.g.\
-            \ a non-qualified local-clock timestamp)."
-          example: PT0.001S
-        signatureAlgorithm:
-          $ref: "#/components/schemas/SignatureAlgorithm"
-          description: Signature algorithm to be used for timestamping
-        hashAlgorithm:
-          $ref: "#/components/schemas/DigestAlgorithm"
-          description: Hash algorithm used to produce the message imprint in the timestamp
-            request
-        policy:
-          type: string
-          description: TSA policy OID requested by the client
-        nonce:
-          type: integer
-          description: Nonce from the timestamp request for replay protection
-        includeSignerCertificate:
-          type: boolean
-          description: Whether the signer certificate should be included in the response
-        qualifiedTimestamp:
-          type: boolean
-          description: Whether the timestamp is ETSI qualified electronic timestamp
-        requestExtensions:
+        tokenProfileAttributes:
           type: array
-          description: Extensions from the timestamp request
+          description: Token profile attributes
           items:
-            $ref: "#/components/schemas/ExtensionDto"
+            $ref: "#/components/schemas/RequestAttribute"
+        keyUsages:
+          type: array
+          description: Key usages selected on the token profile
+          items:
+            $ref: "#/components/schemas/KeyUsage"
+          minItems: 1
+          uniqueItems: true
+        keyMeta:
+          type: array
+          description: "Connector-defined metadata identifying the key, as returned\
+            \ when the key was created, listed or identified. Supply the metadata\
+            \ unchanged in subsequent requests for the key. Metadata must identify\
+            \ the key durably—it must remain valid across connector restarts and sessions;\
+            \ ephemeral handles must not be used."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
+        executionMode:
+          $ref: "#/components/schemas/OperationExecutionMode"
+          description: Caller-selected execution mode. The connector must not switch
+            modes implicitly.
       required:
-      - certificateChain
-      - data
-      - formatAttributes
-      - hashAlgorithm
-      - includeSignerCertificate
-      - qualifiedTimestamp
-      - serialNumber
-      - signatureAlgorithm
-      - signingTime
-      - type
-      title: TimestampingFormatDtbsRequestDto
-    FormatDtbsResponseDto:
+      - executionMode
+      - keyMeta
+      - keyUsages
+      - tokenAttributes
+      - tokenProfileAttributes
+    KeyOperationResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        operationMeta:
+          type: array
+          description: Connector-defined operation tracking metadata. Required and
+            non-empty in the initial response accepting asynchronous execution. Absent
+            from a synchronous creation response and from a completed result nested
+            in a status response. This handle must remain valid for the operation's
+            entire tracking lifetime.
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+    KeyDestructionStatusResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          $ref: "#/components/schemas/OperationStatus"
+          description: Operation status as known to the connector
+        reason:
+          type: string
+          description: Failure or cancellation detail when status is FAILED or CANCELLED
+      required:
+      - status
+    KeyCreationStatusResponseInterface:
+      type: object
+      additionalProperties: false
+      description: Status of an asynchronous key-creation operation selected by key
+        request type
+      discriminator:
+        propertyName: keyRequestType
+        mapping:
+          secret: "#/components/schemas/SecretKeyOperationStatusResponseV2Dto"
+          keyPair: "#/components/schemas/KeyPairOperationStatusResponseV2Dto"
+      oneOf:
+      - $ref: "#/components/schemas/SecretKeyOperationStatusResponseV2Dto"
+      - $ref: "#/components/schemas/KeyPairOperationStatusResponseV2Dto"
+      properties:
+        result:
+          $ref: "#/components/schemas/KeyCreationResponseInterface"
+          description: Created key result. Present only when status is COMPLETED.
+        keyRequestType:
+          $ref: "#/components/schemas/KeyRequestType"
+          description: Type of key requested by the original CreateKeyRequestV2Dto
+      required:
+      - keyRequestType
+      - status
+    KeyPairOperationStatusResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          $ref: "#/components/schemas/OperationStatus"
+          description: Operation status as known to the connector
+        reason:
+          type: string
+          description: Failure or cancellation detail when status is FAILED or CANCELLED
+        result:
+          $ref: "#/components/schemas/KeyPairDataResponseV2Dto"
+          description: Created key result. Present only when status is COMPLETED.
+        keyRequestType:
+          $ref: "#/components/schemas/KeyRequestType"
+          description: Type of key requested
+          enum:
+          - keyPair
+      required:
+      - keyRequestType
+      - status
+    SecretKeyOperationStatusResponseV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          $ref: "#/components/schemas/OperationStatus"
+          description: Operation status as known to the connector
+        reason:
+          type: string
+          description: Failure or cancellation detail when status is FAILED or CANCELLED
+        result:
+          $ref: "#/components/schemas/SecretKeyDataResponseV2Dto"
+          description: Created key result. Present only when status is COMPLETED.
+        keyRequestType:
+          $ref: "#/components/schemas/KeyRequestType"
+          description: Type of key requested
+          enum:
+          - secret
+      required:
+      - keyRequestType
+      - status
+    CreateKeyAttributesRequestV2Dto:
+      type: object
+      additionalProperties: false
+      properties:
+        tokenAttributes:
+          type: array
+          description: Token attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        tokenProfileAttributes:
+          type: array
+          description: Token profile attributes
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        keyUsages:
+          type: array
+          description: Key usages selected on the token profile
+          items:
+            $ref: "#/components/schemas/KeyUsage"
+          minItems: 1
+          uniqueItems: true
+        keyRequestType:
+          $ref: "#/components/schemas/KeyRequestType"
+          description: Type of key whose creation attributes are requested
+      required:
+      - keyRequestType
+      - keyUsages
+      - tokenAttributes
+      - tokenProfileAttributes
+    AttributeCallbackRequestDto:
       type: object
       properties:
-        dtbs:
+        connectorInterface:
+          $ref: "#/components/schemas/ConnectorInterface"
+          description: Provider interface the triggering schema belongs to. Core-stamped
+            from /v2/info.
+        interfaceVersion:
           type: string
-          format: byte
-          description: Data-to-be-signed bytes (e.g. DER-encoded TSTInfo for TSA)
+          description: Version of the provider interface. Core-stamped from /v2/info.
+          minLength: 1
+        attributeUuid:
+          type: string
+          format: uuid
+          description: Connector-global UUID of the attribute whose callback fired
+            — the dispatch key.
+        attributeName:
+          type: string
+          description: Name of the attribute whose callback fired. Informative / logging.
+          minLength: 1
+        contextAttributes:
+          type: array
+          description: "Route scope chain, credentials expanded inline by Core. Empty\
+            \ when the form has no parent scope."
+          items:
+            $ref: "#/components/schemas/ScopedAttributes"
+        currentAttributes:
+          type: array
+          description: "The dependsOn-named form values only, reference-typed values\
+            \ expanded inline by Core."
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        pagination:
+          $ref: "#/components/schemas/PaginationRequestDto"
+          description: Optional pagination for content responses.
       required:
-      - dtbs
+      - attributeName
+      - attributeUuid
+      - connectorInterface
+      - contextAttributes
+      - currentAttributes
+      - interfaceVersion
+    ConnectorInterface:
+      type: string
+      enum:
+      - info
+      - health
+      - metrics
+      - attributes
+      - authority
+      - discovery
+      - entity
+      - compliance
+      - cryptography
+      - notification
+      - secret
+      - signatureFormatting
+      - cadesFormatting
+      - jadesFormatting
+      - padesFormatting
+      - xadesFormatting
+    PaginationRequestDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+        pageNumber:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
+    Resource:
+      type: string
+      enum:
+      - NONE
+      - ANY
+      - dashboard
+      - settings
+      - auditLogs
+      - credentials
+      - connectors
+      - attributes
+      - jobs
+      - proxies
+      - users
+      - roles
+      - acmeAccounts
+      - acmeProfiles
+      - cboms
+      - scepProfiles
+      - cmpProfiles
+      - authorities
+      - raProfiles
+      - certificates
+      - certificateRequests
+      - groups
+      - complianceProfiles
+      - discoveries
+      - oids
+      - entities
+      - locations
+      - tokenProfiles
+      - tokens
+      - keys
+      - approvalProfiles
+      - approvals
+      - notificationProfiles
+      - notificationInstances
+      - rules
+      - actions
+      - triggers
+      - resources
+      - resourceEvents
+      - searchFilters
+      - keyItems
+      - platformEnums
+      - notifications
+      - conditions
+      - executions
+      - complianceRules
+      - complianceGroups
+      - customAttributes
+      - globalMetadata
+      - acmeOrders
+      - acmeAuthorizations
+      - acmeChallenges
+      - cmpTransactions
+      - endEntityProfiles
+      - authenticationProviders
+      - trustedCertificates
+      - vaults
+      - vaultProfiles
+      - secrets
+      - signingProfiles
+      - signingRecords
+      - timeQualityConfigurations
+      - tspProfiles
+      - tspProfileBasicCredentials
+    ScopedAttributes:
+      type: object
+      properties:
+        scope:
+          $ref: "#/components/schemas/Resource"
+          description: "Kind of the scope object. Serialized as the plural resource\
+            \ code, e.g. \"authorities\", \"raProfiles\", \"vaults\"."
+        objectUuid:
+          type: string
+          format: uuid
+          description: "UUID of the scope object, for correlation/logging only — never\
+            \ a lookup key on the connector side."
+        attributes:
+          type: array
+          description: Credential-expanded attributes of the scope object.
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - attributes
+      - scope
+    AttributeCallbackResponseDto:
+      type: object
+      properties:
+        content:
+          type: array
+          description: Resolved attribute content (v3 content model). Set this arm
+            for DATA-attribute dropdown options. Exactly one of content or attributes
+            must be set; leave the other unset.
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
+        attributes:
+          type: array
+          description: Runtime-injected attribute definitions. Set this arm to return
+            GROUP children. Exactly one of content or attributes must be set; leave
+            the other unset.
+          items:
+            $ref: "#/components/schemas/BaseAttributeDto"
+        totalItems:
+          type: integer
+          format: int64
+          description: "Total number of items available, for paginated content responses."
     ConnectorInfo:
       type: object
       properties:

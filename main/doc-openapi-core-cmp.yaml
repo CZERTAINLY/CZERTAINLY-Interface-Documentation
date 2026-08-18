@@ -9,7 +9,7 @@ info:
   license:
     name: MIT License
     url: https://github.com/OmniTrustILM/ilm/blob/main/LICENSE.md
-  version: 2.19.0
+  version: 2.20.0-SNAPSHOT
   x-logo:
     url: images/ilm-logo.svg
 externalDocs:
@@ -941,6 +941,15 @@ components:
           type: string
           description: UUID of the Certificate to be used as signing certificate for
             CMP responses. Required when Protection Method is Signature
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: "Source of the credential for MAC-protected requests ('protocolDefault'\
+            \ or 'certificateRegistration'). 'protocolDefault' verifies against the\
+            \ profile shared secret; 'certificateRegistration' requires the senderKID\
+            \ to reference a pre-registered certificate whose challenge is the MAC\
+            \ secret, and forbids a profile shared secret. Signature protection is\
+            \ independent of this setting. Omit to keep the stored value on edit;\
+            \ on create, omit to default to 'protocolDefault'."
         certificateAssociations:
           $ref: "#/components/schemas/ProtocolCertificateAssociationsRequestDto"
           description: Associations to set for certificates issued by the protocol
@@ -1554,6 +1563,11 @@ components:
           description: Custom Attributes to be associated with certificate by protocol
           items:
             $ref: "#/components/schemas/RequestAttribute"
+    ProtocolChallengeSource:
+      type: string
+      enum:
+      - protocolDefault
+      - certificateRegistration
     RangeAttributeConstraint:
       type: object
       description: Range attribute constraint to specify boundaries for integer value
@@ -2247,6 +2261,9 @@ components:
           description: CMP URL
           examples:
           - https://your-domain.com/api/v1/protocols/cmp/cmpProfile
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: Source of the credential for MAC-protected requests
         issueCertificateAttributes:
           type: array
           description: List of Attributes to issue a Certificate for the associated
@@ -2277,6 +2294,7 @@ components:
           $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
           description: Associations to set for certificates issued by the protocol
       required:
+      - challengeSource
       - enabled
       - name
       - requestProtectionMethod
@@ -2406,6 +2424,15 @@ components:
           type: string
           description: UUID of the Certificate to be used as signing certificate for
             CMP responses. Required when Protection Method is Signature
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: "Source of the credential for MAC-protected requests ('protocolDefault'\
+            \ or 'certificateRegistration'). 'protocolDefault' verifies against the\
+            \ profile shared secret; 'certificateRegistration' requires the senderKID\
+            \ to reference a pre-registered certificate whose challenge is the MAC\
+            \ secret, and forbids a profile shared secret. Signature protection is\
+            \ independent of this setting. Omit to keep the stored value on edit;\
+            \ on create, omit to default to 'protocolDefault'."
         certificateAssociations:
           $ref: "#/components/schemas/ProtocolCertificateAssociationsRequestDto"
           description: Associations to set for certificates issued by the protocol
@@ -2463,7 +2490,11 @@ components:
           description: CMP URL
           examples:
           - https://your-domain.com/api/v1/protocols/cmp/cmpProfile
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: Source of the credential for MAC-protected requests
       required:
+      - challengeSource
       - enabled
       - name
       - uuid

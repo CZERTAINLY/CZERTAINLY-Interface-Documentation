@@ -9,7 +9,7 @@ info:
   license:
     name: MIT License
     url: https://github.com/OmniTrustILM/ilm/blob/main/LICENSE.md
-  version: 2.19.0
+  version: 2.20.0-SNAPSHOT
   x-logo:
     url: images/ilm-logo.svg
 externalDocs:
@@ -1452,6 +1452,11 @@ components:
           description: Custom Attributes to be associated with certificate by protocol
           items:
             $ref: "#/components/schemas/RequestAttribute"
+    ProtocolChallengeSource:
+      type: string
+      enum:
+      - protocolDefault
+      - certificateRegistration
     RangeAttributeConstraint:
       type: object
       description: Range attribute constraint to specify boundaries for integer value
@@ -1840,6 +1845,14 @@ components:
           description: Challenge password protection toggle. Omit to keep the stored
             password unchanged; true to set a new password (or keep the existing one
             if left blank); false to remove it.
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: "Source of the enrolment challenge ('protocolDefault' or 'certificateRegistration').\
+            \ 'protocolDefault' authenticates against the shared challenge password;\
+            \ 'certificateRegistration' requires every initial enrolment to match\
+            \ a pre-registered certificate and forbids a profile challenge password.\
+            \ Omit to keep the stored value on edit; on create, omit to default to\
+            \ 'protocolDefault'."
         enableIntune:
           type: boolean
           description: Status of Intune
@@ -2280,6 +2293,9 @@ components:
           description: Whether a challenge password is currently set for the SCEP
             Profile. The password value itself is write-only and never returned; this
             flag lets clients reflect the current state.
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: Source of the enrolment challenge
         issueCertificateAttributes:
           type: array
           description: List of Attributes to issue a Certificate
@@ -2303,6 +2319,7 @@ components:
           $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
           description: Associations to set for certificates issued by the protocol
       required:
+      - challengeSource
       - enableChallengePassword
       - enabled
       - includeCaCertificate
@@ -2383,6 +2400,14 @@ components:
           description: Challenge password protection toggle. Omit to keep the stored
             password unchanged; true to set a new password (or keep the existing one
             if left blank); false to remove it.
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: "Source of the enrolment challenge ('protocolDefault' or 'certificateRegistration').\
+            \ 'protocolDefault' authenticates against the shared challenge password;\
+            \ 'certificateRegistration' requires every initial enrolment to match\
+            \ a pre-registered certificate and forbids a profile challenge password.\
+            \ Omit to keep the stored value on edit; on create, omit to default to\
+            \ 'protocolDefault'."
         enableIntune:
           type: boolean
           description: Status of Intune
@@ -2456,7 +2481,11 @@ components:
           description: Whether a challenge password is currently set for the SCEP
             Profile. The password value itself is write-only and never returned; this
             flag lets clients reflect the current state.
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: Source of the enrolment challenge
       required:
+      - challengeSource
       - enableChallengePassword
       - enabled
       - includeCaCertificate

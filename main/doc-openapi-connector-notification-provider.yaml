@@ -9,7 +9,7 @@ info:
   license:
     name: MIT License
     url: https://github.com/OmniTrustILM/ilm/blob/main/LICENSE.md
-  version: 2.19.0
+  version: 2.20.0-SNAPSHOT
   x-logo:
     url: images/ilm-logo.svg
 externalDocs:
@@ -1957,14 +1957,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
           example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
       required:
       - name
       - type
@@ -2738,6 +2738,144 @@ components:
       - complianceProviderV2
       - cryptographyProvider
       - notificationProvider
+    NameAndUuidDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+      required:
+      - name
+      - uuid
+    NotificationAssociationDto:
+      type: object
+      description: Reference to an object associated with the notification subject
+      properties:
+        uuid:
+          type: string
+          description: Object identifier
+          examples:
+          - 7b55ge1c-844f-11dc-a8a3-0242ac120002
+        name:
+          type: string
+          description: Object Name
+          examples:
+          - Name
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource type of the referenced object
+      required:
+      - name
+      - resource
+      - uuid
+    NotificationAttributeDto:
+      type: object
+      description: "Attribute values prepared for notification templates: plain scalar\
+        \ values or reference strings only, decoupled from internal attribute content\
+        \ versioning"
+      properties:
+        name:
+          type: string
+          description: Attribute name
+        label:
+          type: string
+          description: Human-readable attribute label
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Attribute content type
+        values:
+          type: array
+          description: "Extracted values; scalar types carry raw data, complex types\
+            \ carry the human-readable reference string"
+          items: {}
+        sourceObjects:
+          type: array
+          description: "Metadata only: aggregate set of source objects that contributed\
+            \ any value to this attribute. NOT positionally paired with values — values\
+            \ are deduplicated independently of source accumulation"
+          items:
+            $ref: "#/components/schemas/NameAndUuidDto"
+      required:
+      - contentType
+      - label
+      - name
+      - values
+    NotificationEventObjectDataDto:
+      type: object
+      description: "Object data enabled on the notification profile, describing the\
+        \ event's subject object. Best-effort: categories the subject does not support,\
+        \ that are disabled, or that failed to load are absent"
+      properties:
+        subject:
+          $ref: "#/components/schemas/NotificationAssociationDto"
+          description: "The object this data describes: the event object, or for approval\
+            \ events the approval's target object"
+        customAttributes:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/NotificationAttributeDto"
+          description: The subject's custom attributes keyed by attribute name
+        metadata:
+          type: array
+          description: "The subject's connector-sourced metadata, grouped by connector\
+            \ and source object type"
+          items:
+            $ref: "#/components/schemas/NotificationMetadataGroupDto"
+        associations:
+          type: array
+          description: "The subject's associated objects: owner, groups, RA profile"
+          items:
+            $ref: "#/components/schemas/NotificationAssociationDto"
+        content:
+          $ref: "#/components/schemas/NotificationObjectContentDto"
+          description: The subject's content representation when its resource type
+            provides one
+      required:
+      - subject
+    NotificationMetadataGroupDto:
+      type: object
+      description: Connector-sourced metadata grouped by connector and source object
+        type; same-named attributes from different connectors live in different groups
+      properties:
+        connectorName:
+          type: string
+          description: Name of the connector that produced the metadata
+        sourceObjectType:
+          $ref: "#/components/schemas/Resource"
+          description: Resource type of the source object the metadata originates
+            from
+        attributes:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/NotificationAttributeDto"
+          description: Metadata attributes keyed by attribute name
+      required:
+      - attributes
+      - connectorName
+      - sourceObjectType
+    NotificationObjectContentDto:
+      type: object
+      description: "Content representation of the notification subject, produced by\
+        \ the platform's content exporter for the subject's resource type"
+      properties:
+        format:
+          type: string
+          description: Content format identifier declared by the exporter
+          examples:
+          - X509_DER_BASE64
+        data:
+          type: string
+          description: Content data; encoding is defined by the format
+      required:
+      - data
+      - format
     NotificationProviderNotifyRequestDto:
       type: object
       properties:
@@ -2760,6 +2898,9 @@ components:
           - certificate
         notificationData:
           description: Data associated with notification event and resource
+        objectData:
+          $ref: "#/components/schemas/NotificationEventObjectDataDto"
+          description: Additional object data enabled on the notification profile
       required:
       - eventType
       - recipients

@@ -9,7 +9,7 @@ info:
   license:
     name: MIT License
     url: https://github.com/OmniTrustILM/ilm/blob/main/LICENSE.md
-  version: 2.19.0
+  version: 2.20.0-SNAPSHOT
   x-logo:
     url: images/ilm-logo.svg
 externalDocs:
@@ -19883,6 +19883,202 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/discoveries/{uuid}/stop:
+    patch:
+      tags:
+      - Discovery Management
+      summary: Stop Discovery
+      description: "Asks the Discovery Provider to suspend an in-progress run, keeping\
+        \ everything already staged and the Provider-side checkpoint needed to resume\
+        \ it. Legal only while the run is in progress."
+      operationId: stopDiscovery
+      parameters:
+      - name: uuid
+        in: path
+        description: Discovery UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Discovery stopped
+        "404":
+          description: Discovery not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: "Discovery is not in progress, or its Discovery Provider does\
+            \ not support stopping a run"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/discoveries/{uuid}/resume:
+    patch:
+      tags:
+      - Discovery Management
+      summary: Resume Discovery
+      description: "Asks the Discovery Provider to continue a stopped run from its\
+        \ checkpoint. Legal only from the stopped status. A Provider that has since\
+        \ lost the checkpoint fails the run instead of restarting it, so a resume\
+        \ is never silently a fresh scan."
+      operationId: resumeDiscovery
+      parameters:
+      - name: uuid
+        in: path
+        description: Discovery UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Discovery resumed
+        "404":
+          description: Discovery not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: "Discovery is not stopped, or its Discovery Provider does not\
+            \ support resuming a run"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/discoveries/{uuid}/cancel:
+    patch:
+      tags:
+      - Discovery Management
+      summary: Cancel Discovery
+      description: "Abandons a run for good: the Discovery Provider releases it and\
+        \ the items already staged are never processed. Legal while the run is in\
+        \ progress or stopped. This is irreversible - a cancelled run cannot be resumed."
+      operationId: cancelDiscovery
+      parameters:
+      - name: uuid
+        in: path
+        description: Discovery UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Discovery cancelled
+        "404":
+          description: Discovery not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: "Discovery is neither in progress nor stopped, or its Discovery\
+            \ Provider does not support cancelling a run"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/credentials/{uuid}/enable:
     patch:
       tags:
@@ -26534,7 +26730,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DiscoveryHistoryDetailDto"
+                $ref: "#/components/schemas/DiscoveryDetailDto"
         "404":
           description: Discovery not found
           content:
@@ -26618,6 +26814,93 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/discoveries/{uuid}/items:
+    get:
+      tags:
+      - Discovery Management
+      summary: List Discovered Items
+      description: "Returns one page of the items this Discovery staged, ordered by\
+        \ their run sequence, optionally narrowed to a single resource type. Certificates\
+        \ are included: a run against a v1 Discovery Provider stages certificates\
+        \ only, so its unfiltered listing contains exactly what the certificate listing\
+        \ contains, with sequence and uniqueRef synthesized by the platform (staging\
+        \ order and certificate fingerprint) because a v1 provider never numbered\
+        \ its items."
+      operationId: getDiscoveryItems
+      parameters:
+      - name: uuid
+        in: path
+        description: Discovery UUID
+        required: true
+        schema:
+          type: string
+      - name: resource
+        in: query
+        description: "Resource type to list, identified by its wire code (e.g. \"\
+          certificates\", \"keys\"); omit to list every resource type this run discovered"
+        required: false
+        schema:
+          $ref: "#/components/schemas/Resource"
+      - name: newlyDiscovered
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: itemsPerPage
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: pageNumber
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      responses:
+        "200":
+          description: Discovered items retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginationResponseDtoDiscoveryItemDto"
+        "404":
+          description: Discovery not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/discoveries/{uuid}/certificates:
     get:
       tags:
@@ -26663,6 +26946,216 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/discoveries/{connectorUuid}/{resource}/attributes:
+    get:
+      tags:
+      - Discovery Management
+      summary: Get per-resource Discovery Attributes from a Discovery Provider
+      description: Relays the attribute definitions that refine discovery of one resource
+        type from the Connector's discovery interface.
+      operationId: getDiscoveryResourceAttributes
+      parameters:
+      - name: connectorUuid
+        in: path
+        description: Discovery Provider Connector UUID
+        required: true
+        schema:
+          type: string
+      - name: resource
+        in: path
+        description: "Resource type, identified by its wire code (e.g. \"certificates\"\
+          , \"keys\")"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Resource"
+      responses:
+        "200":
+          description: Per-resource Discovery Attributes received
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "404":
+          description: Connector not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: "Resource is not discoverable by this Connector, or the Connector\
+            \ does not implement the v2 discovery interface"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/discoveries/{connectorUuid}/resources:
+    get:
+      tags:
+      - Discovery Management
+      summary: Get discoverable resources of a Discovery Provider
+      description: "Returns the resource types this Connector's discovery interface\
+        \ advertises, as synced from the Connector. For a Connector implementing only\
+        \ the v1 discovery interface, Core synthesizes the single entry \"certificates\"\
+        \ with no capabilities, without calling the Connector — a client renders one\
+        \ shape for both generations."
+      operationId: listDiscoveryResources
+      parameters:
+      - name: connectorUuid
+        in: path
+        description: Discovery Provider Connector UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Discoverable resources retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscoverySupportedResourceDto"
+        "404":
+          description: Connector not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/discoveries/{connectorUuid}/attributes:
+    get:
+      tags:
+      - Discovery Management
+      summary: Get run-level Discovery Attributes from a Discovery Provider
+      description: "Relays the run-level attribute definitions from the Connector's\
+        \ discovery interface: the schema that configures a discovery run as a whole\
+        \ and applies to every resource type the run targets. Exists only for Connectors\
+        \ implementing discovery v2; for a v1 Connector, use the kind-scoped Connector\
+        \ attribute endpoint, exactly as today."
+      operationId: getDiscoveryAttributes
+      parameters:
+      - name: connectorUuid
+        in: path
+        description: Discovery Provider Connector UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Run-level Discovery Attributes received
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "404":
+          description: Connector not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Connector does not implement the v2 discovery interface
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
         "400":
           description: Bad Request
           content:
@@ -31591,7 +32084,10 @@ components:
       - notification
       - secret
       - signatureFormatting
-      - signing
+      - cadesFormatting
+      - jadesFormatting
+      - padesFormatting
+      - xadesFormatting
     ConnectorInterfaceDto:
       type: object
       properties:
@@ -31692,14 +32188,20 @@ components:
       enum:
       - stateless
       - openMetrics
+      - asynchronous
       - secretVersioning
       - secretRotation
       - contentSigning
+      - levelTimestamped
+      - levelLongTerm
+      - levelArchival
       - timestamping
       - certificateRegistration
       - certificateStatusPolling
       - certificateRequestStructured
       - certificateIdentityOverride
+      - discoveryStreaming
+      - discoveryStopResume
     FunctionGroupCode:
       type: string
       enum:
@@ -32196,14 +32698,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
           example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
       required:
       - name
       - type
@@ -35635,6 +36137,11 @@ components:
           description: Custom Attributes to be associated with certificate by protocol
           items:
             $ref: "#/components/schemas/RequestAttribute"
+    ProtocolChallengeSource:
+      type: string
+      enum:
+      - protocolDefault
+      - certificateRegistration
     ScepProfileEditRequestDto:
       type: object
       properties:
@@ -35686,6 +36193,14 @@ components:
           description: Challenge password protection toggle. Omit to keep the stored
             password unchanged; true to set a new password (or keep the existing one
             if left blank); false to remove it.
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: "Source of the enrolment challenge ('protocolDefault' or 'certificateRegistration').\
+            \ 'protocolDefault' authenticates against the shared challenge password;\
+            \ 'certificateRegistration' requires every initial enrolment to match\
+            \ a pre-registered certificate and forbids a profile challenge password.\
+            \ Omit to keep the stored value on edit; on create, omit to default to\
+            \ 'protocolDefault'."
         enableIntune:
           type: boolean
           description: Status of Intune
@@ -35919,6 +36434,9 @@ components:
           description: Whether a challenge password is currently set for the SCEP
             Profile. The password value itself is write-only and never returned; this
             flag lets clients reflect the current state.
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: Source of the enrolment challenge
         issueCertificateAttributes:
           type: array
           description: List of Attributes to issue a Certificate
@@ -35942,6 +36460,7 @@ components:
           $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
           description: Associations to set for certificates issued by the protocol
       required:
+      - challengeSource
       - enableChallengePassword
       - enabled
       - includeCaCertificate
@@ -36190,6 +36709,13 @@ components:
       - category
       - displayName
       - oid
+    NotificationDataCategory:
+      type: string
+      enum:
+      - customAttributes
+      - metadata
+      - associations
+      - objectContent
     NotificationProfileUpdateRequestDto:
       type: object
       properties:
@@ -36223,6 +36749,13 @@ components:
           type: integer
           format: int32
           description: Maximum number of repetitions of same notification
+        eventDataCategories:
+          type: array
+          description: "Notification data categories included in external notifications\
+            \ sent by this profile. When updating, an absent field keeps the current\
+            \ value and an empty list disables enrichment"
+          items:
+            $ref: "#/components/schemas/NotificationDataCategory"
       required:
       - internalNotification
       - recipientType
@@ -36280,6 +36813,12 @@ components:
           type: integer
           format: int32
           description: Maximum number of repetitions of same notification
+        eventDataCategories:
+          type: array
+          description: Notification data categories included in external notifications
+            sent by this profile
+          items:
+            $ref: "#/components/schemas/NotificationDataCategory"
       required:
       - internalNotification
       - name
@@ -37069,6 +37608,15 @@ components:
           type: string
           description: UUID of the Certificate to be used as signing certificate for
             CMP responses. Required when Protection Method is Signature
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: "Source of the credential for MAC-protected requests ('protocolDefault'\
+            \ or 'certificateRegistration'). 'protocolDefault' verifies against the\
+            \ profile shared secret; 'certificateRegistration' requires the senderKID\
+            \ to reference a pre-registered certificate whose challenge is the MAC\
+            \ secret, and forbids a profile shared secret. Signature protection is\
+            \ independent of this setting. Omit to keep the stored value on edit;\
+            \ on create, omit to default to 'protocolDefault'."
         certificateAssociations:
           $ref: "#/components/schemas/ProtocolCertificateAssociationsRequestDto"
           description: Associations to set for certificates issued by the protocol
@@ -37131,6 +37679,9 @@ components:
           description: CMP URL
           examples:
           - https://your-domain.com/api/v1/protocols/cmp/cmpProfile
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: Source of the credential for MAC-protected requests
         issueCertificateAttributes:
           type: array
           description: List of Attributes to issue a Certificate for the associated
@@ -37161,6 +37712,7 @@ components:
           $ref: "#/components/schemas/ProtocolCertificateAssociationsDto"
           description: Associations to set for certificates issued by the protocol
       required:
+      - challengeSource
       - enabled
       - name
       - requestProtectionMethod
@@ -37541,16 +38093,21 @@ components:
         version:
           $ref: "#/components/schemas/AttributeVersion"
           description: Version of the attribute
+        resources:
+          type: array
+          description: List of resources for custom attribute
+          items:
+            $ref: "#/components/schemas/Resource"
+        required:
+          type: boolean
+          description: "Boolean determining if the Attribute is required. If true,\
+            \ the Attribute must be provided."
         type:
           $ref: "#/components/schemas/AttributeType"
           default: custom
           description: Type of the Attribute
           examples:
           - custom
-        required:
-          type: boolean
-          description: "Boolean determining if the Attribute is required. If true,\
-            \ the Attribute must be provided."
         visible:
           type: boolean
           default: true
@@ -37582,11 +38139,6 @@ components:
             of the Attribute must satisfy the type
           items:
             $ref: "#/components/schemas/AttributeContent"
-        resources:
-          type: array
-          description: List of resources which are allowed to use the Custom Attribute
-          items:
-            $ref: "#/components/schemas/Resource"
         extensibleList:
           type: boolean
           description: Boolean determining if a list Attribute can have values other
@@ -37597,6 +38149,7 @@ components:
       - label
       - name
       - required
+      - resources
       - type
       - uuid
     ApprovalProfileUpdateRequestDto:
@@ -37970,6 +38523,12 @@ components:
           $ref: "#/components/schemas/CertificateRequestFormat"
           default: pkcs10
           description: Certificate signing request format
+        authorizationSecret:
+          type: string
+          description: One-time authorization secret for renewing a certificate that
+            has an active registration. Write-only; ignored for certificates without
+            one.
+          writeOnly: true
     ClientCertificateRekeyRequestDto:
       type: object
       properties:
@@ -38013,6 +38572,12 @@ components:
             \ alternative attributes will be used to generate the new CSR"
           items:
             $ref: "#/components/schemas/RequestAttribute"
+        authorizationSecret:
+          type: string
+          description: One-time authorization secret for rekeying a certificate that
+            has an active registration. Write-only; ignored for certificates without
+            one.
+          writeOnly: true
     UploadCertificateRequestDto:
       type: object
       properties:
@@ -38703,15 +39268,24 @@ components:
             type: string
             format: uuid
           uniqueItems: true
+        sourceCertificateUuid:
+          type: string
+          format: uuid
+          description: "Optional UUID of an existing certificate this registration\
+            \ succeeds. When set, the registration is a pre-registered successor of\
+            \ the source certificate: renewing the source certificate is gated by\
+            \ this registration's challenge and completes into the registered successor.\
+            \ When omitted, the registration is a standalone placeholder completed\
+            \ by issue."
         authorizationSecret:
           type: string
-          description: Authorization secret (challenge) that gates completion of this
-            pre-registered certificate. Write-only and optional — the operator supplies
-            it to opt the registration into challenge-gated issuance; the platform
-            never generates one. Issuing a pre-registered certificate is currently
-            the only challenge-verified completion path; renewal and rekey requests
-            for a certificate with an active registration are rejected (fail-closed)
-            until challenge-gated successor handling is added.
+          description: "Authorization secret (challenge) that gates completion of\
+            \ this pre-registered certificate. Write-only and optional — the operator\
+            \ supplies it to opt the registration into challenge-gated issuance; the\
+            \ platform never generates one. Challenge verification gates issue of\
+            \ this pre-registered certificate, rekey of it after issuance, and — when\
+            \ registered as a successor (sourceCertificateUuid) — renew of the source\
+            \ certificate."
           maxLength: 255
           minLength: 12
           pattern: "[\\x20-\\x7E]+"
@@ -40184,6 +40758,14 @@ components:
           description: Challenge password protection toggle. Omit to keep the stored
             password unchanged; true to set a new password (or keep the existing one
             if left blank); false to remove it.
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: "Source of the enrolment challenge ('protocolDefault' or 'certificateRegistration').\
+            \ 'protocolDefault' authenticates against the shared challenge password;\
+            \ 'certificateRegistration' requires every initial enrolment to match\
+            \ a pre-registered certificate and forbids a profile challenge password.\
+            \ Omit to keep the stored value on edit; on create, omit to default to\
+            \ 'protocolDefault'."
         enableIntune:
           type: boolean
           description: Status of Intune
@@ -40626,6 +41208,13 @@ components:
           type: integer
           format: int32
           description: Maximum number of repetitions of same notification
+        eventDataCategories:
+          type: array
+          description: "Notification data categories included in external notifications\
+            \ sent by this profile. When updating, an absent field keeps the current\
+            \ value and an empty list disables enrichment"
+          items:
+            $ref: "#/components/schemas/NotificationDataCategory"
         name:
           type: string
           description: Name of the Notification profile
@@ -40871,6 +41460,32 @@ components:
           items:
             type: string
             format: uuid
+        resources:
+          type: array
+          description: "Resource types this run should discover, as resource wire\
+            \ codes (e.g. \"certificates\", \"keys\"). Omit only for a run against\
+            \ a v1 connector, which keeps exactly today's semantics: the run discovers\
+            \ certificates. A v2 connector requires the field — Core rejects a request\
+            \ that omits it — and a v1 connector rejects a request that supplies it:\
+            \ discovery has no resource dimension in v1."
+          items:
+            $ref: "#/components/schemas/Resource"
+          maxItems: 2147483647
+          minItems: 1
+        resourceAttributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/RequestAttribute"
+          description: "Per-resource attributes, keyed by resource wire code, collected\
+            \ against the per-resource attribute definitions the connector advertises.\
+            \ Omit for exactly today's v1 semantics: only the run-level attributes\
+            \ above are sent to the connector. A key absent from this map means that\
+            \ resource is discovered with no refinement of its own, not that it is\
+            \ excluded — resources alone decides what a run targets."
+          propertyNames:
+            $ref: "#/components/schemas/Resource"
       required:
       - attributes
       - connectorUuid
@@ -40887,7 +41502,7 @@ components:
           type: boolean
         request:
           $ref: "#/components/schemas/DiscoveryDto"
-    DiscoveryHistoryDto:
+    DiscoveryListDto:
       type: object
       properties:
         uuid:
@@ -40941,7 +41556,7 @@ components:
           type: array
           description: Discoveries
           items:
-            $ref: "#/components/schemas/DiscoveryHistoryDto"
+            $ref: "#/components/schemas/DiscoveryListDto"
         itemsPerPage:
           type: integer
           format: int32
@@ -40972,6 +41587,8 @@ components:
       - failed
       - completed
       - warning
+      - stopped
+      - cancelled
     CredentialRequestDto:
       type: object
       properties:
@@ -41254,6 +41871,15 @@ components:
           type: string
           description: UUID of the Certificate to be used as signing certificate for
             CMP responses. Required when Protection Method is Signature
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: "Source of the credential for MAC-protected requests ('protocolDefault'\
+            \ or 'certificateRegistration'). 'protocolDefault' verifies against the\
+            \ profile shared secret; 'certificateRegistration' requires the senderKID\
+            \ to reference a pre-registered certificate whose challenge is the MAC\
+            \ secret, and forbids a profile shared secret. Signature protection is\
+            \ independent of this setting. Omit to keep the stored value on edit;\
+            \ on create, omit to default to 'protocolDefault'."
         certificateAssociations:
           $ref: "#/components/schemas/ProtocolCertificateAssociationsRequestDto"
           description: Associations to set for certificates issued by the protocol
@@ -41850,6 +42476,8 @@ components:
       - unarchive
       - finalizeIssue
       - confirmRevoke
+      - stop
+      - resume
       - cancel
       - getAssociations
       - listVersions
@@ -42687,6 +43315,7 @@ components:
       - AccountStatus
       - ProtectionMethod
       - CmpProfileVariant
+      - ProtocolChallengeSource
       - AttributeType
       - AttributeContentType
       - AttributeConstraintType
@@ -42696,6 +43325,7 @@ components:
       - ProtectionLevel
       - SchedulerJobExecutionStatus
       - RecipientType
+      - NotificationDataCategory
       - TriggerType
       - ConditionType
       - ExecutionType
@@ -43991,7 +44621,11 @@ components:
           description: Whether a challenge password is currently set for the SCEP
             Profile. The password value itself is write-only and never returned; this
             flag lets clients reflect the current state.
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: Source of the enrolment challenge
       required:
+      - challengeSource
       - enableChallengePassword
       - enabled
       - includeCaCertificate
@@ -44203,6 +44837,12 @@ components:
         internalNotification:
           type: boolean
           description: Is notification profile sending internal notifications
+        eventDataCategories:
+          type: array
+          description: Notification data categories included in external notifications
+            sent by this profile
+          items:
+            $ref: "#/components/schemas/NotificationDataCategory"
       required:
       - internalNotification
       - name
@@ -44334,7 +44974,7 @@ components:
       required:
       - code
       - label
-    DiscoveryHistoryDetailDto:
+    DiscoveryDetailDto:
       type: object
       properties:
         uuid:
@@ -44407,6 +45047,33 @@ components:
           description: List of associated triggers
           items:
             $ref: "#/components/schemas/TriggerDto"
+        resources:
+          type: array
+          description: "Resource types this run targets, as resource wire codes (e.g.\
+            \ \"certificates\", \"keys\"). Always present: a run against a v1 connector\
+            \ reports [\"certificates\"], synthesized by Core, so a client never inspects\
+            \ the connector to learn what a run was after."
+          items:
+            $ref: "#/components/schemas/Resource"
+        progress:
+          $ref: "#/components/schemas/DiscoveryProgressDto"
+        runMessages:
+          type: array
+          description: Advisory messages collected over the run's lifetime — non-fatal
+            connector errors and per-phase failure reasons — newest last. Entries
+            do not imply the run failed. Curated message text; never a raw exception
+            message.
+          items:
+            type: string
+        effectiveCapabilities:
+          type: array
+          description: "Capabilities effective for this run: the intersection of what\
+            \ the connector's discovery interface supports across every resource type\
+            \ the run targets — a capability any targeted resource lacks is not listed.\
+            \ Always present: empty means the run supports none of them, so a client\
+            \ renders the stop and resume controls from this list alone."
+          items:
+            $ref: "#/components/schemas/DiscoveryResourceCapability"
       required:
       - attributes
       - connectorName
@@ -44417,6 +45084,217 @@ components:
       - status
       - triggers
       - uuid
+    DiscoveryProgressDto:
+      type: object
+      description: "Run-level progress of a discovery run: the run-wide counters,\
+        \ plus an optional per-resource breakdown."
+      properties:
+        processed:
+          type: integer
+          format: int64
+          description: Number of items processed so far; omitted when the connector
+            cannot report it
+        totalEstimate:
+          type: integer
+          format: int64
+          description: Estimated total number of items for the run; omitted when the
+            connector cannot produce an estimate
+        phase:
+          type: string
+          description: "Connector-defined free-text phase label (e.g. \"scanning\"\
+            , \"enumerating\"); omitted when the connector has no phase concept"
+        byResource:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/DiscoveryResourceProgressDto"
+          propertyNames:
+            $ref: "#/components/schemas/Resource"
+    DiscoveryResourceCapability:
+      type: string
+      enum:
+      - stopResume
+    DiscoveryResourceProgressDto:
+      type: object
+      description: "Progress counters. Used for a whole run and, keyed by resource\
+        \ code inside byResource (e.g. \"certificates\", \"keys\"), for one resource\
+        \ type at a time. Every field is optional."
+      properties:
+        processed:
+          type: integer
+          format: int64
+          description: Number of items processed so far; omitted when the connector
+            cannot report it
+        totalEstimate:
+          type: integer
+          format: int64
+          description: Estimated total number of items for the run; omitted when the
+            connector cannot produce an estimate
+        phase:
+          type: string
+          description: "Connector-defined free-text phase label (e.g. \"scanning\"\
+            , \"enumerating\"); omitted when the connector has no phase concept"
+    DiscoveredCertificateDto:
+      allOf:
+      - $ref: "#/components/schemas/DiscoveredItemPayload"
+      - type: object
+        properties:
+          certificateData:
+            type: string
+            description: Base64-encoded certificate data (DER)
+            minLength: 1
+      required:
+      - certificateData
+      - resource
+    DiscoveredItemPayload:
+      type: object
+      description: "Resource-specific payload of a discovered item. The required resource\
+        \ property is the discriminator: it carries the resource's wire code and selects\
+        \ which concrete payload shape this object is. Each concrete shape fixes it\
+        \ to its own value."
+      discriminator:
+        propertyName: resource
+        mapping:
+          certificates: "#/components/schemas/DiscoveredCertificateDto"
+          keys: "#/components/schemas/DiscoveredKeyDto"
+      oneOf:
+      - $ref: "#/components/schemas/DiscoveredCertificateDto"
+      - $ref: "#/components/schemas/DiscoveredKeyDto"
+      properties:
+        resource:
+          $ref: "#/components/schemas/Resource"
+    DiscoveredKeyDto:
+      allOf:
+      - $ref: "#/components/schemas/DiscoveredItemPayload"
+      - type: object
+        properties:
+          type:
+            $ref: "#/components/schemas/KeyType"
+            description: "Key type: whether this is a public, private, secret, or\
+              \ split key"
+          algorithm:
+            $ref: "#/components/schemas/KeyAlgorithm"
+            description: Cryptographic algorithm of the key
+          length:
+            type: integer
+            format: int32
+            description: Key length in bits
+          fingerprint:
+            type: string
+            description: "Intrinsic key fingerprint; correlates the same key across\
+              \ runs, connectors, and certificates without exposing key material"
+          publicKeyFormat:
+            $ref: "#/components/schemas/KeyFormat"
+            description: Format of publicKey when present (typically SubjectPublicKeyInfo);
+              absent when publicKey is absent
+          publicKey:
+            type: string
+            description: "Base64-encoded public key material. Absent for PRIVATE_KEY,\
+              \ SECRET_KEY or SPLIT_KEY discoveries, where only existence and intrinsic\
+              \ metadata are ever reported"
+      description: "A connector reports a key's existence, intrinsic metadata, and\
+        \ at most its public part; private, secret and split key material must never\
+        \ be sent. A PRIVATE_KEY, SECRET_KEY or SPLIT_KEY report MUST omit publicKey\
+        \ and publicKeyFormat entirely."
+      required:
+      - algorithm
+      - resource
+      - type
+    DiscoveryItemDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID of the staged Discovery item
+        inventoryUuid:
+          type: string
+          description: "UUID of the object this item became in inventory. Absent until\
+            \ the item is processed, and absent permanently if its processing failed."
+        sequence:
+          type: integer
+          format: int64
+          description: "Position of this item in the run. For runs against a v2 Discovery\
+            \ Provider this is the provider's run-wide sequence; for runs against\
+            \ a v1 provider, which never numbered its items, Core synthesizes it from\
+            \ staging order."
+        uniqueRef:
+          type: string
+          description: "Reference identifying this item within the run, unique per\
+            \ resource type. Provider-assigned for v2-staged items; for certificates\
+            \ staged by a v1 provider Core uses the certificate fingerprint, which\
+            \ is the identity it deduplicates on."
+        discoveredAt:
+          type: string
+          format: date-time
+          description: When the Discovery Provider reported discovering this item
+        payload:
+          $ref: "#/components/schemas/DiscoveredItemPayload"
+          description: "Resource-specific data the Discovery Provider reported, discriminated\
+            \ by resource"
+        newlyDiscovered:
+          type: boolean
+          description: "True when the object was not already in the inventory at the\
+            \ time this run staged it, false when the run rediscovered something the\
+            \ inventory already held."
+        processed:
+          type: boolean
+          description: Indicator whether processing of the staged item has been attempted;
+            processedError and inventoryUuid convey the outcome.
+        processedError:
+          type: string
+          description: Error message in case of failed processing of the staged item.
+        meta:
+          type: array
+          description: Item metadata as reported by the Discovery Provider — where
+            the item was found (e.g. IP address and port). Absent when the provider
+            reported none.
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        resource:
+          $ref: "#/components/schemas/Resource"
+          readOnly: true
+      required:
+      - newlyDiscovered
+      - payload
+      - processed
+      - resource
+      - sequence
+      - uniqueRef
+      - uuid
+    MetadataAttribute:
+      description: Metadata Attribute definition
+      oneOf:
+      - $ref: "#/components/schemas/MetadataAttributeV2"
+      - $ref: "#/components/schemas/MetadataAttributeV3"
+    PaginationResponseDtoDiscoveryItemDto:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items returned
+          items:
+            $ref: "#/components/schemas/DiscoveryItemDto"
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+      required:
+      - items
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
     DiscoveryCertificateDto:
       type: object
       properties:
@@ -44503,6 +45381,26 @@ components:
       - pageNumber
       - totalItems
       - totalPages
+    DiscoverySupportedResourceDto:
+      type: object
+      properties:
+        resource:
+          $ref: "#/components/schemas/Resource"
+        capabilities:
+          type: array
+          description: "Per-resource capabilities this resource supports. Enumerates\
+            \ only capabilities that can differ from one resource to another; a capability\
+            \ listed here is valid only if the connector also advertises the interface-level\
+            \ feature flag it maps to. A null value means every such capability the\
+            \ connector advertises applies to this resource; an empty list means none\
+            \ apply. These are distinct and must not be normalized to one another.\
+            \ This list must not be used to decide whether the connector streams:\
+            \ streaming is a property of the whole discovery interface, advertised\
+            \ once by the discoveryStreaming feature flag, never per resource."
+          items:
+            $ref: "#/components/schemas/DiscoveryResourceCapability"
+      required:
+      - resource
     HealthDto:
       type: object
       properties:
@@ -44835,7 +45733,11 @@ components:
           description: CMP URL
           examples:
           - https://your-domain.com/api/v1/protocols/cmp/cmpProfile
+        challengeSource:
+          $ref: "#/components/schemas/ProtocolChallengeSource"
+          description: Source of the credential for MAC-protected requests
       required:
+      - challengeSource
       - enabled
       - name
       - uuid
@@ -45478,11 +46380,16 @@ components:
           description: List of resources for custom attribute
           items:
             $ref: "#/components/schemas/Resource"
+        required:
+          type: boolean
+          description: "Boolean determining if the Attribute is required. If true,\
+            \ the Attribute must be provided."
       required:
       - contentType
       - description
       - label
       - name
+      - required
       - resources
       - uuid
     CustomAttribute:

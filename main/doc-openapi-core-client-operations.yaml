@@ -9,7 +9,7 @@ info:
   license:
     name: MIT License
     url: https://github.com/OmniTrustILM/ilm/blob/main/LICENSE.md
-  version: 2.19.0
+  version: 2.20.0-SNAPSHOT
   x-logo:
     url: images/ilm-logo.svg
 externalDocs:
@@ -3305,6 +3305,12 @@ components:
           $ref: "#/components/schemas/CertificateRequestFormat"
           default: pkcs10
           description: Certificate signing request format
+        authorizationSecret:
+          type: string
+          description: One-time authorization secret for renewing a certificate that
+            has an active registration. Write-only; ignored for certificates without
+            one.
+          writeOnly: true
     ClientCertificateRekeyRequestDto:
       type: object
       properties:
@@ -3348,6 +3354,12 @@ components:
             \ alternative attributes will be used to generate the new CSR"
           items:
             $ref: "#/components/schemas/RequestAttribute"
+        authorizationSecret:
+          type: string
+          description: One-time authorization secret for rekeying a certificate that
+            has an active registration. Write-only; ignored for certificates without
+            one.
+          writeOnly: true
     UploadCertificateRequestDto:
       type: object
       properties:
@@ -4598,15 +4610,24 @@ components:
             type: string
             format: uuid
           uniqueItems: true
+        sourceCertificateUuid:
+          type: string
+          format: uuid
+          description: "Optional UUID of an existing certificate this registration\
+            \ succeeds. When set, the registration is a pre-registered successor of\
+            \ the source certificate: renewing the source certificate is gated by\
+            \ this registration's challenge and completes into the registered successor.\
+            \ When omitted, the registration is a standalone placeholder completed\
+            \ by issue."
         authorizationSecret:
           type: string
-          description: Authorization secret (challenge) that gates completion of this
-            pre-registered certificate. Write-only and optional — the operator supplies
-            it to opt the registration into challenge-gated issuance; the platform
-            never generates one. Issuing a pre-registered certificate is currently
-            the only challenge-verified completion path; renewal and rekey requests
-            for a certificate with an active registration are rejected (fail-closed)
-            until challenge-gated successor handling is added.
+          description: "Authorization secret (challenge) that gates completion of\
+            \ this pre-registered certificate. Write-only and optional — the operator\
+            \ supplies it to opt the registration into challenge-gated issuance; the\
+            \ platform never generates one. Challenge verification gates issue of\
+            \ this pre-registered certificate, rekey of it after issuance, and — when\
+            \ registered as a successor (sourceCertificateUuid) — renew of the source\
+            \ certificate."
           maxLength: 255
           minLength: 12
           pattern: "[\\x20-\\x7E]+"
@@ -4641,14 +4662,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
           example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
       required:
       - name
       - type
