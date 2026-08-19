@@ -2010,6 +2010,72 @@ paths:
       - SessionAuth: []
       - CertificateAuth: []
       - BearerJWTAuth: []
+  /v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/renew:
+    get:
+      tags:
+      - RA Profile Management
+      summary: Get renew Certificate Attributes
+      operationId: listRaProfileRenewCertificateAttributes
+      parameters:
+      - name: authorityUuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      - name: raProfileUuid
+        in: path
+        description: RA Profile UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Renew certificate attributes list obtained
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "404":
+          description: RA Profile not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - SessionAuth: []
+      - CertificateAuth: []
+      - BearerJWTAuth: []
   /v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/issue:
     get:
       tags:
@@ -2032,6 +2098,72 @@ paths:
       responses:
         "200":
           description: Issue certificate attributes list obtained
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "404":
+          description: RA Profile not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - SessionAuth: []
+      - CertificateAuth: []
+      - BearerJWTAuth: []
+  /v1/authorities/{authorityUuid}/raProfiles/{raProfileUuid}/attributes/identify:
+    get:
+      tags:
+      - RA Profile Management
+      summary: Get identify Certificate Attributes
+      operationId: listRaProfileIdentifyCertificateAttributes
+      parameters:
+      - name: authorityUuid
+        in: path
+        description: Authority Instance UUID
+        required: true
+        schema:
+          type: string
+      - name: raProfileUuid
+        in: path
+        description: RA Profile UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Identify certificate attributes list obtained
           content:
             application/json:
               schema:
@@ -4821,6 +4953,19 @@ components:
           type: array
           description: "List of register attributes: the connector's register-operation\
             \ attributes submitted when the certificate was pre-registered"
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        renewAttributes:
+          type: array
+          description: "List of renew attributes: the connector's renew-operation\
+            \ attributes submitted when this certificate was created by renewing or\
+            \ rekeying its predecessor"
+          items:
+            $ref: "#/components/schemas/ResponseAttribute"
+        identifyAttributes:
+          type: array
+          description: "List of identify attributes: the connector's identify-operation\
+            \ attributes submitted when the certificate was identified at its authority"
           items:
             $ref: "#/components/schemas/ResponseAttribute"
         registrationRequestAttributes:

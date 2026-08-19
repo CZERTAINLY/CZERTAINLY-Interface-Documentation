@@ -14,7 +14,77 @@ info:
     url: images/ilm-logo.svg
   x-metrics-profile:
     version: 1
+    required:
+    - unit: "1"
+      name: app_build_info
+      type: gauge
+      labels:
+      - version
+      - commit
+      - runtime
+    - unit: seconds
+      name: process_start_time_seconds
+      type: gauge
+      labels: []
+    - unit: seconds
+      name: process_cpu_seconds_total
+      type: counter
+      labels: []
+    - unit: bytes
+      name: process_resident_memory_bytes
+      type: gauge
+      labels: []
+    - unit: requests
+      name: http_requests_total
+      type: counter
+      labels:
+      - method
+      - route
+      - status
+    - buckets_ref: http_server_latency_buckets_seconds
+      labels:
+      - method
+      - route
+      type: histogram
+      unit: seconds
+      name: http_request_duration_seconds
+    - unit: requests
+      name: http_server_in_flight_requests
+      type: gauge
+      labels:
+      - route
+    - unit: requests
+      name: http_client_requests_total
+      type: counter
+      labels:
+      - method
+      - target
+      - status
+    - buckets_ref: http_client_latency_buckets_seconds
+      labels:
+      - method
+      - target
+      type: histogram
+      unit: seconds
+      name: http_client_request_duration_seconds
+    - unit: events
+      name: connector_events_total
+      type: counter
+      labels:
+      - event
+      - outcome
     histograms:
+      http_client_latency_buckets_seconds:
+      - 0.01
+      - 0.025
+      - 0.05
+      - 0.1
+      - 0.25
+      - 0.5
+      - 1.0
+      - 2.5
+      - 5.0
+      - 10.0
       http_server_latency_buckets_seconds:
       - 0.005
       - 0.01
@@ -27,76 +97,6 @@ info:
       - 2.5
       - 5.0
       - 10.0
-      http_client_latency_buckets_seconds:
-      - 0.01
-      - 0.025
-      - 0.05
-      - 0.1
-      - 0.25
-      - 0.5
-      - 1.0
-      - 2.5
-      - 5.0
-      - 10.0
-    required:
-    - type: gauge
-      name: app_build_info
-      unit: "1"
-      labels:
-      - version
-      - commit
-      - runtime
-    - type: gauge
-      name: process_start_time_seconds
-      unit: seconds
-      labels: []
-    - type: counter
-      name: process_cpu_seconds_total
-      unit: seconds
-      labels: []
-    - type: gauge
-      name: process_resident_memory_bytes
-      unit: bytes
-      labels: []
-    - type: counter
-      name: http_requests_total
-      unit: requests
-      labels:
-      - method
-      - route
-      - status
-    - labels:
-      - method
-      - route
-      buckets_ref: http_server_latency_buckets_seconds
-      name: http_request_duration_seconds
-      unit: seconds
-      type: histogram
-    - type: gauge
-      name: http_server_in_flight_requests
-      unit: requests
-      labels:
-      - route
-    - type: counter
-      name: http_client_requests_total
-      unit: requests
-      labels:
-      - method
-      - target
-      - status
-    - labels:
-      - method
-      - target
-      buckets_ref: http_client_latency_buckets_seconds
-      name: http_client_request_duration_seconds
-      unit: seconds
-      type: histogram
-    - type: counter
-      name: connector_events_total
-      unit: events
-      labels:
-      - event
-      - outcome
 externalDocs:
   description: ILM Documentation
   url: https://docs.otilm.com
@@ -307,6 +307,62 @@ paths:
       - CertificateTLSAuth: []
       - NoAuth: []
       - BasicAuth: []
+  /v3/authorityProvider/certificates/request/attributes:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: List certificate request attributes
+      description: "List the dynamic-attribute schema describing the certificate request\
+        \ identity (subject RDNs, SANs, extensions) this authority expects. Optional\
+        \ endpoint — see responses."
+      operationId: listRequestAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateAttributeListRequestDtoV3"
+        required: true
+      responses:
+        "200":
+          description: Schema retrieved; an empty array means nothing to list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "501":
+          description: Connector declines to offer a schema (ErrorCode.OPERATION_NOT_SUPPORTED)
+            — Core resolves an empty schema
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
   /v3/authorityProvider/certificates/renew:
     post:
       tags:
@@ -342,6 +398,60 @@ paths:
                 $ref: "#/components/schemas/ProblemDetailExtended"
         "404":
           description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/renew/attributes:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: List renew operation attributes
+      description: List dynamic attributes for renew. Optional endpoint — see responses.
+      operationId: listRenewAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateAttributeListRequestDtoV3"
+        required: true
+      responses:
+        "200":
+          description: Schema retrieved; an empty array means nothing to list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "501":
+          description: Connector declines to offer a schema (ErrorCode.OPERATION_NOT_SUPPORTED)
+            — Core resolves an empty schema
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
           content:
             application/problem+json:
               schema:
@@ -744,6 +854,60 @@ paths:
                 $ref: "#/components/schemas/ProblemDetailExtended"
         "404":
           description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v3/authorityProvider/certificates/identify/attributes:
+    post:
+      tags:
+      - Certificate Management v3
+      summary: List identify operation attributes
+      description: List dynamic attributes for identify. Optional endpoint — see responses.
+      operationId: listIdentifyAttributes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CertificateAttributeListRequestDtoV3"
+        required: true
+      responses:
+        "200":
+          description: Schema retrieved; an empty array means nothing to list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "501":
+          description: Connector declines to offer a schema (ErrorCode.OPERATION_NOT_SUPPORTED)
+            — Core resolves an empty schema
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
           content:
             application/problem+json:
               schema:
@@ -3689,8 +3853,7 @@ components:
             \ is delegated to the upstream CA's renewal policy."
         attributes:
           type: array
-          description: Renew-specific dynamic attributes (schema from shared /issue/attributes
-            endpoint)
+          description: Renew-specific dynamic attributes (schema from /renew/attributes)
           items:
             $ref: "#/components/schemas/RequestAttribute"
         meta:
@@ -3914,8 +4077,7 @@ components:
           description: CSR format
         attributes:
           type: array
-          description: Issue-specific dynamic attributes (from shared /issue/attributes
-            schema endpoint)
+          description: Issue-specific dynamic attributes (schema from /issue/attributes)
           items:
             $ref: "#/components/schemas/RequestAttribute"
         meta:
@@ -3956,6 +4118,11 @@ components:
           format: byte
           description: Base64 of cert to identify at the upstream CA
           minLength: 1
+        attributes:
+          type: array
+          description: Identify-specific dynamic attributes (schema from /identify/attributes)
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
       required:
       - authorityAttributes
       - certificate
