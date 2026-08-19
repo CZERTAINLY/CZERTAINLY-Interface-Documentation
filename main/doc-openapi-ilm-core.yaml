@@ -35081,7 +35081,9 @@ components:
       - uuid
     ContentSigningWorkflowRequestDto:
       type: object
-      description: Content signing workflow configuration request
+      description: Content signing workflow configuration request. The validation
+        material that LONG_TERM and ARCHIVAL embed is fetched by the Signature Formatting
+        Provider and needs no configuration here.
       properties:
         type:
           $ref: "#/components/schemas/SigningWorkflowType"
@@ -35097,10 +35099,32 @@ components:
         signatureFormattingConnectorAttributes:
           type: array
           description: Attributes for the Signature Formatting Provider that control
-            DTBS construction for the content signing workflow. Applicable only when
-            ILM-managed signing is used.
+            DTBS construction for the content signing workflow. Must be omitted for
+            delegated signing.
           items:
             $ref: "#/components/schemas/RequestAttribute"
+        family:
+          $ref: "#/components/schemas/SignatureFamily"
+          description: Signature family this profile produces. Required for ILM-managed
+            signing; must be omitted for delegated signing.
+        maxLevel:
+          $ref: "#/components/schemas/SignatureLevel"
+          description: Highest signature level a request may ask for. A request asking
+            for more is rejected. Required for ILM-managed signing; must be omitted
+            for delegated signing.
+        timestampSource:
+          $ref: "#/components/schemas/TimestampSourceRequestDto"
+          description: "Source of the timestamps embedded at level TIMESTAMPED and\
+            \ above. Required when maxLevel is TIMESTAMPED or higher, and must be\
+            \ omitted when maxLevel is SIGNED, which embeds no timestamp. Must be\
+            \ omitted for delegated signing."
+        documentSizeCap:
+          type: integer
+          format: int64
+          description: "Largest document accepted for signing, in bytes. Enforced\
+            \ when a signing request arrives, under both ILM-managed and delegated\
+            \ signing. When omitted, no profile-level cap applies."
+          example: 5242880
       required:
       - type
     DelegatedSigningRequestDto:
@@ -35136,6 +35160,21 @@ components:
       - SHA3-256
       - SHA3-384
       - SHA3-512
+    InternalTimestampSourceRequestDto:
+      allOf:
+      - $ref: "#/components/schemas/TimestampSourceRequestDto"
+      - type: object
+        properties:
+          signingProfileUuid:
+            type: string
+            format: uuid
+            description: UUID of the Timestamping Signing Profile that issues the
+              timestamps. ILM rejects a UUID that is not a Timestamping profile.
+      description: "Timestamp source referencing a Timestamping Signing Profile on\
+        \ this platform by UUID, as supplied on create and update"
+      required:
+      - signingProfileUuid
+      - type
     ManagedSigningRequestSchemeInterface:
       type: object
       description: Managed signing request configuration dependent on the managed
@@ -35206,6 +35245,24 @@ components:
           - timestamping
       required:
       - type
+    SignatureFamily:
+      type: string
+      description: "Signature family, naming the standard and document format a signature\
+        \ follows"
+      enum:
+      - pades
+      - xades
+      - cades
+      - jades
+    SignatureLevel:
+      type: string
+      description: "Level a signature has reached, ordered from SIGNED up to ARCHIVAL\
+        \ with each level containing the one before it"
+      enum:
+      - signed
+      - timestamped
+      - long_term
+      - archival
     SigningProfileRequestDto:
       type: object
       description: Request to create or update a Signing Profile
@@ -35336,6 +35393,32 @@ components:
       - managedSigningType
       - signingOperationAttributes
       - signingScheme
+    TimestampSourceRequestDto:
+      type: object
+      description: "Source of the timestamps a content-signing profile embeds, as\
+        \ supplied on create and update. The required type property is the discriminator\
+        \ selecting the source."
+      discriminator:
+        propertyName: type
+        mapping:
+          internal: "#/components/schemas/InternalTimestampSourceRequestDto"
+      oneOf:
+      - $ref: "#/components/schemas/InternalTimestampSourceRequestDto"
+      properties:
+        type:
+          $ref: "#/components/schemas/TimestampSourceType"
+          description: "Kind of timestamp source, and the discriminator selecting\
+            \ the fields that accompany it"
+          examples:
+          - internal
+      required:
+      - type
+    TimestampSourceType:
+      type: string
+      description: "Kind of timestamp source, and the discriminator selecting the\
+        \ fields that accompany it"
+      enum:
+      - internal
     TimestampingWorkflowRequestDto:
       type: object
       description: Timestamping workflow configuration request
@@ -35498,7 +35581,9 @@ components:
       - revoked
     ContentSigningWorkflowDto:
       type: object
-      description: Content signing workflow configuration
+      description: Content signing workflow configuration. The validation material
+        that LONG_TERM and ARCHIVAL embed is fetched by the Signature Formatting Provider
+        and is not configured here.
       properties:
         type:
           $ref: "#/components/schemas/SigningWorkflowType"
@@ -35517,6 +35602,26 @@ components:
             only when ILM-managed signing is used.
           items:
             $ref: "#/components/schemas/ResponseAttribute"
+        family:
+          $ref: "#/components/schemas/SignatureFamily"
+          description: Signature family this profile produces. Present only when ILM-managed
+            signing is used; null for delegated signing.
+        maxLevel:
+          $ref: "#/components/schemas/SignatureLevel"
+          description: Highest signature level a request may ask for. A request asking
+            for more is rejected. Present only when ILM-managed signing is used; null
+            for delegated signing.
+        timestampSource:
+          $ref: "#/components/schemas/TimestampSourceDto"
+          description: Source of the timestamps embedded at level TIMESTAMPED and
+            above. Set when maxLevel is TIMESTAMPED or higher.
+        documentSizeCap:
+          type: integer
+          format: int64
+          description: "Largest document accepted for signing, in bytes. Enforced\
+            \ when a signing request arrives, under both ILM-managed and delegated\
+            \ signing. Null when no profile-level cap applies."
+          example: 5242880
       required:
       - type
     DelegatedSigningDto:
@@ -35539,6 +35644,19 @@ components:
       required:
       - connector
       - signingScheme
+    InternalTimestampSourceDto:
+      allOf:
+      - $ref: "#/components/schemas/TimestampSourceDto"
+      - type: object
+        properties:
+          signingProfile:
+            $ref: "#/components/schemas/NameAndUuidDto"
+            description: Timestamping Signing Profile that issues the timestamps
+      description: Timestamp source referencing the Timestamping Signing Profile on
+        this platform that issues the timestamps
+      required:
+      - signingProfile
+      - type
     ManagedSigningSchemeInterface:
       type: object
       description: Managed signing configuration dependent on the managed signing
@@ -35654,9 +35772,13 @@ components:
       - workflow
     SigningProtocol:
       type: string
+      description: How a signing operation was initiated. Some values name a client
+        protocol that a Signing Profile can enable; others record an invocation the
+        platform makes on its own and can never be enabled.
       enum:
       - csc_api
       - tsp
+      - internal_tsa
     SigningRecordPolicyDto:
       type: object
       description: Effective Signing Record policy on a Signing Profile
@@ -35729,6 +35851,26 @@ components:
       - managedSigningType
       - signingOperationAttributes
       - signingScheme
+    TimestampSourceDto:
+      type: object
+      description: "Source of the timestamps a content-signing profile embeds, as\
+        \ currently configured on the profile. The required type property is the discriminator\
+        \ selecting the source."
+      discriminator:
+        propertyName: type
+        mapping:
+          internal: "#/components/schemas/InternalTimestampSourceDto"
+      oneOf:
+      - $ref: "#/components/schemas/InternalTimestampSourceDto"
+      properties:
+        type:
+          $ref: "#/components/schemas/TimestampSourceType"
+          description: "Kind of timestamp source, and the discriminator selecting\
+            \ the fields that accompany it"
+          examples:
+          - internal
+      required:
+      - type
     TimestampingWorkflowDto:
       type: object
       description: Timestamping workflow configuration
@@ -43665,9 +43807,12 @@ components:
       - SecretState
       - ManagedSigningType
       - QcType
+      - SignatureFamily
+      - SignatureLevel
       - SigningProtocol
       - SigningScheme
       - SigningWorkflowType
+      - TimestampSourceType
       - TspAuthenticationMethod
     SearchFieldDataByGroupDto:
       type: object
