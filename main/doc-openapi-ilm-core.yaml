@@ -27190,10 +27190,9 @@ paths:
       - Discovery Management
       summary: Get discoverable resources of a Discovery Provider
       description: "Returns the resource types this Connector's discovery interface\
-        \ advertises, as synced from the Connector. For a Connector implementing only\
-        \ the v1 discovery interface, Core synthesizes the single entry \"certificates\"\
-        \ with no capabilities, without calling the Connector — a client renders one\
-        \ shape for both generations."
+        \ supports, relayed live from the Connector. For a Connector implementing\
+        \ only the v1 discovery interface, Core synthesizes the single entry \"certificates\"\
+        \ without calling the Connector — a client renders one shape for both generations."
       operationId: listDiscoveryResources
       parameters:
       - name: connectorUuid
@@ -45534,15 +45533,13 @@ components:
             message.
           items:
             type: string
-        effectiveCapabilities:
-          type: array
-          description: "Capabilities effective for this run: the intersection of what\
-            \ the connector's discovery interface supports across every resource type\
-            \ the run targets — a capability any targeted resource lacks is not listed.\
-            \ Always present: empty means the run supports none of them, so a client\
-            \ renders the stop and resume controls from this list alone."
-          items:
-            $ref: "#/components/schemas/DiscoveryResourceCapability"
+        stoppable:
+          type: boolean
+          description: "Whether this run can be stopped and later resumed. Always\
+            \ present; false for runs against v1 connectors. This flag says whether\
+            \ the run has the capability; the run status decides which control is\
+            \ currently valid (stop while in progress, resume while stopped). The\
+            \ connector may still refuse a stop at runtime past the point of no return."
       required:
       - attributes
       - connectorName
@@ -45551,6 +45548,7 @@ components:
       - kind
       - name
       - status
+      - stoppable
       - triggers
       - uuid
     DiscoveryProgressDto:
@@ -45578,10 +45576,6 @@ components:
             $ref: "#/components/schemas/DiscoveryResourceProgressDto"
           propertyNames:
             $ref: "#/components/schemas/Resource"
-    DiscoveryResourceCapability:
-      type: string
-      enum:
-      - stopResume
     DiscoveryResourceProgressDto:
       type: object
       description: "Progress counters. Used for a whole run and, keyed by resource\
@@ -45855,19 +45849,6 @@ components:
       properties:
         resource:
           $ref: "#/components/schemas/Resource"
-        capabilities:
-          type: array
-          description: "Per-resource capabilities this resource supports. Enumerates\
-            \ only capabilities that can differ from one resource to another; a capability\
-            \ listed here is valid only if the connector also advertises the interface-level\
-            \ feature flag it maps to. A null value means every such capability the\
-            \ connector advertises applies to this resource; an empty list means none\
-            \ apply. These are distinct and must not be normalized to one another.\
-            \ This list must not be used to decide whether the connector streams:\
-            \ streaming is a property of the whole discovery interface, advertised\
-            \ once by the discoveryStreaming feature flag, never per resource."
-          items:
-            $ref: "#/components/schemas/DiscoveryResourceCapability"
       required:
       - resource
     HealthDto:
