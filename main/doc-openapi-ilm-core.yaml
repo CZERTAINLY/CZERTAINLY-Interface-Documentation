@@ -62,6 +62,8 @@ tags:
   description: Audit Log API
 - name: Certificate Inventory
   description: Certificate Inventory API
+- name: Comments
+  description: Comments API
 - name: Token Instance Management
   description: Token Instance Management API
 - name: Workflow Rules Management
@@ -14989,6 +14991,154 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/comments/{resource}/{objectUuid}:
+    get:
+      tags:
+      - Comments
+      summary: List comment threads for an object
+      description: Pages over thread roots; each root carries its reply count. Replies
+        are paged separately.
+      operationId: listComments
+      parameters:
+      - name: resource
+        in: path
+        description: Resource
+        required: true
+        schema:
+          $ref: "#/components/schemas/Resource"
+      - name: objectUuid
+        in: path
+        description: Object UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: itemsPerPage
+        in: query
+        description: Number of entries per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
+      responses:
+        "200":
+          description: Comment threads retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentResponseDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+    post:
+      tags:
+      - Comments
+      summary: Post a comment or a reply on an object
+      description: A request without parentUuid starts a new thread; with parentUuid
+        it replies to that thread root. Threads are one level deep.
+      operationId: createComment
+      parameters:
+      - name: resource
+        in: path
+        description: Resource
+        required: true
+        schema:
+          $ref: "#/components/schemas/Resource"
+      - name: objectUuid
+        in: path
+        description: Object UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CommentCreateRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Comment created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/cmpProfiles:
     get:
       tags:
@@ -20317,6 +20467,108 @@ paths:
                 $ref: "#/components/schemas/ErrorMessageDto"
         "204":
           description: No Content
+  /v1/comments/{uuid}/unresolve:
+    patch:
+      tags:
+      - Comments
+      summary: Reopen a resolved comment thread
+      description: Thread roots only.
+      operationId: unresolveComment
+      parameters:
+      - name: uuid
+        in: path
+        description: Comment UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Comment thread reopened
+        "422":
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/comments/{uuid}/resolve:
+    patch:
+      tags:
+      - Comments
+      summary: Resolve a comment thread
+      description: Thread roots only.
+      operationId: resolveComment
+      parameters:
+      - name: uuid
+        in: path
+        description: Comment UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Comment thread resolved
+        "422":
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/cmpProfiles/{cmpProfileUuid}/raProfiles/{raProfileUuid}:
     patch:
       tags:
@@ -28034,6 +28286,80 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/comments/{uuid}/replies:
+    get:
+      tags:
+      - Comments
+      summary: List replies of a comment thread
+      description: Pages over the thread root's replies in creation order.
+      operationId: listReplies
+      parameters:
+      - name: uuid
+        in: path
+        description: Comment UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: itemsPerPage
+        in: query
+        description: Number of entries per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+      - name: pageNumber
+        in: query
+        description: Page number for the request
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
+      responses:
+        "200":
+          description: Thread replies retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentResponseDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
   /v1/cmpProfiles/signingCertificates:
     get:
       tags:
@@ -30590,6 +30916,46 @@ paths:
           description: Connector Communication Error
           content:
             application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+  /v1/comments/{uuid}:
+    delete:
+      tags:
+      - Comments
+      summary: Delete a comment
+      description: Deleting a thread root that has replies also deletes the replies.
+      operationId: deleteComment
+      parameters:
+      - name: uuid
+        in: path
+        description: Comment UUID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Comment deleted
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "404":
+          description: Not Found
+          content:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/ErrorMessageDto"
   /v1/cmpProfiles/delete:
@@ -42260,6 +42626,74 @@ components:
       - connectorUuid
       - groupUuid
       - kind
+    CommentCreateRequestDto:
+      type: object
+      description: Request to post a comment or a reply on an object. Author identity
+        and creation timestamp are populated by the server from the authenticated
+        principal.
+      properties:
+        body:
+          type: string
+          description: Comment body as verbatim Markdown source
+          maxLength: 65536
+          minLength: 0
+        parentUuid:
+          type: string
+          format: uuid
+          description: "UUID of the thread root this comment replies to. Threads are\
+            \ one level deep: the referenced comment must be a thread root on the\
+            \ same object."
+      required:
+      - body
+    CommentDto:
+      type: object
+      description: A comment on an object. Thread roots carry resolution state and
+        a reply count; replies carry neither.
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          description: Comment UUID
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Host resource the commented object belongs to
+        objectUuid:
+          type: string
+          format: uuid
+          description: UUID of the commented object
+        author:
+          $ref: "#/components/schemas/NameAndUuidDto"
+          description: UUID and username of the author; server-populated
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp; server-populated
+        body:
+          type: string
+          description: Comment body as verbatim Markdown source
+        resolved:
+          type: boolean
+          description: Whether the thread is resolved; thread roots only
+        resolvedBy:
+          $ref: "#/components/schemas/NameAndUuidDto"
+          description: UUID and username of the resolving user; resolved thread roots
+            only
+        resolvedAt:
+          type: string
+          format: date-time
+          description: Resolution timestamp; resolved thread roots only
+        replyCount:
+          type: integer
+          format: int64
+          description: Number of replies in the thread; thread roots only. The replies
+            themselves are paged separately.
+      required:
+      - author
+      - body
+      - createdAt
+      - objectUuid
+      - resource
+      - uuid
     CmpProfileRequestDto:
       type: object
       properties:
@@ -46152,6 +46586,37 @@ components:
       required:
       - name
       - uuid
+    CommentResponseDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+        comments:
+          type: array
+          description: "Comments on the requested page: thread roots for the object\
+            \ listing, replies for the thread listing"
+          items:
+            $ref: "#/components/schemas/CommentDto"
+      required:
+      - comments
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
     CmpProfileDto:
       type: object
       properties:
