@@ -910,9 +910,11 @@ paths:
       - Signing Profile Management
       summary: Get formatting attribute descriptors from a Signature Formatting Provider
       description: Queries the Signature Formatting Provider for its available formatting
-        attribute descriptors with connector default values. The signingProfileUuid
-        parameter is used for authorization only and does not affect the returned
-        descriptors.
+        attribute descriptors with connector default values. Serves the timestamping
+        workflow only. Content-signing formatting attributes are declared per operation
+        under the Content Signing Formatting contract and are not returned here. The
+        signingProfileUuid parameter is used for authorization only and does not affect
+        the returned descriptors.
       operationId: listSignatureFormattingConnectorAttributes
       parameters:
       - name: connectorUuid
@@ -1409,8 +1411,8 @@ components:
           type: integer
           format: int64
           description: "Largest document accepted for signing, in bytes. Enforced\
-            \ when a signing request arrives, under both ILM-managed and delegated\
-            \ signing. When omitted, no profile-level cap applies."
+            \ when an ILM-managed signing request arrives. When omitted, no profile-level\
+            \ cap applies."
           example: 5242880
       required:
       - type
@@ -2953,8 +2955,8 @@ components:
           type: integer
           format: int64
           description: "Largest document accepted for signing, in bytes. Enforced\
-            \ when a signing request arrives, under both ILM-managed and delegated\
-            \ signing. Null when no profile-level cap applies."
+            \ when an ILM-managed signing request arrives. Null when no profile-level\
+            \ cap applies."
           example: 5242880
       required:
       - type
@@ -3542,12 +3544,25 @@ components:
           description: Server time at which the Signing Record was created in the
             system. This timestamp is set by the platform and is independent of the
             cryptographic signing time.
+        timestampTokenSerialNumbers:
+          type: array
+          description: "Serial numbers of the timestamp tokens this operation traces\
+            \ to: for a content signature the tokens embedded in the signature, for\
+            \ a timestamp record its own serial number. The protocol field tells the\
+            \ two apart. Unpadded lower-case hex, no 0x prefix and no leading zeros.\
+            \ Empty when the operation embedded no timestamp token, as a content signature\
+            \ at level SIGNED does."
+          example:
+          - 2a
+          items:
+            type: string
       required:
       - createdAt
       - name
       - protocol
       - signingProfile
       - signingTime
+      - timestampTokenSerialNumbers
       - uuid
     PaginationResponseDtoSigningProfileListDto:
       type: object
