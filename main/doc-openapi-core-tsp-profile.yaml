@@ -2542,6 +2542,21 @@ components:
       - custom
       - data
       - property
+    SearchColumnRequestDto:
+      type: object
+      properties:
+        fieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: Field source of the column
+        fieldIdentifier:
+          type: string
+          description: "Field identifier of the column. Available fields with their\
+            \ identifiers can be retrieved from the corresponding endpoint `GET /v1/{resource}/search`;\
+            \ only fields marked as displayable may be requested as a column."
+          minLength: 1
+      required:
+      - fieldIdentifier
+      - fieldSource
     SearchFilterRequestDto:
       type: object
       properties:
@@ -2553,6 +2568,7 @@ components:
           description: "Field identifier of search filter. List of available fields\
             \ with their identifiers can be retrieved from corresponding endpoint\
             \ `GET /v1/{resource}/search`, e.g.: [**GET /v1/certificates/search**](../core-certificate/#tag/Certificate-Inventory/operation/getSearchableFieldInformation)"
+          minLength: 1
         condition:
           $ref: "#/components/schemas/FilterConditionOperator"
           description: Condition for the search filter
@@ -2581,6 +2597,43 @@ components:
           format: int32
           default: 1
           description: Page number for the request
+        sort:
+          $ref: "#/components/schemas/SearchSortRequestDto"
+          description: "Ordering of the whole result set. When omitted, the endpoint's\
+            \ own default ordering applies, unchanged from before this field existed."
+        columns:
+          type: array
+          description: "Fields to return as columns. When omitted, the response carries\
+            \ the endpoint's full default shape, unchanged from before this field\
+            \ existed. Requesting attribute-sourced fields adds their values to each\
+            \ returned object."
+          items:
+            $ref: "#/components/schemas/SearchColumnRequestDto"
+    SearchSortRequestDto:
+      type: object
+      properties:
+        fieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: Field source of the field to sort by
+        fieldIdentifier:
+          type: string
+          description: "Field identifier of the field to sort by. Available fields\
+            \ with their identifiers can be retrieved from the corresponding endpoint\
+            \ `GET /v1/{resource}/search`; only fields marked as sortable may be sorted\
+            \ by."
+          minLength: 1
+        direction:
+          $ref: "#/components/schemas/SortDirection"
+          description: Direction of the ordering
+      required:
+      - direction
+      - fieldIdentifier
+      - fieldSource
+    SortDirection:
+      type: string
+      enum:
+      - asc
+      - desc
     PaginationResponseDtoTspProfileListDto:
       type: object
       properties:
@@ -2684,6 +2737,7 @@ components:
       - FilterConditionOperator
       - FilterFieldType
       - FilterFieldSource
+      - SortDirection
       - SettingsSection
       - AuthType
       - HealthStatus
@@ -2796,6 +2850,14 @@ components:
         multiValue:
           type: boolean
           description: "Multivalue flag. true = yes, false = no"
+        displayable:
+          type: boolean
+          description: "Whether the field may be requested as a column of the listing.\
+            \ true = yes, false = no"
+        sortable:
+          type: boolean
+          description: "Whether the listing may be ordered by the field. true = yes,\
+            \ false = no"
       required:
       - conditions
       - fieldIdentifier
