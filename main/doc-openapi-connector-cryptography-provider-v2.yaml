@@ -13,65 +13,66 @@ info:
   x-logo:
     url: images/ilm-logo.svg
   x-metrics-profile:
+    version: 1
     required:
-    - labels:
+    - unit: "1"
+      name: app_build_info
+      type: gauge
+      labels:
       - version
       - commit
       - runtime
-      unit: "1"
-      name: app_build_info
-      type: gauge
-    - labels: []
-      unit: seconds
+    - unit: seconds
       name: process_start_time_seconds
       type: gauge
-    - labels: []
-      unit: seconds
+      labels: []
+    - unit: seconds
       name: process_cpu_seconds_total
       type: counter
-    - labels: []
-      unit: bytes
+      labels: []
+    - unit: bytes
       name: process_resident_memory_bytes
       type: gauge
-    - labels:
+      labels: []
+    - unit: requests
+      name: http_requests_total
+      type: counter
+      labels:
       - method
       - route
       - status
-      unit: requests
-      name: http_requests_total
-      type: counter
-    - labels:
+    - buckets_ref: http_server_latency_buckets_seconds
+      labels:
       - method
       - route
       type: histogram
       unit: seconds
       name: http_request_duration_seconds
-      buckets_ref: http_server_latency_buckets_seconds
-    - labels:
-      - route
-      unit: requests
+    - unit: requests
       name: http_server_in_flight_requests
       type: gauge
-    - labels:
+      labels:
+      - route
+    - unit: requests
+      name: http_client_requests_total
+      type: counter
+      labels:
       - method
       - target
       - status
-      unit: requests
-      name: http_client_requests_total
-      type: counter
-    - labels:
+    - buckets_ref: http_client_latency_buckets_seconds
+      labels:
       - method
       - target
       type: histogram
       unit: seconds
       name: http_client_request_duration_seconds
-      buckets_ref: http_client_latency_buckets_seconds
-    - labels:
-      - event
-      - outcome
-      unit: events
+    - unit: events
       name: connector_events_total
       type: counter
+      labels:
+      - event
+      - outcome
     histograms:
       http_client_latency_buckets_seconds:
       - 0.01
@@ -96,7 +97,6 @@ info:
       - 2.5
       - 5.0
       - 10.0
-    version: 1
 externalDocs:
   description: ILM Documentation
   url: https://docs.otilm.com
@@ -153,8 +153,17 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/KeyUsage"
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
           content:
             application/problem+json:
               schema:
@@ -205,8 +214,17 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
           content:
             application/problem+json:
               schema:
@@ -255,8 +273,17 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenStatusResponseV2Dto"
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
           content:
             application/problem+json:
               schema:
@@ -307,8 +334,17 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/KeyRequestType"
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
           content:
             application/problem+json:
               schema:
@@ -356,6 +392,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/VerifyDataResponseV2Dto"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -374,8 +417,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -408,6 +453,13 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -426,8 +478,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -465,6 +519,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SignDataResponseV2Dto"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -483,8 +544,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -520,6 +583,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -532,8 +602,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -567,7 +639,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
         "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+          description: "Cancellation cannot be processed: the operation is already\
+            \ terminal or past the point of no return (errorCode OPERATION_PAST_POINT_OF_NO_RETURN),\
+            \ or the request body violates a field validation rule (errorCode VALIDATION_FAILED)"
           content:
             application/problem+json:
               schema:
@@ -580,6 +654,14 @@ paths:
                 $ref: "#/components/schemas/ProblemDetailExtended"
         "500":
           description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -612,6 +694,13 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -630,8 +719,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -661,6 +752,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RandomDataResponseV2Dto"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -679,8 +777,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -712,6 +812,13 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -730,8 +837,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -761,6 +870,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EncryptDataResponseV2Dto"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -779,8 +895,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -813,6 +931,13 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -831,8 +956,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -862,6 +989,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DecryptDataResponseV2Dto"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -880,8 +1014,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -914,6 +1050,13 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -932,8 +1075,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -963,7 +1108,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/KeyCreationResponseInterface"
+                $ref: "#/components/schemas/KeyCreationResponse"
         "202":
           description: "Creation accepted asynchronously, or equivalent operation\
             \ replayed asynchronously; body carries the original operationMeta tracking\
@@ -971,13 +1116,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/KeyCreationResponseInterface"
+                $ref: "#/components/schemas/KeyCreationResponse"
         "409":
           description: keyCreationId reused with a non-equivalent request (RESOURCE_ALREADY_EXISTS)
           content:
-            application/json:
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/KeyCreationResponseInterface"
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -996,8 +1148,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -1037,6 +1191,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/KeyOperationResponseV2Dto"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -1055,8 +1216,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -1093,6 +1256,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -1105,8 +1275,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -1140,7 +1312,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
         "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+          description: "Cancellation cannot be processed: the operation is already\
+            \ terminal or past the point of no return (errorCode OPERATION_PAST_POINT_OF_NO_RETURN),\
+            \ or the request body violates a field validation rule (errorCode VALIDATION_FAILED)"
           content:
             application/problem+json:
               schema:
@@ -1153,6 +1327,14 @@ paths:
                 $ref: "#/components/schemas/ProblemDetailExtended"
         "500":
           description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -1182,9 +1364,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/KeyCreationStatusResponseInterface"
+                $ref: "#/components/schemas/KeyCreationStatusResponse"
         "404":
           description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
           content:
             application/problem+json:
               schema:
@@ -1201,8 +1390,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -1236,7 +1427,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
         "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+          description: "Cancellation cannot be processed: the operation is already\
+            \ terminal or past the point of no return (errorCode OPERATION_PAST_POINT_OF_NO_RETURN),\
+            \ or the request body violates a field validation rule (errorCode VALIDATION_FAILED)"
           content:
             application/problem+json:
               schema:
@@ -1249,6 +1442,14 @@ paths:
                 $ref: "#/components/schemas/ProblemDetailExtended"
         "500":
           description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -1281,6 +1482,13 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BaseAttributeDto"
+        "422":
+          description: Request body was read successfully but violates a field validation
+            rule (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
           content:
@@ -1299,8 +1507,10 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
-        "422":
-          description: Request validation failed (errorCode VALIDATION_FAILED)
+        "400":
+          description: "Request body cannot be read (errorCode BAD_REQUEST), including\
+            \ malformed JSON, unknown properties, and values outside the published\
+            \ enum values"
           content:
             application/problem+json:
               schema:
@@ -4143,9 +4353,10 @@ components:
         signatures:
           type: array
           description: "Signatures, correlated to the request items by identifier.\
-            \ Populated on sync 200; null on async 202."
+            \ Populated on sync 200; absent on async 202."
           items:
             $ref: "#/components/schemas/SignatureDataV2Dto"
+          minItems: 1
         operationMeta:
           type: array
           description: Connector-defined signing operation metadata. Present on async
@@ -4154,6 +4365,7 @@ components:
             for the operation's entire tracking lifetime.
           items:
             $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
     OperationTrackingRequestV2Dto:
       type: object
       additionalProperties: false
@@ -4208,10 +4420,10 @@ components:
         signature:
           type: string
           format: byte
-          description: Signature over the item's data. Populated when status=COMPLETED.
+          description: Signature over the item's data. Populated when status=`completed`.
         reason:
           type: string
-          description: Failure or cancellation detail when status=FAILED or CANCELLED
+          description: Failure or cancellation detail when status=`failed` or `cancelled`
             — curated message text (no raw exception messages)
       required:
       - identifier
@@ -4242,6 +4454,7 @@ components:
           format: int32
           description: "Number of random bytes to generate, capped at 1 MiB"
           maximum: 1048576
+          minimum: 1
         operationAttributes:
           type: array
           description: Random generator attributes
@@ -4392,7 +4605,7 @@ components:
             returns HTTP 202 with the original operationMeta. A synchronous replay returns HTTP 200 with the
             original result. Non-equivalent reuse returns RESOURCE_ALREADY_EXISTS (HTTP 409).
           maxLength: 256
-          minLength: 0
+          minLength: 1
         createKeyAttributes:
           type: array
           description: Attributes to create the key
@@ -4418,9 +4631,8 @@ components:
       - CRYSTALS-Dilithium
       - SPHINCS+
       - Unknown
-    KeyCreationResponseInterface:
+    KeyCreationResponse:
       type: object
-      additionalProperties: false
       description: Key-creation response selected by key request type
       discriminator:
         propertyName: keyRequestType
@@ -4431,11 +4643,12 @@ components:
       - $ref: "#/components/schemas/SecretKeyDataResponseV2Dto"
       - $ref: "#/components/schemas/KeyPairDataResponseV2Dto"
       properties:
+        operationMeta:
+          type: array
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
         keyRequestType:
           $ref: "#/components/schemas/KeyRequestType"
-          description: Type of key requested and returned
-      required:
-      - keyRequestType
     KeyPairDataResponseV2Dto:
       type: object
       additionalProperties: false
@@ -4443,20 +4656,20 @@ components:
         operationMeta:
           type: array
           description: Connector-defined operation tracking metadata. Required and
-            non-empty in the initial response when ASYNCHRONOUS executionMode was
-            requested in CreateKeyRequestV2Dto. Absent from the initial response when
-            SYNCHRONOUS executionMode was requested and from a completed result nested
-            in a status response. This handle must remain valid for the operation's
-            entire tracking lifetime.
+            non-empty in the initial response accepting asynchronous execution. Absent
+            from a synchronous response and from a completed result nested in a status
+            response. This handle must remain valid for the operation's entire tracking
+            lifetime.
           items:
             $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
         publicKeyData:
           $ref: "#/components/schemas/PublicKeyDataResponseV2Dto"
-          description: Data of the public key. Populated on sync 200; null on async
+          description: Data of the public key. Populated on sync 200; absent on async
             202.
         privateKeyData:
           $ref: "#/components/schemas/PrivateKeyDataResponseV2Dto"
-          description: Data of the private key. Populated on sync 200; null on async
+          description: Data of the private key. Populated on sync 200; absent on async
             202.
         keyPairMeta:
           type: array
@@ -4465,6 +4678,7 @@ components:
             absent from the initial asynchronous 202.
           items:
             $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
         keyRequestType:
           $ref: "#/components/schemas/KeyRequestType"
           description: Type of key requested and returned
@@ -4508,6 +4722,7 @@ components:
           type: integer
           format: int32
           description: Bit length of the key
+          minimum: 1
         metadata:
           type: array
           description: "Non-sensitive, provider-specific descriptive metadata"
@@ -4555,6 +4770,7 @@ components:
           type: integer
           format: int32
           description: Bit length of the key
+          minimum: 1
         metadata:
           type: array
           description: "Non-sensitive, provider-specific descriptive metadata"
@@ -4576,16 +4792,16 @@ components:
         operationMeta:
           type: array
           description: Connector-defined operation tracking metadata. Required and
-            non-empty in the initial response when ASYNCHRONOUS executionMode was
-            requested in CreateKeyRequestV2Dto. Absent from the initial response when
-            SYNCHRONOUS executionMode was requested and from a completed result nested
-            in a status response. This handle must remain valid for the operation's
-            entire tracking lifetime.
+            non-empty in the initial response accepting asynchronous execution. Absent
+            from a synchronous response and from a completed result nested in a status
+            response. This handle must remain valid for the operation's entire tracking
+            lifetime.
           items:
             $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
         keyData:
           $ref: "#/components/schemas/SecretKeyDataV2Dto"
-          description: Created secret-key descriptor. Null on an asynchronous 202
+          description: Created secret-key descriptor. Absent on an asynchronous 202
             response.
         keyMeta:
           type: array
@@ -4595,6 +4811,7 @@ components:
             used.
           items:
             $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
         keyRequestType:
           $ref: "#/components/schemas/KeyRequestType"
           description: Type of key requested and returned
@@ -4620,6 +4837,7 @@ components:
           type: integer
           format: int32
           description: Bit length of the key
+          minimum: 1
         metadata:
           type: array
           description: "Non-sensitive, provider-specific descriptive metadata"
@@ -4678,11 +4896,12 @@ components:
           type: array
           description: Connector-defined operation tracking metadata. Required and
             non-empty in the initial response accepting asynchronous execution. Absent
-            from a synchronous creation response and from a completed result nested
-            in a status response. This handle must remain valid for the operation's
-            entire tracking lifetime.
+            from a synchronous response and from a completed result nested in a status
+            response. This handle must remain valid for the operation's entire tracking
+            lifetime.
           items:
             $ref: "#/components/schemas/MetadataAttribute"
+          minItems: 1
     KeyDestructionStatusResponseV2Dto:
       type: object
       additionalProperties: false
@@ -4692,12 +4911,11 @@ components:
           description: Operation status as known to the connector
         reason:
           type: string
-          description: Failure or cancellation detail when status is FAILED or CANCELLED
+          description: Failure or cancellation detail when status is `failed` or `cancelled`
       required:
       - status
-    KeyCreationStatusResponseInterface:
+    KeyCreationStatusResponse:
       type: object
-      additionalProperties: false
       description: Status of an asynchronous key-creation operation selected by key
         request type
       discriminator:
@@ -4709,15 +4927,14 @@ components:
       - $ref: "#/components/schemas/SecretKeyOperationStatusResponseV2Dto"
       - $ref: "#/components/schemas/KeyPairOperationStatusResponseV2Dto"
       properties:
+        reason:
+          type: string
         result:
-          $ref: "#/components/schemas/KeyCreationResponseInterface"
-          description: Created key result. Present only when status is COMPLETED.
+          $ref: "#/components/schemas/KeyCreationResponse"
+        status:
+          $ref: "#/components/schemas/OperationStatus"
         keyRequestType:
           $ref: "#/components/schemas/KeyRequestType"
-          description: Type of key requested by the original CreateKeyRequestV2Dto
-      required:
-      - keyRequestType
-      - status
     KeyPairOperationStatusResponseV2Dto:
       type: object
       additionalProperties: false
@@ -4727,10 +4944,10 @@ components:
           description: Operation status as known to the connector
         reason:
           type: string
-          description: Failure or cancellation detail when status is FAILED or CANCELLED
+          description: Failure or cancellation detail when status is `failed` or `cancelled`
         result:
           $ref: "#/components/schemas/KeyPairDataResponseV2Dto"
-          description: Created key result. Present only when status is COMPLETED.
+          description: Created key-pair result. Present only when status is `completed`.
         keyRequestType:
           $ref: "#/components/schemas/KeyRequestType"
           description: Type of key requested
@@ -4748,10 +4965,10 @@ components:
           description: Operation status as known to the connector
         reason:
           type: string
-          description: Failure or cancellation detail when status is FAILED or CANCELLED
+          description: Failure or cancellation detail when status is `failed` or `cancelled`
         result:
           $ref: "#/components/schemas/SecretKeyDataResponseV2Dto"
-          description: Created key result. Present only when status is COMPLETED.
+          description: Created secret-key result. Present only when status is `completed`.
         keyRequestType:
           $ref: "#/components/schemas/KeyRequestType"
           description: Type of key requested
