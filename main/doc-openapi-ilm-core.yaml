@@ -25336,6 +25336,39 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+  /v1/statistics/cbomAssets:
+    get:
+      tags:
+      - Statistics/Dashboard
+      summary: Get Cryptographic Asset Inventory dashboard statistics
+      description: "Returns count badges, distribution maps and the sync-completeness\
+        \ block for the cross-CBOM cryptographic asset inventory. Counts are computed\
+        \ over deduplicated assets, so an asset referenced by several CBOM documents\
+        \ counts once."
+      operationId: getCryptographicAssetStatistics
+      responses:
+        "200":
+          description: Cryptographic asset statistics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CryptographicAssetStatisticsDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
   /v1/signingRecords/{uuid}:
     get:
       tags:
@@ -33441,6 +33474,7 @@ components:
       - acmeAccounts
       - acmeProfiles
       - cboms
+      - cbomAssets
       - scepProfiles
       - cmpProfiles
       - authorities
@@ -43433,6 +43467,13 @@ components:
           minItems: 1
       required:
       - certificateUuids
+    CbomAssetSyncState:
+      type: string
+      enum:
+      - pending
+      - inProgress
+      - synced
+      - failed
     CbomDto:
       type: object
       properties:
@@ -43481,6 +43522,17 @@ components:
           type: integer
           format: int32
           description: Total number of assets
+        assetSyncState:
+          $ref: "#/components/schemas/CbomAssetSyncState"
+          description: State of the cryptographic asset sync for this CBOM record;
+            pending until the first sync attempt considers it. Platform versions predating
+            the asset sync omit the field.
+        assetSyncedAt:
+          type: string
+          format: date-time
+          description: When this record last successfully reached the synced state;
+            later failed attempts neither advance nor clear it. Platform versions
+            predating the asset sync omit the field.
         attributeValues:
           type: object
           additionalProperties:
@@ -44724,6 +44776,9 @@ components:
       - SigningWorkflowType
       - TimestampSourceType
       - TspAuthenticationMethod
+      - CbomAssetSyncState
+      - CryptographicAssetType
+      - PqcVerdict
     SearchFieldDataByGroupDto:
       type: object
       properties:
@@ -45573,6 +45628,73 @@ components:
           description: "Retained record count by signing scheme, flattened as the\
             \ cross-product of signing scheme and managed signing type: 'delegated',\
             \ 'managed_static_key', 'managed_one_time_key' (and more later)."
+    CryptographicAssetStatisticsDto:
+      type: object
+      description: Cryptographic asset inventory dashboard statistics
+      properties:
+        totalAssets:
+          type: integer
+          format: int64
+          description: Total number of deduplicated cryptographic assets in the inventory
+        sourceCbomCount:
+          type: integer
+          format: int64
+          description: Number of CBOM documents that contributed at least one asset
+            to the inventory; documents whose assets are not yet synced do not count
+        statByType:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+          description: "Asset count by asset type. Keys are CryptographicAssetType\
+            \ codes; every type is present, with 0 when none"
+        statByPqcVerdict:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+          description: "Asset count by PQC readiness verdict. Keys are PqcVerdict\
+            \ codes; every verdict is present, with 0 when none"
+        statByAlgorithmFamily:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+          description: "Asset count by algorithm family, limited to the top-N families\
+            \ by count. Use distinctAlgorithmFamilyCount for the total number of families;\
+            \ assets with no family are counted in unassignedAssetCount and never\
+            \ occupy a slot here"
+        distinctAlgorithmFamilyCount:
+          type: integer
+          format: int64
+          description: "Number of distinct algorithm families across the inventory,\
+            \ excluding assets with no family. Lets the client render a \"+k more\"\
+            \ overflow beyond the top-N entries in statByAlgorithmFamily"
+        unassignedAssetCount:
+          type: integer
+          format: int64
+          description: "Number of assets with no algorithm family, which is common:\
+            \ the family concept does not apply to most related-crypto-material. Never\
+            \ counted in statByAlgorithmFamily or distinctAlgorithmFamilyCount"
+        syncCompleteness:
+          $ref: "#/components/schemas/CryptographicAssetSyncCompletenessDto"
+          description: How completely the inventory reflects the stored CBOM documents
+    CryptographicAssetSyncCompletenessDto:
+      type: object
+      description: Coverage of the cryptographic asset sync across stored CBOM documents
+      properties:
+        cbomStatBySyncState:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+          description: "CBOM document count by asset sync state. Keys are CbomAssetSyncState\
+            \ codes; every state is present, with 0 when none"
+        lastCompletedSyncAt:
+          type: string
+          format: date-time
+          description: The most recent time any record successfully reached the synced
+            state; absent until the first record does
     SigningRecordDto:
       type: object
       description: Signing Record detail
@@ -47529,6 +47651,17 @@ components:
           type: integer
           format: int32
           description: Total number of assets
+        assetSyncState:
+          $ref: "#/components/schemas/CbomAssetSyncState"
+          description: State of the cryptographic asset sync for this CBOM record;
+            pending until the first sync attempt considers it. Platform versions predating
+            the asset sync omit the field.
+        assetSyncedAt:
+          type: string
+          format: date-time
+          description: When this record last successfully reached the synced state;
+            later failed attempts neither advance nor clear it. Platform versions
+            predating the asset sync omit the field.
         attributeValues:
           type: object
           additionalProperties:
