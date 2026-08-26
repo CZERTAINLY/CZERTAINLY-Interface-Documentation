@@ -1623,6 +1623,14 @@ components:
       required:
       - contentType
       - data
+    ExtendedKeyUsageMappedField:
+      allOf:
+      - $ref: "#/components/schemas/MappedField"
+      description: "Maps an attribute to the Extended Key Usage extension; the permitted\
+        \ purposes are the attribute's content, resolved against the EXTENDED_KEY_USAGE\
+        \ OID registry"
+      required:
+      - fieldType
     ExtensionMappedField:
       allOf:
       - $ref: "#/components/schemas/MappedField"
@@ -1663,7 +1671,9 @@ components:
             \ from a single attribute)"
           items:
             oneOf:
+            - $ref: "#/components/schemas/ExtendedKeyUsageMappedField"
             - $ref: "#/components/schemas/ExtensionMappedField"
+            - $ref: "#/components/schemas/KeyUsageMappedField"
             - $ref: "#/components/schemas/RdnMappedField"
             - $ref: "#/components/schemas/SanMappedField"
           minItems: 1
@@ -1682,6 +1692,8 @@ components:
       - rdn
       - san
       - extension
+      - keyUsage
+      - extendedKeyUsage
     FileAttributeContentData:
       type: object
       properties:
@@ -2063,6 +2075,13 @@ components:
       enum:
       - JKS
       - PKCS12
+    KeyUsageMappedField:
+      allOf:
+      - $ref: "#/components/schemas/MappedField"
+      description: "Maps an attribute to the Key Usage extension; the permitted bits\
+        \ are the attribute's content, taken from CertificateKeyUsage"
+      required:
+      - fieldType
     KeyValueSecretContent:
       type: object
       description: Secret representing key-value pairs
@@ -2087,6 +2106,12 @@ components:
         is determined by fieldType
       discriminator:
         propertyName: fieldType
+        mapping:
+          rdn: "#/components/schemas/RdnMappedField"
+          san: "#/components/schemas/SanMappedField"
+          extension: "#/components/schemas/ExtensionMappedField"
+          keyUsage: "#/components/schemas/KeyUsageMappedField"
+          extendedKeyUsage: "#/components/schemas/ExtendedKeyUsageMappedField"
       properties:
         fieldType:
           $ref: "#/components/schemas/FieldType"

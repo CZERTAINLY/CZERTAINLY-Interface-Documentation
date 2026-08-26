@@ -13,66 +13,66 @@ info:
   x-logo:
     url: images/ilm-logo.svg
   x-metrics-profile:
+    version: 1
     required:
-    - type: gauge
+    - unit: "1"
       name: app_build_info
-      unit: "1"
+      type: gauge
       labels:
       - version
       - commit
       - runtime
-    - type: gauge
+    - unit: seconds
       name: process_start_time_seconds
-      unit: seconds
+      type: gauge
       labels: []
-    - type: counter
+    - unit: seconds
       name: process_cpu_seconds_total
-      unit: seconds
+      type: counter
       labels: []
-    - type: gauge
+    - unit: bytes
       name: process_resident_memory_bytes
-      unit: bytes
+      type: gauge
       labels: []
-    - type: counter
+    - unit: requests
       name: http_requests_total
-      unit: requests
+      type: counter
       labels:
       - method
       - route
       - status
-    - type: histogram
+    - buckets_ref: http_server_latency_buckets_seconds
       labels:
       - method
       - route
-      buckets_ref: http_server_latency_buckets_seconds
+      type: histogram
+      unit: seconds
       name: http_request_duration_seconds
-      unit: seconds
-    - type: gauge
+    - unit: requests
       name: http_server_in_flight_requests
-      unit: requests
+      type: gauge
       labels:
       - route
-    - type: counter
+    - unit: requests
       name: http_client_requests_total
-      unit: requests
+      type: counter
       labels:
       - method
       - target
       - status
-    - type: histogram
+    - buckets_ref: http_client_latency_buckets_seconds
       labels:
       - method
       - target
-      buckets_ref: http_client_latency_buckets_seconds
-      name: http_client_request_duration_seconds
+      type: histogram
       unit: seconds
-    - type: counter
+      name: http_client_request_duration_seconds
+    - unit: events
       name: connector_events_total
-      unit: events
+      type: counter
       labels:
       - event
       - outcome
-    version: 1
     histograms:
       http_client_latency_buckets_seconds:
       - 0.01
@@ -3453,6 +3453,14 @@ components:
       - type
       - uuid
       - version
+    ExtendedKeyUsageMappedField:
+      allOf:
+      - $ref: "#/components/schemas/MappedField"
+      description: "Maps an attribute to the Extended Key Usage extension; the permitted\
+        \ purposes are the attribute's content, resolved against the EXTENDED_KEY_USAGE\
+        \ OID registry"
+      required:
+      - fieldType
     ExtensionMappedField:
       allOf:
       - $ref: "#/components/schemas/MappedField"
@@ -3493,7 +3501,9 @@ components:
             \ from a single attribute)"
           items:
             oneOf:
+            - $ref: "#/components/schemas/ExtendedKeyUsageMappedField"
             - $ref: "#/components/schemas/ExtensionMappedField"
+            - $ref: "#/components/schemas/KeyUsageMappedField"
             - $ref: "#/components/schemas/RdnMappedField"
             - $ref: "#/components/schemas/SanMappedField"
           minItems: 1
@@ -3512,6 +3522,8 @@ components:
       - rdn
       - san
       - extension
+      - keyUsage
+      - extendedKeyUsage
     GeneralNameType:
       type: string
       enum:
@@ -3720,12 +3732,25 @@ components:
       - schemaVersion
       - type
       - uuid
+    KeyUsageMappedField:
+      allOf:
+      - $ref: "#/components/schemas/MappedField"
+      description: "Maps an attribute to the Key Usage extension; the permitted bits\
+        \ are the attribute's content, taken from CertificateKeyUsage"
+      required:
+      - fieldType
     MappedField:
       type: object
       description: Describes a single target field within an object; concrete type
         is determined by fieldType
       discriminator:
         propertyName: fieldType
+        mapping:
+          rdn: "#/components/schemas/RdnMappedField"
+          san: "#/components/schemas/SanMappedField"
+          extension: "#/components/schemas/ExtensionMappedField"
+          keyUsage: "#/components/schemas/KeyUsageMappedField"
+          extendedKeyUsage: "#/components/schemas/ExtendedKeyUsageMappedField"
       properties:
         fieldType:
           $ref: "#/components/schemas/FieldType"
@@ -3818,6 +3843,18 @@ components:
       - none
       - connectorCallback
       - staticList
+    CertificateKeyUsage:
+      type: string
+      enum:
+      - digitalSignature
+      - nonRepudiation
+      - keyEncipherment
+      - dataEncipherment
+      - keyAgreement
+      - keyCertSign
+      - cRLSign
+      - encipherOnly
+      - decipherOnly
     CertificateRenewRequestDtoV3:
       type: object
       properties:
@@ -3975,9 +4012,25 @@ components:
               in extensions
             items:
               $ref: "#/components/schemas/GeneralNameEntry"
+          keyUsage:
+            type: array
+            description: "Requested key usages; the key usage extension (2.5.29.15)\
+              \ is never duplicated in extensions. Criticality is not carried here:\
+              \ the platform marks this extension critical, which RFC 5280 4.2.1.3\
+              \ recommends (SHOULD) rather than requires."
+            items:
+              $ref: "#/components/schemas/CertificateKeyUsage"
+          extendedKeyUsage:
+            type: array
+            description: Requested extended key usage purposes as dotted-decimal OIDs;
+              the extended key usage extension (2.5.29.37) is never duplicated in
+              extensions
+            items:
+              type: string
           extensions:
             type: array
-            description: "Requested X.509 extensions, excluding SAN"
+            description: "Requested X.509 extensions, excluding SAN, key usage and\
+              \ extended key usage"
             items:
               $ref: "#/components/schemas/RequestedExtension"
       description: Typed identity content of an X.509 certificate request

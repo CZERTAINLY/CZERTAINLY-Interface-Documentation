@@ -33896,6 +33896,14 @@ components:
       - type
       - uuid
       - version
+    ExtendedKeyUsageMappedField:
+      allOf:
+      - $ref: "#/components/schemas/MappedField"
+      description: "Maps an attribute to the Extended Key Usage extension; the permitted\
+        \ purposes are the attribute's content, resolved against the EXTENDED_KEY_USAGE\
+        \ OID registry"
+      required:
+      - fieldType
     ExtensionMappedField:
       allOf:
       - $ref: "#/components/schemas/MappedField"
@@ -33936,7 +33944,9 @@ components:
             \ from a single attribute)"
           items:
             oneOf:
+            - $ref: "#/components/schemas/ExtendedKeyUsageMappedField"
             - $ref: "#/components/schemas/ExtensionMappedField"
+            - $ref: "#/components/schemas/KeyUsageMappedField"
             - $ref: "#/components/schemas/RdnMappedField"
             - $ref: "#/components/schemas/SanMappedField"
           minItems: 1
@@ -33955,6 +33965,8 @@ components:
       - rdn
       - san
       - extension
+      - keyUsage
+      - extendedKeyUsage
     GeneralNameType:
       type: string
       enum:
@@ -34163,12 +34175,25 @@ components:
       - schemaVersion
       - type
       - uuid
+    KeyUsageMappedField:
+      allOf:
+      - $ref: "#/components/schemas/MappedField"
+      description: "Maps an attribute to the Key Usage extension; the permitted bits\
+        \ are the attribute's content, taken from CertificateKeyUsage"
+      required:
+      - fieldType
     MappedField:
       type: object
       description: Describes a single target field within an object; concrete type
         is determined by fieldType
       discriminator:
         propertyName: fieldType
+        mapping:
+          rdn: "#/components/schemas/RdnMappedField"
+          san: "#/components/schemas/SanMappedField"
+          extension: "#/components/schemas/ExtensionMappedField"
+          keyUsage: "#/components/schemas/KeyUsageMappedField"
+          extendedKeyUsage: "#/components/schemas/ExtendedKeyUsageMappedField"
       properties:
         fieldType:
           $ref: "#/components/schemas/FieldType"
@@ -39587,6 +39612,14 @@ components:
         uuid:
           type: string
           description: UUID of Certificate
+        requestAttributeWarnings:
+          type: array
+          description: "Request-attribute policy warnings raised while validating\
+            \ an externally supplied CSR under lenient request validation. Empty under\
+            \ strict, where a violation is rejected with 422 instead of accepted with\
+            \ warnings."
+          items:
+            type: string
       required:
       - uuid
     CertificateRevocationReason:
