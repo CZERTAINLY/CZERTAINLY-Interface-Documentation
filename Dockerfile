@@ -14,6 +14,12 @@ RUN for file in /home/app/*.yaml; do redocly build-docs "$file" -o "${file/yaml/
 
 # production environment
 FROM nginx:stable-alpine
+
+# Patch base-image OS packages for known CVEs (openssl CVE-2026-14456).
+# Pin the minimum fixed version so the build fails fast if the patched package
+# is ever unavailable, keeping the Trivy scan gate reliably green.
+RUN apk add --no-cache --upgrade "libcrypto3>=3.5.8-r0" "libssl3>=3.5.8-r0"
+
 COPY --from=build /home/app/index.html /usr/share/nginx/html/docs/index.html
 COPY --from=build /home/app/style.css /usr/share/nginx/html/docs/style.css
 COPY --from=build /home/app/images/ilm-logo.svg /usr/share/nginx/html/docs/images/ilm-logo.svg
