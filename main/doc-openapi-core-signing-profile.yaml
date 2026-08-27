@@ -869,6 +869,27 @@ paths:
         schema:
           type: boolean
           default: false
+      - name: requireNonRepudiation
+        in: query
+        description: "When true and signingWorkflowType is CONTENT_SIGNING or RAW_SIGNING,\
+          \ restricts results to certificates carrying the nonRepudiation key-usage\
+          \ bit."
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: requiredExtendedKeyUsageOids
+        in: query
+        description: "When signingWorkflowType is CONTENT_SIGNING or RAW_SIGNING,\
+          \ restricts results to certificates carrying all of these extended key usage\
+          \ OIDs, in dot notation."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            example: 1.3.6.1.5.5.7.3.36
+            pattern: "^([01]\\.(\\d|[1-3]\\d)|2\\.(0|[1-9]\\d*))(\\.(0|[1-9]\\d*)){0,49}$"
       responses:
         "200":
           description: List of certificates retrieved
@@ -1414,6 +1435,23 @@ components:
             \ when an ILM-managed signing request arrives. When omitted, no profile-level\
             \ cap applies."
           example: 5242880
+        requireNonRepudiation:
+          type: boolean
+          description: "Demand the nonRepudiation key-usage bit specifically, for\
+            \ commitment-grade profiles. Applies to ILM-managed signing only. For\
+            \ delegated signing, omit it or send false; an echoed false from a response\
+            \ is accepted, true is rejected."
+        requiredExtendedKeyUsageOids:
+          type: array
+          description: "Extended key usage OIDs the signing certificate must all carry,\
+            \ in dot notation (1.3.6.1.5.5.7.3.36 is RFC 9336 id-kp-documentSigning).\
+            \ An empty set accepts any extended key usage. Applies to ILM-managed\
+            \ signing only; for delegated signing send nothing or an empty set."
+          items:
+            type: string
+            minLength: 1
+            pattern: "^([01]\\.(\\d|[1-3]\\d)|2\\.(0|[1-9]\\d*))(\\.(0|[1-9]\\d*)){0,49}$"
+          uniqueItems: true
       required:
       - type
     CredentialAttributeContentData:
@@ -2958,6 +2996,21 @@ components:
             \ when an ILM-managed signing request arrives. Null when no profile-level\
             \ cap applies."
           example: 5242880
+        requireNonRepudiation:
+          type: boolean
+          default: false
+          description: "Demand the nonRepudiation key-usage bit specifically, for\
+            \ commitment-grade profiles. Applies to ILM-managed signing only; delegated\
+            \ profile gets always false."
+        requiredExtendedKeyUsageOids:
+          type: array
+          description: "Extended key usage OIDs the signing certificate must all carry,\
+            \ in dot notation (1.3.6.1.5.5.7.3.36 is RFC 9336 id-kp-documentSigning).\
+            \ An empty set accepts any extended key usage. Applies to ILM-managed\
+            \ signing only."
+          items:
+            type: string
+          uniqueItems: true
       required:
       - type
     DelegatedSigningDto:
@@ -3913,14 +3966,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
         uuid:
           type: string
           description: UUID of the Attribute for unique identification
           example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
       required:
       - name
       - type
