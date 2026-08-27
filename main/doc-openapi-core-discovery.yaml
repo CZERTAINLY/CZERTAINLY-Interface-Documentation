@@ -597,6 +597,82 @@ paths:
       - SessionAuth: []
       - CertificateAuth: []
       - BearerJWTAuth: []
+  /v1/discoveries/{uuid}/messages:
+    get:
+      tags:
+      - Discovery Management
+      summary: List Discovery Run Messages
+      description: "Returns one page of the advisory messages a Discovery run collected,\
+        \ oldest first and stable across pages. Repeated problems are aggregated into\
+        \ a single entry carrying an occurrence count rather than repeated per occurrence.\
+        \ Messages are advisory: collecting them does not imply the run failed."
+      operationId: getDiscoveryRunMessages
+      parameters:
+      - name: uuid
+        in: path
+        description: Discovery UUID
+        required: true
+        schema:
+          type: string
+      - name: itemsPerPage
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 10
+      - name: pageNumber
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      responses:
+        "200":
+          description: Discovery run messages retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginationResponseDtoDiscoveryMessageDto"
+        "404":
+          description: Discovery not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+        "502":
+          description: Connector Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "503":
+          description: Connector Communication Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+      security:
+      - SessionAuth: []
+      - CertificateAuth: []
+      - BearerJWTAuth: []
   /v1/discoveries/{uuid}/items:
     get:
       tags:
@@ -2679,7 +2755,6 @@ components:
           - IP-HostName
         status:
           $ref: "#/components/schemas/DiscoveryStatus"
-          description: Status of Discovery
         startTime:
           type: string
           format: date-time
@@ -2778,10 +2853,8 @@ components:
           - IP-HostName
         status:
           $ref: "#/components/schemas/DiscoveryStatus"
-          description: Status of Discovery
         connectorStatus:
           $ref: "#/components/schemas/DiscoveryStatus"
-          description: Status of Discovery returned by connector
         message:
           type: string
           description: Failure/Success Messages
@@ -2841,14 +2914,14 @@ components:
             $ref: "#/components/schemas/Resource"
         progress:
           $ref: "#/components/schemas/DiscoveryProgressDto"
-        runMessages:
-          type: array
-          description: Advisory messages collected over the run's lifetime — non-fatal
-            connector errors and per-phase failure reasons — newest last. Entries
-            do not imply the run failed. Curated message text; never a raw exception
-            message.
-          items:
-            type: string
+        runMessageCount:
+          type: integer
+          format: int64
+          description: "How many distinct advisory messages this run collected, as\
+            \ counted by the run messages listing. Repeated problems are aggregated,\
+            \ so this counts kinds of problem rather than occurrences. A non-zero\
+            \ count does not imply the run failed. Always 0 for runs against a v1\
+            \ Discovery Provider."
         stoppable:
           type: boolean
           description: "Whether this run can be stopped and later resumed. Always\
@@ -2863,6 +2936,7 @@ components:
       - connectorUuid
       - kind
       - name
+      - runMessageCount
       - status
       - stoppable
       - triggers
@@ -3119,6 +3193,83 @@ components:
       enum:
       - event
       - manual
+    DiscoveryMessageDto:
+      type: object
+      description: "One kind of problem a Discovery run reported, with how often it\
+        \ happened. Repeats aggregate onto the entry already carrying them rather\
+        \ than adding a new one."
+      properties:
+        severity:
+          $ref: "#/components/schemas/DiscoveryMessageSeverity"
+        code:
+          type: string
+          description: "Identifier for the kind of problem, from a closed vocabulary\
+            \ — what an operator or a support engineer matches on. Entries are aggregated\
+            \ by code together with the message text, so several entries in one run\
+            \ may share a code."
+          maxLength: 64
+        message:
+          type: string
+          description: "Human-readable description of the problem. Curated text written\
+            \ for a person to read; never a raw exception message, and never text\
+            \ a Discovery Provider authored."
+        occurrences:
+          type: integer
+          format: int64
+          description: How many times this problem occurred during the run. At least
+            1.
+          minimum: 1
+        firstSeenAt:
+          type: string
+          format: date-time
+          description: When this problem was first seen during the run.
+        lastSeenAt:
+          type: string
+          format: date-time
+          description: When this problem was most recently seen during the run.
+      required:
+      - code
+      - firstSeenAt
+      - lastSeenAt
+      - message
+      - occurrences
+      - severity
+    DiscoveryMessageSeverity:
+      type: string
+      enum:
+      - info
+      - warning
+      - error
+    PaginationResponseDtoDiscoveryMessageDto:
+      type: object
+      properties:
+        items:
+          type: array
+          description: Items returned
+          items:
+            $ref: "#/components/schemas/DiscoveryMessageDto"
+        itemsPerPage:
+          type: integer
+          format: int32
+          description: Number of entries per page
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number for the request
+        totalPages:
+          type: integer
+          format: int32
+          description: Number of pages available
+        totalItems:
+          type: integer
+          format: int64
+          description: Number of items available
+      required:
+      - items
+      - itemsPerPage
+      - pageNumber
+      - totalItems
+      - totalPages
     DiscoveredCertificateDto:
       allOf:
       - $ref: "#/components/schemas/DiscoveredItemPayload"
@@ -3227,7 +3378,9 @@ components:
             processedError and inventoryUuid convey the outcome.
         processedError:
           type: string
-          description: Error message in case of failed processing of the staged item.
+          description: "Reason recorded against this item, if any — not only a failure,\
+            \ and not tied to processed. An item that was handled can carry one, and\
+            \ an item that was never attempted carries one while processed stays false."
         meta:
           type: array
           description: Item metadata as reported by the Discovery Provider — where
@@ -3472,12 +3625,16 @@ components:
             available in the inventory
         processed:
           type: boolean
-          description: Indicator whether the discovery certificate has already been
-            processed.
+          description: "Whether processing of this row has been attempted; processedError\
+            \ conveys the outcome. False means the platform reached no verdict for\
+            \ the row, which may still carry a reason."
         processedError:
           type: string
-          description: Error message in case of failed processing of the discovery
-            certificate.
+          description: "Reason recorded against this row, if any — not only a failure,\
+            \ and not tied to processed. A row that imported cleanly can carry one\
+            \ (a certificate imported without all of its public keys associated, say),\
+            \ and a row that was never attempted carries one while processed stays\
+            \ false."
       required:
       - certificateContent
       - commonName
@@ -3534,14 +3691,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
@@ -4223,6 +4380,7 @@ components:
       - CertificateRevocationReason
       - CertificateRequestFormat
       - DiscoveryStatus
+      - DiscoveryMessageSeverity
       - CertificateProtocol
       - CertificateSubjectType
       - CertificateKeyUsage
