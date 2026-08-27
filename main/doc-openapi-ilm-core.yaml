@@ -27,6 +27,8 @@ tags:
 - name: Secret Management
   description: "APIs for managing secrets, including creation, retrieval, updating,\
     \ and deletion of secrets."
+- name: Branding
+  description: Public branding API
 - name: Statistics/Dashboard
   description: Statistics/Dashboard API
 - name: Local operations
@@ -29407,6 +29409,33 @@ paths:
                 $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
         "500":
           description: Internal Server Error
+  /v1/branding:
+    get:
+      tags:
+      - Branding
+      summary: Get branding available to unauthenticated clients
+      operationId: getBranding
+      responses:
+        "200":
+          description: Branding retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicBrandingDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "500":
+          description: Internal Server Error
   /v1/authorities/{uuid}/endentityprofiles:
     get:
       tags:
@@ -39257,11 +39286,11 @@ components:
       - $ref: "#/components/schemas/BaseAttributeContentDtoV2"
       - $ref: "#/components/schemas/BaseAttributeContentDtoV3"
       properties:
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
         reference:
           type: string
         data: {}
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
     CustomAttributeUpdateRequestDto:
       type: object
       properties:
@@ -47932,6 +47961,77 @@ components:
       - totalAssets
       - uuid
       - version
+    PublicBrandingDto:
+      type: object
+      properties:
+        configured:
+          type: boolean
+          description: "Whether the operator has configured branding. When false,\
+            \ every colour and logo field is null, defaultTheme is absent, and a client\
+            \ applies the platform's own themes."
+        primaryColor:
+          type:
+          - string
+          - "null"
+          description: "Primary brand color, used for the header and for solid interactive\
+            \ elements"
+          examples:
+          - "#0073CF"
+        secondaryColor:
+          type:
+          - string
+          - "null"
+          description: "Secondary brand color, used as an accent"
+          examples:
+          - "#00A3E0"
+        tertiaryColor:
+          type:
+          - string
+          - "null"
+          description: "Tertiary brand color, used as an additional accent"
+          examples:
+          - "#7B61FF"
+        backgroundColor:
+          type:
+          - string
+          - "null"
+          description: Page background color of the branded theme
+          examples:
+          - "#FFFFFF"
+        textColor:
+          type:
+          - string
+          - "null"
+          description: Body text color of the branded theme
+          examples:
+          - "#171717"
+        lightLogo:
+          type:
+          - string
+          - "null"
+          description: "Logo shown by the branded light theme, as a base64 data URI"
+          examples:
+          - "data:image/png;base64,iVBORw0KGgo="
+        darkLogo:
+          type:
+          - string
+          - "null"
+          description: "Logo shown by the branded dark theme, as a base64 data URI"
+          examples:
+          - "data:image/svg+xml;base64,PHN2Zy8+"
+        defaultTheme:
+          $ref: "#/components/schemas/BrandingTheme"
+          description: Branded theme applied when the user has expressed no preference
+            of their own. Absent when branding is not configured.
+      required:
+      - backgroundColor
+      - configured
+      - darkLogo
+      - lightLogo
+      - primaryColor
+      - secondaryColor
+      - tertiaryColor
+      - textColor
     NameAndIdDto:
       type: object
       properties:
