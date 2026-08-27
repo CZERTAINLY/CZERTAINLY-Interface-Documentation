@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
-  title: Signature Formatting Provider API
-  description: REST API for implementations of custom Signature Formatting Provider
+  title: Discovery Provider v2 API
+  description: REST API for implementations of custom v2 Discovery Provider
   contact:
     name: ILM
     url: https://www.otilm.com
@@ -110,12 +110,6 @@ tags:
 - name: Connector Attributes v2
   description: Attribute-definition registry and stateless callback surface for NG
     connectors.
-- name: Signature Formatting Provider
-  description: Signature Formatting Provider API defines operations for protocol-specific
-    formatting of digital signing requests. The provider is stateless and handles
-    the conversion between raw signing material and protocol-specific formats (e.g.
-    TSA TimeStampToken). It serves the timestamping workflow; AdES content-signature
-    formatting is served by the Content Signing Formatting contract at /v1/signatureProvider/contentSigning.
 - name: Health check v2
   description: "Connector Health check API. Connector returns own status and in some\
     \ cases can return status of components on which it depends like database, HSM\
@@ -127,7 +121,381 @@ tags:
     \ interface, this is validated by the core. You can also implement helper end\
     \ points that are used for callbacks and other relevant operations specific to\
     \ implementation."
+- name: Discovery Metadata v2
+  description: "Stateless discovery v2 metadata surface: which resource types this\
+    \ connector supports, and the attribute schema for configuring a run."
+- name: Discovery Operations v2
+  description: "Stateless discovery v2 run lifecycle: initiate a run, poll or stream\
+    \ its results, and control it (stop/resume/cancel). Every call carries the full\
+    \ runId + meta + attributes context; the connector is not required to hold any\
+    \ state between calls. A connector MUST answer 404 for any runId it does not recognize,\
+    \ including after a restart."
 paths:
+  /v2/discoveryProvider/discoveries/stream:
+    post:
+      tags:
+      - Discovery Operations v2
+      summary: Stream discovery events
+      description: "Opens a chunked application/x-ndjson response, one JSON event\
+        \ object per line, replaying items with sequence greater than afterSequence\
+        \ and then continuing to emit live events (progress, resultBatch, stateChanged,\
+        \ heartbeat, error) until the run reaches a terminal state or the caller disconnects.\
+        \ Only one stream may be active per run at a time: a new call to this endpoint\
+        \ for the same runId supersedes any prior one, and the connector MUST close\
+        \ the earlier response as it begins serving the new one. This endpoint is\
+        \ reached by direct HTTP only and never traverses the platform proxy; a connector\
+        \ reachable only through the proxy MUST NOT advertise the discoveryStreaming\
+        \ feature flag."
+      operationId: stream
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscoveryStreamRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "NDJSON event stream opened; the body is one flat JSON DiscoveryEvent\
+            \ object per line, never a JSON array of events"
+          content:
+            application/x-ndjson:
+              schema:
+                $ref: "#/components/schemas/DiscoveryEvent"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/discoveryProvider/discoveries/stop:
+    post:
+      tags:
+      - Discovery Operations v2
+      summary: Stop a discovery run
+      description: "Halts scanning for an in-progress run. The connector persists\
+        \ a best-effort checkpoint into the returned meta; this checkpoint MUST preserve\
+        \ the item sequence counter, so a subsequent resume continues assigning sequences\
+        \ from where the run left off. Items already discovered but not yet drained\
+        \ remain drainable via POST /results while the run is stopped."
+      operationId: stop
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscoveryRunRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Run stopped; meta carries the checkpoint to resume from
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscoveryStopResponseDto"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: "Run cannot be stopped: past the point of no return, or the\
+            \ connector cannot checkpoint this run (errorCode OPERATION_PAST_POINT_OF_NO_RETURN).\
+            \ Core's own gate rejects stops for runs whose effective stoppability\
+            \ is false before they reach the connector, so this refusal is the connector's\
+            \ runtime authority"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/discoveryProvider/discoveries/status:
+    post:
+      tags:
+      - Discovery Operations v2
+      summary: Get discovery run status
+      description: Returns the run's current state and progress.
+      operationId: status
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscoveryRunRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Run status retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscoveryStatusResponseDto"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/discoveryProvider/discoveries/resume:
+    post:
+      tags:
+      - Discovery Operations v2
+      summary: Resume a stopped discovery run
+      description: Continues a stopped run from the checkpoint carried in the replayed
+        meta. Item sequences assigned after resuming continue the run's existing sequence
+        space; the connector never restarts numbering for a resumed run.
+      operationId: resume
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscoveryRunRequestDto"
+        required: true
+      responses:
+        "202":
+          description: "Resume accepted; meta carries the connector's (possibly updated)\
+            \ opaque run handle, and stoppable, when present, re-declares whether\
+            \ the resumed run can be stopped again"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscoveryInitiateResponseDto"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "410":
+          description: "The checkpoint needed to resume this run is no longer available\
+            \ (errorCode CHECKPOINT_LOST); distinct from 404, which means the run\
+            \ was never known"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/discoveryProvider/discoveries/results:
+    post:
+      tags:
+      - Discovery Operations v2
+      summary: Drain discovered items
+      description: "Returns one page of items discovered after afterSequence, bounded\
+        \ by maxItems and maxBytes. This call doubles as the acknowledgment mechanism:\
+        \ submitting a given afterSequence is the implicit ack for every item at or\
+        \ below it, and the connector MAY discard those items once it has answered.\
+        \ Draining is legal at any point during a live run. A drain with afterSequence\
+        \ equal to highestSequence, made after the run has reached a terminal state,\
+        \ is the full ack. Until the full ack arrives, the connector MUST retain terminal-run\
+        \ state for at least 24 hours after the run reached a terminal state. Once\
+        \ the full ack arrives, the connector MAY discard all state it holds for the\
+        \ run."
+      operationId: results
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscoveryDrainRequestDto"
+        required: true
+      responses:
+        "200":
+          description: Items retrieved; more indicates whether additional items remain
+            beyond this page
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscoveryResultsResponseDto"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/discoveryProvider/discoveries/initiate:
+    post:
+      tags:
+      - Discovery Operations v2
+      summary: Initiate a discovery run
+      description: Starts a new discovery run for the given resource types and attributes.
+        runId is minted by Core and never reused. The connector MUST validate the
+        full payload — including that every requested resource type is supported —
+        and reject the whole request with 422 rather than silently narrowing the resource
+        set. Submitting the same runId again with an identical payload MUST be answered
+        idempotently with another 202.
+      operationId: initiate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscoveryInitiateRequestDto"
+        required: true
+      responses:
+        "202":
+          description: "Run accepted; meta carries the connector's opaque run handle,\
+            \ replayed on every subsequent lifecycle call, and stoppable, when present,\
+            \ declares whether this run can be stopped and resumed"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiscoveryInitiateResponseDto"
+        "422":
+          description: One or more requested resources or attributes are unsupported
+            or invalid (errorCode VALIDATION_FAILED)
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/discoveryProvider/discoveries/cancel:
+    post:
+      tags:
+      - Discovery Operations v2
+      summary: Cancel a discovery run
+      description: Terminally aborts the run; the connector discards its job state
+        for this runId once it has answered.
+      operationId: cancel
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiscoveryRunRequestDto"
+        required: true
+      responses:
+        "204":
+          description: Run cancelled
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "422":
+          description: "Cancel refused: the run is past the point of no return (errorCode\
+            \ OPERATION_PAST_POINT_OF_NO_RETURN)"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
   /v2/attributes/callback:
     post:
       tags:
@@ -163,112 +531,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-  /v1/signatureProvider/formatting/formatResponse:
-    post:
-      tags:
-      - Signature Formatting Provider
-      summary: Assemble final formatted output
-      operationId: formatSigningResponse
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FormatResponseInterface"
-        required: true
-      responses:
-        "200":
-          description: Formatted response assembled
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FormattedResponseDto"
-        "422":
-          description: Unprocessable Entity
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-  /v1/signatureProvider/formatting/formatDtbs:
-    post:
-      tags:
-      - Signature Formatting Provider
-      summary: Compute data-to-be-signed bytes
-      operationId: formatDtbs
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/FormatDtbsInterface"
-        required: true
-      responses:
-        "200":
-          description: Data-to-be-signed bytes computed
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/FormatDtbsResponseDto"
-        "422":
-          description: Unprocessable Entity
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: string
-              example:
-              - Error Message 1
-              - Error Message 2
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
           content:
             application/problem+json:
               schema:
@@ -410,6 +672,140 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetailExtended"
       security: []
+  /v2/discoveryProvider/{resource}/attributes:
+    get:
+      tags:
+      - Discovery Metadata v2
+      summary: List per-resource attributes
+      description: "Returns the attribute schema that refines discovery of a single\
+        \ resource type. Values collected against this schema are replayed back to\
+        \ the connector as the per-resource attributes, keyed by resource, on every\
+        \ discovery lifecycle call."
+      operationId: listResourceAttributes
+      parameters:
+      - name: resource
+        in: path
+        description: "Resource type, identified by its wire code (e.g. \"certificates\"\
+          , \"keys\")"
+        required: true
+        schema:
+          $ref: "#/components/schemas/Resource"
+      responses:
+        "200":
+          description: Per-resource attribute schema retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/discoveryProvider/resources:
+    get:
+      tags:
+      - Discovery Metadata v2
+      summary: List supported resources
+      description: "Returns the resource types this connector can discover. Whether\
+        \ a concrete run can be stopped and resumed is not declared here: the connector\
+        \ states it per run, in the initiate response's stoppable field."
+      operationId: listSupportedResources
+      responses:
+        "200":
+          description: Supported resources retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DiscoverySupportedResourceDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
+  /v2/discoveryProvider/attributes:
+    get:
+      tags:
+      - Discovery Metadata v2
+      summary: List run-level attributes
+      description: "Returns the attribute schema that configures a discovery run as\
+        \ a whole and applies to every resource type targeted by that run (for example,\
+        \ target addresses or address ranges). Values collected against this schema\
+        \ are replayed back to the connector as the run-level attributes on every\
+        \ discovery lifecycle call."
+      operationId: listRunAttributes
+      responses:
+        "200":
+          description: Run-level attribute schema retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BaseAttributeDto"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "404":
+          description: Not Found. Endpoint not found or not implemented
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetailExtended"
+      security:
+      - ConnectorAPIKeyAuth: []
+      - CertificateTLSAuth: []
+      - NoAuth: []
+      - BasicAuth: []
   /v2/attributes:
     get:
       tags:
@@ -489,44 +885,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDetailExtended"
         "401":
           description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "500":
-          description: Internal Server Error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-      security:
-      - ConnectorAPIKeyAuth: []
-      - CertificateTLSAuth: []
-      - NoAuth: []
-      - BasicAuth: []
-  /v1/signatureProvider/formatting/attributes:
-    get:
-      tags:
-      - Signature Formatting Provider
-      summary: List Formatting Attributes
-      operationId: listFormattingAttributes
-      responses:
-        "200":
-          description: Attributes retrieved
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BaseAttributeDto"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetailExtended"
-        "404":
-          description: Not Found. Endpoint not found or not implemented
           content:
             application/problem+json:
               schema:
@@ -675,48 +1033,6 @@ components:
       required:
       - targets
       - to
-    AttributeCallbackRequestDto:
-      type: object
-      properties:
-        connectorInterface:
-          $ref: "#/components/schemas/ConnectorInterface"
-          description: Provider interface the triggering schema belongs to. Core-stamped
-            from /v2/info.
-        interfaceVersion:
-          type: string
-          description: Version of the provider interface. Core-stamped from /v2/info.
-          minLength: 1
-        attributeUuid:
-          type: string
-          format: uuid
-          description: Connector-global UUID of the attribute whose callback fired
-            — the dispatch key.
-        attributeName:
-          type: string
-          description: Name of the attribute whose callback fired. Informative / logging.
-          minLength: 1
-        contextAttributes:
-          type: array
-          description: "Route scope chain, credentials expanded inline by Core. Empty\
-            \ when the form has no parent scope."
-          items:
-            $ref: "#/components/schemas/ScopedAttributes"
-        currentAttributes:
-          type: array
-          description: "The dependsOn-named form values only, reference-typed values\
-            \ expanded inline by Core."
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-        pagination:
-          $ref: "#/components/schemas/PaginationRequestDto"
-          description: Optional pagination for content responses.
-      required:
-      - attributeName
-      - attributeUuid
-      - connectorInterface
-      - contextAttributes
-      - currentAttributes
-      - interfaceVersion
     AttributeConstraintType:
       type: string
       enum:
@@ -946,25 +1262,6 @@ components:
       required:
       - contentType
       - data
-    ConnectorInterface:
-      type: string
-      enum:
-      - info
-      - health
-      - metrics
-      - attributes
-      - authority
-      - discovery
-      - entity
-      - compliance
-      - cryptography
-      - notification
-      - secret
-      - signatureFormatting
-      - cadesFormatting
-      - jadesFormatting
-      - padesFormatting
-      - xadesFormatting
     CredentialAttributeContentData:
       type: object
       properties:
@@ -1206,6 +1503,48 @@ components:
       required:
       - contentType
       - data
+    DiscoveryStreamRequestDto:
+      type: object
+      properties:
+        runId:
+          type: string
+          format: uuid
+          description: Discovery run identifier assigned by Core when the run was
+            created
+        meta:
+          type: array
+          description: "Connector-defined metadata returned in the original discovery\
+            \ initiate/stop/resume response, replayed here so the stateless connector\
+            \ can resolve its run state; absent on the initiate call itself, which\
+            \ is the call that mints it. Serialized size is capped at 64 KB."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        attributes:
+          type: array
+          description: "Run-level attributes supplied when the discovery run was initiated;\
+            \ optional, since a connector may define no run-level attributes at all."
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        resourceAttributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/RequestAttribute"
+          description: "Per-resource attributes, keyed by resource code (e.g. \"certificates\"\
+            , \"keys\"); optional, since a connector may define none."
+          propertyNames:
+            $ref: "#/components/schemas/Resource"
+        afterSequence:
+          type: integer
+          format: int64
+          default: 0
+          description: "Cursor: stream items with sequence greater than this value.\
+            \ Item sequences are dense per run, so 0 requests items from the start\
+            \ of the run."
+          minimum: 0
+      required:
+      - runId
     FileAttributeContentData:
       type: object
       properties:
@@ -1397,6 +1736,136 @@ components:
       - content
       - type
       title: KeyValueSecretContent
+    MetadataAttribute:
+      description: Metadata Attribute definition
+      oneOf:
+      - $ref: "#/components/schemas/MetadataAttributeV2"
+      - $ref: "#/components/schemas/MetadataAttributeV3"
+    MetadataAttributeProperties:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Friendly name of the the Attribute
+          examples:
+          - Attribute Name
+        visible:
+          type: boolean
+          default: true
+          description: "Boolean determining if the Attribute is visible and can be\
+            \ displayed, otherwise it should be hidden to the user."
+        group:
+          type: string
+          description: "Group of the Attribute, used for the logical grouping of the\
+            \ Attribute"
+          examples:
+          - requiredAttributes
+        global:
+          type: boolean
+          default: false
+          description: Boolean determining if the Metadata is a global metadata.
+        overwrite:
+          type: boolean
+          default: false
+          description: Boolean determining if the new metadata content should overwrite
+            (replace) existing content instead of appending.
+        protectionLevel:
+          $ref: "#/components/schemas/ProtectionLevel"
+          default: none
+          description: Protection level of the attribute content
+      required:
+      - label
+      - visible
+    MetadataAttributeV2:
+      type: object
+      description: Info attribute contains content that is for metadata. Its content
+        can not be edited and is not send in requests to store.
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        version:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/MetadataAttributeProperties"
+          description: Properties of the Attributes
+      required:
+      - contentType
+      - name
+      - properties
+      - type
+      - uuid
+      - version
+    MetadataAttributeV3:
+      type: object
+      description: Info attribute contains content that is for metadata. Its content
+        can not be edited and is not send in requests to store.
+      properties:
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
+        name:
+          type: string
+          description: Name of the Attribute that is used for identification
+          examples:
+          - Attribute
+        description:
+          type: string
+          description: "Optional description of the Attribute, should contain helper\
+            \ text on what is expected"
+        version:
+          type: integer
+          format: int32
+          description: Version of the attribute
+        type:
+          $ref: "#/components/schemas/AttributeType"
+          description: Type of the Attribute
+        content:
+          type: array
+          description: Content of the Attribute
+          items:
+            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
+          description: Type of the Content
+        properties:
+          $ref: "#/components/schemas/MetadataAttributeProperties"
+          description: Properties of the Attributes
+        schemaVersion:
+          $ref: "#/components/schemas/AttributeVersion"
+          description: Schema version of the Attribute
+      required:
+      - contentType
+      - name
+      - properties
+      - schemaVersion
+      - type
+      - uuid
+      - version
     ObjectAttributeContentV2:
       type: object
       description: Object attribute content for data with custom structure
@@ -1423,20 +1892,6 @@ components:
       required:
       - contentType
       - data
-    PaginationRequestDto:
-      type: object
-      properties:
-        itemsPerPage:
-          type: integer
-          format: int32
-          default: 10
-          description: Number of entries per page
-          maximum: 1000
-        pageNumber:
-          type: integer
-          format: int32
-          default: 1
-          description: Page number for the request
     PrivateKeySecretContent:
       type: object
       description: Secret representing private key
@@ -1910,26 +2365,6 @@ components:
       - type
       - uuid
       - version
-    ScopedAttributes:
-      type: object
-      properties:
-        scope:
-          $ref: "#/components/schemas/Resource"
-          description: "Kind of the scope object. Serialized as the plural resource\
-            \ code, e.g. \"authorities\", \"raProfiles\", \"vaults\"."
-        objectUuid:
-          type: string
-          format: uuid
-          description: "UUID of the scope object, for correlation/logging only — never\
-            \ a lookup key on the connector side."
-        attributes:
-          type: array
-          description: Credential-expanded attributes of the scope object.
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-      required:
-      - attributes
-      - scope
     SecretAttributeContentData:
       type: object
       properties:
@@ -2089,6 +2524,288 @@ components:
       required:
       - contentType
       - data
+    DiscoveredCertificateDto:
+      allOf:
+      - $ref: "#/components/schemas/DiscoveredItemPayload"
+      - type: object
+        properties:
+          certificateData:
+            type: string
+            description: Base64-encoded certificate data (DER)
+            minLength: 1
+      required:
+      - certificateData
+      - resource
+    DiscoveredItemDto:
+      type: object
+      properties:
+        sequence:
+          type: integer
+          format: int64
+          description: "Dense per-run item sequence (1, 2, 3, ... with no holes);\
+            \ the drain/stream cursor value after which the next batch starts"
+          minimum: 1
+        uniqueRef:
+          type: string
+          description: Connector-side natural key that Core uses to dedupe this item
+            across drains and retries
+          minLength: 1
+        payload:
+          $ref: "#/components/schemas/DiscoveredItemPayload"
+          description: Resource-specific payload; its concrete type is selected by
+            resource
+        meta:
+          type: array
+          description: "Item metadata (platform convention). Where an item was found\
+            \ (e.g. IP and port, file path, HSM slot) belongs here as typed, labeled\
+            \ entries, never in payload."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        discoveredAt:
+          type: string
+          format: date-time
+          description: Timestamp at which the connector discovered this item
+      required:
+      - payload
+      - sequence
+      - uniqueRef
+    DiscoveredItemPayload:
+      type: object
+      description: "Resource-specific payload of a discovered item. The required resource\
+        \ property is the discriminator: it carries the resource's wire code and selects\
+        \ which concrete payload shape this object is. Each concrete shape fixes it\
+        \ to its own value."
+      discriminator:
+        propertyName: resource
+        mapping:
+          certificates: "#/components/schemas/DiscoveredCertificateDto"
+          keys: "#/components/schemas/DiscoveredKeyDto"
+      oneOf:
+      - $ref: "#/components/schemas/DiscoveredCertificateDto"
+      - $ref: "#/components/schemas/DiscoveredKeyDto"
+      properties:
+        resource:
+          $ref: "#/components/schemas/Resource"
+    DiscoveredKeyDto:
+      allOf:
+      - $ref: "#/components/schemas/DiscoveredItemPayload"
+      - type: object
+        properties:
+          type:
+            $ref: "#/components/schemas/KeyType"
+            description: "Key type: whether this is a public, private, secret, or\
+              \ split key"
+          algorithm:
+            $ref: "#/components/schemas/KeyAlgorithm"
+            description: Cryptographic algorithm of the key
+          length:
+            type: integer
+            format: int32
+            description: Key length in bits
+          fingerprint:
+            type: string
+            description: "Intrinsic key fingerprint; correlates the same key across\
+              \ runs, connectors, and certificates without exposing key material"
+          publicKeyFormat:
+            $ref: "#/components/schemas/KeyFormat"
+            description: Format of publicKey when present (typically SubjectPublicKeyInfo);
+              absent when publicKey is absent
+          publicKey:
+            type: string
+            description: "Base64-encoded public key material. Absent for PRIVATE_KEY,\
+              \ SECRET_KEY or SPLIT_KEY discoveries, where only existence and intrinsic\
+              \ metadata are ever reported"
+      description: "A connector reports a key's existence, intrinsic metadata, and\
+        \ at most its public part; private, secret and split key material must never\
+        \ be sent. A PRIVATE_KEY, SECRET_KEY or SPLIT_KEY report MUST omit publicKey\
+        \ and publicKeyFormat entirely."
+      required:
+      - algorithm
+      - resource
+      - type
+    DiscoveryErrorEvent:
+      allOf:
+      - $ref: "#/components/schemas/DiscoveryEvent"
+      - type: object
+        properties:
+          type:
+            $ref: "#/components/schemas/DiscoveryEventType"
+            description: Event type; this event's own discriminator field
+          code:
+            type: string
+            description: Connector-defined error code
+            maxLength: 64
+            minLength: 0
+          message:
+            type: string
+            description: Human-readable error message — curated message text (no raw
+              exception messages)
+      required:
+      - code
+      - message
+      - type
+    DiscoveryEvent:
+      type: object
+      description: One flat discovery stream/AMQP event; type selects the concrete
+        shape.
+      discriminator:
+        propertyName: type
+        mapping:
+          progress: "#/components/schemas/DiscoveryProgressEvent"
+          resultBatch: "#/components/schemas/DiscoveryResultBatchEvent"
+          stateChanged: "#/components/schemas/DiscoveryStateChangedEvent"
+          heartbeat: "#/components/schemas/DiscoveryHeartbeatEvent"
+          error: "#/components/schemas/DiscoveryErrorEvent"
+      oneOf:
+      - $ref: "#/components/schemas/DiscoveryProgressEvent"
+      - $ref: "#/components/schemas/DiscoveryResultBatchEvent"
+      - $ref: "#/components/schemas/DiscoveryStateChangedEvent"
+      - $ref: "#/components/schemas/DiscoveryHeartbeatEvent"
+      - $ref: "#/components/schemas/DiscoveryErrorEvent"
+      properties:
+        type:
+          $ref: "#/components/schemas/DiscoveryEventType"
+    DiscoveryEventType:
+      type: string
+      enum:
+      - progress
+      - resultBatch
+      - stateChanged
+      - heartbeat
+      - error
+    DiscoveryHeartbeatEvent:
+      allOf:
+      - $ref: "#/components/schemas/DiscoveryEvent"
+      - type: object
+        properties:
+          type:
+            $ref: "#/components/schemas/DiscoveryEventType"
+            description: Event type; this event's own discriminator field
+          sentAt:
+            type: string
+            format: date-time
+            description: Timestamp at which the connector sent this heartbeat
+      required:
+      - sentAt
+      - type
+    DiscoveryProgressEvent:
+      allOf:
+      - $ref: "#/components/schemas/DiscoveryEvent"
+      - type: object
+        properties:
+          processed:
+            type: integer
+            format: int64
+            description: Number of items processed so far; omitted when the connector
+              cannot report it
+          totalEstimate:
+            type: integer
+            format: int64
+            description: Estimated total number of items for the run; omitted when
+              the connector cannot produce an estimate
+          phase:
+            type: string
+            description: "Connector-defined free-text phase label (e.g. \"scanning\"\
+              , \"enumerating\"); omitted when the connector has no phase concept"
+          byResource:
+            type: object
+            additionalProperties:
+              $ref: "#/components/schemas/DiscoveryResourceProgressDto"
+            propertyNames:
+              $ref: "#/components/schemas/Resource"
+          type:
+            $ref: "#/components/schemas/DiscoveryEventType"
+            description: Event type; this event's own discriminator field
+      required:
+      - type
+    DiscoveryResourceProgressDto:
+      type: object
+      description: "Progress counters. Used for a whole run and, keyed by resource\
+        \ code inside byResource (e.g. \"certificates\", \"keys\"), for one resource\
+        \ type at a time. Every field is optional."
+      properties:
+        processed:
+          type: integer
+          format: int64
+          description: Number of items processed so far; omitted when the connector
+            cannot report it
+        totalEstimate:
+          type: integer
+          format: int64
+          description: Estimated total number of items for the run; omitted when the
+            connector cannot produce an estimate
+        phase:
+          type: string
+          description: "Connector-defined free-text phase label (e.g. \"scanning\"\
+            , \"enumerating\"); omitted when the connector has no phase concept"
+    DiscoveryResultBatchEvent:
+      allOf:
+      - $ref: "#/components/schemas/DiscoveryEvent"
+      - type: object
+        properties:
+          type:
+            $ref: "#/components/schemas/DiscoveryEventType"
+            description: Event type; this event's own discriminator field
+          items:
+            type: array
+            description: "Discovered items in this batch, each carrying its own per-run\
+              \ sequence. A producer that means \"this batch has no items\" MUST send\
+              \ an explicit empty array; omitting the field is rejected rather than\
+              \ read as \"no discoveries\"."
+            items:
+              $ref: "#/components/schemas/DiscoveredItemDto"
+      required:
+      - items
+      - type
+    DiscoveryRunState:
+      type: string
+      enum:
+      - running
+      - stopped
+      - completed
+      - failed
+      - cancelled
+    DiscoveryStateChangedEvent:
+      allOf:
+      - $ref: "#/components/schemas/DiscoveryEvent"
+      - type: object
+        properties:
+          type:
+            $ref: "#/components/schemas/DiscoveryEventType"
+            description: Event type; this event's own discriminator field
+          state:
+            $ref: "#/components/schemas/DiscoveryRunState"
+            description: "Run state the connector is reporting; advisory, not authoritative"
+      required:
+      - state
+      - type
+    KeyAlgorithm:
+      type: string
+      enum:
+      - RSA
+      - ECDSA
+      - FALCON
+      - ML-DSA
+      - SLH-DSA
+      - ML-KEM
+      - CRYSTALS-Dilithium
+      - SPHINCS+
+      - Unknown
+    KeyFormat:
+      type: string
+      enum:
+      - Raw
+      - SubjectPublicKeyInfo
+      - PrivateKeyInfo
+      - EncryptedPrivateKeyInfo
+      - Custom
+    KeyType:
+      type: string
+      enum:
+      - Secret
+      - Public
+      - Private
+      - Split
     ErrorCode:
       type: string
       enum:
@@ -2184,6 +2901,340 @@ components:
       - status
       - timestamp
       - type
+    DiscoveryRunRequestDto:
+      type: object
+      properties:
+        runId:
+          type: string
+          format: uuid
+          description: Discovery run identifier assigned by Core when the run was
+            created
+        meta:
+          type: array
+          description: "Connector-defined metadata returned in the original discovery\
+            \ initiate/stop/resume response, replayed here so the stateless connector\
+            \ can resolve its run state; absent on the initiate call itself, which\
+            \ is the call that mints it. Serialized size is capped at 64 KB."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        attributes:
+          type: array
+          description: "Run-level attributes supplied when the discovery run was initiated;\
+            \ optional, since a connector may define no run-level attributes at all."
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        resourceAttributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/RequestAttribute"
+          description: "Per-resource attributes, keyed by resource code (e.g. \"certificates\"\
+            , \"keys\"); optional, since a connector may define none."
+          propertyNames:
+            $ref: "#/components/schemas/Resource"
+      required:
+      - runId
+    DiscoveryStopResponseDto:
+      type: object
+      properties:
+        meta:
+          type: array
+          description: "Connector-defined metadata for this run, replayed by Core\
+            \ on every subsequent lifecycle call — status, results, stream, stop,\
+            \ resume and cancel — so the stateless connector can resolve its run state.\
+            \ Serialized size is capped at 64 KB; Core fails the run outright if this\
+            \ exceeds the cap."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+    DiscoveryProgressDto:
+      type: object
+      description: "Run-level progress of a discovery run: the run-wide counters,\
+        \ plus an optional per-resource breakdown."
+      properties:
+        processed:
+          type: integer
+          format: int64
+          description: Number of items processed so far; omitted when the connector
+            cannot report it
+        totalEstimate:
+          type: integer
+          format: int64
+          description: Estimated total number of items for the run; omitted when the
+            connector cannot produce an estimate
+        phase:
+          type: string
+          description: "Connector-defined free-text phase label (e.g. \"scanning\"\
+            , \"enumerating\"); omitted when the connector has no phase concept"
+        byResource:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/DiscoveryResourceProgressDto"
+          propertyNames:
+            $ref: "#/components/schemas/Resource"
+    DiscoveryStatusResponseDto:
+      type: object
+      properties:
+        state:
+          $ref: "#/components/schemas/DiscoveryRunState"
+          description: Current state of the discovery run
+        progress:
+          $ref: "#/components/schemas/DiscoveryProgressDto"
+        highestSequence:
+          type: integer
+          format: int64
+          description: "Run-wide highest item sequence assigned so far — never page-scoped.\
+            \ Consumers must advance cursors only by item sequences actually received.\
+            \ Item sequences start at 1, so 0 means the run has produced no items\
+            \ yet."
+          minimum: 0
+      required:
+      - highestSequence
+      - state
+    DiscoveryInitiateResponseDto:
+      type: object
+      properties:
+        meta:
+          type: array
+          description: "Connector-defined metadata for this run, replayed by Core\
+            \ on every subsequent lifecycle call — status, results, stream, stop,\
+            \ resume and cancel — so the stateless connector can resolve its run state.\
+            \ Serialized size is capped at 64 KB; Core fails the run outright if this\
+            \ exceeds the cap."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        stoppable:
+          type: boolean
+          description: |-
+            Whether this run can be stopped and later resumed.
+
+            **Feature gate:** may only narrow the discoveryStopResume feature flag, never widen it — true without the flag advertised is a contract violation and Core clamps the run to not-stoppable.
+
+            **Absent:** undeclared — Core gates on the flag alone.
+
+            **Refresh:** each resume response replaces the value; omitting it reverts the run to flag-gating.
+
+            **Runtime:** the connector may still refuse a stop past the point of no return.
+    DiscoveryDrainRequestDto:
+      type: object
+      properties:
+        runId:
+          type: string
+          format: uuid
+          description: Discovery run identifier assigned by Core when the run was
+            created
+        meta:
+          type: array
+          description: "Connector-defined metadata returned in the original discovery\
+            \ initiate/stop/resume response, replayed here so the stateless connector\
+            \ can resolve its run state; absent on the initiate call itself, which\
+            \ is the call that mints it. Serialized size is capped at 64 KB."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        attributes:
+          type: array
+          description: "Run-level attributes supplied when the discovery run was initiated;\
+            \ optional, since a connector may define no run-level attributes at all."
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        resourceAttributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/RequestAttribute"
+          description: "Per-resource attributes, keyed by resource code (e.g. \"certificates\"\
+            , \"keys\"); optional, since a connector may define none."
+          propertyNames:
+            $ref: "#/components/schemas/Resource"
+        afterSequence:
+          type: integer
+          format: int64
+          default: 0
+          description: "Cursor: return items with sequence greater than this value.\
+            \ Item sequences are dense per run, so 0 requests items from the start\
+            \ of the run."
+          minimum: 0
+        maxItems:
+          type: integer
+          format: int32
+          description: Maximum number of items to return in this batch. The platform's
+            tunneled transport caps a single response at 10 MiB; a connector MUST
+            apply its own bound on the returned page when this is omitted.
+          minimum: 1
+        maxBytes:
+          type: integer
+          format: int64
+          description: "Maximum serialized size, in bytes, of the items returned in\
+            \ this batch. The platform's tunneled transport caps a single response\
+            \ at 10 MiB (10485760 bytes); exceeding it is an unrecoverable run failure.\
+            \ A connector MUST apply its own bound when this is omitted."
+          maximum: 10485760
+          minimum: 1
+      required:
+      - runId
+    DiscoveryResultsResponseDto:
+      type: object
+      properties:
+        items:
+          type: array
+          description: "Items discovered after the requested cursor, up to the batch\
+            \ limits. A producer that means \"this page has no items\" MUST send an\
+            \ explicit empty array; omitting the field is rejected rather than read\
+            \ as \"no discoveries\"."
+          items:
+            $ref: "#/components/schemas/DiscoveredItemDto"
+        highestSequence:
+          type: integer
+          format: int64
+          description: "Run-wide highest item sequence assigned so far — never page-scoped.\
+            \ Consumers must advance cursors only by item sequences actually received.\
+            \ Item sequences start at 1, so 0 means the run has produced no items\
+            \ yet."
+          minimum: 0
+        more:
+          type: boolean
+          description: True when the connector has additional items beyond this page
+      required:
+      - highestSequence
+      - items
+      - more
+    DiscoveryInitiateRequestDto:
+      type: object
+      properties:
+        runId:
+          type: string
+          format: uuid
+          description: Discovery run identifier assigned by Core when the run was
+            created
+        meta:
+          type: array
+          description: "Connector-defined metadata returned in the original discovery\
+            \ initiate/stop/resume response, replayed here so the stateless connector\
+            \ can resolve its run state; absent on the initiate call itself, which\
+            \ is the call that mints it. Serialized size is capped at 64 KB."
+          items:
+            $ref: "#/components/schemas/MetadataAttribute"
+        attributes:
+          type: array
+          description: "Run-level attributes supplied when the discovery run was initiated;\
+            \ optional, since a connector may define no run-level attributes at all."
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        resourceAttributes:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/RequestAttribute"
+          description: "Per-resource attributes, keyed by resource code (e.g. \"certificates\"\
+            , \"keys\"); optional, since a connector may define none."
+          propertyNames:
+            $ref: "#/components/schemas/Resource"
+        resources:
+          type: array
+          description: Resource types to discover in this run
+          items:
+            $ref: "#/components/schemas/Resource"
+          minItems: 1
+      required:
+      - resources
+      - runId
+    AttributeCallbackRequestDto:
+      type: object
+      properties:
+        connectorInterface:
+          $ref: "#/components/schemas/ConnectorInterface"
+          description: Provider interface the triggering schema belongs to. Core-stamped
+            from /v2/info.
+        interfaceVersion:
+          type: string
+          description: Version of the provider interface. Core-stamped from /v2/info.
+          minLength: 1
+        attributeUuid:
+          type: string
+          format: uuid
+          description: Connector-global UUID of the attribute whose callback fired
+            — the dispatch key.
+        attributeName:
+          type: string
+          description: Name of the attribute whose callback fired. Informative / logging.
+          minLength: 1
+        contextAttributes:
+          type: array
+          description: "Route scope chain, credentials expanded inline by Core. Empty\
+            \ when the form has no parent scope."
+          items:
+            $ref: "#/components/schemas/ScopedAttributes"
+        currentAttributes:
+          type: array
+          description: "The dependsOn-named form values only, reference-typed values\
+            \ expanded inline by Core."
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+        pagination:
+          $ref: "#/components/schemas/PaginationRequestDto"
+          description: Optional pagination for content responses.
+      required:
+      - attributeName
+      - attributeUuid
+      - connectorInterface
+      - contextAttributes
+      - currentAttributes
+      - interfaceVersion
+    ConnectorInterface:
+      type: string
+      enum:
+      - info
+      - health
+      - metrics
+      - attributes
+      - authority
+      - discovery
+      - entity
+      - compliance
+      - cryptography
+      - notification
+      - secret
+      - signatureFormatting
+      - cadesFormatting
+      - jadesFormatting
+      - padesFormatting
+      - xadesFormatting
+    PaginationRequestDto:
+      type: object
+      properties:
+        itemsPerPage:
+          type: integer
+          format: int32
+          default: 10
+          description: Number of entries per page
+          maximum: 1000
+        pageNumber:
+          type: integer
+          format: int32
+          default: 1
+          description: Page number for the request
+    ScopedAttributes:
+      type: object
+      properties:
+        scope:
+          $ref: "#/components/schemas/Resource"
+          description: "Kind of the scope object. Serialized as the plural resource\
+            \ code, e.g. \"authorities\", \"raProfiles\", \"vaults\"."
+        objectUuid:
+          type: string
+          format: uuid
+          description: "UUID of the scope object, for correlation/logging only — never\
+            \ a lookup key on the connector side."
+        attributes:
+          type: array
+          description: Credential-expanded attributes of the scope object.
+          items:
+            $ref: "#/components/schemas/RequestAttribute"
+      required:
+      - attributes
+      - scope
     AttributeCallbackResponseDto:
       type: object
       properties:
@@ -2791,131 +3842,6 @@ components:
             values
       required:
       - fieldType
-    MetadataAttributeProperties:
-      type: object
-      properties:
-        label:
-          type: string
-          description: Friendly name of the the Attribute
-          examples:
-          - Attribute Name
-        visible:
-          type: boolean
-          default: true
-          description: "Boolean determining if the Attribute is visible and can be\
-            \ displayed, otherwise it should be hidden to the user."
-        group:
-          type: string
-          description: "Group of the Attribute, used for the logical grouping of the\
-            \ Attribute"
-          examples:
-          - requiredAttributes
-        global:
-          type: boolean
-          default: false
-          description: Boolean determining if the Metadata is a global metadata.
-        overwrite:
-          type: boolean
-          default: false
-          description: Boolean determining if the new metadata content should overwrite
-            (replace) existing content instead of appending.
-        protectionLevel:
-          $ref: "#/components/schemas/ProtectionLevel"
-          default: none
-          description: Protection level of the attribute content
-      required:
-      - label
-      - visible
-    MetadataAttributeV2:
-      type: object
-      description: Info attribute contains content that is for metadata. Its content
-        can not be edited and is not send in requests to store.
-      properties:
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV2"
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/MetadataAttributeProperties"
-          description: Properties of the Attributes
-      required:
-      - contentType
-      - name
-      - properties
-      - type
-      - uuid
-      - version
-    MetadataAttributeV3:
-      type: object
-      description: Info attribute contains content that is for metadata. Its content
-        can not be edited and is not send in requests to store.
-      properties:
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
-        name:
-          type: string
-          description: Name of the Attribute that is used for identification
-          examples:
-          - Attribute
-        description:
-          type: string
-          description: "Optional description of the Attribute, should contain helper\
-            \ text on what is expected"
-        version:
-          type: integer
-          format: int32
-          description: Version of the attribute
-        type:
-          $ref: "#/components/schemas/AttributeType"
-          description: Type of the Attribute
-        content:
-          type: array
-          description: Content of the Attribute
-          items:
-            $ref: "#/components/schemas/BaseAttributeContentDtoV3"
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
-          description: Type of the Content
-        properties:
-          $ref: "#/components/schemas/MetadataAttributeProperties"
-          description: Properties of the Attributes
-        schemaVersion:
-          $ref: "#/components/schemas/AttributeVersion"
-          description: Schema version of the Attribute
-      required:
-      - contentType
-      - name
-      - properties
-      - schemaVersion
-      - type
-      - uuid
-      - version
     ObjectType:
       type: string
       enum:
@@ -2992,273 +3918,6 @@ components:
       - none
       - connectorCallback
       - staticList
-    DigestAlgorithm:
-      type: string
-      enum:
-      - MD5
-      - SHA-1
-      - SHA-224
-      - SHA-256
-      - SHA-384
-      - SHA-512
-      - SHA3-256
-      - SHA3-384
-      - SHA3-512
-    ExtensionDto:
-      type: object
-      description: "ASN.1 extension (OID, criticality, value)"
-      properties:
-        oid:
-          type: string
-          description: OID of the extension
-          example: 1.3.6.1.5.5.7.1.1
-          minLength: 1
-        critical:
-          type: boolean
-          description: Whether the extension is critical
-        value:
-          type: string
-          description: Base64-encoded DER value of the extension
-      required:
-      - critical
-      - oid
-      - value
-      title: ExtensionDto
-    FormatResponseInterface:
-      type: object
-      description: Response formatting request specific to the signing workflow type
-      discriminator:
-        propertyName: type
-        mapping:
-          timestamping: "#/components/schemas/TimestampingFormatResponseRequestDto"
-      oneOf:
-      - $ref: "#/components/schemas/TimestampingFormatResponseRequestDto"
-      required:
-      - type
-    SignatureAlgorithm:
-      type: string
-      enum:
-      - SHA256withRSA
-      - SHA384withRSA
-      - SHA512withRSA
-      - SHA256withRSAandMGF1
-      - SHA384withRSAandMGF1
-      - SHA512withRSAandMGF1
-      - SHA256withECDSA
-      - SHA384withECDSA
-      - SHA512withECDSA
-      - Ed25519
-      - Ed448
-      - FALCON-1024
-      - ML-DSA-65
-      - SLH-DSA-SHA2-128F
-    SigningWorkflowType:
-      type: string
-      enum:
-      - content_signing
-      - raw_signing
-      - timestamping
-    TimestampingFormatResponseRequestDto:
-      type: object
-      description: Response formatting request for Timestamping
-      properties:
-        type:
-          $ref: "#/components/schemas/SigningWorkflowType"
-          description: Signing workflow type
-          examples:
-          - timestamping
-        dtbs:
-          type: string
-          format: byte
-          description: "Data-to-be-signed bytes returned by formatDtbs (already contains\
-            \ serialNumber, signingTime, etc.)"
-        signature:
-          type: string
-          format: byte
-          description: Raw signature bytes from the Cryptography Provider
-        certificateChain:
-          type: array
-          description: Certificate chain where the first element is the signer certificate
-          items:
-            type: string
-            format: byte
-          minItems: 1
-        formatAttributes:
-          type: array
-          description: "Formatting-specific parameters, same attributes as passed\
-            \ to formatDtbs"
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-        serialNumber:
-          type: integer
-          description: "Serial number generated by Core, recorded in the Signature\
-            \ inventory"
-        signingTime:
-          type: string
-          format: date-time
-          description: Signing time captured by Core from the time quality system
-          example: 2024-05-01T12:00:00Z
-        accuracy:
-          type: string
-          description: "Accuracy of the signing time, captured by Core from the time\
-            \ quality system (ISO 8601 duration, e.g. PT0.001S for 1 ms). Optional\
-            \ per RFC 3161 — absent when no Time Quality Configuration applies (e.g.\
-            \ a non-qualified local-clock timestamp)."
-          example: PT0.001S
-        signatureAlgorithm:
-          $ref: "#/components/schemas/SignatureAlgorithm"
-          description: Signature algorithm to be used for timestamping
-        hashAlgorithm:
-          $ref: "#/components/schemas/DigestAlgorithm"
-          description: Hash algorithm used to produce the message imprint in the timestamp
-            request
-        policy:
-          type: string
-          description: TSA policy OID requested by the client
-        nonce:
-          type: integer
-          description: Nonce from the timestamp request for replay protection
-        includeSignerCertificate:
-          type: boolean
-          description: Whether the signer certificate should be included in the response
-        qualifiedTimestamp:
-          type: boolean
-          description: Whether the timestamp is ETSI qualified electronic timestamp
-        requestExtensions:
-          type: array
-          description: Extensions from the timestamp request
-          items:
-            $ref: "#/components/schemas/ExtensionDto"
-        data:
-          type: string
-          format: byte
-          description: The hashed message (message imprint) — needed to rebuild the
-            TimeStampRequest
-      required:
-      - certificateChain
-      - data
-      - dtbs
-      - formatAttributes
-      - hashAlgorithm
-      - includeSignerCertificate
-      - qualifiedTimestamp
-      - serialNumber
-      - signature
-      - signatureAlgorithm
-      - signingTime
-      - type
-      title: TimestampingFormatResponseRequestDto
-    FormattedResponseDto:
-      type: object
-      properties:
-        response:
-          type: string
-          format: byte
-          description: Final formatted output bytes (e.g. DER-encoded TimeStampResp
-            for TSA)
-      required:
-      - response
-    FormatDtbsInterface:
-      type: object
-      description: DTBS formatting request specific to the signing workflow type
-      discriminator:
-        propertyName: type
-        mapping:
-          timestamping: "#/components/schemas/TimestampingFormatDtbsRequestDto"
-      oneOf:
-      - $ref: "#/components/schemas/TimestampingFormatDtbsRequestDto"
-      required:
-      - type
-    TimestampingFormatDtbsRequestDto:
-      type: object
-      description: DTBS formatting request for Timestamping
-      properties:
-        type:
-          $ref: "#/components/schemas/SigningWorkflowType"
-          description: Signing workflow type
-          examples:
-          - timestamping
-        certificateChain:
-          type: array
-          description: Certificate chain where the first element is the signer certificate.
-            Individual certificates are DER encoded X.509 certificates (represented
-            as Base64 strings in the JSON transport).
-          items:
-            type: string
-            format: byte
-          minItems: 1
-        data:
-          type: string
-          format: byte
-          description: Data to be formatted into the protocol-specific data-to-be-signed
-            bytes
-        formatAttributes:
-          type: array
-          description: "Formatting-specific parameters (e.g. message imprint hash\
-            \ and algorithm, nonce, policy OID for TSA)"
-          items:
-            $ref: "#/components/schemas/RequestAttribute"
-        serialNumber:
-          type: integer
-          description: "Serial number generated by Core, recorded in the Signature\
-            \ inventory"
-        signingTime:
-          type: string
-          format: date-time
-          description: Signing time captured by Core from the time quality system
-          example: 2024-05-01T12:00:00Z
-        accuracy:
-          type: string
-          description: "Accuracy of the signing time, captured by Core from the time\
-            \ quality system (ISO 8601 duration, e.g. PT0.001S for 1 ms). Optional\
-            \ per RFC 3161 — absent when no Time Quality Configuration applies (e.g.\
-            \ a non-qualified local-clock timestamp)."
-          example: PT0.001S
-        signatureAlgorithm:
-          $ref: "#/components/schemas/SignatureAlgorithm"
-          description: Signature algorithm to be used for timestamping
-        hashAlgorithm:
-          $ref: "#/components/schemas/DigestAlgorithm"
-          description: Hash algorithm used to produce the message imprint in the timestamp
-            request
-        policy:
-          type: string
-          description: TSA policy OID requested by the client
-        nonce:
-          type: integer
-          description: Nonce from the timestamp request for replay protection
-        includeSignerCertificate:
-          type: boolean
-          description: Whether the signer certificate should be included in the response
-        qualifiedTimestamp:
-          type: boolean
-          description: Whether the timestamp is ETSI qualified electronic timestamp
-        requestExtensions:
-          type: array
-          description: Extensions from the timestamp request
-          items:
-            $ref: "#/components/schemas/ExtensionDto"
-      required:
-      - certificateChain
-      - data
-      - formatAttributes
-      - hashAlgorithm
-      - includeSignerCertificate
-      - qualifiedTimestamp
-      - serialNumber
-      - signatureAlgorithm
-      - signingTime
-      - type
-      title: TimestampingFormatDtbsRequestDto
-    FormatDtbsResponseDto:
-      type: object
-      properties:
-        dtbs:
-          type: string
-          format: byte
-          description: Data-to-be-signed bytes (e.g. DER-encoded TSTInfo for TSA)
-      required:
-      - dtbs
     ConnectorInfo:
       type: object
       properties:
@@ -3365,6 +4024,13 @@ components:
       - DOWN
       - OUT_OF_SERVICE
       - UNKNOWN
+    DiscoverySupportedResourceDto:
+      type: object
+      properties:
+        resource:
+          $ref: "#/components/schemas/Resource"
+      required:
+      - resource
     AttributeDefinitionsDto:
       type: object
       properties:
