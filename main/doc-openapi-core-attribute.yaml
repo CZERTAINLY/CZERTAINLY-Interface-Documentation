@@ -1266,6 +1266,7 @@ components:
       - regExp
       - range
       - dateTime
+      - jsonSchema
     AttributeContent:
       type: object
       description: Attribute Content
@@ -1273,11 +1274,11 @@ components:
       - $ref: "#/components/schemas/BaseAttributeContentDtoV2"
       - $ref: "#/components/schemas/BaseAttributeContentDtoV3"
       properties:
+        contentType:
+          $ref: "#/components/schemas/AttributeContentType"
         reference:
           type: string
         data: {}
-        contentType:
-          $ref: "#/components/schemas/AttributeContentType"
     AttributeResource:
       type: string
       enum:
@@ -1303,10 +1304,12 @@ components:
           regExp: "#/components/schemas/RegexpAttributeConstraint"
           range: "#/components/schemas/RangeAttributeConstraint"
           dateTime: "#/components/schemas/DateTimeAttributeConstraint"
+          jsonSchema: "#/components/schemas/JsonSchemaAttributeConstraint"
       oneOf:
       - $ref: "#/components/schemas/RegexpAttributeConstraint"
       - $ref: "#/components/schemas/RangeAttributeConstraint"
       - $ref: "#/components/schemas/DateTimeAttributeConstraint"
+      - $ref: "#/components/schemas/JsonSchemaAttributeConstraint"
       properties:
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
@@ -1898,6 +1901,27 @@ components:
       required:
       - contentType
       - data
+    JsonSchemaAttributeConstraint:
+      type: object
+      description: JSON Schema attribute constraint restricting a string value to
+        JSON conforming to an inline JSON Schema (draft 2020-12)
+      properties:
+        description:
+          type: string
+          description: Description of the constraint
+        errorMessage:
+          type: string
+          description: Error message to be displayed for wrong data
+        type:
+          $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
+        data:
+          type: string
+          description: Inline JSON Schema document the value must conform to
+          minLength: 1
+      required:
+      - data
+      - type
     JwtTokenSecretContent:
       type: object
       description: Secret representing JWT Token

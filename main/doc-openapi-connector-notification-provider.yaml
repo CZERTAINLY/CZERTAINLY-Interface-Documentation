@@ -654,6 +654,7 @@ components:
       - regExp
       - range
       - dateTime
+      - jsonSchema
     AttributeContentType:
       type: string
       enum:
@@ -709,10 +710,12 @@ components:
           regExp: "#/components/schemas/RegexpAttributeConstraint"
           range: "#/components/schemas/RangeAttributeConstraint"
           dateTime: "#/components/schemas/DateTimeAttributeConstraint"
+          jsonSchema: "#/components/schemas/JsonSchemaAttributeConstraint"
       oneOf:
       - $ref: "#/components/schemas/RegexpAttributeConstraint"
       - $ref: "#/components/schemas/RangeAttributeConstraint"
       - $ref: "#/components/schemas/DateTimeAttributeConstraint"
+      - $ref: "#/components/schemas/JsonSchemaAttributeConstraint"
       properties:
         type:
           $ref: "#/components/schemas/AttributeConstraintType"
@@ -1242,6 +1245,27 @@ components:
       required:
       - contentType
       - data
+    JsonSchemaAttributeConstraint:
+      type: object
+      description: JSON Schema attribute constraint restricting a string value to
+        JSON conforming to an inline JSON Schema (draft 2020-12)
+      properties:
+        description:
+          type: string
+          description: Description of the constraint
+        errorMessage:
+          type: string
+          description: Error message to be displayed for wrong data
+        type:
+          $ref: "#/components/schemas/AttributeConstraintType"
+          description: Attribute Constraint Type
+        data:
+          type: string
+          description: Inline JSON Schema document the value must conform to
+          minLength: 1
+      required:
+      - data
+      - type
     JwtTokenSecretContent:
       type: object
       description: Secret representing JWT Token
@@ -1957,14 +1981,14 @@ components:
         type:
           $ref: "#/components/schemas/AttributeType"
           description: Type of the Attribute
-        uuid:
-          type: string
-          description: UUID of the Attribute for unique identification
-          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
         description:
           type: string
           description: "Optional description of the Attribute, should contain helper\
             \ text on what is expected"
+        uuid:
+          type: string
+          description: UUID of the Attribute for unique identification
+          example: b11c9be1-b619-4ef5-be1b-a1cd9ef265b7
       required:
       - name
       - type
