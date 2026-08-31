@@ -35,6 +35,11 @@ tags:
   description: Resource Management API
 - name: Statistics/Dashboard
   description: Statistics/Dashboard API
+- name: List View
+  description: "List View API that manages the saved column selections of the logged\
+    \ user. A view belongs to one user and one resource; views are never shared between\
+    \ users, so every operation here acts on the views of the user the request is\
+    \ authenticated as."
 - name: Settings
   description: Settings API
 paths:
@@ -653,6 +658,116 @@ paths:
       - SessionAuth: []
       - CertificateAuth: []
       - BearerJWTAuth: []
+  /v1/listViews/{uuid}:
+    put:
+      tags:
+      - List View
+      summary: Edit a view of logged user
+      operationId: editView
+      parameters:
+      - name: uuid
+        in: path
+        description: View UUID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListViewUpdateRequestDto"
+        required: true
+      responses:
+        "200":
+          description: View updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListViewDto"
+        "404":
+          description: View not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "409":
+          description: View of that name already exists for the resource
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - SessionAuth: []
+      - CertificateAuth: []
+      - BearerJWTAuth: []
+    delete:
+      tags:
+      - List View
+      summary: Delete a view of logged user
+      operationId: deleteView
+      parameters:
+      - name: uuid
+        in: path
+        description: View UUID
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: View deleted
+        "404":
+          description: View not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - SessionAuth: []
+      - CertificateAuth: []
+      - BearerJWTAuth: []
   /v1/oids:
     post:
       tags:
@@ -747,6 +862,103 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CustomOidEntryListResponseDto"
+        "422":
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+              - Error Message 1
+              - Error Message 2
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - SessionAuth: []
+      - CertificateAuth: []
+      - BearerJWTAuth: []
+  /v1/listViews:
+    get:
+      tags:
+      - List View
+      summary: List views of logged user
+      operationId: listViews
+      parameters:
+      - name: resource
+        in: query
+        description: Return only views of this resource
+        required: false
+        schema:
+          $ref: "#/components/schemas/Resource"
+      responses:
+        "200":
+          description: List of views
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ListViewDto"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationServiceExceptionDto"
+        "500":
+          description: Internal Server Error
+      security:
+      - SessionAuth: []
+      - CertificateAuth: []
+      - BearerJWTAuth: []
+    post:
+      tags:
+      - List View
+      summary: Create a view for logged user
+      operationId: createView
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListViewRequestDto"
+        required: true
+      responses:
+        "200":
+          description: View created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListViewDto"
+        "409":
+          description: View of that name already exists for the resource
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessageDto"
         "422":
           description: Unprocessable Entity
           content:
@@ -4500,36 +4712,6 @@ components:
       - category
       - displayName
       - oid
-    CustomOidEntryRequestDto:
-      type: object
-      properties:
-        displayName:
-          type: string
-          description: Display name of the custom OID entry
-          minLength: 1
-        description:
-          type: string
-          description: Description of the custom OID entry
-        category:
-          $ref: "#/components/schemas/OidCategory"
-          description: "Category of the OID entry. When updating OID entry, this property\
-            \ does not change the category and is instead used to determine type of\
-            \ additional properties."
-        additionalProperties:
-          description: Additional properties depending on OID category
-          oneOf:
-          - $ref: "#/components/schemas/CertificateExtensionOidPropertiesDto"
-          - $ref: "#/components/schemas/RdnAttributeTypeOidPropertiesDto"
-        oid:
-          type: string
-          description: "Object Identifier (OID) in dot notation (e.g., 1.2.840.113549.1.1.1)"
-          example: 1.2.840.113549.1.1.1
-          minLength: 1
-          pattern: "^([01]\\.(\\d|[1-3]\\d)|2\\.(0|[1-9]\\d*))(\\.(0|[1-9]\\d*)){0,49}$"
-      required:
-      - category
-      - displayName
-      - oid
     FilterConditionOperator:
       type: string
       enum:
@@ -4560,7 +4742,7 @@ components:
       - custom
       - data
       - property
-    SearchColumnRequestDto:
+    ListViewColumnDto:
       type: object
       properties:
         fieldSource:
@@ -4568,13 +4750,55 @@ components:
           description: Field source of the column
         fieldIdentifier:
           type: string
-          description: "Field identifier of the column. Available fields with their\
-            \ identifiers can be retrieved from the corresponding endpoint `GET /v1/{resource}/search`;\
-            \ only fields marked as displayable may be requested as a column."
+          description: "Field identifier of the column, resolved against the resource's\
+            \ field catalogue when the view is read"
           minLength: 1
+        label:
+          type: string
+          description: "Heading to show instead of the field's catalogue label. Absent\
+            \ means the column uses the catalogue label, so a field that is later\
+            \ relabelled follows along; setting this pins the heading for this view\
+            \ only. A blank heading is rejected rather than pinned."
+          maxLength: 255
+          minLength: 0
       required:
       - fieldIdentifier
       - fieldSource
+    ListViewUpdateRequestDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Name of the view, unique per user and resource"
+          examples:
+          - Expiry watch
+          maxLength: 255
+          minLength: 0
+        columns:
+          type: array
+          description: "Columns of the view, in display order"
+          items:
+            $ref: "#/components/schemas/ListViewColumnDto"
+          minItems: 1
+        defaultView:
+          type: boolean
+          default: false
+          description: Whether this view applies when the listing is opened. At most
+            one view per user and resource is the default; marking a view default
+            clears the flag on the previous one.
+        filters:
+          type: array
+          description: Filters the view applies. Absent or empty means the view applies
+            no filter of its own and shows the whole inventory.
+          items:
+            $ref: "#/components/schemas/SearchFilterRequestDto"
+        sort:
+          $ref: "#/components/schemas/SearchSortRequestDto"
+          description: Ordering the view applies. Absent means the view falls back
+            to the endpoint's own default ordering.
+      required:
+      - columns
+      - name
     SearchFilterRequestDto:
       type: object
       properties:
@@ -4594,6 +4818,118 @@ components:
           description: Value to match
       required:
       - condition
+      - fieldIdentifier
+      - fieldSource
+    SearchSortRequestDto:
+      type: object
+      properties:
+        fieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: Field source of the field to sort by
+        fieldIdentifier:
+          type: string
+          description: "Field identifier of the field to sort by. Available fields\
+            \ with their identifiers can be retrieved from the corresponding endpoint\
+            \ `GET /v1/{resource}/search`; only fields marked as sortable may be sorted\
+            \ by."
+          minLength: 1
+        direction:
+          $ref: "#/components/schemas/SortDirection"
+          description: Direction of the ordering
+      required:
+      - direction
+      - fieldIdentifier
+      - fieldSource
+    SortDirection:
+      type: string
+      enum:
+      - asc
+      - desc
+    ListViewDto:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: UUID of the view
+        name:
+          type: string
+          description: Name of the view
+          examples:
+          - Expiry watch
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource whose listing the view applies to
+          examples:
+          - certificates
+        columns:
+          type: array
+          description: "Columns of the view, in display order. Columns whose field\
+            \ is no longer in the resource's catalogue are omitted."
+          items:
+            $ref: "#/components/schemas/ListViewColumnDto"
+        defaultView:
+          type: boolean
+          default: false
+          description: Whether this view applies when the listing is opened
+        filters:
+          type: array
+          description: Filters the view applies. Absent or empty means the view shows
+            the whole inventory.
+          items:
+            $ref: "#/components/schemas/SearchFilterRequestDto"
+        sort:
+          $ref: "#/components/schemas/SearchSortRequestDto"
+          description: Ordering the view applies. Absent means the endpoint's own
+            default ordering.
+      required:
+      - columns
+      - defaultView
+      - name
+      - resource
+      - uuid
+    CustomOidEntryRequestDto:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Display name of the custom OID entry
+          minLength: 1
+        description:
+          type: string
+          description: Description of the custom OID entry
+        category:
+          $ref: "#/components/schemas/OidCategory"
+          description: "Category of the OID entry. When updating OID entry, this property\
+            \ does not change the category and is instead used to determine type of\
+            \ additional properties."
+        additionalProperties:
+          description: Additional properties depending on OID category
+          oneOf:
+          - $ref: "#/components/schemas/CertificateExtensionOidPropertiesDto"
+          - $ref: "#/components/schemas/RdnAttributeTypeOidPropertiesDto"
+        oid:
+          type: string
+          description: "Object Identifier (OID) in dot notation (e.g., 1.2.840.113549.1.1.1)"
+          example: 1.2.840.113549.1.1.1
+          minLength: 1
+          pattern: "^([01]\\.(\\d|[1-3]\\d)|2\\.(0|[1-9]\\d*))(\\.(0|[1-9]\\d*)){0,49}$"
+      required:
+      - category
+      - displayName
+      - oid
+    SearchColumnRequestDto:
+      type: object
+      properties:
+        fieldSource:
+          $ref: "#/components/schemas/FilterFieldSource"
+          description: Field source of the column
+        fieldIdentifier:
+          type: string
+          description: "Field identifier of the column. Available fields with their\
+            \ identifiers can be retrieved from the corresponding endpoint `GET /v1/{resource}/search`;\
+            \ only fields marked as displayable may be requested as a column."
+          minLength: 1
+      required:
       - fieldIdentifier
       - fieldSource
     SearchRequestDto:
@@ -4627,31 +4963,6 @@ components:
             \ returned object."
           items:
             $ref: "#/components/schemas/SearchColumnRequestDto"
-    SearchSortRequestDto:
-      type: object
-      properties:
-        fieldSource:
-          $ref: "#/components/schemas/FilterFieldSource"
-          description: Field source of the field to sort by
-        fieldIdentifier:
-          type: string
-          description: "Field identifier of the field to sort by. Available fields\
-            \ with their identifiers can be retrieved from the corresponding endpoint\
-            \ `GET /v1/{resource}/search`; only fields marked as sortable may be sorted\
-            \ by."
-          minLength: 1
-        direction:
-          $ref: "#/components/schemas/SortDirection"
-          description: Direction of the ordering
-      required:
-      - direction
-      - fieldIdentifier
-      - fieldSource
-    SortDirection:
-      type: string
-      enum:
-      - asc
-      - desc
     CustomOidEntryListResponseDto:
       type: object
       properties:
@@ -4700,6 +5011,47 @@ components:
       - category
       - displayName
       - oid
+    ListViewRequestDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: "Name of the view, unique per user and resource"
+          examples:
+          - Expiry watch
+          maxLength: 255
+          minLength: 0
+        columns:
+          type: array
+          description: "Columns of the view, in display order"
+          items:
+            $ref: "#/components/schemas/ListViewColumnDto"
+          minItems: 1
+        defaultView:
+          type: boolean
+          default: false
+          description: Whether this view applies when the listing is opened. At most
+            one view per user and resource is the default; marking a view default
+            clears the flag on the previous one.
+        filters:
+          type: array
+          description: Filters the view applies. Absent or empty means the view applies
+            no filter of its own and shows the whole inventory.
+          items:
+            $ref: "#/components/schemas/SearchFilterRequestDto"
+        sort:
+          $ref: "#/components/schemas/SearchSortRequestDto"
+          description: Ordering the view applies. Absent means the view falls back
+            to the endpoint's own default ordering.
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: Resource whose listing the view applies to
+          examples:
+          - certificates
+      required:
+      - columns
+      - name
+      - resource
     CbomAssetSyncState:
       type: string
       enum:
