@@ -8967,12 +8967,38 @@ paths:
       tags:
       - Connector Management v2
       summary: List Connectors
+      description: |-
+        Ordering and columns address a field by its source together with its identifier, because an identifier is unique only within its source. Both halves, and which fields may be shown or ordered on, come from the searchable-fields operation of this resource.
+
+        `sort` orders the whole result set before it is paged, so paging walks the sorted set rather than sorting one page at a time; only fields the catalogue marks `sortable` may be used. `columns` names the fields the caller means to display, and only fields the catalogue marks `displayable` may be named. It does not narrow the response: every listing object comes back whole, and naming a property field asks for nothing extra because the object already carries it. Naming an attribute-sourced field is what has an effect, described below.
+
+        A request that carries neither `sort` nor `columns` is answered exactly as it was before the two fields existed: the endpoint's own default ordering, the full default shape of every object, and no `attributeValues` member. A caller written against the previous contract therefore needs no change.
+
+        Requesting attribute-sourced columns adds an `attributeValues` member to each returned object, keyed by field source and then by field identifier. A field the object holds no value for is absent rather than empty, and a multi-valued attribute arrives in its stored `item_order`.
       operationId: listConnectorsV2
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/SearchRequestDto"
+            examples:
+              With ordering and columns:
+                description: With ordering and columns
+                value:
+                  pageNumber: 1
+                  itemsPerPage: 10
+                  filters: []
+                  sort:
+                    fieldSource: property
+                    fieldIdentifier: CONNECTOR_NAME
+                    direction: asc
+                  columns:
+                  - fieldSource: property
+                    fieldIdentifier: CONNECTOR_NAME
+                  - fieldSource: property
+                    fieldIdentifier: CONNECTOR_STATUS
+                  - fieldSource: property
+                    fieldIdentifier: CONNECTOR_URL
         required: true
       responses:
         "200":
@@ -11636,12 +11662,38 @@ paths:
       tags:
       - Signing Record Management
       summary: List of Signing Records
+      description: |-
+        Ordering and columns address a field by its source together with its identifier, because an identifier is unique only within its source. Both halves, and which fields may be shown or ordered on, come from the searchable-fields operation of this resource.
+
+        `sort` orders the whole result set before it is paged, so paging walks the sorted set rather than sorting one page at a time; only fields the catalogue marks `sortable` may be used. `columns` names the fields the caller means to display, and only fields the catalogue marks `displayable` may be named. It does not narrow the response: every listing object comes back whole, and naming a property field asks for nothing extra because the object already carries it. Naming an attribute-sourced field is what has an effect, described below.
+
+        A request that carries neither `sort` nor `columns` is answered exactly as it was before the two fields existed: the endpoint's own default ordering, the full default shape of every object, and no `attributeValues` member. A caller written against the previous contract therefore needs no change.
+
+        Requesting attribute-sourced columns adds an `attributeValues` member to each returned object, keyed by field source and then by field identifier. A field the object holds no value for is absent rather than empty, and a multi-valued attribute arrives in its stored `item_order`.
       operationId: listSigningRecords
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/SearchRequestDto"
+            examples:
+              With ordering and columns:
+                description: With ordering and columns
+                value:
+                  pageNumber: 1
+                  itemsPerPage: 10
+                  filters: []
+                  sort:
+                    fieldSource: property
+                    fieldIdentifier: SIGNING_RECORD_SIGNING_TIME
+                    direction: desc
+                  columns:
+                  - fieldSource: property
+                    fieldIdentifier: SIGNING_RECORD_NAME
+                  - fieldSource: property
+                    fieldIdentifier: SIGNING_RECORD_SIGNING_PROFILE
+                  - fieldSource: property
+                    fieldIdentifier: SIGNING_RECORD_PROTOCOL
         required: true
       responses:
         "200":
@@ -11979,12 +12031,38 @@ paths:
       tags:
       - Secret Management
       summary: List secrets
+      description: |-
+        Ordering and columns address a field by its source together with its identifier, because an identifier is unique only within its source. Both halves, and which fields may be shown or ordered on, come from the searchable-fields operation of this resource.
+
+        `sort` orders the whole result set before it is paged, so paging walks the sorted set rather than sorting one page at a time; only fields the catalogue marks `sortable` may be used. `columns` names the fields the caller means to display, and only fields the catalogue marks `displayable` may be named. It does not narrow the response: every listing object comes back whole, and naming a property field asks for nothing extra because the object already carries it. Naming an attribute-sourced field is what has an effect, described below.
+
+        A request that carries neither `sort` nor `columns` is answered exactly as it was before the two fields existed: the endpoint's own default ordering, the full default shape of every object, and no `attributeValues` member. A caller written against the previous contract therefore needs no change.
+
+        Requesting attribute-sourced columns adds an `attributeValues` member to each returned object, keyed by field source and then by field identifier. A field the object holds no value for is absent rather than empty, and a multi-valued attribute arrives in its stored `item_order`.
       operationId: listSecrets
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/SearchRequestDto"
+            examples:
+              With ordering and columns:
+                description: With ordering and columns
+                value:
+                  pageNumber: 1
+                  itemsPerPage: 10
+                  filters: []
+                  sort:
+                    fieldSource: property
+                    fieldIdentifier: SECRET_NAME
+                    direction: asc
+                  columns:
+                  - fieldSource: property
+                    fieldIdentifier: SECRET_NAME
+                  - fieldSource: property
+                    fieldIdentifier: SECRET_STATE
+                  - fieldSource: property
+                    fieldIdentifier: SECRET_OWNER
         required: true
       responses:
         "200":
@@ -13385,12 +13463,38 @@ paths:
       tags:
       - Cryptographic Key Management
       summary: List cryptographic keys
+      description: |-
+        Ordering and columns address a field by its source together with its identifier, because an identifier is unique only within its source. Both halves, and which fields may be shown or ordered on, come from the searchable-fields operation of this resource.
+
+        `sort` orders the whole result set before it is paged, so paging walks the sorted set rather than sorting one page at a time; only fields the catalogue marks `sortable` may be used. `columns` names the fields the caller means to display, and only fields the catalogue marks `displayable` may be named. It does not narrow the response: every listing object comes back whole, and naming a property field asks for nothing extra because the object already carries it. Naming an attribute-sourced field is what has an effect, described below.
+
+        A request that carries neither `sort` nor `columns` is answered exactly as it was before the two fields existed: the endpoint's own default ordering, the full default shape of every object, and no `attributeValues` member. A caller written against the previous contract therefore needs no change.
+
+        Requesting attribute-sourced columns adds an `attributeValues` member to each returned object, keyed by field source and then by field identifier. A field the object holds no value for is absent rather than empty, and a multi-valued attribute arrives in its stored `item_order`.
       operationId: listCryptographicKeys
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/SearchRequestDto"
+            examples:
+              With ordering and columns:
+                description: With ordering and columns
+                value:
+                  pageNumber: 1
+                  itemsPerPage: 10
+                  filters: []
+                  sort:
+                    fieldSource: property
+                    fieldIdentifier: CKI_NAME
+                    direction: asc
+                  columns:
+                  - fieldSource: property
+                    fieldIdentifier: CKI_NAME
+                  - fieldSource: property
+                    fieldIdentifier: CKI_STATE
+                  - fieldSource: custom
+                    fieldIdentifier: businessUnit|STRING
         required: true
       responses:
         "200":
@@ -14086,12 +14190,38 @@ paths:
       tags:
       - Discovery Management
       summary: List Discovery
+      description: |-
+        Ordering and columns address a field by its source together with its identifier, because an identifier is unique only within its source. Both halves, and which fields may be shown or ordered on, come from the searchable-fields operation of this resource.
+
+        `sort` orders the whole result set before it is paged, so paging walks the sorted set rather than sorting one page at a time; only fields the catalogue marks `sortable` may be used. `columns` names the fields the caller means to display, and only fields the catalogue marks `displayable` may be named. It does not narrow the response: every listing object comes back whole, and naming a property field asks for nothing extra because the object already carries it. Naming an attribute-sourced field is what has an effect, described below.
+
+        A request that carries neither `sort` nor `columns` is answered exactly as it was before the two fields existed: the endpoint's own default ordering, the full default shape of every object, and no `attributeValues` member. A caller written against the previous contract therefore needs no change.
+
+        Requesting attribute-sourced columns adds an `attributeValues` member to each returned object, keyed by field source and then by field identifier. A field the object holds no value for is absent rather than empty, and a multi-valued attribute arrives in its stored `item_order`.
       operationId: listDiscoveries
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/SearchRequestDto"
+            examples:
+              With ordering and columns:
+                description: With ordering and columns
+                value:
+                  pageNumber: 1
+                  itemsPerPage: 10
+                  filters: []
+                  sort:
+                    fieldSource: property
+                    fieldIdentifier: DISCOVERY_START_TIME
+                    direction: desc
+                  columns:
+                  - fieldSource: property
+                    fieldIdentifier: DISCOVERY_NAME
+                  - fieldSource: property
+                    fieldIdentifier: DISCOVERY_STATUS
+                  - fieldSource: property
+                    fieldIdentifier: DISCOVERY_KIND
         required: true
       responses:
         "200":
@@ -14323,6 +14453,10 @@ paths:
       tags:
       - Connector Management
       summary: List Connectors by Function Group and Kind
+      description: |-
+        Returns every Connector matching the supplied function group, kind and status, unpaged.
+
+        Those three query parameters are the only narrowing this listing offers, and it takes neither ordering nor column selection. The Connector listing that accepts request filters, ordering and columns is `POST /v2/connectors/list`.
       operationId: listConnectors
       parameters:
       - name: functionGroup
@@ -15598,12 +15732,38 @@ paths:
       tags:
       - Certificate Inventory
       summary: List Certificates
+      description: |-
+        Ordering and columns address a field by its source together with its identifier, because an identifier is unique only within its source. Both halves, and which fields may be shown or ordered on, come from the searchable-fields operation of this resource.
+
+        `sort` orders the whole result set before it is paged, so paging walks the sorted set rather than sorting one page at a time; only fields the catalogue marks `sortable` may be used. `columns` names the fields the caller means to display, and only fields the catalogue marks `displayable` may be named. It does not narrow the response: every listing object comes back whole, and naming a property field asks for nothing extra because the object already carries it. Naming an attribute-sourced field is what has an effect, described below.
+
+        A request that carries neither `sort` nor `columns` is answered exactly as it was before the two fields existed: the endpoint's own default ordering, the full default shape of every object, and no `attributeValues` member. A caller written against the previous contract therefore needs no change.
+
+        Requesting attribute-sourced columns adds an `attributeValues` member to each returned object, keyed by field source and then by field identifier. A field the object holds no value for is absent rather than empty, and a multi-valued attribute arrives in its stored `item_order`.
       operationId: listCertificates
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/CertificateSearchRequestDto"
+            examples:
+              With ordering and columns:
+                description: With ordering and columns
+                value:
+                  pageNumber: 1
+                  itemsPerPage: 10
+                  filters: []
+                  sort:
+                    fieldSource: property
+                    fieldIdentifier: NOT_AFTER
+                    direction: asc
+                  columns:
+                  - fieldSource: property
+                    fieldIdentifier: COMMON_NAME
+                  - fieldSource: property
+                    fieldIdentifier: NOT_AFTER
+                  - fieldSource: custom
+                    fieldIdentifier: businessUnit|STRING
         required: true
       responses:
         "200":
@@ -15973,12 +16133,38 @@ paths:
       tags:
       - CBOM management
       summary: List CBOMs
+      description: |-
+        Ordering and columns address a field by its source together with its identifier, because an identifier is unique only within its source. Both halves, and which fields may be shown or ordered on, come from the searchable-fields operation of this resource.
+
+        `sort` orders the whole result set before it is paged, so paging walks the sorted set rather than sorting one page at a time; only fields the catalogue marks `sortable` may be used. `columns` names the fields the caller means to display, and only fields the catalogue marks `displayable` may be named. It does not narrow the response: every listing object comes back whole, and naming a property field asks for nothing extra because the object already carries it. Naming an attribute-sourced field is what has an effect, described below.
+
+        A request that carries neither `sort` nor `columns` is answered exactly as it was before the two fields existed: the endpoint's own default ordering, the full default shape of every object, and no `attributeValues` member. A caller written against the previous contract therefore needs no change.
+
+        Requesting attribute-sourced columns adds an `attributeValues` member to each returned object, keyed by field source and then by field identifier. A field the object holds no value for is absent rather than empty, and a multi-valued attribute arrives in its stored `item_order`.
       operationId: listCboms
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/SearchRequestDto"
+            examples:
+              With ordering and columns:
+                description: With ordering and columns
+                value:
+                  pageNumber: 1
+                  itemsPerPage: 10
+                  filters: []
+                  sort:
+                    fieldSource: property
+                    fieldIdentifier: CBOM_TIMESTAMP
+                    direction: desc
+                  columns:
+                  - fieldSource: property
+                    fieldIdentifier: CBOM_SERIAL_NUMBER
+                  - fieldSource: property
+                    fieldIdentifier: CBOM_VERSION
+                  - fieldSource: property
+                    fieldIdentifier: CBOM_TIMESTAMP
         required: true
       responses:
         "200":
@@ -23943,6 +24129,10 @@ paths:
       tags:
       - Connector Management v2
       summary: Get Connectors searchable fields information
+      description: |-
+        Besides the conditions a field may be filtered with, each field reports whether it can serve as a configurable column of the listing: `displayable` marks the fields that may be named in `columns`, and `sortable` those the listing may be ordered by. A field that reports neither flag is filter-only, so an absent flag is to be read as `false` rather than as unknown.
+
+        Both flags are answered per field, and that answer is authoritative for attribute-sourced fields as much as for property ones: whether a given attribute may be ordered on depends on the resource and is reported here rather than assumed. A field that may be shown but not ordered on reports `displayable` without `sortable`.
       operationId: getConnectorSearchableFields
       responses:
         "200":
@@ -25653,6 +25843,10 @@ paths:
       tags:
       - Signing Record Management
       summary: List search filters for Signing Records
+      description: |-
+        Besides the conditions a field may be filtered with, each field reports whether it can serve as a configurable column of the listing: `displayable` marks the fields that may be named in `columns`, and `sortable` those the listing may be ordered by. A field that reports neither flag is filter-only, so an absent flag is to be read as `false` rather than as unknown.
+
+        Both flags are answered per field, and that answer is authoritative for attribute-sourced fields as much as for property ones: whether a given attribute may be ordered on depends on the resource and is reported here rather than assumed. A field that may be shown but not ordered on reports `displayable` without `sortable`.
       operationId: listSigningRecordSearchableFields
       responses:
         "200":
@@ -26108,6 +26302,10 @@ paths:
       tags:
       - Secret Management
       summary: List search filters for secrets
+      description: |-
+        Besides the conditions a field may be filtered with, each field reports whether it can serve as a configurable column of the listing: `displayable` marks the fields that may be named in `columns`, and `sortable` those the listing may be ordered by. A field that reports neither flag is filter-only, so an absent flag is to be read as `false` rather than as unknown.
+
+        Both flags are answered per field, and that answer is authoritative for attribute-sourced fields as much as for property ones: whether a given attribute may be ordered on depends on the resource and is reported here rather than assumed. A field that may be shown but not ordered on reports `displayable` without `sortable`.
       operationId: getSecretSearchableFields
       responses:
         "200":
@@ -27170,6 +27368,10 @@ paths:
       tags:
       - Cryptographic Key Management
       summary: Get CryptographicKey searchable fields information
+      description: |-
+        Besides the conditions a field may be filtered with, each field reports whether it can serve as a configurable column of the listing: `displayable` marks the fields that may be named in `columns`, and `sortable` those the listing may be ordered by. A field that reports neither flag is filter-only, so an absent flag is to be read as `false` rather than as unknown.
+
+        Both flags are answered per field, and that answer is authoritative for attribute-sourced fields as much as for property ones: whether a given attribute may be ordered on depends on the resource and is reported here rather than assumed. A field that may be shown but not ordered on reports `displayable` without `sortable`.
       operationId: getCryptographicKeySearchableFields
       responses:
         "200":
@@ -28111,6 +28313,10 @@ paths:
       tags:
       - Discovery Management
       summary: Get Discovery searchable fields information
+      description: |-
+        Besides the conditions a field may be filtered with, each field reports whether it can serve as a configurable column of the listing: `displayable` marks the fields that may be named in `columns`, and `sortable` those the listing may be ordered by. A field that reports neither flag is filter-only, so an absent flag is to be read as `false` rather than as unknown.
+
+        Both flags are answered per field, and that answer is authoritative for attribute-sourced fields as much as for property ones: whether a given attribute may be ordered on depends on the resource and is reported here rather than assumed. A field that may be shown but not ordered on reports `displayable` without `sortable`.
       operationId: getDiscoverySearchableFields
       responses:
         "200":
@@ -29343,6 +29549,10 @@ paths:
       tags:
       - Certificate Inventory
       summary: Get Certificate searchable fields information
+      description: |-
+        Besides the conditions a field may be filtered with, each field reports whether it can serve as a configurable column of the listing: `displayable` marks the fields that may be named in `columns`, and `sortable` those the listing may be ordered by. A field that reports neither flag is filter-only, so an absent flag is to be read as `false` rather than as unknown.
+
+        Both flags are answered per field, and that answer is authoritative for attribute-sourced fields as much as for property ones: whether a given attribute may be ordered on depends on the resource and is reported here rather than assumed. A field that may be shown but not ordered on reports `displayable` without `sortable`.
       operationId: getCertificateSearchableFields
       responses:
         "200":
@@ -29579,6 +29789,10 @@ paths:
       tags:
       - CBOM management
       summary: Get Cbom searchable fields information
+      description: |-
+        Besides the conditions a field may be filtered with, each field reports whether it can serve as a configurable column of the listing: `displayable` marks the fields that may be named in `columns`, and `sortable` those the listing may be ordered by. A field that reports neither flag is filter-only, so an absent flag is to be read as `false` rather than as unknown.
+
+        Both flags are answered per field, and that answer is authoritative for attribute-sourced fields as much as for property ones: whether a given attribute may be ordered on depends on the resource and is reported here rather than assumed. A field that may be shown but not ordered on reports `displayable` without `sortable`.
       operationId: getCbomSearchableFields
       responses:
         "200":
@@ -33267,7 +33481,21 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
+          example:
+            custom:
+              businessUnit|STRING:
+              - contentType: string
+                reference: Payments
+                data: payments
+              environment|STRING:
+              - contentType: string
+                reference: Production
+                data: production
+              - contentType: string
+                reference: Disaster recovery
+                data: disaster-recovery
         authType:
           $ref: "#/components/schemas/AuthType"
           description: Type of authentication for the Connector
@@ -37490,7 +37718,21 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
+          example:
+            custom:
+              businessUnit|STRING:
+              - contentType: string
+                reference: Payments
+                data: payments
+              environment|STRING:
+              - contentType: string
+                reference: Production
+                data: production
+              - contentType: string
+                reference: Disaster recovery
+                data: disaster-recovery
         syncVaultProfiles:
           type: array
           description: List of vault profiles where the secret is stored
@@ -37827,7 +38069,21 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
+          example:
+            custom:
+              businessUnit|STRING:
+              - contentType: string
+                reference: Payments
+                data: payments
+              environment|STRING:
+              - contentType: string
+                reference: Production
+                data: production
+              - contentType: string
+                reference: Disaster recovery
+                data: disaster-recovery
       required:
       - certificateType
       - commonName
@@ -38431,7 +38687,9 @@ components:
         fieldIdentifier:
           type: string
           description: "Field identifier of the column, resolved against the resource's\
-            \ field catalogue when the view is read"
+            \ field catalogue when the view is read. Available fields with their identifiers\
+            \ can be retrieved from the resource's searchable-fields operation, for\
+            \ example `GET /v1/certificates/search` or `GET /v2/connectors/search`."
           minLength: 1
         label:
           type: string
@@ -38488,8 +38746,8 @@ components:
         fieldIdentifier:
           type: string
           description: "Field identifier of search filter. List of available fields\
-            \ with their identifiers can be retrieved from corresponding endpoint\
-            \ `GET /v1/{resource}/search`, e.g.: [**GET /v1/certificates/search**](../core-certificate/#tag/Certificate-Inventory/operation/getSearchableFieldInformation)"
+            \ with their identifiers can be retrieved from the resource's searchable-fields\
+            \ operation, e.g.: [**GET /v1/certificates/search**](../core-certificate/#tag/Certificate-Inventory/operation/getSearchableFieldInformation)"
           minLength: 1
         condition:
           $ref: "#/components/schemas/FilterConditionOperator"
@@ -38509,9 +38767,9 @@ components:
         fieldIdentifier:
           type: string
           description: "Field identifier of the field to sort by. Available fields\
-            \ with their identifiers can be retrieved from the corresponding endpoint\
-            \ `GET /v1/{resource}/search`; only fields marked as sortable may be sorted\
-            \ by."
+            \ with their identifiers can be retrieved from the resource's searchable-fields\
+            \ operation, for example `GET /v1/certificates/search` or `GET /v2/connectors/search`;\
+            \ only fields marked as sortable may be sorted by."
           minLength: 1
         direction:
           $ref: "#/components/schemas/SortDirection"
@@ -40452,7 +40710,21 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
+          example:
+            custom:
+              businessUnit|STRING:
+              - contentType: string
+                reference: Payments
+                data: payments
+              environment|STRING:
+              - contentType: string
+                reference: Production
+                data: production
+              - contentType: string
+                reference: Disaster recovery
+                data: disaster-recovery
         extendedKeyUsage:
           type: array
           description: Extended key usages
@@ -40903,7 +41175,21 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
+          example:
+            custom:
+              businessUnit|STRING:
+              - contentType: string
+                reference: Payments
+                data: payments
+              environment|STRING:
+              - contentType: string
+                reference: Production
+                data: production
+              - contentType: string
+                reference: Disaster recovery
+                data: disaster-recovery
       required:
       - associations
       - complianceStatus
@@ -41295,7 +41581,8 @@ components:
         fieldIdentifier:
           type: string
           description: "Field identifier of the column. Available fields with their\
-            \ identifiers can be retrieved from the corresponding endpoint `GET /v1/{resource}/search`;\
+            \ identifiers can be retrieved from the resource's searchable-fields operation,\
+            \ for example `GET /v1/certificates/search` or `GET /v2/connectors/search`;\
             \ only fields marked as displayable may be requested as a column."
           minLength: 1
       required:
@@ -41384,7 +41671,21 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
+          example:
+            custom:
+              businessUnit|STRING:
+              - contentType: string
+                reference: Payments
+                data: payments
+              environment|STRING:
+              - contentType: string
+                reference: Production
+                data: production
+              - contentType: string
+                reference: Disaster recovery
+                data: disaster-recovery
       required:
       - functionGroups
       - interfaces
@@ -42384,7 +42685,8 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
       required:
       - createdAt
       - name
@@ -42507,7 +42809,21 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
+          example:
+            custom:
+              businessUnit|STRING:
+              - contentType: string
+                reference: Payments
+                data: payments
+              environment|STRING:
+              - contentType: string
+                reference: Production
+                data: production
+              - contentType: string
+                reference: Disaster recovery
+                data: disaster-recovery
       required:
       - complianceStatus
       - enabled
@@ -43403,7 +43719,21 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
+          example:
+            custom:
+              businessUnit|STRING:
+              - contentType: string
+                reference: Payments
+                data: payments
+              environment|STRING:
+              - contentType: string
+                reference: Production
+                data: production
+              - contentType: string
+                reference: Disaster recovery
+                data: disaster-recovery
       required:
       - connectorName
       - connectorUuid
@@ -44123,7 +44453,8 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
       required:
       - algorithms
       - certificates
@@ -48342,7 +48673,8 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
         content:
           type: object
           additionalProperties: {}

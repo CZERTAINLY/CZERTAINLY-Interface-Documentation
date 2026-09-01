@@ -3486,7 +3486,8 @@ components:
         fieldIdentifier:
           type: string
           description: "Field identifier of the column. Available fields with their\
-            \ identifiers can be retrieved from the corresponding endpoint `GET /v1/{resource}/search`;\
+            \ identifiers can be retrieved from the resource's searchable-fields operation,\
+            \ for example `GET /v1/certificates/search` or `GET /v2/connectors/search`;\
             \ only fields marked as displayable may be requested as a column."
           minLength: 1
       required:
@@ -3501,8 +3502,8 @@ components:
         fieldIdentifier:
           type: string
           description: "Field identifier of search filter. List of available fields\
-            \ with their identifiers can be retrieved from corresponding endpoint\
-            \ `GET /v1/{resource}/search`, e.g.: [**GET /v1/certificates/search**](../core-certificate/#tag/Certificate-Inventory/operation/getSearchableFieldInformation)"
+            \ with their identifiers can be retrieved from the resource's searchable-fields\
+            \ operation, e.g.: [**GET /v1/certificates/search**](../core-certificate/#tag/Certificate-Inventory/operation/getSearchableFieldInformation)"
           minLength: 1
         condition:
           $ref: "#/components/schemas/FilterConditionOperator"
@@ -3553,9 +3554,9 @@ components:
         fieldIdentifier:
           type: string
           description: "Field identifier of the field to sort by. Available fields\
-            \ with their identifiers can be retrieved from the corresponding endpoint\
-            \ `GET /v1/{resource}/search`; only fields marked as sortable may be sorted\
-            \ by."
+            \ with their identifiers can be retrieved from the resource's searchable-fields\
+            \ operation, for example `GET /v1/certificates/search` or `GET /v2/connectors/search`;\
+            \ only fields marked as sortable may be sorted by."
           minLength: 1
         direction:
           $ref: "#/components/schemas/SortDirection"
@@ -3697,7 +3698,8 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
       required:
       - createdAt
       - name
@@ -3893,7 +3895,21 @@ components:
           description: "Values of the attribute-sourced fields requested as columns,\
             \ keyed by field source and then by field identifier. Present only when\
             \ the listing request asked for attribute-sourced columns; a field the\
-            \ object has no value for is absent rather than empty."
+            \ object has no value for is absent rather than empty, and a multi-valued\
+            \ attribute arrives in its stored item_order."
+          example:
+            custom:
+              businessUnit|STRING:
+              - contentType: string
+                reference: Payments
+                data: payments
+              environment|STRING:
+              - contentType: string
+                reference: Production
+                data: production
+              - contentType: string
+                reference: Disaster recovery
+                data: disaster-recovery
       required:
       - certificateType
       - commonName
